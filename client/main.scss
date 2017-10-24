@@ -1,0 +1,44 @@
+body {
+  padding-top: 50px;
+}
+
+.app-header {
+  height: 50px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.2);
+
+  img {
+    height: 80%;
+    margin-top: 5px;
+    margin-left: 5px;
+  }
+
+  .fa {
+    float: right;
+    font-size: 34px;
+    margin-right: 20px;
+    margin-top: 7px;
+  }
+}
+
+.app-main {
+  margin-top: 20px;
+}
+
+.txhistory {
+  margin: 10px;
+
+  .txlist-transaction {
+    box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+    overflow-x: hidden;
+
+    .label {
+      font-size: 14px;
+      padding: 3px;
+    }
+  }
+}

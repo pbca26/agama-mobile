@@ -24,3 +24,5 @@ http@1.2.12
 
 npm-container
 dynamic-import
+fourseven:scss
+fortawesome:fontawesome

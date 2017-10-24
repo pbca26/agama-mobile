@@ -5,8 +5,12 @@ import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 
 import './main.html';
-import appReducer from '../imports/ui/reducers'; // need to create
-import App from '../imports/ui/App'; // need to create
+
+import './assets/global/css/bootstrap.min.css';
+import './main.scss';
+
+import appReducer from '../imports/ui/reducers';
+import App from '../imports/ui/App';
 
 const store = createStore(appReducer, applyMiddleware(thunk));
 
