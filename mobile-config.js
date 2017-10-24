@@ -1,7 +1,7 @@
 // This section sets up some basic app metadata, the entire section is optional.
 App.info({
   id: 'com.supernet.agama',
-  name: 'agama-app',
+  name: 'Agama',
   description: 'Agama Wallet Mobile',
   author: 'SuperNET',
   email: 'dev@supernet.org',
@@ -14,9 +14,12 @@ App.icons({
   'iphone_3x': 'icons/128x128.png',
   'android_mdpi': 'icons/48x48.png',
   'android_hdpi': 'icons/64x64.png',
-  'android_xhdpi': 'icons/96x96.png'
+  'android_xhdpi': 'icons/96x96.png',
+  'android_xxhdpi': 'icons/128x128.png',
+  'android_xxxhdpi': 'icons/256x256.png',
 });
 
+App.accessRule('*');
 /*App.launchScreens({
   'iphone_2x': 'splash/Default@2x~iphone.png',
   'iphone5': 'splash/Default~iphone5.png',
