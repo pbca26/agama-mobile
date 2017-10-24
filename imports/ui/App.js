@@ -22,7 +22,7 @@ class App extends React.Component {
     this.updateInput = this.updateInput.bind(this);
   }
 
-  componentDidMount() {
+  /*componentDidMount() {
     const { actions } = this.props;
 
     actions.getKeys()
@@ -33,17 +33,7 @@ class App extends React.Component {
 
   componentWillReceiveProps(props) {
     console.warn('componentWillReceiveProps', props);
-  }
-
-  handleForm(e) {
-    e.preventDefault();
-    const { widgetActions } = this.props;
-    const name = this.refs.name.value;
-
-    this.props.widgetActions.createWidget({ name });
-
-    this.refs.name.value = '';
-  }
+  }*/
 
   getKeys() {
     const { actions } = this.props;

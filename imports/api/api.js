@@ -1,8 +1,9 @@
 const API = new Mongo.Collection('keys');
 
 import { Promise } from 'meteor/promise';
+// import { HTTP } from 'meteor/http';
 
-import sha256 from 'sha256';
+/*import sha256 from 'sha256';
 import CoinKey from 'coinkey';
 
 const electrumJSNetworks = require('./electrumNetworks.js');
@@ -35,7 +36,6 @@ function seedToWif(seed, iguana) {
     bytes[31] &= 127;
     bytes[31] |= 64;
   }
-
 
   const toHexString = (byteArray) => {
     return Array.from(byteArray, (byte) => {
@@ -116,6 +116,17 @@ Meteor.methods({
   },
   // 'widgets.fetch'() { return Widgets.find().fetch(); },
   // 'widgets.insert'(data) { return Widgets.insert(data); }
+})*/
+
+Meteor.methods({
+  'auth'(seed) {
+    return 'test';
+  },
+  'balance'(address) {
+    return new Promise((resolve, reject) => {
+      resolve({ msg: 'success', result: { confirmed: 1000000000 } })
+    });
+  },
 })
 
 export default API;
