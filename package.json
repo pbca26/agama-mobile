@@ -9,6 +9,7 @@
     "bitcoinjs-lib": "^3.2.1",
     "body-parser": "^1.17.1",
     "coinkey": "^2.0.0",
+    "coinselect": "github:bitcoinjs/coinselect",
     "cordova": "^7.1.0",
     "express": "^4.15.2",
     "meteor-node-stubs": "~0.2.4",

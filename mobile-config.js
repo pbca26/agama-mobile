@@ -1,6 +1,9 @@
 // This section sets up some basic app metadata, the entire section is optional.
+
 App.info({
   id: 'com.supernet.agama',
+  version: '0.0.2',
+  buildNumber: '777',
   name: 'Agama',
   description: 'Agama Wallet Mobile',
   author: 'SuperNET',
