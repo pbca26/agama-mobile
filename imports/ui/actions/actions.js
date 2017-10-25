@@ -481,7 +481,7 @@ const createtx = (outputAddress, changeAddress, value, defaultFee, push) => {
           if (network === 'komodo' &&
               totalInterest > 0) {
             // account for extra vout
-            const _feeOverhead = outputs.length === 1 ? shepherd.estimateTxSize(0, 1) * feeRate : 0;
+            const _feeOverhead = outputs.length === 1 ? estimateTxSize(0, 1) * feeRate : 0;
 
             console.log(`max interest to claim ${totalInterest} (${totalInterest * 0.00000001})`, true);
             console.log(`estimated fee overhead ${_feeOverhead}`, true);

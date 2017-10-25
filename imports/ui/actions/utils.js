@@ -53,3 +53,8 @@ export const secondsToString = (seconds, skipMultiply, showSeconds) => {
 
   return time;
 }
+
+const export estimateTxSize = (numVins, numOuts) => {
+  // in x 180 + out x 34 + 10 plus or minus in
+  return numVins * 180 + numOuts * 34 + 11;
+}
