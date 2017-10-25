@@ -430,7 +430,7 @@ class App extends React.Component {
             <div className="nav-menu-items">
               <div>Switch account</div>
               <div>Coins</div>
-              <div>Dashboard</div>
+              <div onClick={ this.toggleSend }>Dashboard</div>
               <div onClick={ this.toggleSend }>Send</div>
               <div>Logout</div>
             </div>
@@ -512,7 +512,7 @@ class App extends React.Component {
             onClick={ this.dashboardRefresh }
             className="fa fa-refresh dashboard-refresh"></i>
           { this.state.balance &&
-            <div style={{ margin: '10px 0', fontSize: '16px', marginTop: '20px', marginBottom: '20px' }}>
+            <div style={{ margin: '10px 0', fontSize: '16px', margin: '20px' }}>
               <div>
                 <strong>Balance: </strong> <span>{ this.state.balance.balance } KMD</span>
               </div>
