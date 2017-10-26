@@ -35,6 +35,9 @@ sign apk with your key
 ## How to debug with hot code push
 enable dev mode on your android device
 
+connect your device via a usb cable to your machine
+connect your device to the same wifi network as your machine
+
 meteor run android-device
 
 refer to meteor docs https://guide.meteor.com
