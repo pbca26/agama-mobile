@@ -119,32 +119,32 @@ class App extends React.Component {
         category === 'sent') {
       return (
         <span className="label label-danger">
-          <i className="icon fa-arrow-circle-left"></i> <span>out</span>
+          <i className="fa fa-arrow-circle-left"></i> <span>out</span>
         </span>
       );
     } else if (category === 'receive' ||
         category === 'received') {
       return (
         <span className="label label-success">
-          <i className="icon fa-arrow-circle-right"></i> <span>in &nbsp; &nbsp;</span>
+          <i className="fa fa-arrow-circle-right"></i> <span>in &nbsp; &nbsp;</span>
         </span>
       );
     } else if (category === 'generate') {
       return (
         <span>
-          <i className="icon fa-cogs"></i> <span>mine</span>
+          <i className="fa fa-cogs"></i> <span>mine</span>
         </span>
       );
     } else if (category === 'immature') {
       return (
         <span>
-          <i className="icon fa-clock-o"></i> <span>immature</span>
+          <i className="fa fa-clock-o"></i> <span>immature</span>
         </span>
       );
     } else if (category === 'unknown') {
       return (
         <span>
-          <i className="icon fa-meh-o"></i> <span>unknown</span>
+          <i className="fa fa-meh-o"></i> <span>unknown</span>
         </span>
       );
     }

@@ -7,7 +7,10 @@ import CoinKey from 'coinkey';
 import bitcoin from 'bitcoinjs-lib';
 import coinSelect from 'coinselect';
 
-import { kmdCalcInterest } from './utils';
+import {
+  kmdCalcInterest,
+  estimateTxSize
+} from './utils';
 
 const electrumJSNetworks = require('../../api/electrumNetworks.js');
 const electrumJSTxDecoder = require('../../api/electrumTxDecoder.js');
@@ -302,7 +305,7 @@ const buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, s
 
   console.log('buildSignedTx');
   console.log(`buildSignedTx priv key ${wif}`);
-  console.log(`buildSignedTx pub key ${key.getAddress().toString()}`, true);
+  console.log(`buildSignedTx pub key ${key.getAddress().toString()}`);
 
   for (let i = 0; i < utxo.length; i++) {
     tx.addInput(utxo[i].txid, utxo[i].vout);
@@ -318,15 +321,15 @@ const buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, s
       network === 'KMD') {
     const _locktime = Math.floor(Date.now() / 1000) - 777;
     tx.setLockTime(_locktime);
-    console.log(`kmd tx locktime set to ${_locktime}`, true);
+    console.log(`kmd tx locktime set to ${_locktime}`);
   }
 
-  console.log('buildSignedTx unsigned tx data vin', true);
-  console.log(tx.tx.ins, true);
-  console.log('buildSignedTx unsigned tx data vout', true);
-  console.log(tx.tx.outs, true);
-  console.log('buildSignedTx unsigned tx data', true);
-  console.log(tx, true);
+  console.log('buildSignedTx unsigned tx data vin');
+  console.log(tx.tx.ins);
+  console.log('buildSignedTx unsigned tx data vout');
+  console.log(tx.tx.outs);
+  console.log('buildSignedTx unsigned tx data');
+  console.log(tx);
 
   for (let i = 0; i < utxo.length; i++) {
     tx.sign(i, key);
@@ -334,8 +337,8 @@ const buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, s
 
   const rawtx = tx.build().toHex();
 
-  console.log('buildSignedTx signed tx hex', true);
-  console.log(rawtx, true);
+  console.log('buildSignedTx signed tx hex');
+  console.log(rawtx);
 
   return rawtx;
 }
@@ -490,8 +493,7 @@ const createtx = (outputAddress, changeAddress, value, defaultFee, push) => {
             _change = _change + (totalInterest - _feeOverhead);
           }
 
-          if (!inputs &&
-              !outputs) {
+          if (!inputs && !outputs) {
             const successObj = {
               msg: 'error',
               result: 'Can\'t find best fit utxo. Try lower amount.',
