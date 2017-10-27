@@ -6,11 +6,6 @@ export const kmdCalcInterest = (locktime, value) => { // value in sats
   let timestampDiffMinutes = timestampDiff / 60;
   let interest = 0;
 
-  console.log('kmdCalcInterest', true);
-  console.log(`locktime ${locktime}`, true);
-  console.log(`minutes converted ${timestampDiffMinutes}`, true);
-  console.log(`passed ${hoursPassed}h ${minutesPassed}m ${secondsPassed}s`, true);
-
   // calc interest
   if (timestampDiffMinutes >= 60) {
     if (timestampDiffMinutes > 365 * 24 * 60) {
@@ -18,10 +13,7 @@ export const kmdCalcInterest = (locktime, value) => { // value in sats
     }
     timestampDiffMinutes -= 59;
 
-    console.log(`minutes if statement ${timestampDiffMinutes}`, true);
-
     interest = ((Number(value) * 0.00000001) / 10512000) * timestampDiffMinutes;
-    console.log(`interest ${interest}`, true);
   }
 
   return interest;
@@ -57,4 +49,51 @@ export const secondsToString = (seconds, skipMultiply, showSeconds) => {
 export const estimateTxSize = (numVins, numOuts) => {
   // in x 180 + out x 34 + 10 plus or minus in
   return numVins * 180 + numOuts * 34 + 11;
+}
+
+export function sortBy(data, sortKey) {
+  return data.sort(function(a, b) {
+    if (a[sortKey] < b[sortKey]) {
+      return -1;
+    }
+
+    if (a[sortKey] > b[sortKey]) {
+      return 1;
+    }
+
+    return 0;
+  });
+}
+
+export function isNumber(value) {
+  return !isNaN(parseFloat(value)) && isFinite(value);
+}
+
+export function isPositiveNumber(value) {
+  return isNumber(value) && (+value) > 0;
+}
+
+// display rounding
+export function formatValue(formatValue) {
+  const _valueToStr = formatValue.toString();
+
+  if (_valueToStr.indexOf('.') === -1) {
+    return formatValue;
+  } else {
+    if (_valueToStr) {
+      const _decimal = _valueToStr.substr(_valueToStr.indexOf('.') + 1, _valueToStr.length);
+      let newVal = _valueToStr.substr(0, _valueToStr.indexOf('.') + 1);
+
+      for (let i = 0; i < _decimal.length; i++) {
+        if (_decimal[i] === '0') {
+          newVal = newVal + _decimal[i];
+        } else {
+          newVal = newVal + _decimal[i];
+          break;
+        }
+      }
+
+      return newVal;
+    }
+  }
 }

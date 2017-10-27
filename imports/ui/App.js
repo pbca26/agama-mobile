@@ -26,6 +26,7 @@ class App extends React.Component {
       sendTo: 'RDbGxL8QYdEp8sMULaVZS2E6XThcTKT9Jd',
       sendCurrentStep: 0,
       sendResult: null,
+      saveSeed: null,
     };
     this.login = this.login.bind(this);
     this.getKeys = this.getKeys.bind(this);
@@ -36,6 +37,7 @@ class App extends React.Component {
     this.changeSendCoinStep = this.changeSendCoinStep.bind(this);
     this.toggleSend = this.toggleSend.bind(this);
     this.dashboardRefresh = this.dashboardRefresh.bind(this);
+    this.saveSeed = this.saveSeed.bind(this);
   }
 
   componentDidMount() {
@@ -94,6 +96,18 @@ class App extends React.Component {
         address: res.res,
       });
       console.warn(res);
+    });
+  }
+
+  saveSeed() {
+    const { actions } = this.props;
+
+    actions.saveToFile()
+    .then((res) => {
+      this.setState({
+        saveSeed: res,
+      });
+      console.warn('saveToFile', res);
     });
   }
 
@@ -502,6 +516,16 @@ class App extends React.Component {
             Login
             </span>
           </button>
+
+          <button
+            className="btn btn-lg btn-primary btn-block ladda-button"
+            onClick={ this.saveSeed }>
+            <span className="ladda-label">
+            Save seed
+            </span>
+          </button>
+          <div>{ this.state.saveSeed }</div>
+
           <input
             type="text"
             className="form-control margin-top-20 margin-bottom-20"

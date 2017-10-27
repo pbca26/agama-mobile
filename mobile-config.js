@@ -1,8 +1,6 @@
-// This section sets up some basic app metadata, the entire section is optional.
-
 App.info({
   id: 'com.supernet.agama',
-  version: '0.0.2',
+  version: '0.0.3',
   buildNumber: '777',
   name: 'Agama',
   description: 'Agama Wallet Mobile',
@@ -31,6 +29,7 @@ App.launchScreens({
 });
 
 App.accessRule('*');
+
 /*App.launchScreens({
   'iphone_2x': 'splash/Default@2x~iphone.png',
   'iphone5': 'splash/Default~iphone5.png',

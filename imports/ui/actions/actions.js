@@ -1,9 +1,7 @@
-// import API from '../../api/api';
+const StorageKey = new Mongo.Collection(null);
+const StorageSettings = new Mongo.Collection(null);
 
 import { Promise } from 'meteor/promise';
-
-import sha256 from 'sha256';
-import CoinKey from 'coinkey';
 import bitcoin from 'bitcoinjs-lib';
 import coinSelect from 'coinselect';
 
@@ -12,65 +10,28 @@ import {
   estimateTxSize
 } from './utils';
 
-const electrumJSNetworks = require('../../api/electrumNetworks.js');
-const electrumJSTxDecoder = require('../../api/electrumTxDecoder.js');
+const electrumJSNetworks = require('./electrumNetworks.js');
+const electrumJSTxDecoder = require('./electrumTxDecoder.js');
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
-function seedToWif(seed, iguana) {
-  const bytes = sha256(seed, { asBytes: true });
-
-  if (iguana) {
-    bytes[0] &= 248;
-    bytes[31] &= 127;
-    bytes[31] |= 64;
-  }
-
-  const toHexString = (byteArray) => {
-    return Array.from(byteArray, (byte) => {
-      return ('0' + (byte & 0xFF).toString(16)).slice(-2);
-    }).join('');
-  }
-
-  const hex = toHexString(bytes);
-
-  const _wif = electrumJSNetworks.komodo.wif;
-  const _pkh = electrumJSNetworks.komodo.pubKeyHash;
-
-  const key = new CoinKey(new Buffer(hex, 'hex'), {
-    private: _wif,
-    public: _pkh,
-  });
-
-  key.compressed = true;
-
-  // shepherd.log(`seedtowif priv key ${key.privateWif}`, true);
-  // shepherd.log(`seedtowif pub key ${key.publicAddress}`, true);
-
-  return {
-    priv: key.privateWif,
-    pub: key.publicAddress,
-  };
-}
+import { seedToWif } from './seedToWif';
+import { proxyServer } from './proxyServers';
+import { electrumServers } from './electrumServers';
 
 let electrumKeys = {};
-let proxyServer = {
-  ip: '46.20.235.46',
-  port: 9999,
-};
-let electrumServer = {
-  komodo: { // !estimatefee
-    ip: '173.212.225.176',
-    port: 50011,
-    proto: 'tcp',
-    txfee: 10000,
-    abbr: 'KMD',
-    serverList: [
-      '173.212.225.176:50011',
-      '136.243.45.140:50011'
-    ],
-  },
-};
+
+let _key = StorageKey.findOne(0);
+console.warn(_key);
+const _newKey = StorageKey.insert({
+  key: '123'
+});
+
+console.log(StorageKey);
+
+_key = StorageKey.findOne(0);
+console.warn(_key);
+
 
 const parseTransactionAddresses = (tx, targetAddress, network) => {
   // TODO: - sum vins / sum vouts to the same address
@@ -191,7 +152,7 @@ const parseTransactionAddresses = (tx, targetAddress, network) => {
 
 const getKMDBalance = (address, json) => {
   return new Promise((resolve, reject) => {
-    HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent?port=${electrumServer.komodo.port}&ip=${electrumServer.komodo.ip}&address=${address}`, {
+    HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent?port=${electrumServers.komodo.port}&ip=${electrumServers.komodo.ip}&address=${address}`, {
       params: {}
     }, (error, result) => {
       result = JSON.parse(result.content);
@@ -223,7 +184,7 @@ const getKMDBalance = (address, json) => {
 
             Promise.all(_utxo.map((_utxoItem, index) => {
               return new Promise((resolve, reject) => {
-                HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction?port=${electrumServer.komodo.port}&ip=${electrumServer.komodo.ip}&address=${address}&txid=${_utxoItem['tx_hash']}`, {
+                HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction?port=${electrumServers.komodo.port}&ip=${electrumServers.komodo.ip}&address=${address}&txid=${_utxoItem['tx_hash']}`, {
                   params: {}
                 }, (error, result) => {
                   // console.log('gettransaction =>');
@@ -548,8 +509,8 @@ const createtx = (outputAddress, changeAddress, value, defaultFee, push) => {
                 },
                 data: {
                   rawtx: _rawtx,
-                  port: electrumServer.komodo.port,
-                  ip: electrumServer.komodo.ip,
+                  port: electrumServers.komodo.port,
+                  ip: electrumServers.komodo.ip,
                 },
               }, (error, result) => {
                 result = JSON.parse(result.content);
@@ -687,7 +648,7 @@ const listunspent = (address, network, full, verify) => {
 
   if (full) {
     return new Promise((resolve, reject) => {
-      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent?port=${electrumServer.komodo.port}&ip=${electrumServer.komodo.ip}&address=${address}`, {
+      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent?port=${electrumServers.komodo.port}&ip=${electrumServers.komodo.ip}&address=${address}`, {
         params: {}
       }, (error, result) => {
         result = JSON.parse(result.content);
@@ -703,7 +664,7 @@ const listunspent = (address, network, full, verify) => {
             let _utxo = [];
 
             // get current height
-            HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getcurrentblock?port=${electrumServer.komodo.port}&ip=${electrumServer.komodo.ip}`, {
+            HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getcurrentblock?port=${electrumServers.komodo.port}&ip=${electrumServers.komodo.ip}`, {
               params: {}
             }, (error, result) => {
               result = JSON.parse(result.content);
@@ -727,7 +688,7 @@ const listunspent = (address, network, full, verify) => {
                   } else {
                     Promise.all(_utxo.map((_utxoItem, index) => {
                       return new Promise((resolve, reject) => {
-                        HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction?port=${electrumServer.komodo.port}&ip=${electrumServer.komodo.ip}&address=${address}&txid=${_utxoItem['tx_hash']}`, {
+                        HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction?port=${electrumServers.komodo.port}&ip=${electrumServers.komodo.ip}&address=${address}&txid=${_utxoItem['tx_hash']}`, {
                           params: {}
                         }, (error, result) => {
                           result = JSON.parse(result.content);
@@ -846,7 +807,7 @@ const listunspent = (address, network, full, verify) => {
     });
   } else {
     return new Promise((resolve, reject) => {
-      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent?port=${electrumServer.komodo.port}&ip=${electrumServer.komodo.ip}&address=${address}`, {
+      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent?port=${electrumServers.komodo.port}&ip=${electrumServers.komodo.ip}&address=${address}`, {
         params: {}
       }, (error, result) => {
         result = JSON.parse(result.content);
@@ -876,7 +837,7 @@ function transactions(address) {
   return async function(dispatch) {
     return new Promise((resolve, reject) => {
       // get current height
-      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getcurrentblock?port=${electrumServer.komodo.port}&ip=${electrumServer.komodo.ip}`, {
+      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getcurrentblock?port=${electrumServers.komodo.port}&ip=${electrumServers.komodo.ip}`, {
         params: {}
       }, (error, result) => {
         result = JSON.parse(result.content);
@@ -889,7 +850,7 @@ function transactions(address) {
           // console.log('currentHeight =>');
           // console.log(currentHeight);
 
-          HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listtransactions?port=${electrumServer.komodo.port}&ip=${electrumServer.komodo.ip}&address=${address}&raw=true`, {
+          HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listtransactions?port=${electrumServers.komodo.port}&ip=${electrumServers.komodo.ip}&address=${address}&raw=true`, {
             params: {}
           }, (error, result) => {
             result = JSON.parse(result.content);
@@ -906,7 +867,7 @@ function transactions(address) {
 
                 Promise.all(json.map((transaction, index) => {
                   return new Promise((resolve, reject) => {
-                    HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getblockinfo?port=${electrumServer.komodo.port}&ip=${electrumServer.komodo.ip}&address=${address}&height=${transaction.height}`, {
+                    HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getblockinfo?port=${electrumServers.komodo.port}&ip=${electrumServers.komodo.ip}&address=${address}&height=${transaction.height}`, {
                       params: {}
                     }, (error, result) => {
                       // console.log('getblock =>');
@@ -936,7 +897,7 @@ function transactions(address) {
                             return new Promise((_resolve, _reject) => {
                               if (_decodedInput.txid !== '0000000000000000000000000000000000000000000000000000000000000000') {
 
-                                HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction?port=${electrumServer.komodo.port}&ip=${electrumServer.komodo.ip}&address=${address}&txid=${_decodedInput.txid}`, {
+                                HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction?port=${electrumServers.komodo.port}&ip=${electrumServers.komodo.ip}&address=${address}&txid=${_decodedInput.txid}`, {
                                   params: {}
                                 }, (error, result) => {
                                   // console.log('gettransaction =>');
@@ -1059,15 +1020,13 @@ function transactions(address) {
 function balance(address) {
   return async function(dispatch) {
     return new Promise((resolve, reject) => {
-      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance?port=${electrumServer.komodo.port}&ip=${electrumServer.komodo.ip}&address=${address}`, {
+      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance?port=${electrumServers.komodo.port}&ip=${electrumServers.komodo.ip}&address=${address}`, {
         params: {}
       }, (error, result) => {
         getKMDBalance(address, JSON.parse(result.content).result)
         .then((res) => {
-          console.warn('getKMDBalance', res);
           resolve(res);
         });
-        // resolve(JSON.parse(result.content));
       });
     });
   }
@@ -1076,11 +1035,28 @@ function balance(address) {
 function auth(seed) {
   return async function(dispatch) {
     return new Promise((resolve, reject) => {
-      const _seedToWif = seedToWif(seed, true);
+      const _seedToWif = seedToWif(seed, true, 'komodo');
 
       electrumKeys = _seedToWif;
 
       resolve({ res: _seedToWif.pub });
+    });
+  }
+}
+
+function saveToFile() {
+  return async function(dispatch) {
+    return new Promise((resolve, reject) => {
+      Meteor.call('saveFile', 'abracadabra', 'key.txt', 'UTF-8', (error, result) => {
+        console.warn(error);
+        console.warn(result);
+        HTTP.call('GET', `key.txt`, {
+          params: {}
+        }, (error, result) => {
+          resolve(result.content);
+          console.warn(result);
+        });
+      });
     });
   }
 }
@@ -1101,5 +1077,6 @@ export default {
   getKeys,
   balance,
   transactions,
-  sendtx
+  sendtx,
+  saveToFile
 }
