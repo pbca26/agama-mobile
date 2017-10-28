@@ -1,4 +1,4 @@
-export function seedToWif(seed, iguana, network) {
+export const seedToWif = (seed, iguana, network) => {
   import sha256 from 'sha256';
   import CoinKey from 'coinkey';
   const electrumJSNetworks = require('./electrumNetworks.js');

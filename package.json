@@ -11,6 +11,7 @@
     "coinselect": "github:bitcoinjs/coinselect",
     "cordova": "^7.1.0",
     "meteor-node-stubs": "~0.2.4",
+    "nodejs-aes256": "^1.0.1",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-redux": "^5.0.3",
