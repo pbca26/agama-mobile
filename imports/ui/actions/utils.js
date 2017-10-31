@@ -97,3 +97,44 @@ export function formatValue(formatValue) {
     }
   }
 }
+
+export function maskPubAddress(pub) {
+  // keep 3 first and 3 last chars unmasked
+  let masked = '';
+
+  for (let i = 0; i < pub.length - 3 * 2; i++) {
+    masked = masked + '*';
+  }
+
+  return pub[0] + pub[1] + pub[2] + masked + pub[pub.length - 3] + pub[pub.length - 2] + pub[pub.length - 1];
+}
+
+export function isAssetChain(coin) {
+  coin = coin.toUpperCase();
+
+  if (coin === 'SUPERNET' ||
+      coin === 'REVS' ||
+      coin === 'SUPERNET' ||
+      coin === 'PANGEA' ||
+      coin === 'DEX' ||
+      coin === 'JUMBLR' ||
+      coin === 'BET' ||
+      coin === 'CRYPTO' ||
+      coin === 'COQUI' ||
+      coin === 'HODL' ||
+      coin === 'SHARK' ||
+      coin === 'BOTS' ||
+      coin === 'MGW' ||
+      coin === 'MVP' ||
+      coin === 'KV' ||
+      coin === 'CEAL' ||
+      coin === 'MESH' ||
+      coin === 'WLC' ||
+      coin === 'MNZ' ||
+      coin === 'komodo' ||
+      coin === 'KMD') {
+    return true;
+  }
+
+  return false;
+}

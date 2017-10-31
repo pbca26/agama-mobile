@@ -1,5 +1,6 @@
 import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
+import { isAssetChain } from './utils';
 import { parseTransactionAddresses } from './parseTransactionAddresses';
 
 const electrumJSNetworks = require('./electrumNetworks.js');
@@ -54,7 +55,7 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
                       devlog(transaction.raw);
 
                       // decode tx
-                      const _network = electrumJSNetworks[network];
+                      const _network = electrumJSNetworks[isAssetChain(network) ? 'komodo' : network];
                       const decodedTx = electrumJSTxDecoder(transaction.raw, _network);
 
                       let txInputs = [];
