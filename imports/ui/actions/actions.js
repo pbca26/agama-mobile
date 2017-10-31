@@ -7,6 +7,7 @@ const electrumJSTxDecoder = require('./electrumTxDecoder.js');
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
+import { isAssetChain } from './utils';
 import { seedToWif } from './seedToWif';
 import {
   encryptKey,
@@ -23,7 +24,7 @@ let electrumKeys = {};
 function sendtx(outputAddress, changeAddress, value, fee, push) {
   return async function(dispatch) {
     return new Promise((resolve, reject) => {
-      createtx(proxyServer, electrumServers.komodo, outputAddress, changeAddress, value, fee, '', push)
+      createtx(proxyServer, electrumServers[network], outputAddress, changeAddress, value, fee, '', push)
       .then((res) => {
         resolve(res);
       });
@@ -31,10 +32,10 @@ function sendtx(outputAddress, changeAddress, value, fee, push) {
   }
 }
 
-function transactions(address) {
+function transactions(address, network) {
   return async function(dispatch) {
     return new Promise((resolve, reject) => {
-      listtransactions(proxyServer, electrumServers.komodo, address, 'komodo', true)
+      listtransactions(proxyServer, electrumServers[network], address, network, true)
       .then((res) => {
         resolve(res);
       });
@@ -45,12 +46,12 @@ function transactions(address) {
 function balance(address, network) {
   return async function(dispatch) {
     return new Promise((resolve, reject) => {
-      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance?port=${electrumServers.komodo.port}&ip=${electrumServers.komodo.ip}&address=${address}`, {
+      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance?port=${electrumServers[network].port}&ip=${electrumServers[network].ip}&address=${address}`, {
         params: {}
       }, (error, result) => {
-        network = 'komodo';
+        // network = 'komodo';
         if (network === 'komodo') {
-          getKMDBalance(address, JSON.parse(result.content).result, proxyServer, electrumServers.komodo)
+          getKMDBalance(address, JSON.parse(result.content).result, proxyServer, electrumServers[network])
           .then((res) => {
             resolve(res);
           });
@@ -70,23 +71,23 @@ function balance(address, network) {
 function auth(seed) {
   return async function(dispatch) {
     return new Promise((resolve, reject) => {
-      const _seedToWif = seedToWif(seed, true, 'komodo');
+      let _pubKeys = {};
 
-      electrumKeys = _seedToWif;
+      for (let key in electrumServers) {
+        const _seedToWif = seedToWif(seed, true, isAssetChain(key) || key === 'komodo' ? 'komodo' : key.toLowerCase());
+        electrumKeys[electrumServers[key].abbr.toLowerCase()] = _seedToWif;
+        _pubKeys[electrumServers[key].abbr.toLowerCase()] = _seedToWif.pub;
+      }
 
-      resolve({ res: _seedToWif.pub });
+      console.warn(electrumKeys);
+      resolve(_pubKeys);
     });
   }
 }
 
 function getKeys() {
   return async function(dispatch) {
-    const _keys = await Meteor.callPromise('keys');
-
-    return dispatch({
-      type: 'KEYS',
-      res: _keys,
-    });
+    // todo
   }
 }
 
