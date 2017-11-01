@@ -54,26 +54,44 @@ class AddCoin extends React.Component {
     } else {
       this.props.changeActiveSection('login');
     }
+
+    this.setState({
+      multiSelect: {},
+    });
   }
 
   componentWillReceiveProps(props) {
     console.warn(props);
   }
 
-  renderCoins() {
+  renderCoins(singleSelect) {
     let _items = [];
+    _items.push(
+      <span key={ `addcoin-kmd` }>
+        <img
+          onClick={ () => singleSelect ? this.addCoin('kmd') : this.toggleMultiSelectCoin('kmd') }
+          src={ `/images/cryptologo/kmd.png` } />
+        { this.state.multiSelect.kmd &&
+          !singleSelect &&
+          <i className="fa fa-check-circle-o"></i>
+        }
+      </span>
+    );
 
     for (let key in electrumServers) {
-      _items.push(
-        <span key={ `addcoin-${key}` }>
-          <img
-            onClick={ () => this.toggleMultiSelectCoin(electrumServers[key].abbr.toLowerCase()) }
-            src={ `/images/cryptologo/${electrumServers[key].abbr.toLowerCase()}.png` } />
-          { this.state.multiSelect[electrumServers[key].abbr.toLowerCase()] &&
-            <i className="fa fa-check-circle-o"></i>
-          }
-        </span>
-      );
+      if (key !== 'komodo') {
+        _items.push(
+          <span key={ `addcoin-${key}` }>
+            <img
+              onClick={ () => singleSelect ? this.addCoin(electrumServers[key].abbr.toLowerCase()) : this.toggleMultiSelectCoin(electrumServers[key].abbr.toLowerCase()) }
+              src={ `/images/cryptologo/${electrumServers[key].abbr.toLowerCase()}.png` } />
+            { this.state.multiSelect[electrumServers[key].abbr.toLowerCase()] &&
+              !singleSelect &&
+              <i className="fa fa-check-circle-o"></i>
+            }
+          </span>
+        );
+      }
     }
 
     return _items;
@@ -82,15 +100,6 @@ class AddCoin extends React.Component {
   renderCoinShortcuts() {
     return (
       <div className="coins-list-shortcuts">
-        <div className="combination">
-          <img
-            onClick={ () => this.addCoin('kmd') }
-            src="/images/cryptologo/kmd.png" />
-          <strong className="margin-left-20 margin-right-20">OR</strong>
-          <img
-            onClick={ () => this.addCoin('chips') }
-            src="/images/cryptologo/chips.png" />
-        </div>
         <div
           onClick={ () => this.addCoin('kmd+chips') }
           className="combination">
@@ -124,24 +133,27 @@ class AddCoin extends React.Component {
     if (this.props.activeSection === 'addcoin' ||
         !Object.keys(this.props.coins).length) {
       return (
-        <div className="col-sm-12 padding-top-10 fixed-layer">
+        <div className="col-sm-12">
           <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12">
-            <div className="row margin-top-10">
+            <div className="row">
               <h4 className="padding-bottom-10">Shortcuts</h4>
+              <div className="coins-list">
+              { this.renderCoins(true) }
+              </div>
               { this.renderCoinShortcuts() }
               <hr />
               <h4>Multi-select</h4>
               <div className="coins-list">
                 { this.renderCoins() }
-                <div className="margin-top-10">
-                  <button
-                    className="btn btn-lg btn-primary btn-block ladda-button"
-                    onClick={ () => this.addCoin('multi') }>
-                    <span className="ladda-label">
-                    Add selected coins
-                    </span>
-                  </button>
-                </div>
+              </div>
+              <div className="margin-top-10 padding-bottom-20">
+                <button
+                  className="btn btn-lg btn-primary btn-block ladda-button"
+                  onClick={ () => this.addCoin('multi') }>
+                  <span className="ladda-label">
+                  Add selected coins
+                  </span>
+                </button>
               </div>
             </div>
           </div>
