@@ -35,6 +35,7 @@ class App extends React.Component {
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
+    this.lock = this.lock.bind(this);
     // this.getKeys = this.getKeys.bind(this);
     this.getBalance = this.getBalance.bind(this);
     this.getTransactions = this.getTransactions.bind(this);
@@ -130,7 +131,19 @@ class App extends React.Component {
   }
 
   logout() {
-    this.setState(this.defaultState);
+    const { actions } = this.props;
+
+    actions.clearKeys()
+    .then((res) => {
+      this.setState(this.defaultState);
+    });
+  }
+
+  lock() {
+    const lockState = Object.assign({}, this.defaultState);
+    lockState.coins = this.state.coins;
+
+    this.setState(lockState);
   }
 
   login(passphrase) {
@@ -177,6 +190,12 @@ class App extends React.Component {
   }
 
   toggleMenu() {
+    if (!this.state.displayMenu) {
+      document.getElementById('body').style.overflow = 'hidden';
+    } else {
+      document.getElementById('body').style.overflow = 'inherit';
+    }
+
     this.setState({
       displayMenu: !this.state.displayMenu,
     });
@@ -194,10 +213,6 @@ class App extends React.Component {
       activeSection: this.state.activeSection === 'addcoin' ? 'dashboard' : 'addcoin',
       displayMenu: !this.state.displayMenu,
     });
-  }
-
-  activateCoin(coin) {
-
   }
 
   renderActiveCoins() {
@@ -232,6 +247,7 @@ class App extends React.Component {
               className="fa fa-bars"></i>
             <div className="nav-menu-items">
               <div onClick={ this.logout }>Logout</div>
+              <div onClick={ this.lock }>Lock</div>
               <div onClick={ this.toggleSend }>Dashboard</div>
               <div onClick={ this.toggleSend }>Send</div>
               <div>
@@ -250,30 +266,35 @@ class App extends React.Component {
   render() {
     return (
       <div className="app-container">
-        <Login
-          { ...this.state }
-          login={ this.login } />
-        { this.state.auth &&
-          <MyAddress { ...this.state } />
-        }
-        { this.renderMenu() }
-        <SendCoin
-          { ...this.state } />
-        <AddCoin
-          { ...this.state }
-          addCoin={ this.addCoin }
-          changeActiveSection={ this.changeActiveSection } />
         <div className="app-header">
           <img src="/images/agama-logo-side.svg" />
           <img
             className="margin-left-20"
             src={ `/images/cryptologo/${this.state.coin}.png` } />
-          <i
-            onClick={ this.toggleMenu }
-            className="fa fa-bars"></i>
+          { this.state.auth &&
+            <i
+              onClick={ this.toggleMenu }
+              className="fa fa-bars"></i>
+          }
         </div>
         <div className="app-main">
+          <Login
+            { ...this.state }
+            login={ this.login } />
+          { this.state.auth &&
+            this.state.activeSection === 'dashboard' &&
+            <MyAddress { ...this.state } />
+          }
+          { this.renderMenu() }
+          <SendCoin
+            { ...this.state } />
+          <AddCoin
+            { ...this.state }
+            addCoin={ this.addCoin }
+            changeActiveSection={ this.changeActiveSection } />
           { !this.state.loading &&
+            this.state.auth &&
+            this.state.activeSection === 'dashboard' &&
             <i
               onClick={ this.dashboardRefresh }
               className="fa fa-refresh dashboard-refresh"></i>
@@ -290,13 +311,6 @@ class App extends React.Component {
           }
           <Balance { ...this.state } />
           <Transactions { ...this.state } />
-          { this.state.errors &&
-            <div>
-              <hr />
-              <h4>Errors</h4>
-              <div>{ this.state.errors }</div>
-            </div>
-          }
         </div>
       </div>
     )
