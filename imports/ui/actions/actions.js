@@ -21,6 +21,15 @@ import { listtransactions } from './listtransactions';
 
 let electrumKeys = {};
 
+function clearKeys() {
+  return async function(dispatch) {
+    return new Promise((resolve, reject) => {
+      electrumKeys = {};
+      resolve(true);
+    });
+  }
+}
+
 function sendtx(outputAddress, changeAddress, value, fee, push) {
   return async function(dispatch) {
     return new Promise((resolve, reject) => {
@@ -94,6 +103,7 @@ function getKeys() {
 export default {
   auth,
   getKeys,
+  clearKeys,
   balance,
   transactions,
   sendtx,
