@@ -1,16 +1,19 @@
 import aes256 from 'nodejs-aes256';
 
 export const encryptkey = (ciperKey, string) => {
-  const encryptedString = aes256.encrypt(ciperKey, req.body.string);
   // test pin security
   // - at least 1 char in upper case
   // - at least 1 digit
   // - at least one special character
   // - min length 8
 
-  const _pinTest = _pin.match('^(?=.*[A-Z])(?=.*[^<>{}\"/|;:.,~!?@#$%^=&*\\]\\\\()\\[_+]*$)(?=.*[0-9])(?=.*[a-z]).{8}$');
+  // const _pinTest = _pin.match('^(?=.*[A-Z])(?=.*[^<>{}\"/|;:.,~!?@#$%^=&*\\]\\\\()\\[_+]*$)(?=.*[0-9])(?=.*[a-z]).{8}$');
 
-  console.warn('encryptkey', _pinTest);
+  const encryptedString = aes256.encrypt(ciperKey, string);
+
+  console.warn('encryptkey', encryptedString);
+
+  return encryptedString;
 }
 
 export const decryptkey = (ciperKey, string) => {
@@ -24,6 +27,6 @@ export const decryptkey = (ciperKey, string) => {
   if (!_regexTest) {
     return false;
   } else {
-    return true,
+    return encryptedKey;
   }
 }

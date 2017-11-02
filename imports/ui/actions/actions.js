@@ -1,6 +1,4 @@
 import { Promise } from 'meteor/promise';
-import bitcoin from 'bitcoinjs-lib';
-import coinSelect from 'coinselect';
 
 const electrumJSNetworks = require('./electrumNetworks.js');
 const electrumJSTxDecoder = require('./electrumTxDecoder.js');
@@ -30,10 +28,12 @@ function clearKeys() {
   }
 }
 
-function sendtx(outputAddress, changeAddress, value, fee, push) {
+function sendtx(network, outputAddress, value, push) {
   return async function(dispatch) {
     return new Promise((resolve, reject) => {
-      createtx(proxyServer, electrumServers[network], outputAddress, changeAddress, value, fee, '', push)
+      const changeAddress = electrumKeys[network].pub;
+
+      createtx(proxyServer, electrumServers[network === 'kmd' ? 'komodo' : network], outputAddress, changeAddress, value, 10000, electrumKeys[network].wif, network, push)
       .then((res) => {
         resolve(res);
       });
@@ -41,10 +41,10 @@ function sendtx(outputAddress, changeAddress, value, fee, push) {
   }
 }
 
-function transactions(address, network) {
+function transactions(network) {
   return async function(dispatch) {
     return new Promise((resolve, reject) => {
-      listtransactions(proxyServer, electrumServers[network], address, network, true)
+      listtransactions(proxyServer, electrumServers[network === 'kmd' ? 'komodo' : network], electrumKeys[network].pub, network === 'kmd' ? 'komodo' : network, true)
       .then((res) => {
         resolve(res);
       });
@@ -52,15 +52,17 @@ function transactions(address, network) {
   }
 }
 
-function balance(address, network) {
+function balance(network) {
   return async function(dispatch) {
+    const address = electrumKeys[network].pub;
+
     return new Promise((resolve, reject) => {
-      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance?port=${electrumServers[network].port}&ip=${electrumServers[network].ip}&address=${address}`, {
+      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance?port=${electrumServers[network === 'kmd' ? 'komodo' : network].port}&ip=${electrumServers[network === 'kmd' ? 'komodo' : network].ip}&address=${address}`, {
         params: {}
       }, (error, result) => {
-        // network = 'komodo';
-        if (network === 'komodo') {
-          getKMDBalance(address, JSON.parse(result.content).result, proxyServer, electrumServers[network])
+        if (network === 'komodo' ||
+            network === 'kmd') {
+          getKMDBalance(address, JSON.parse(result.content).result, proxyServer, electrumServers[network === 'kmd' ? 'komodo' : network])
           .then((res) => {
             resolve(res);
           });

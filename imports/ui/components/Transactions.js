@@ -83,6 +83,12 @@ class Transactions extends React.Component {
     );
   };
 
+/*
+              <div className="margin-top-10">
+              { _transactions[i].address }
+              </div>
+*/
+
   render() {
     if (this.props.activeSection === 'dashboard') {
       if (this.props.transactions) {
@@ -98,9 +104,6 @@ class Transactions extends React.Component {
                 { this.renderTxType(_transactions[i].type) }
                 <span className="margin-left-20">{ this.renderTxAmount(_transactions[i]) }</span>
                 <span className="margin-left-20">{ secondsToString(_transactions[i].timestamp) }</span>
-              </div>
-              <div className="margin-top-10">
-              { _transactions[i].address }
               </div>
               <div className="margin-top-10 padding-bottom-10">
               { _transactions[i].txid }

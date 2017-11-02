@@ -1,6 +1,7 @@
 import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
 import { kmdCalcInterest } from './utils';
+import { isAssetChain } from './utils';
 
 const electrumJSNetworks = require('./electrumNetworks.js');
 const electrumJSTxDecoder = require('./electrumTxDecoder.js');
@@ -66,7 +67,7 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                             devlog(_rawtxJSON);
 
                             // decode tx
-                            const _network = electrumJSNetworks.komodo;
+                            const _network = electrumJSNetworks[isAssetChain(network) ? 'komodo' : network];
                             const decodedTx = electrumJSTxDecoder(_rawtxJSON, _network);
 
                             devlog('decoded tx =>');

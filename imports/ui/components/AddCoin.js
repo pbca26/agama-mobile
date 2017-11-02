@@ -136,7 +136,7 @@ class AddCoin extends React.Component {
         <div className="col-sm-12">
           <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12">
             <div className="row">
-              <h4 className="padding-bottom-10">Shortcuts</h4>
+              <h4>Shortcuts</h4>
               <div className="coins-list">
               { this.renderCoins(true) }
               </div>
