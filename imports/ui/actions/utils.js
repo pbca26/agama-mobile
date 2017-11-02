@@ -148,10 +148,15 @@ export function setLocalStorageVar(name, json) {
 }
 
 export function getLocalStorageVar(name) {
-  const _json = JSON.parse(localStorage.getItem(name));
+  const _var = localStorage.getItem(name);
+  if (_var) {
+    const _json = JSON.parse(_var);
 
-  console.warn('getLocalStorageVar');
-  console.warn(_json);
+    console.warn('getLocalStorageVar');
+    console.warn(_json);
 
-  return _json;
+    return _json;
+  } else {
+    return null;
+  }
 }
