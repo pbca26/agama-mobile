@@ -102,6 +102,7 @@ class Login extends React.Component {
 
   render() {
     if ((this.props.activeSection === 'login' || !this.props.auth) &&
+        this.props.coins &&
         Object.keys(this.props.coins).length) {
       return (
         <div className="col-sm-12">

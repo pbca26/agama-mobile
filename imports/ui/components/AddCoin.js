@@ -131,7 +131,8 @@ class AddCoin extends React.Component {
 
   render() {
     if (this.props.activeSection === 'addcoin' ||
-        !Object.keys(this.props.coins).length) {
+        !this.props.coins ||
+        (this.props.coins && !Object.keys(this.props.coins).length)) {
       return (
         <div className="col-sm-12">
           <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12">

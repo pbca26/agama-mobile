@@ -58,11 +58,14 @@ class App extends React.Component {
   }
 
   componentWillMount() {
-    console.warn(getLocalStorageVar('coins'));
+    const _localStorageCoins = getLocalStorageVar('coins');
+    console.warn(_localStorageCoins);
 
-    this.setState({
-      coins: getLocalStorageVar('coins'),
-    });
+    if (_localStorageCoins) {
+      this.setState({
+        coins: _localStorageCoins,
+      });
+    }
   }
 
   addCoin(coin) {
