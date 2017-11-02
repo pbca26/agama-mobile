@@ -186,8 +186,11 @@ class App extends React.Component {
       setLocalStorageVar('coins', {});
 
       setTimeout(() => {
-        this.setState(this.defaultState);
+        this.toggleMenu();
       }, 10);
+      setTimeout(() => {
+        this.setState(this.defaultState);
+      }, 20);
     });
   }
 
@@ -201,10 +204,12 @@ class App extends React.Component {
       lockState.coins = this.state.coins;
 
       this.toggleAutoRefresh(true);
-
+      setTimeout(() => {
+        this.toggleMenu();
+      }, 10);
       setTimeout(() => {
         this.setState(lockState);
-      }, 10);
+      }, 20);
     });
   }
 
