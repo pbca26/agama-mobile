@@ -138,3 +138,20 @@ export function isAssetChain(coin) {
 
   return false;
 }
+
+export function setLocalStorageVar(name, json) {
+  const _json = JSON.stringify(json);
+
+  localStorage.setItem(name, _json);
+  console.warn('setLocalStorageVar');
+  console.warn(_json);
+}
+
+export function getLocalStorageVar(name) {
+  const _json = JSON.parse(localStorage.getItem(name));
+
+  console.warn('getLocalStorageVar');
+  console.warn(_json);
+
+  return _json;
+}

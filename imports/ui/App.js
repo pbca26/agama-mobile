@@ -3,7 +3,11 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import actions from './actions/actions';
-import { secondsToString, maskPubAddress, sortBy } from './actions/utils';
+import {
+  setLocalStorageVar,
+  getLocalStorageVar,
+  sortBy,
+} from './actions/utils';
 
 import SendCoin from './components/SendCoin';
 import MyAddress from './components/MyAddress';
@@ -11,6 +15,8 @@ import AddCoin from './components/AddCoin';
 import Login from './components/Login';
 import Transactions from './components/Transactions';
 import Balance from './components/Balance';
+
+const DASHBOARD_UPDATE_INTERVAL = 120000;
 
 class App extends React.Component {
   constructor() {
@@ -31,6 +37,7 @@ class App extends React.Component {
       activeSection: null,
       saveSeed: null,
       auth: false,
+      updateInterval: null,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.login = this.login.bind(this);
@@ -47,6 +54,15 @@ class App extends React.Component {
     this.switchCoin = this.switchCoin.bind(this);
     this.addCoin = this.addCoin.bind(this);
     this.changeActiveSection = this.changeActiveSection.bind(this);
+    this.toggleAutoRefresh = this.toggleAutoRefresh.bind(this);
+  }
+
+  componentWillMount() {
+    console.warn(getLocalStorageVar('coins'));
+
+    this.setState({
+      coins: getLocalStorageVar('coins'),
+    });
   }
 
   addCoin(coin) {
@@ -58,30 +74,57 @@ class App extends React.Component {
     this.setState({
       coins,
     });
+
+    setLocalStorageVar('coins', this.state.coins);
   }
 
-  changeActiveSection(section) {
-    this.setState({
-      activeSection: section,
-    });
+  changeActiveSection(section, toggleMenu) {
+    if (toggleMenu) {
+      this.setState({
+        displayMenu: false,
+        activeSection: section,
+      });
+    } else {
+      this.setState({
+        activeSection: section,
+      });
+    }
   }
 
   switchCoin(coin) {
     this.setState({
       coin: coin,
       address: this.state.pubKeys[coin],
-      displayMenu: false,
     });
 
     // toggle refresh and update in-mem coins cache obj
     setTimeout(() => {
+      this.toggleMenu();
       this.dashboardRefresh();
-    }, 100);
+    }, 10);
   }
 
-  componentDidMount() {
-    if (this.state.auth) {
-      this.dashboardRefresh();
+  toggleAutoRefresh(disable) {
+    if (disable) {
+      console.warn('disable updates');
+      console.warn('interval id ' + this.state.updateInterval);
+      clearInterval(this.state.updateInterval);
+
+      this.setState({
+        updateInterval: null,
+      });
+    } else {
+      const _updateInterval = setInterval(() => {
+        console.warn('dashboard update triggered');
+        if (this.state.activeSection === 'dashboard') {
+          this.dashboardRefresh();
+        }
+      }, DASHBOARD_UPDATE_INTERVAL);
+
+      console.warn('set inverval id ' + _updateInterval);
+      this.setState({
+        updateInterval: _updateInterval,
+      });
     }
   }
 
@@ -102,7 +145,7 @@ class App extends React.Component {
   getBalance() {
     const { actions } = this.props;
 
-    actions.balance(this.state.address, this.state.coin === 'kmd' ? 'komodo' : this.state.coin)
+    actions.balance(this.state.coin)
     .then((res) => {
       this.setState({
         balance: res,
@@ -118,7 +161,7 @@ class App extends React.Component {
       loading: true,
     });
 
-    actions.transactions(this.state.address, this.state.coin === 'kmd' ? 'komodo' : this.state.coin)
+    actions.transactions(this.state.coin)
     .then((res) => {
       res = sortBy(res, 'confirmations');
 
@@ -130,20 +173,36 @@ class App extends React.Component {
     });
   }
 
+  // purge keys and added coins
   logout() {
     const { actions } = this.props;
 
     actions.clearKeys()
     .then((res) => {
-      this.setState(this.defaultState);
+      this.toggleAutoRefresh(true);
+      setLocalStorageVar('coins', {});
+
+      setTimeout(() => {
+        this.setState(this.defaultState);
+      }, 10);
     });
   }
 
+  // lock is logout when list of added coins is persistent
   lock() {
-    const lockState = Object.assign({}, this.defaultState);
-    lockState.coins = this.state.coins;
+    const { actions } = this.props;
 
-    this.setState(lockState);
+    actions.clearKeys()
+    .then((res) => {
+      const lockState = Object.assign({}, this.defaultState);
+      lockState.coins = this.state.coins;
+
+      this.toggleAutoRefresh(true);
+
+      setTimeout(() => {
+        this.setState(lockState);
+      }, 10);
+    });
   }
 
   login(passphrase) {
@@ -168,9 +227,11 @@ class App extends React.Component {
         pubKeys: res,
         coin,
         address,
+        activeSection: 'dashboard',
       });
 
       this.dashboardRefresh();
+      this.toggleAutoRefresh();
 
       console.warn('post login state');
       console.warn(this.state);
@@ -202,16 +263,22 @@ class App extends React.Component {
   }
 
   toggleSend() {
+    setTimeout(() => {
+      this.toggleMenu();
+    }, 10);
+
     this.setState({
       activeSection: this.state.activeSection === 'send' ? 'dashboard' : 'send',
-      displayMenu: !this.state.displayMenu,
     });
   }
 
   toggleAddCoin() {
+    setTimeout(() => {
+      this.toggleMenu();
+    }, 10);
+
     this.setState({
       activeSection: this.state.activeSection === 'addcoin' ? 'dashboard' : 'addcoin',
-      displayMenu: !this.state.displayMenu,
     });
   }
 
@@ -221,7 +288,7 @@ class App extends React.Component {
     for (let key in this.state.coins) {
       _items.push(
         <div
-          onClick={ () => this.switchCoin(key) }
+          onClick={ () => key !== this.state.coin ? this.switchCoin(key) : null }
           key={ `active-coins-${key}` }
           className="active-coins">
           <img
@@ -248,7 +315,7 @@ class App extends React.Component {
             <div className="nav-menu-items">
               <div onClick={ this.logout }>Logout</div>
               <div onClick={ this.lock }>Lock</div>
-              <div onClick={ this.toggleSend }>Dashboard</div>
+              <div onClick={ () => this.changeActiveSection('dashboard', true) }>Dashboard</div>
               <div onClick={ this.toggleSend }>Send</div>
               <div>
               { this.renderActiveCoins() }
@@ -263,14 +330,42 @@ class App extends React.Component {
     }
   }
 
+  renderSpinner() {
+    let _paths = [];
+
+    for (let i = 0; i < 4; i++) {
+      _paths.push(
+        <circle
+          className={ i === 0 ? 'path' : `path${i + 1}` }
+          cx="50"
+          cy="50"
+          r="20"
+          fill="none"
+          strokeWidth="5"
+          strokeMiterlimit="10"
+          key={ `spinner-circle-${i}` } />
+      );
+    }
+
+    return (
+      <div className="loader">
+        <svg className="circle">
+        { _paths }
+        </svg>
+      </div>
+    );
+  }
+
   render() {
     return (
       <div className="app-container">
         <div className="app-header">
           <img src="/images/agama-logo-side.svg" />
-          <img
-            className="margin-left-20"
-            src={ `/images/cryptologo/${this.state.coin}.png` } />
+          { this.state.auth &&
+            <img
+              className="margin-left-20"
+              src={ `/images/cryptologo/${this.state.coin}.png` } />
+          }
           { this.state.auth &&
             <i
               onClick={ this.toggleMenu }
@@ -287,7 +382,8 @@ class App extends React.Component {
           }
           { this.renderMenu() }
           <SendCoin
-            { ...this.state } />
+            { ...this.state }
+            sendtx={ this.props.actions.sendtx } />
           <AddCoin
             { ...this.state }
             addCoin={ this.addCoin }
@@ -300,14 +396,8 @@ class App extends React.Component {
               className="fa fa-refresh dashboard-refresh"></i>
           }
           { this.state.loading &&
-            <div className="loader">
-              <svg className="circle">
-                <circle className="path" cx="50" cy="50" r="20" fill="none" strokeWidth="5" strokeMiterlimit="10"/>
-                <circle className="path2" cx="50" cy="50" r="20" fill="none" strokeWidth="5" strokeMiterlimit="10"/>
-                <circle className="path3" cx="50" cy="50" r="20" fill="none" strokeWidth="5" strokeMiterlimit="10"/>
-                <circle className="path4" cx="50" cy="50" r="20" fill="none" strokeWidth="5" strokeMiterlimit="10"/>
-              </svg>
-            </div>
+            this.state.activeSection === 'dashboard' &&
+            this.renderSpinner()
           }
           <Balance { ...this.state } />
           <Transactions { ...this.state } />

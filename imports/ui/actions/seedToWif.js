@@ -33,7 +33,7 @@ export const seedToWif = (seed, iguana, network) => {
   // shepherd.log(`seedtowif pub key ${key.publicAddress}`, true);
 
   return {
-    priv: key.privateWif,
+    wif: key.privateWif,
     pub: key.publicAddress,
   };
 }

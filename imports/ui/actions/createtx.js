@@ -1,17 +1,22 @@
 import { Promise } from 'meteor/promise';
+import bitcoin from 'bitcoinjs-lib';
+import coinSelect from 'coinselect';
+
 import { devlog } from './dev';
 import {
   kmdCalcInterest,
   estimateTxSize,
 } from './utils';
 import { listunspent } from './listunspent';
+import { isAssetChain } from './utils';
 
 const electrumJSNetworks = require('./electrumNetworks.js');
 const electrumJSTxDecoder = require('./electrumTxDecoder.js');
 
 // single sig
 const buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue) => {
-  const _network = electrumJSNetworks[network];
+  console.warn(wif);
+  const _network = electrumJSNetworks[isAssetChain(network) ? 'komodo' : network];
   let key = bitcoin.ECPair.fromWIF(wif, _network);
   let tx = new bitcoin.TransactionBuilder(_network);
 
@@ -69,14 +74,11 @@ const maxSpendBalance = (utxoList, fee) => {
   }
 }
 
-export const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, value, defaultFee, wif, push) => {
-  const network = 'komodo';
-  wif = 'UrA1TCN2j9iMYKBLkKGMo9MbndBNYVW9nJV9RdViR9CoVK82ApFb';
-
+export const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, value, defaultFee, wif, network, push) => {
   return new Promise((resolve, reject) => {
     devlog('createrawtx =>');
 
-    listunspent(proxyServer, electrumServer, changeAddress, 'komodo', true)
+    listunspent(proxyServer, electrumServer, changeAddress, network, true)
     .then((utxoList) => {
       if (utxoList &&
           utxoList.length) {
@@ -266,8 +268,8 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
                 },
                 data: {
                   rawtx: _rawtx,
-                  port: electrumServers.komodo.port,
-                  ip: electrumServers.komodo.ip,
+                  port: electrumServer.port,
+                  ip: electrumServer.ip,
                 },
               }, (error, result) => {
                 result = JSON.parse(result.content);

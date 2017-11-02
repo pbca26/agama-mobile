@@ -16,7 +16,7 @@ class Balance extends React.Component {
     if (this.props.activeSection === 'dashboard') {
       if (this.props.balance) {
         return (
-          <div style={{ fontSize: '16px', margin: '20px', marginLeft: '10px' }}>
+          <div style={{ fontSize: '16px', margin: '20px', marginLeft: '10px', marginBottom: '35px' }}>
             <div>
               <strong>Balance: </strong> <span>{ formatValue(this.props.balance.balance) } { this.props.coin.toUpperCase() }</span>
             </div>
