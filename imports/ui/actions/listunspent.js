@@ -3,6 +3,8 @@ import { devlog } from './dev';
 import { kmdCalcInterest } from './utils';
 import { isAssetChain } from './utils';
 
+const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
+
 const electrumJSNetworks = require('./electrumNetworks.js');
 const electrumJSTxDecoder = require('./electrumTxDecoder.js');
 
@@ -11,8 +13,12 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
 
   if (full) {
     return new Promise((resolve, reject) => {
-      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent?port=${electrumServer.port}&ip=${electrumServer.ip}&address=${address}`, {
-        params: {}
+      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent`, {
+        params: {
+          port: electrumServer.port,
+          ip: electrumServer.ip,
+          address,
+        },
       }, (error, result) => {
         result = JSON.parse(result.content);
 
@@ -27,8 +33,11 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
             let _utxo = [];
 
             // get current height
-            HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getcurrentblock?port=${electrumServer.port}&ip=${electrumServer.ip}`, {
-              params: {}
+            HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getcurrentblock`, {
+              params: {
+                port: electrumServer.port,
+                ip: electrumServer.ip,
+              },
             }, (error, result) => {
               result = JSON.parse(result.content);
 
@@ -51,8 +60,13 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                   } else {
                     Promise.all(_utxo.map((_utxoItem, index) => {
                       return new Promise((resolve, reject) => {
-                        HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction?port=${electrumServer.port}&ip=${electrumServer.ip}&address=${address}&txid=${_utxoItem['tx_hash']}`, {
-                          params: {}
+                        HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction`, {
+                          params: {
+                            port: electrumServer.port,
+                            ip: electrumServer.ip,
+                            address,
+                            txid: _utxoItem['tx_hash'],
+                          },
                         }, (error, result) => {
                           result = JSON.parse(result.content);
 
@@ -170,8 +184,12 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
     });
   } else {
     return new Promise((resolve, reject) => {
-      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent?port=${electrumServer.port}&ip=${electrumServer.ip}&address=${address}`, {
-        params: {}
+      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent`, {
+        params: {
+          port: electrumServer.port,
+          ip: electrumServer.ip,
+          address,
+        },
       }, (error, result) => {
         result = JSON.parse(result.content);
 

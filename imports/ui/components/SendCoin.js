@@ -8,10 +8,12 @@ class SendCoin extends React.Component {
     super();
     this.state = {
       display: false,
-      sendAmount: 0,
-      sendTo: '',
+      sendAmount: 0.0001,
+      sendTo: 'RDbGxL8QYdEp8sMULaVZS2E6XThcTKT9Jd',
       sendCurrentStep: 0,
       sendResult: null,
+      spvVerificationWarning: false,
+      spvPreflightSendInProgress: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.changeSendCoinStep = this.changeSendCoinStep.bind(this);
@@ -43,6 +45,31 @@ class SendCoin extends React.Component {
           this.setState(this.defaultState);
           break;
         case 1:
+          this.setState({
+            spvPreflightSendInProgress: true,
+            currentStep: step,
+          });
+
+          // spv pre tx push request
+          this.props.sendtx(
+            this.props.coin,
+            this.state.sendTo,
+            this.state.sendAmount * 100000000,
+            false
+          ).then((sendPreflight) => {
+            if (sendPreflight &&
+                sendPreflight.msg === 'success') {
+              this.setState({
+                spvVerificationWarning: !sendPreflight.result.utxoVerified,
+                spvPreflightSendInProgress: false,
+              });
+            } else {
+              this.setState({
+                spvPreflightSendInProgress: false,
+              });
+            }
+          });
+
           // todo validation
           this.setState({
             sendCurrentStep: 1,
@@ -183,7 +210,7 @@ class SendCoin extends React.Component {
                   <div
                     className="padding-top-20"
                     style={{ fontSize: '15px' }}>
-                    <strong className="color-warning">{ translate('SEND.WARNING') }:</strong> { translate('SEND.WARNING_SPV_P1') }<br />
+                    <strong className="warning">{ translate('SEND.WARNING') }:</strong> { translate('SEND.WARNING_SPV_P1') }<br />
                     { translate('SEND.WARNING_SPV_P2') }
                   </div>
                 }
@@ -256,7 +283,7 @@ class SendCoin extends React.Component {
                       type="button"
                       className="btn btn-primary"
                       onClick={ () => this.changeSendCoinStep(0) }>
-                        { translate('SEND.MAKE_NOTHER_TX') }
+                        { translate('SEND.MAKE_ANOTHER_TX') }
                     </button>
                   </div>
                 </div>

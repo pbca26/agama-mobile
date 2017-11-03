@@ -59,8 +59,8 @@ class AddCoin extends React.Component {
   }
 
   renderCoins(singleSelect) {
-    let _items = [];
     let _coins = this.props.coins;
+    let _items = [];
 
     _items.push(
       <span
@@ -84,9 +84,14 @@ class AddCoin extends React.Component {
           <span
             className={ _coins[key] ? 'disabled' : '' }
             key={ `addcoin-${key}` }>
-            <img
-              onClick={ () => singleSelect ? this.addCoin(_coin) : this.toggleMultiSelectCoin(_coin) }
-              src={ `/images/cryptologo/${_coin}.png` } />
+            { _coins[key] &&
+              <img src={ `/images/cryptologo/${_coin}.png` } />
+            }
+            { !_coins[key] &&
+              <img
+                onClick={ () => singleSelect ? this.addCoin(_coin) : this.toggleMultiSelectCoin(_coin) }
+                src={ `/images/cryptologo/${_coin}.png` } />
+            }
             { this.state.multiSelect[_coin] &&
               !singleSelect &&
               <i className="fa fa-check-circle-o"></i>

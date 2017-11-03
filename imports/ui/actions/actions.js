@@ -3,8 +3,6 @@ import { Promise } from 'meteor/promise';
 const electrumJSNetworks = require('./electrumNetworks.js');
 const electrumJSTxDecoder = require('./electrumTxDecoder.js');
 
-const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
-
 import { isAssetChain } from './utils';
 import { seedToWif } from './seedToWif';
 import {
@@ -33,8 +31,17 @@ function sendtx(network, outputAddress, value, push) {
     return new Promise((resolve, reject) => {
       const changeAddress = electrumKeys[network].pub;
 
-      createtx(proxyServer, electrumServers[network === 'kmd' ? 'komodo' : network], outputAddress, changeAddress, value, 10000, electrumKeys[network].wif, network, push)
-      .then((res) => {
+      createtx(
+        proxyServer,
+        electrumServers[network === 'kmd' ? 'komodo' : network],
+        outputAddress,
+        changeAddress,
+        value,
+        10000,
+        electrumKeys[network].wif,
+        network,
+        push
+      ).then((res) => {
         resolve(res);
       });
     });
@@ -44,8 +51,13 @@ function sendtx(network, outputAddress, value, push) {
 function transactions(network) {
   return async function(dispatch) {
     return new Promise((resolve, reject) => {
-      listtransactions(proxyServer, electrumServers[network === 'kmd' ? 'komodo' : network], electrumKeys[network].pub, network === 'kmd' ? 'komodo' : network, true)
-      .then((res) => {
+      listtransactions(
+        proxyServer,
+        electrumServers[network === 'kmd' ? 'komodo' : network],
+        electrumKeys[network].pub,
+        network === 'kmd' ? 'komodo' : network,
+        true
+      ).then((res) => {
         resolve(res);
       });
     });
@@ -57,13 +69,21 @@ function balance(network) {
     const address = electrumKeys[network].pub;
 
     return new Promise((resolve, reject) => {
-      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance?port=${electrumServers[network === 'kmd' ? 'komodo' : network].port}&ip=${electrumServers[network === 'kmd' ? 'komodo' : network].ip}&address=${address}`, {
-        params: {}
+      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`, {
+        params: {
+          port: electrumServers[network === 'kmd' ? 'komodo' : network].port,
+          ip: electrumServers[network === 'kmd' ? 'komodo' : network].ip,
+          address: address,
+        },
       }, (error, result) => {
         if (network === 'komodo' ||
             network === 'kmd') {
-          getKMDBalance(address, JSON.parse(result.content).result, proxyServer, electrumServers[network === 'kmd' ? 'komodo' : network])
-          .then((res) => {
+          getKMDBalance(
+            address,
+            JSON.parse(result.content).result,
+            proxyServer,
+            electrumServers[network === 'kmd' ? 'komodo' : network]
+          ).then((res) => {
             resolve(res);
           });
         } else {
@@ -90,7 +110,7 @@ function auth(seed) {
         _pubKeys[electrumServers[key].abbr.toLowerCase()] = _seedToWif.pub;
       }
 
-      console.warn(electrumKeys);
+      // console.warn(electrumKeys);
       resolve(_pubKeys);
     });
   }
