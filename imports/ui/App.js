@@ -306,10 +306,10 @@ class App extends React.Component {
               <div className="nav-menu-items">
                 <div onClick={ this.logout }>{ translate('DASHBOARD.LOGOUT') }</div>
                 <div onClick={ this.lock }>{ translate('DASHBOARD.LOCK') }</div>
-                { this.state.activeSection === 'dashboard' &&
+                { this.state.activeSection !== 'dashboard' &&
                   <div onClick={ () => this.changeActiveSection('dashboard', true) }>{ translate('DASHBOARD.DASHBOARD') }</div>
                 }
-                { this.state.activeSection === 'send' &&
+                { this.state.activeSection !== 'send' &&
                   <div onClick={ this.toggleSend }>{ translate('DASHBOARD.SEND') }</div>
                 }
                 <div>

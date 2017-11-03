@@ -19,7 +19,7 @@ class Login extends React.Component {
       createPin: false,
       pinOverride: null,
       pinOverrideTooShort: false,
-      pin: null,
+      pin: '112233',
       wrongPin: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
@@ -109,11 +109,11 @@ class Login extends React.Component {
                 onChange={ this.updateInput }
                 placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
                 value={ this.state.pin || '' } />
-                { this.state.wrongPin &&
-                  <div className="error margin-bottom-25">
-                    <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
-                  </div>
-                }
+              { this.state.wrongPin &&
+                <div className="error margin-bottom-25">
+                  <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
+                </div>
+              }
               <button
                 className="btn btn-lg btn-primary btn-block ladda-button"
                 onClick={ () => this.login(true) }>

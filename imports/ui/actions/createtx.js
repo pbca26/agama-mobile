@@ -2,6 +2,8 @@ import { Promise } from 'meteor/promise';
 import bitcoin from 'bitcoinjs-lib';
 import coinSelect from 'coinselect';
 
+const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
+
 import { devlog } from './dev';
 import {
   kmdCalcInterest,

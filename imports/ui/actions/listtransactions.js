@@ -3,14 +3,19 @@ import { devlog } from './dev';
 import { isAssetChain } from './utils';
 import { parseTransactionAddresses } from './parseTransactionAddresses';
 
+const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
+
 const electrumJSNetworks = require('./electrumNetworks.js');
 const electrumJSTxDecoder = require('./electrumTxDecoder.js');
 
 export const listtransactions = (proxyServer, electrumServer, address, network, full, verify) => {
   return new Promise((resolve, reject) => {
     // get current height
-    HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getcurrentblock?port=${electrumServer.port}&ip=${electrumServer.ip}`, {
-      params: {}
+    HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getcurrentblock`, {
+      params: {
+        port: electrumServer.port,
+        ip: electrumServer.ip,
+      },
     }, (error, result) => {
       result = JSON.parse(result.content);
 
@@ -22,8 +27,13 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
         devlog('currentHeight =>');
         devlog(currentHeight);
 
-        HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listtransactions?port=${electrumServer.port}&ip=${electrumServer.ip}&address=${address}&raw=true`, {
-          params: {}
+        HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listtransactions`, {
+          params: {
+            port: electrumServer.port,
+            ip: electrumServer.ip,
+            address,
+            raw: true,
+          },
         }, (error, result) => {
           result = JSON.parse(result.content);
 
@@ -39,8 +49,13 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
 
               Promise.all(json.map((transaction, index) => {
                 return new Promise((resolve, reject) => {
-                  HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getblockinfo?port=${electrumServer.port}&ip=${electrumServer.ip}&address=${address}&height=${transaction.height}`, {
-                    params: {}
+                  HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getblockinfo`, {
+                    params: {
+                      port: electrumServer.port,
+                      ip: electrumServer.ip,
+                      address,
+                      height: transaction.height,
+                    },
                   }, (error, result) => {
                     devlog('getblock =>');
                     devlog(result);
@@ -69,8 +84,13 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
                           return new Promise((_resolve, _reject) => {
                             if (_decodedInput.txid !== '0000000000000000000000000000000000000000000000000000000000000000') {
 
-                              HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction?port=${electrumServer.port}&ip=${electrumServer.ip}&address=${address}&txid=${_decodedInput.txid}`, {
-                                params: {}
+                              HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction`, {
+                                params: {
+                                  port: electrumServer.port,
+                                  ip: electrumServer.ip,
+                                  address,
+                                  txid: _decodedInput.txid,
+                                },
                               }, (error, result) => {
                                 devlog('gettransaction =>');
                                 devlog(result);

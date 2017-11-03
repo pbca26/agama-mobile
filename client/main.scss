@@ -170,6 +170,9 @@ body {
     width: 33.3%;
     float: left;
   }
+  .steps {
+    box-shadow: none;
+  }
 }
 
 .no-padding-left {
@@ -422,6 +425,9 @@ input:checked + .slider:before {
 
 .error {
   color: #f96868;
+}
+.warning {
+  color: #f2a654;
 }
 
 .balance {
