@@ -15,6 +15,7 @@ meteor npm install nodejs-aes256
 meteor npm install bitcoinjs-lib
 meteor npm install coinkey
 meteor npm install coinselect
+meteor npm install buffer-reverse
 meteor update
 
 os specific (build):

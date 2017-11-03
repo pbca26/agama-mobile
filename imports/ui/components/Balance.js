@@ -7,6 +7,14 @@ class Balance extends React.Component {
     super();
     this.state = {
     };
+    this.isInterestDefined = this.isInterestDefined.bind(this);
+  }
+
+  isInterestDefined() {
+    if (this.props.balance.interest &&
+        this.props.balance.interest > 0) {
+      return true;
+    }
   }
 
   render() {
@@ -20,7 +28,7 @@ class Balance extends React.Component {
             <div>
               <strong>{ translate('BALANCE.BALANCE') }: </strong> <span>{ formatValue(_balance.balance) } { _coin }</span>
             </div>
-            { _balance.interest &&
+            { this.isInterestDefined() &&
               <div className="margin-top-10">
                 <strong> { translate('BALANCE.INTEREST') }: </strong> <span>{ formatValue(_balance.interest) } { _coin }</span>
               </div>

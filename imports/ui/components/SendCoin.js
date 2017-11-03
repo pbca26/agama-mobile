@@ -55,6 +55,7 @@ class SendCoin extends React.Component {
             this.props.coin,
             this.state.sendTo,
             this.state.sendAmount * 100000000,
+            true,
             false
           ).then((sendPreflight) => {
             if (sendPreflight &&
@@ -84,6 +85,7 @@ class SendCoin extends React.Component {
             this.props.coin,
             this.state.sendTo,
             this.state.sendAmount * 100000000,
+            null,
             true
           ).then((res) => {
             // console.warn('sendtx result');

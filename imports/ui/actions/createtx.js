@@ -17,7 +17,6 @@ const electrumJSTxDecoder = require('./electrumTxDecoder.js');
 
 // single sig
 const buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue) => {
-  console.warn(wif);
   const _network = electrumJSNetworks[isAssetChain(network) ? 'komodo' : network];
   let key = bitcoin.ECPair.fromWIF(wif, _network);
   let tx = new bitcoin.TransactionBuilder(_network);
@@ -37,7 +36,7 @@ const buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, s
   }
 
   if (network === 'komodo' ||
-      network === 'KMD') {
+      network === 'kmd') {
     const _locktime = Math.floor(Date.now() / 1000) - 777;
     tx.setLockTime(_locktime);
     devlog(`kmd tx locktime set to ${_locktime}`);
@@ -76,11 +75,11 @@ const maxSpendBalance = (utxoList, fee) => {
   }
 }
 
-export const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, value, defaultFee, wif, network, push) => {
+export const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, value, defaultFee, wif, network, verify, push) => {
   return new Promise((resolve, reject) => {
     devlog('createrawtx =>');
 
-    listunspent(proxyServer, electrumServer, changeAddress, network, true)
+    listunspent(proxyServer, electrumServer, changeAddress, network, true, verify)
     .then((utxoList) => {
       if (utxoList &&
           utxoList.length) {
@@ -91,7 +90,8 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
         let utxoVerified = true;
 
         for (let i = 0; i < utxoList.length; i++) {
-          if (network === 'komodo') {
+          if (network === 'komodo' ||
+              network === 'kmd') {
             utxoListFormatted.push({
               txid: utxoList[i].txid,
               vout: utxoList[i].vout,
@@ -203,7 +203,7 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
           devlog(`changeto ${changeAddress} amount ${_change} (${_change * 0.00000001})`, true);
 
           // account for KMD interest
-          if (network === 'komodo' &&
+          if ((network === 'komodo' || network === 'kmd') &&
               totalInterest > 0) {
             // account for extra vout
             const _feeOverhead = outputs.length === 1 ? estimateTxSize(0, 1) * feeRate : 0;
