@@ -12,8 +12,7 @@ class MyAddress extends React.Component {
         <strong>
           { translate('DASHBOARD.MY') }&nbsp;
           { this.props.coin.toUpperCase() }&nbsp;
-          { translate('DASHBOARD.ADDRESS') }:&nbsp;
-        </strong>
+          { translate('DASHBOARD.ADDRESS') }: </strong>
         { this.props.address }
       </div>
     );

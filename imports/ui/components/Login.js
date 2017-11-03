@@ -94,7 +94,7 @@ class Login extends React.Component {
   }
 
   render() {
-    if ((this.props.activeSection === 'login' || !this.props.auth) &&
+    if ((this.props.activeSection === 'login' || (!this.props.auth && this.props.activeSection !== 'addcoin')) &&
         this.props.coins &&
         Object.keys(this.props.coins).length) {
       return (

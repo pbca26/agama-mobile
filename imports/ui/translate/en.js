@@ -47,6 +47,12 @@ export const _lang = {
     'DASHBOARD': {
       'MY': 'My',
       'ADDRESS': 'address',
+      'LOGOUT': 'Logout',
+      'LOGIN': 'Login',
+      'LOCK': 'Lock',
+      'DASHBOARD': 'Dashboard',
+      'SEND': 'Send',
+      'ADD_COIN': 'Add coin',
     },
     'TRANSACTIONS': {
       'OUT': 'out',

@@ -12,7 +12,7 @@ class Balance extends React.Component {
   render() {
     if (this.props.activeSection === 'dashboard') {
       const _balance = this.props.balance;
-      const _coin = this.props.coin.toUpperCase();
+      const _coin = this.props.coin && this.props.coin.toUpperCase();
 
       if (_balance) {
         return (
