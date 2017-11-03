@@ -15,6 +15,7 @@ import AddCoin from './components/AddCoin';
 import Login from './components/Login';
 import Transactions from './components/Transactions';
 import Balance from './components/Balance';
+import Spinner from './components/Spinner';
 
 const DASHBOARD_UPDATE_INTERVAL = 120000;
 
@@ -30,9 +31,7 @@ class App extends React.Component {
       displayMenu: false,
       loading: false,
       coin: null,
-      coins: {
-        //'kmd': {}
-      },
+      coins: {},
       pubKeys: {},
       activeSection: null,
       saveSeed: null,
@@ -50,7 +49,6 @@ class App extends React.Component {
     this.toggleSend = this.toggleSend.bind(this);
     this.toggleAddCoin = this.toggleAddCoin.bind(this);
     this.dashboardRefresh = this.dashboardRefresh.bind(this);
-    this.saveSeed = this.saveSeed.bind(this);
     this.switchCoin = this.switchCoin.bind(this);
     this.addCoin = this.addCoin.bind(this);
     this.changeActiveSection = this.changeActiveSection.bind(this);
@@ -59,7 +57,6 @@ class App extends React.Component {
 
   componentWillMount() {
     const _localStorageCoins = getLocalStorageVar('coins');
-    console.warn(_localStorageCoins);
 
     if (_localStorageCoins) {
       this.setState({
@@ -109,8 +106,6 @@ class App extends React.Component {
 
   toggleAutoRefresh(disable) {
     if (disable) {
-      console.warn('disable updates');
-      console.warn('interval id ' + this.state.updateInterval);
       clearInterval(this.state.updateInterval);
 
       this.setState({
@@ -118,13 +113,11 @@ class App extends React.Component {
       });
     } else {
       const _updateInterval = setInterval(() => {
-        console.warn('dashboard update triggered');
         if (this.state.activeSection === 'dashboard') {
           this.dashboardRefresh();
         }
       }, DASHBOARD_UPDATE_INTERVAL);
 
-      console.warn('set inverval id ' + _updateInterval);
       this.setState({
         updateInterval: _updateInterval,
       });
@@ -172,7 +165,6 @@ class App extends React.Component {
         transactions: res,
         loading: false,
       });
-      console.warn(res);
     });
   }
 
@@ -240,21 +232,6 @@ class App extends React.Component {
 
       this.dashboardRefresh();
       this.toggleAutoRefresh();
-
-      console.warn('post login state');
-      console.warn(this.state);
-    });
-  }
-
-  saveSeed() {
-    const { actions } = this.props;
-
-    actions.saveToFile()
-    .then((res) => {
-      this.setState({
-        saveSeed: res,
-      });
-      console.warn('saveToFile', res);
     });
   }
 
@@ -315,7 +292,9 @@ class App extends React.Component {
     if (this.state.displayMenu) {
       return (
         <div className="nav-menu">
-          <div className="nav-menu-overlay"></div>
+          <div
+            onClick={ this.toggleMenu }
+            className="nav-menu-overlay"></div>
           <div className="nav-menu-inner">
             <i
               onClick={ this.toggleMenu }
@@ -336,32 +315,6 @@ class App extends React.Component {
     } else {
       return null;
     }
-  }
-
-  renderSpinner() {
-    let _paths = [];
-
-    for (let i = 0; i < 4; i++) {
-      _paths.push(
-        <circle
-          className={ i === 0 ? 'path' : `path${i + 1}` }
-          cx="50"
-          cy="50"
-          r="20"
-          fill="none"
-          strokeWidth="5"
-          strokeMiterlimit="10"
-          key={ `spinner-circle-${i}` } />
-      );
-    }
-
-    return (
-      <div className="loader">
-        <svg className="circle">
-        { _paths }
-        </svg>
-      </div>
-    );
   }
 
   render() {
@@ -405,7 +358,7 @@ class App extends React.Component {
           }
           { this.state.loading &&
             this.state.activeSection === 'dashboard' &&
-            this.renderSpinner()
+            <Spinner />
           }
           <Balance { ...this.state } />
           <Transactions { ...this.state } />

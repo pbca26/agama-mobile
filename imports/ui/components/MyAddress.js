@@ -1,8 +1,4 @@
 import React from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-
-import actions from '../actions/actions';
 import { translate } from '../translate/translate';
 
 class MyAddress extends React.Component {
@@ -13,12 +9,15 @@ class MyAddress extends React.Component {
   render() {
     return (
       <div className="margin-top-20 margin-left-10">
-        <strong>{ translate('INDEX.MY') } { this.props.coin.toUpperCase() } { translate('INDEX.ADDRESS') }: </strong>
+        <strong>
+          { translate('DASHBOARD.MY') }&nbsp;
+          { this.props.coin.toUpperCase() }&nbsp;
+          { translate('DASHBOARD.ADDRESS') }:&nbsp;
+        </strong>
         { this.props.address }
       </div>
     );
   }
 }
-
 
 export default MyAddress;

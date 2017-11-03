@@ -1,9 +1,7 @@
 import React from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
 
-import actions from '../actions/actions';
 import { electrumServers } from '../actions/electrumServers';
+import { translate } from '../translate/translate';
 
 class AddCoin extends React.Component {
   constructor() {
@@ -60,10 +58,6 @@ class AddCoin extends React.Component {
     });
   }
 
-  componentWillReceiveProps(props) {
-    console.warn(props);
-  }
-
   renderCoins(singleSelect) {
     let _items = [];
     _items.push(
@@ -80,12 +74,14 @@ class AddCoin extends React.Component {
 
     for (let key in electrumServers) {
       if (key !== 'komodo') {
+        const _coin = electrumServers[key].abbr.toLowerCase();
+
         _items.push(
           <span key={ `addcoin-${key}` }>
             <img
-              onClick={ () => singleSelect ? this.addCoin(electrumServers[key].abbr.toLowerCase()) : this.toggleMultiSelectCoin(electrumServers[key].abbr.toLowerCase()) }
-              src={ `/images/cryptologo/${electrumServers[key].abbr.toLowerCase()}.png` } />
-            { this.state.multiSelect[electrumServers[key].abbr.toLowerCase()] &&
+              onClick={ () => singleSelect ? this.addCoin(_coin) : this.toggleMultiSelectCoin(_coin) }
+              src={ `/images/cryptologo/${_coin}.png` } />
+            { this.state.multiSelect[_coin] &&
               !singleSelect &&
               <i className="fa fa-check-circle-o"></i>
             }
@@ -121,7 +117,7 @@ class AddCoin extends React.Component {
             className="btn btn-lg btn-primary btn-block ladda-button"
             onClick={ () => this.addCoin('all') }>
             <span className="ladda-label">
-            Add all coins
+            { translate('ADD_COIN.ADD_ALL_COINS') }
             </span>
           </button>
         </div>
@@ -137,13 +133,13 @@ class AddCoin extends React.Component {
         <div className="col-sm-12">
           <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12">
             <div className="row">
-              <h4>Shortcuts</h4>
+              <h4>{ translate('ADD_COIN.SHORTCUTS') }</h4>
               <div className="coins-list">
               { this.renderCoins(true) }
               </div>
               { this.renderCoinShortcuts() }
               <hr />
-              <h4>Multi-select</h4>
+              <h4>{ translate('ADD_COIN.MULTI_SELECT') }</h4>
               <div className="coins-list">
                 { this.renderCoins() }
               </div>
@@ -152,7 +148,7 @@ class AddCoin extends React.Component {
                   className="btn btn-lg btn-primary btn-block ladda-button"
                   onClick={ () => this.addCoin('multi') }>
                   <span className="ladda-label">
-                  Add selected coins
+                  { translate('ADD_COIN.ADD_SELECTED_COINS') }
                   </span>
                 </button>
               </div>
@@ -166,10 +162,4 @@ class AddCoin extends React.Component {
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    actions: bindActionCreators(actions, dispatch),
-  }
-}
-
-export default connect(mapDispatchToProps)(AddCoin);
+export default AddCoin;

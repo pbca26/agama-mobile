@@ -1,6 +1,7 @@
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { translate } from '../translate/translate';
 
 class SendCoin extends React.Component {
   constructor() {
@@ -18,8 +19,6 @@ class SendCoin extends React.Component {
   }
 
   componentWillReceiveProps(props) {
-    console.warn(props);
-
     if (props &&
         props.activeSection !== 'send') {
       // reset form state
@@ -50,15 +49,18 @@ class SendCoin extends React.Component {
           });
           break;
         case 2:
-          // todo
           this.setState({
             sendCurrentStep: 2,
           });
 
-          this.props.sendtx(this.props.coin, this.state.sendTo, this.state.sendAmount * 100000000, true)
-          .then((res) => {
-            console.warn('sendtx result');
-            console.warn(res);
+          this.props.sendtx(
+            this.props.coin,
+            this.state.sendTo,
+            this.state.sendAmount * 100000000,
+            true
+          ).then((res) => {
+            // console.warn('sendtx result');
+            // console.warn(res);
 
             this.setState({
               sendResult: res,
@@ -77,7 +79,7 @@ class SendCoin extends React.Component {
         autoComplete="off">
         <div className="row">
           <div className="col-xlg-12 form-group form-material">
-            <label className="control-label padding-bottom-10">Send from</label>
+            <label className="control-label padding-bottom-10">{ translate('SEND.SEND_FROM') }</label>
             <div>{ this.props.address }</div>
           </div>
         </div>
@@ -85,7 +87,7 @@ class SendCoin extends React.Component {
           <div className="col-xlg-12 form-group form-material">
             <label
               className="control-label"
-              htmlFor="kmdWalletSendTo">Send to</label>
+              htmlFor="kmdWalletSendTo">{ translate('SEND.SEND_TO') }</label>
             <input
               type="text"
               className="form-control"
@@ -93,7 +95,7 @@ class SendCoin extends React.Component {
               onChange={ this.updateInput }
               value={ this.state.sendTo }
               id="kmdWalletSendTo"
-              placeholder="Enter address"
+              placeholder={ translate('SEND.ENTER_AN_ADDRESS') }
               autoComplete="off"
               required />
           </div>
@@ -101,7 +103,7 @@ class SendCoin extends React.Component {
             <label
               className="control-label"
               htmlFor="kmdWalletAmount">
-              Amount
+              { translate('SEND.AMOUNT') }
             </label>
             <input
               type="text"
@@ -119,7 +121,7 @@ class SendCoin extends React.Component {
               className="btn btn-primary waves-effect waves-light pull-right"
               onClick={ () => this.changeSendCoinStep(1) }
               disabled={ !this.state.sendTo || !this.state.sendAmount }>
-              Send { this.state.sendAmount } { this.state.coin }
+              { translate('SEND.SEND') } { this.state.sendAmount } { this.state.coin }
             </button>
           </div>
         </div>
@@ -149,7 +151,7 @@ class SendCoin extends React.Component {
             <div className="panel">
               <div className="panel-heading">
                 <div className="margin-bottom-20">
-                  <span className="step-title">Fill in details</span>
+                  <span className="step-title">{ translate('SEND.FILL_IN_DETAILS') }</span>
                 </div>
               </div>
               <div className="panel-body container-fluid">
@@ -163,10 +165,10 @@ class SendCoin extends React.Component {
               <div className="panel-heading">
                 <div className="row">
                   <div className="col-xs-12 margin-bottom-20">
-                    <span className="step-title">Confirm</span>
+                    <span className="step-title">{ translate('SEND.CONFIRM') }</span>
                   </div>
                   <div className="col-xs-12">
-                    <strong>To</strong>
+                    <strong>{ translate('SEND.TO') }</strong>
                   </div>
                   <div className="col-lg-6 col-sm-6 col-xs-12">{ this.state.sendTo }</div>
                   <div className="col-lg-6 col-sm-6 col-xs-6 margin-top-10">
@@ -188,13 +190,13 @@ class SendCoin extends React.Component {
                 <div className="widget-body-footer">
                   <a
                     className="btn btn-default waves-effect waves-light"
-                    onClick={ () => this.changeSendCoinStep(0, true) }>Back</a>
+                    onClick={ () => this.changeSendCoinStep(0, true) }>{ translate('SEND.BACK') }</a>
                   <div className="widget-actions pull-right">
                     <button
                       type="button"
                       className="btn btn-primary"
                       onClick={ () => this.changeSendCoinStep(2) }>
-                        Confirm
+                        { translate('SEND.CONFIRM') }
                     </button>
                   </div>
                 </div>
@@ -206,7 +208,7 @@ class SendCoin extends React.Component {
             <div className="panel">
               <div className="panel-heading">
                 <h4 className="panel-title">
-                  Transaction result
+                  { translate('SEND.TX_RESULT') }
                 </h4>
                 <div>
                   { this.state.sendResult &&
@@ -214,35 +216,35 @@ class SendCoin extends React.Component {
                     <table className="table table-hover table-striped margin-top-20">
                       <thead>
                         <tr>
-                          <th>Key</th>
-                          <th>Info</th>
+                          <th>{ translate('SEND.KEY') }</th>
+                          <th>{ translate('SEND.INFO') }</th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr>
                           <td>
-                          Result
+                          { translate('SEND.RESULT') }
                           </td>
                           <td>
-                            <span className="label label-success">success</span>
+                            <span className="label label-success">{ translate('SEND.SUCCESS') }</span>
                           </td>
                         </tr>
                         <tr>
                           <td>Tx ID</td>
-                          <td>{ this.state.sendResult && this.state.sendResult.result && this.state.sendResult.result.txid ? this.state.sendResult.result.txid : 'processing...' }</td>
+                          <td>{ this.state.sendResult && this.state.sendResult.result && this.state.sendResult.result.txid ? this.state.sendResult.result.txid : translate('SEND.PROCESSING_SM') }</td>
                         </tr>
                       </tbody>
                     </table>
                   }
                   { !this.state.sendResult &&
-                    <div className="padding-top-20">Processing transaction...</div>
+                    <div className="padding-top-20">{ translate('SEND.PROCESSING_TX') }</div>
                   }
                   { this.state.sendResult &&
                     this.state.sendResult.msg &&
                     this.state.sendResult.msg === 'error' &&
                     <div className="padding-top-20">
                       <div>
-                        <strong>Error</strong>
+                        <strong>{ translate('SEND.ERROR') }</strong>
                       </div>
                       <div>{ this.state.sendResult.result }</div>
                     </div>
@@ -254,7 +256,7 @@ class SendCoin extends React.Component {
                       type="button"
                       className="btn btn-primary"
                       onClick={ () => this.changeSendCoinStep(0) }>
-                        Make another tx
+                        { translate('SEND.MAKE_NOTHER_TX') }
                     </button>
                   </div>
                 </div>

@@ -11,8 +11,6 @@ export const encryptkey = (ciperKey, string) => {
 
   const encryptedString = aes256.encrypt(ciperKey, string);
 
-  console.warn('encryptkey', encryptedString);
-
   return encryptedString;
 }
 
@@ -21,8 +19,6 @@ export const decryptkey = (ciperKey, string) => {
   // test if stored encrypted passphrase is decrypted correctly
   // if not then the key is wrong
   const _regexTest = encryptedKey.match(/^[0-9a-zA-Z ]+$/g);
-
-  console.warn('decryptkey', _regexTest);
 
   if (!_regexTest) {
     return false;
