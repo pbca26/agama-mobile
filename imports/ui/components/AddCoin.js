@@ -60,8 +60,12 @@ class AddCoin extends React.Component {
 
   renderCoins(singleSelect) {
     let _items = [];
+    let _coins = this.props.coins;
+
     _items.push(
-      <span key={ `addcoin-kmd` }>
+      <span
+        className={ _coins.kmd ? 'disabled' : '' }
+        key={ `addcoin-kmd` }>
         <img
           onClick={ () => singleSelect ? this.addCoin('kmd') : this.toggleMultiSelectCoin('kmd') }
           src={ `/images/cryptologo/kmd.png` } />
@@ -77,7 +81,9 @@ class AddCoin extends React.Component {
         const _coin = electrumServers[key].abbr.toLowerCase();
 
         _items.push(
-          <span key={ `addcoin-${key}` }>
+          <span
+            className={ _coins[key] ? 'disabled' : '' }
+            key={ `addcoin-${key}` }>
             <img
               onClick={ () => singleSelect ? this.addCoin(_coin) : this.toggleMultiSelectCoin(_coin) }
               src={ `/images/cryptologo/${_coin}.png` } />
@@ -94,22 +100,34 @@ class AddCoin extends React.Component {
   }
 
   renderCoinShortcuts() {
+    let _coins = this.props.coins;
+
     return (
       <div className="coins-list-shortcuts">
         <div
           onClick={ () => this.addCoin('kmd+chips') }
           className="combination">
-          <img src="/images/cryptologo/kmd.png" />
+          <img
+            className={ _coins.kmd ? 'disabled' : '' }
+            src="/images/cryptologo/kmd.png" />
           <i className="fa fa-plus margin-left-15 margin-right-15"></i>
-          <img src="/images/cryptologo/chips.png" />
+          <img
+            className={ _coins.chips ? 'disabled' : '' }
+            src="/images/cryptologo/chips.png" />
         </div>
         <div
           onClick={ () => this.addCoin('kmd+revs+jumblr') }
           className="combination">
-          <img src="/images/cryptologo/kmd.png" />
+          <img
+            className={ _coins.kmd ? 'disabled' : '' }
+            src="/images/cryptologo/kmd.png" />
           <i className="fa fa-plus margin-left-15 margin-right-15"></i>
-          <img src="/images/cryptologo/revs.png" />
-          <i className="fa fa-plus margin-left-15 margin-right-15"></i>
+          <img
+            className={ _coins.revs ? 'disabled' : '' }
+            src="/images/cryptologo/revs.png" />
+          <i
+            className={ _coins.jumblr ? 'disabled' : '' }
+            className="fa fa-plus margin-left-15 margin-right-15"></i>
           <img src="/images/cryptologo/jumblr.png" />
         </div>
         <div className="combination">

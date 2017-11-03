@@ -8,6 +8,7 @@ import {
   getLocalStorageVar,
   sortBy,
 } from './actions/utils';
+import { translate } from './translate/translate';
 
 import SendCoin from './components/SendCoin';
 import MyAddress from './components/MyAddress';
@@ -295,20 +296,40 @@ class App extends React.Component {
           <div
             onClick={ this.toggleMenu }
             className="nav-menu-overlay"></div>
-          <div className="nav-menu-inner">
+          <div
+            id="nav-menu-inner"
+            className="nav-menu-inner">
             <i
               onClick={ this.toggleMenu }
               className="fa fa-bars"></i>
-            <div className="nav-menu-items">
-              <div onClick={ this.logout }>Logout</div>
-              <div onClick={ this.lock }>Lock</div>
-              <div onClick={ () => this.changeActiveSection('dashboard', true) }>Dashboard</div>
-              <div onClick={ this.toggleSend }>Send</div>
-              <div>
-              { this.renderActiveCoins() }
+            { this.state.auth &&
+              <div className="nav-menu-items">
+                <div onClick={ this.logout }>{ translate('DASHBOARD.LOGOUT') }</div>
+                <div onClick={ this.lock }>{ translate('DASHBOARD.LOCK') }</div>
+                { this.state.activeSection === 'dashboard' &&
+                  <div onClick={ () => this.changeActiveSection('dashboard', true) }>{ translate('DASHBOARD.DASHBOARD') }</div>
+                }
+                { this.state.activeSection === 'send' &&
+                  <div onClick={ this.toggleSend }>{ translate('DASHBOARD.SEND') }</div>
+                }
+                <div>
+                { this.renderActiveCoins() }
+                </div>
+                { this.state.activeSection !== 'addcoin' &&
+                  <div onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.ADD_COIN') }</div>
+                }
               </div>
-              <div onClick={ this.toggleAddCoin }>Add coin</div>
-            </div>
+            }
+            { !this.state.auth &&
+              <div className="nav-menu-items">
+                { this.state.activeSection === 'addcoin' &&
+                  <div onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.LOGIN') }</div>
+                }
+                { this.state.activeSection !== 'addcoin' &&
+                  <div onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.ADD_COIN') }</div>
+                }
+              </div>
+            }
           </div>
         </div>
       );
@@ -327,11 +348,9 @@ class App extends React.Component {
               className="margin-left-20"
               src={ `/images/cryptologo/${this.state.coin}.png` } />
           }
-          { this.state.auth &&
-            <i
-              onClick={ this.toggleMenu }
-              className="fa fa-bars"></i>
-          }
+          <i
+            onClick={ this.toggleMenu }
+            className="fa fa-bars"></i>
         </div>
         <div className="app-main">
           <Login
