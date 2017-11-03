@@ -1,9 +1,6 @@
 import React from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
 import { formatValue } from '../actions/utils';
-
-import actions from '../actions/actions';
+import { translate } from '../translate/translate';
 
 class Balance extends React.Component {
   constructor() {
@@ -14,15 +11,18 @@ class Balance extends React.Component {
 
   render() {
     if (this.props.activeSection === 'dashboard') {
-      if (this.props.balance) {
+      const _balance = this.props.balance;
+      const _coin = this.props.coin.toUpperCase();
+
+      if (_balance) {
         return (
-          <div style={{ fontSize: '16px', margin: '20px', marginLeft: '10px', marginBottom: '35px' }}>
+          <div className="balance">
             <div>
-              <strong>Balance: </strong> <span>{ formatValue(this.props.balance.balance) } { this.props.coin.toUpperCase() }</span>
+              <strong>{ translate('BALANCE.BALANCE') }: </strong> <span>{ formatValue(_balance.balance) } { _coin }</span>
             </div>
-            { this.props.balance.interest &&
+            { _balance.interest &&
               <div className="margin-top-10">
-                <strong>Interest: </strong> <span>{ formatValue(this.props.balance.interest) } { this.props.coin.toUpperCase() }</span>
+                <strong> { translate('BALANCE.INTEREST') }: </strong> <span>{ formatValue(_balance.interest) } { _coin }</span>
               </div>
             }
           </div>
@@ -36,10 +36,4 @@ class Balance extends React.Component {
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    actions: bindActionCreators(actions, dispatch),
-  }
-}
-
-export default connect(mapDispatchToProps)(Balance);
+export default Balance;

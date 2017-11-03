@@ -29,9 +29,6 @@ export const seedToWif = (seed, iguana, network) => {
 
   key.compressed = true;
 
-  // shepherd.log(`seedtowif priv key ${key.privateWif}`, true);
-  // shepherd.log(`seedtowif pub key ${key.publicAddress}`, true);
-
   return {
     wif: key.privateWif,
     pub: key.publicAddress,

@@ -1,12 +1,9 @@
 import React from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
 import {
   secondsToString,
   formatValue,
 } from '../actions/utils';
-
-import actions from '../actions/actions';
+import { translate } from '../translate/translate';
 
 class Transactions extends React.Component {
   constructor() {
@@ -30,32 +27,32 @@ class Transactions extends React.Component {
         category === 'sent') {
       return (
         <span className="label label-danger">
-          <i className="fa fa-arrow-circle-left"></i> <span>out</span>
+          <i className="fa fa-arrow-circle-left"></i> <span>{ translate('TRANSACTIONS.OUT') }</span>
         </span>
       );
     } else if (category === 'receive' ||
         category === 'received') {
       return (
         <span className="label label-success">
-          <i className="fa fa-arrow-circle-right"></i> <span>in &nbsp; &nbsp;</span>
+          <i className="fa fa-arrow-circle-right"></i> <span>{ translate('TRANSACTIONS.IN') } &nbsp; &nbsp;</span>
         </span>
       );
     } else if (category === 'generate') {
       return (
         <span>
-          <i className="fa fa-cogs"></i> <span>mine</span>
+          <i className="fa fa-cogs"></i> <span>{ translate('TRANSACTIONS.MINE') }</span>
         </span>
       );
     } else if (category === 'immature') {
       return (
         <span>
-          <i className="fa fa-clock-o"></i> <span>immature</span>
+          <i className="fa fa-clock-o"></i> <span>{ translate('TRANSACTIONS.IMMATURE') }</span>
         </span>
       );
     } else if (category === 'unknown') {
       return (
         <span>
-          <i className="fa fa-meh-o"></i> <span>unknown</span>
+          <i className="fa fa-meh-o"></i> <span>{ translate('TRANSACTIONS.UNKNOWN') }</span>
         </span>
       );
     }
@@ -75,7 +72,7 @@ class Transactions extends React.Component {
 
     return (
       <span>
-        { formatValue(tx.amount) * _amountNegative || 'uknown' }
+        { formatValue(tx.amount) * _amountNegative || translate('TRANSACTIONS.UNKNOWN') }
         { tx.interest &&
           <span className="tx-interest margin-left-15">(+{ formatValue(Math.abs(tx.interest)) })</span>
         }
@@ -105,7 +102,7 @@ class Transactions extends React.Component {
                 <span className="margin-left-20">{ this.renderTxAmount(_transactions[i]) }</span>
                 <span className="margin-left-20">{ secondsToString(_transactions[i].timestamp) }</span>
               </div>
-              <div className="margin-top-10 padding-bottom-10">
+              <div className="margin-top-10 padding-bottom-10 txid-hash">
               { _transactions[i].txid }
               </div>
             </div>
@@ -114,7 +111,7 @@ class Transactions extends React.Component {
 
         if (!_items.length) {
           return (
-            <div className="txhistory">No history</div>
+            <div className="txhistory">{ translate('TRANSACTIONS.NO_HISTORY') }</div>
           );
         } else {
           return (
@@ -130,10 +127,4 @@ class Transactions extends React.Component {
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    actions: bindActionCreators(actions, dispatch),
-  }
-}
-
-export default connect(mapDispatchToProps)(Transactions);
+export default Transactions;
