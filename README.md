@@ -11,6 +11,7 @@ install java8, don't install java9 it won't work with meteor 1.5.x
 git clone
 cd to project's folder
 meteor npm install sha256
+meteor npm install nodejs-aes256
 meteor npm install bitcoinjs-lib
 meteor npm install coinkey
 meteor npm install coinselect
@@ -28,7 +29,7 @@ meteor run --port=3002
 ## How to build an apk
 meteor add-platform android
 
-meteor build build --server=supernet.org
+meteor build build --server=localhost
 
 sign apk with your key
 
