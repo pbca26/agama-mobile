@@ -26,7 +26,7 @@ function clearKeys() {
   }
 }
 
-function sendtx(network, outputAddress, value, push) {
+function sendtx(network, outputAddress, value, verify, push) {
   return async function(dispatch) {
     return new Promise((resolve, reject) => {
       const changeAddress = electrumKeys[network].pub;
@@ -40,6 +40,7 @@ function sendtx(network, outputAddress, value, push) {
         10000,
         electrumKeys[network].wif,
         network,
+        verify,
         push
       ).then((res) => {
         resolve(res);

@@ -2,13 +2,19 @@ import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
 import { kmdCalcInterest } from './utils';
 
+const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
+
 const electrumJSNetworks = require('./electrumNetworks.js');
 const electrumJSTxDecoder = require('./electrumTxDecoder.js');
 
 export const getKMDBalance = (address, json, proxyServer, electrumServer) => {
   return new Promise((resolve, reject) => {
-    HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent?port=${electrumServer.port}&ip=${electrumServer.ip}&address=${address}`, {
-      params: {}
+    HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent`, {
+      params: {
+        port: electrumServer.port,
+        ip: electrumServer.ip,
+        address,
+      },
     }, (error, result) => {
       result = JSON.parse(result.content);
 
@@ -23,7 +29,7 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer) => {
           let _utxo = [];
 
           for (let i = 0; i < utxoList.length; i++) {
-            devlog(`utxo ${utxoList[i]['tx_hash']} sats ${utxoList[i].value} value ${Number(utxoList[i].value) * 0.00000001}`, true);
+            devlog(`utxo ${utxoList[i]['tx_hash']} sats ${utxoList[i].value} value ${Number(utxoList[i].value) * 0.00000001}`);
 
             if (Number(utxoList[i].value) * 0.00000001 >= 10) {
               _utxo.push(utxoList[i]);
@@ -39,8 +45,13 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer) => {
 
             Promise.all(_utxo.map((_utxoItem, index) => {
               return new Promise((resolve, reject) => {
-                HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction?port=${electrumServer.port}&ip=${electrumServer.ip}&address=${address}&txid=${_utxoItem['tx_hash']}`, {
-                  params: {}
+                HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction`, {
+                  params: {
+                    port: electrumServer.port,
+                    ip: electrumServer.ip,
+                    address,
+                    txid: _utxoItem['tx_hash'],
+                  },
                 }, (error, result) => {
                   // devlog('gettransaction =>');
                   // devlog(result);
