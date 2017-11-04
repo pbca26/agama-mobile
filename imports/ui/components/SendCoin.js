@@ -212,7 +212,7 @@ class SendCoin extends React.Component {
                   <div
                     className="padding-top-20"
                     style={{ fontSize: '15px' }}>
-                    <strong className="warning">{ translate('SEND.WARNING') }:</strong> { translate('SEND.WARNING_SPV_P1') }<br />
+                    <i className="fa fa-warning warning"></i> <strong className="warning">{ translate('SEND.WARNING') }:</strong> { translate('SEND.WARNING_SPV_P1') }<br />
                     { translate('SEND.WARNING_SPV_P2') }
                   </div>
                 }

@@ -53,6 +53,10 @@ export const _lang = {
       'DASHBOARD': 'Dashboard',
       'SEND': 'Send',
       'ADD_COIN': 'Add coin',
+      'CON_ERROR': 'Connection error. Please try another @template@ server.',
+      'SWITCH_SERVER': 'Switch server',
+      'ERROR_TESTING_SERVER': 'Error: server @template@ is unreachable!',
+      'CONNECTING_TO_NEW_SERVER': 'Connecting to a new server...',
     },
     'TRANSACTIONS': {
       'OUT': 'out',

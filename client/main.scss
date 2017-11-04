@@ -436,3 +436,11 @@ input:checked + .slider:before {
   margin-left: 10px;
   margin-bottom: 35px;
 }
+
+.con-error {
+  font-weight: bold;
+  float: left;
+  width: calc(100% - 64px);
+  margin-top: 22px;
+  margin-left: 10px;
+}
