@@ -41,6 +41,7 @@ class App extends React.Component {
       auth: false,
       updateInterval: null,
       conError: false,
+      proxyError: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.login = this.login.bind(this);
@@ -150,18 +151,26 @@ class App extends React.Component {
     actions.balance(this.state.coin)
     .then((res) => {
       if (res &&
-          !res.hasOwnProperty('balance') &&
-          res.indexOf('error') > -1) {
+          res === 'proxy-error') {
         this.setState({
-          balance: null,
-          transactions: null,
-          conError: true,
+          proxyError: true,
         });
       } else {
-        this.setState({
-          balance: res,
-          conError: false,
-        });
+        if (res &&
+            !res.hasOwnProperty('balance') &&
+            res.indexOf('error') > -1) {
+          this.setState({
+            balance: null,
+            transactions: null,
+            conError: true,
+          });
+        } else {
+          this.setState({
+            balance: res,
+            conError: false,
+            proxyError: false,
+          });
+        }
       }
     });
   }
@@ -190,6 +199,7 @@ class App extends React.Component {
           transactions: res,
           loading: false,
           conError: false,
+          proxyError: false,
         });
       }
     });
@@ -455,6 +465,11 @@ class App extends React.Component {
               dashboardRefresh={ this.dashboardRefresh }
               getServersList={ this.props.actions.getServersList }
               setDefaultServer={ this.props.actions.setDefaultServer } />
+          }
+          { this.state.proxyError &&
+            <div className="con-error">
+              <i className="fa fa-warning error"></i> <span className="error">{ translate('DASHBOARD.PROXY_ERROR') }</span>
+            </div>
           }
           <Balance { ...this.state } />
           <Transactions { ...this.state } />
