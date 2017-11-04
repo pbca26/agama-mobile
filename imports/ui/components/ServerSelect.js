@@ -78,7 +78,9 @@ class ServerSelect extends React.Component {
   render() {
     return (
       <div className="con-error">
-        <i className="fa fa-warning error"></i> <span className="error">{ translate('DASHBOARD.CON_ERROR', this.props.coin.toUpperCase()) }</span>
+        <span className="bold">
+          <i className="fa fa-warning error"></i> <span className="error">{ translate('DASHBOARD.CON_ERROR', this.props.coin.toUpperCase()) }</span>
+        </span>
         <div>
           <hr />
           <div>

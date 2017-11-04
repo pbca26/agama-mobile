@@ -109,23 +109,27 @@ function balance(network) {
           address: address,
         },
       }, (error, result) => {
-        if (network === 'komodo' ||
-            network === 'kmd') {
-          getKMDBalance(
-            address,
-            JSON.parse(result.content).result,
-            proxyServer,
-            electrumServers[network === 'kmd' ? 'komodo' : network]
-          ).then((res) => {
-            resolve(res);
-          });
+        if (!result) {
+          resolve('proxy-error');
         } else {
-          const _balance = JSON.parse(result.content).result;
+          if (network === 'komodo' ||
+              network === 'kmd') {
+            getKMDBalance(
+              address,
+              JSON.parse(result.content).result,
+              proxyServer,
+              electrumServers[network === 'kmd' ? 'komodo' : network]
+            ).then((res) => {
+              resolve(res);
+            });
+          } else {
+            const _balance = JSON.parse(result.content).result;
 
-          resolve({
-            balance: Number((0.00000001 * _balance.confirmed).toFixed(8)),
-            unconfirmed: Number((0.00000001 * _balance.unconfirmed).toFixed(8)),
-          });
+            resolve({
+              balance: Number((0.00000001 * _balance.confirmed).toFixed(8)),
+              unconfirmed: Number((0.00000001 * _balance.unconfirmed).toFixed(8)),
+            });
+          }
         }
       });
     });

@@ -65,6 +65,7 @@ export const _lang = {
       'SWITCH_SERVER': 'Switch server',
       'ERROR_TESTING_SERVER': 'Error: server @template@ is unreachable!',
       'CONNECTING_TO_NEW_SERVER': 'Connecting to a new server...',
+      'PROXY_ERROR': 'Proxy service is unreachable!',
     },
     'TRANSACTIONS': {
       'OUT': 'out',
