@@ -18,6 +18,7 @@ import Transactions from './components/Transactions';
 import Balance from './components/Balance';
 import Spinner from './components/Spinner';
 import ServerSelect from './components/ServerSelect';
+import CreateSeed from './components/CreateSeed';
 
 const DASHBOARD_UPDATE_INTERVAL = 120000;
 
@@ -50,13 +51,13 @@ class App extends React.Component {
     this.getTransactions = this.getTransactions.bind(this);
     this.toggleMenu = this.toggleMenu.bind(this);
     this.toggleSend = this.toggleSend.bind(this);
+    this.toggleCreateSeed = this.toggleCreateSeed.bind(this);
     this.toggleAddCoin = this.toggleAddCoin.bind(this);
     this.dashboardRefresh = this.dashboardRefresh.bind(this);
     this.switchCoin = this.switchCoin.bind(this);
     this.addCoin = this.addCoin.bind(this);
     this.changeActiveSection = this.changeActiveSection.bind(this);
     this.toggleAutoRefresh = this.toggleAutoRefresh.bind(this);
-    this.switchServer = this.switchServer.bind(this);
   }
 
   componentWillMount() {
@@ -148,6 +149,7 @@ class App extends React.Component {
     actions.balance(this.state.coin)
     .then((res) => {
       if (res &&
+          !res.hasOwnProperty('balance') &&
           res.indexOf('error') > -1) {
         this.setState({
           balance: null,
@@ -189,7 +191,6 @@ class App extends React.Component {
           conError: false,
         });
       }
-      // conError
     });
   }
 
@@ -272,10 +273,6 @@ class App extends React.Component {
     });
   }
 
-  switchServer() {
-
-  }
-
   toggleSend() {
     setTimeout(() => {
       this.toggleMenu();
@@ -293,6 +290,16 @@ class App extends React.Component {
 
     this.setState({
       activeSection: this.state.activeSection === 'addcoin' ? 'dashboard' : 'addcoin',
+    });
+  }
+
+  toggleCreateSeed() {
+    setTimeout(() => {
+      this.toggleMenu();
+    }, 10);
+
+    this.setState({
+      activeSection: this.state.activeSection === 'create-seed' ? 'dashboard' : 'create-seed',
     });
   }
 
@@ -356,6 +363,7 @@ class App extends React.Component {
                 { this.state.activeSection !== 'addcoin' &&
                   <div onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.ADD_COIN') }</div>
                 }
+                <div onClick={ this.toggleCreateSeed }>{ translate('DASHBOARD.CREATE_SEED') }</div>
               </div>
             }
           </div>
@@ -382,6 +390,9 @@ class App extends React.Component {
         </div>
         <div className="app-main">
           <Login
+            { ...this.state }
+            login={ this.login } />
+          <CreateSeed
             { ...this.state }
             login={ this.login } />
           { this.state.auth &&

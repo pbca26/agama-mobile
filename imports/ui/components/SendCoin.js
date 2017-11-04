@@ -8,8 +8,8 @@ class SendCoin extends React.Component {
     super();
     this.state = {
       display: false,
-      sendAmount: 0.0001,
-      sendTo: 'RDbGxL8QYdEp8sMULaVZS2E6XThcTKT9Jd',
+      sendAmount: 0,
+      sendTo: '',
       sendCurrentStep: 0,
       sendResult: null,
       spvVerificationWarning: false,
