@@ -22,7 +22,7 @@ const buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, s
   let tx = new bitcoin.TransactionBuilder(_network);
 
   devlog('buildSignedTx');
-  devlog(`buildSignedTx priv key ${wif}`);
+  // devlog(`buildSignedTx priv key ${wif}`);
   devlog(`buildSignedTx pub key ${key.getAddress().toString()}`);
 
   for (let i = 0; i < utxo.length; i++) {

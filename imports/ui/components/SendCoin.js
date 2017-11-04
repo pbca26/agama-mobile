@@ -2,6 +2,7 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { translate } from '../translate/translate';
+import { isNumber } from '../actions/utils';
 
 class SendCoin extends React.Component {
   constructor() {
@@ -14,10 +15,14 @@ class SendCoin extends React.Component {
       sendResult: null,
       spvVerificationWarning: false,
       spvPreflightSendInProgress: false,
+      validNan: false,
+      validTooMuch: false,
+      validIncorrectAddress: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.changeSendCoinStep = this.changeSendCoinStep.bind(this);
     this.updateInput = this.updateInput.bind(this);
+    this.validate = this.validate.bind(this);
   }
 
   componentWillReceiveProps(props) {
@@ -34,68 +39,97 @@ class SendCoin extends React.Component {
     });
   }
 
+  validate() {
+    let _isFailed = false;
+
+    if (this.state.sendAmount > this.props.balance.balance) {
+      this.setState({
+        validTooMuch: true,
+      });
+      _isFailed = true;
+    }
+
+    if (this.state.sendTo.length !== 34) {
+      this.setState({
+        validIncorrectAddress: true,
+      });
+      _isFailed = true;
+    }
+
+    if (!isNumber(this.state.sendAmount)) {
+      this.setState({
+        validNan: true,
+      });
+      _isFailed = true;
+    }
+
+    return _isFailed;
+  }
+
   changeSendCoinStep(step, back) {
     if (back) {
       this.setState({
         sendCurrentStep: step,
       });
     } else {
-      switch(step) {
-        case 0:
-          this.setState(this.defaultState);
-          break;
-        case 1:
-          this.setState({
-            spvPreflightSendInProgress: true,
-            currentStep: step,
-          });
-
-          // spv pre tx push request
-          this.props.sendtx(
-            this.props.coin,
-            this.state.sendTo,
-            this.state.sendAmount * 100000000,
-            true,
-            false
-          ).then((sendPreflight) => {
-            if (sendPreflight &&
-                sendPreflight.msg === 'success') {
-              this.setState({
-                spvVerificationWarning: !sendPreflight.result.utxoVerified,
-                spvPreflightSendInProgress: false,
-              });
-            } else {
-              this.setState({
-                spvPreflightSendInProgress: false,
-              });
-            }
-          });
-
-          // todo validation
-          this.setState({
-            sendCurrentStep: 1,
-          });
-          break;
-        case 2:
-          this.setState({
-            sendCurrentStep: 2,
-          });
-
-          this.props.sendtx(
-            this.props.coin,
-            this.state.sendTo,
-            this.state.sendAmount * 100000000,
-            null,
-            true
-          ).then((res) => {
-            // console.warn('sendtx result');
-            // console.warn(res);
-
+      if (!this.validate()) {
+        switch(step) {
+          case 0:
+            this.setState(this.defaultState);
+            break;
+          case 1:
             this.setState({
-              sendResult: res,
+              spvPreflightSendInProgress: true,
+              currentStep: step,
             });
-          });
-          break;
+
+            // spv pre tx push request
+            this.props.sendtx(
+              this.props.coin,
+              this.state.sendTo,
+              Math.abs(this.state.sendAmount * 100000000),
+              true,
+              false
+            ).then((sendPreflight) => {
+              if (sendPreflight &&
+                  sendPreflight.msg === 'success') {
+                this.setState({
+                  spvVerificationWarning: !sendPreflight.result.utxoVerified,
+                  spvPreflightSendInProgress: false,
+                });
+              } else {
+                this.setState({
+                  spvPreflightSendInProgress: false,
+                });
+              }
+            });
+
+            // todo validation
+            this.setState({
+              sendCurrentStep: 1,
+            });
+            break;
+          case 2:
+            this.setState({
+              sendCurrentStep: 2,
+            });
+
+            this.props.sendtx(
+              this.props.coin,
+              this.state.sendTo,
+              Math.abs(this.state.sendAmount * 100000000),
+              null,
+              true
+            ).then((res) => {
+              // console.warn('sendtx result');
+              // console.warn(res);
+
+              this.setState({
+                sendResult: res,
+              });
+            });
+            break;
+        }
       }
     }
   }
@@ -127,6 +161,11 @@ class SendCoin extends React.Component {
               placeholder={ translate('SEND.ENTER_AN_ADDRESS') }
               autoComplete="off"
               required />
+          { this.state.validIncorrectAddress &&
+            <div className="error margin-top-15">
+              <i className="fa fa-warning"></i> { translate('SEND.ADDRESS_IS_INCORECT') }
+            </div>
+          }
           </div>
           <div className="col-lg-12 form-group form-material">
             <label
@@ -143,6 +182,16 @@ class SendCoin extends React.Component {
               id="kmdWalletAmount"
               placeholder="0.000"
               autoComplete="off" />
+            { this.state.validNan &&
+              <div className="error margin-top-15">
+                <i className="fa fa-warning"></i> { translate('SEND.NAN') }
+              </div>
+            }
+            { this.state.validTooMuch &&
+              <div className="error margin-top-15">
+                <i className="fa fa-warning"></i> { translate('SEND.TOO_MUCH', `${this.props.balance.balance} ${this.props.coin.toUpperCase()}`) }
+              </div>
+            }
           </div>
           <div className="col-lg-12">
             <button

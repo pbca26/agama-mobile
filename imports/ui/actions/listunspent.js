@@ -92,7 +92,8 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                               _atLeastOneDecodeTxFailed = true;
                               resolve('cant decode tx');
                             } else {
-                              if (network === 'komodo') {
+                              if (network === 'komodo' ||
+                                  network === 'kmd') {
                                 let interest = 0;
 
                                 if (Number(_utxoItem.value) * 0.00000001 >= 10 &&
