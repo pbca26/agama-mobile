@@ -17,8 +17,6 @@ class ServerSelect extends React.Component {
   }
 
   componentWillMount() {
-    console.warn(this.props);
-
     this.props.getServersList()
     .then((res) => {
       const _coin = this.props.coin === 'kmd' ? 'komodo' : this.props.coin;
@@ -28,8 +26,6 @@ class ServerSelect extends React.Component {
         electrumServer: res[_coin].ip + ':' + res[_coin].port,
         serverList: res[_coin].serverList,
       });
-
-      console.warn(this.state);
     });
   }
 
@@ -61,8 +57,6 @@ class ServerSelect extends React.Component {
         });
         this.props.dashboardRefresh();
       }
-
-      console.warn(res);
     });
   }
 

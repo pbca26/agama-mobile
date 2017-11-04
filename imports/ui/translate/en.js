@@ -9,6 +9,10 @@ export const _lang = {
       'OVERRIDE_PIN': 'Create / Override PIN',
       'ENTER_6_DIGIT_PIN': 'Enter a PIN (min. 6 digits)',
       'PIN_TOO_SHORT': 'PIN is too short!',
+      'I_CONFIRM_I_SAVED_SEED': 'I confirm that I saved the seed',
+      'PLEASE_MAKE_SURE_TO': 'Please make sure to write it down and store in a safe place!',
+      'THIS_IS_YOUR_NEW_SEED': 'This is your new seed',
+      'CONFIRMATION_REQUIRED': 'Confirmation is required',
     },
     'SEND': {
       'SEND': 'Send',
@@ -53,6 +57,7 @@ export const _lang = {
       'DASHBOARD': 'Dashboard',
       'SEND': 'Send',
       'ADD_COIN': 'Add coin',
+      'CREATE_SEED': 'Create seed',
       'CON_ERROR': 'Connection error. Please try another @template@ server.',
       'SWITCH_SERVER': 'Switch server',
       'ERROR_TESTING_SERVER': 'Error: server @template@ is unreachable!',

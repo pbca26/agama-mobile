@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {
-  maskPubAddress,
   setLocalStorageVar,
   getLocalStorageVar,
 } from '../actions/utils';
@@ -10,22 +9,33 @@ import {
   decryptkey,
 } from '../actions/seedCrypt';
 import { translate } from '../translate/translate';
+import { PassPhraseGenerator } from './seedGen/passphrasegenerator';
 
-class Login extends React.Component {
+class CreateSeed extends React.Component {
   constructor() {
     super();
     this.state = {
       passphrase: null,
-      createPin: false,
+      createPin: true,
       pinOverride: null,
       pinOverrideTooShort: false,
       pin: '',
-      wrongPin: false,
+      pinConfirm: false,
+      confirmSeedSaved: false,
+      seed: PassPhraseGenerator.generatePassPhrase(256),
+      pristine: true,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.updateInput = this.updateInput.bind(this);
     this.login = this.login.bind(this);
     this.toggleCreatePin = this.toggleCreatePin.bind(this);
+    this.toggleConfirmSeed = this.toggleConfirmSeed.bind(this);
+  }
+
+  componentWillMount() {
+    this.setState({
+      seed: PassPhraseGenerator.generatePassPhrase(256),
+    });
   }
 
   componentWillReceiveProps(props) {
@@ -38,41 +48,21 @@ class Login extends React.Component {
     });
   }
 
-  login(isPinAccess) {
-    if (isPinAccess) {
-      // decrypt
-      const _encryptedKey = getLocalStorageVar('seed');
-
-      if (_encryptedKey &&
-          _encryptedKey.encryptedKey &&
-          this.state.pin &&
-          this.state.pin.length >= 6) {
-        const _decryptedKey = decryptkey(this.state.pin, _encryptedKey.encryptedKey);
-
-        if (_decryptedKey) {
-          this.props.login(_decryptedKey);
-          this.setState(this.defaultState);
-        } else {
-          this.setState({
-            pinOverrideTooShort: false,
-            wrongPin: true,
-          });
-        }
-      } else {
-        this.setState({
-          pinOverrideTooShort: false,
-          wrongPin: true,
-        });
-      }
+  login() {
+    if (!this.state.confirmSeedSaved &&
+        this.state.pristine) {
+      this.setState({
+        pristine: false,
+      });
     } else {
       if (this.state.createPin) {
         if (this.state.pinOverride &&
             this.state.pinOverride.length >= 6) {
-          const _encryptedKey = encryptkey(this.state.pinOverride, this.state.passphrase);
+          const _encryptedKey = encryptkey(this.state.pinOverride, this.state.seed);
 
           setLocalStorageVar('seed', { encryptedKey: _encryptedKey });
 
-          this.props.login(this.state.passphrase);
+          this.props.login(this.state.seed);
           this.setState(this.defaultState);
         } else {
           this.setState({
@@ -81,7 +71,7 @@ class Login extends React.Component {
           });
         }
       } else {
-        this.props.login(this.state.passphrase);
+        this.props.login(this.state.seed);
         this.setState(this.defaultState);
       }
     }
@@ -93,47 +83,43 @@ class Login extends React.Component {
     });
   }
 
+  toggleConfirmSeed() {
+    this.setState({
+      confirmSeedSaved: !this.state.confirmSeedSaved,
+    });
+  }
+
   render() {
-    if ((this.props.activeSection === 'login' || (!this.props.auth && this.props.activeSection !== 'addcoin')) &&
-        this.props.coins &&
-        Object.keys(this.props.coins).length &&
-        this.props.activeSection !== 'create-seed') {
+    if (this.props.activeSection === 'create-seed') {
       return (
         <div className="col-sm-12">
           <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12">
             <div className="row">
-              <h4 className="padding-bottom-10">{ translate('LOGIN.PIN_ACCESS') }</h4>
-              <input
-                type="password"
-                className="form-control margin-bottom-30"
-                name="pin"
-                onChange={ this.updateInput }
-                placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
-                value={ this.state.pin || '' } />
-              { this.state.wrongPin &&
-                <div className="error margin-bottom-25">
-                  <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
+              <h4>{ translate('LOGIN.THIS_IS_YOUR_NEW_SEED') }</h4>
+              <div className="seed-gen-box">{ this.state.seed }</div>
+              <div className="margin-top-25 margin-bottom-25 warning">
+                <strong>{ translate('LOGIN.PLEASE_MAKE_SURE_TO') }</strong>
+              </div>
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  value="on"
+                  checked={ this.state.confirmSeedSaved } />
+                <div
+                  className="slider"
+                  onClick={ this.toggleConfirmSeed }></div>
+              </label>
+              <div
+                className="toggle-label pointer"
+                onClick={ this.toggleConfirmSeed }>
+                { translate('LOGIN.I_CONFIRM_I_SAVED_SEED') }
+              </div>
+              { !this.state.confirmSeedSaved &&
+                !this.state.pristine &&
+                <div className="error margin-top-15">
+                  <i className="fa fa-warning"></i> { translate('LOGIN.CONFIRMATION_REQUIRED') }
                 </div>
               }
-              <button
-                className="btn btn-lg btn-primary btn-block ladda-button"
-                onClick={ () => this.login(true) }>
-                <span className="ladda-label">
-                { translate('LOGIN.LOGIN') }
-                </span>
-              </button>
-
-              <hr />
-
-              <h4 className="padding-bottom-10">{ translate('LOGIN.PASSPHRASE_ACCESS') }</h4>
-              <input
-                type="password"
-                className="form-control margin-bottom-10"
-                name="passphrase"
-                onChange={ this.updateInput }
-                placeholder={ translate('LOGIN.ENTER_PASSPHRASE') }
-                value={ this.state.passphrase || '' } />
-
               <div className="margin-bottom-25 margin-top-30">
                 <label className="switch">
                   <input
@@ -168,7 +154,7 @@ class Login extends React.Component {
 
               <button
                 className="btn btn-lg btn-primary btn-block ladda-button"
-                onClick={ () => this.login(false) }>
+                onClick={ this.login }>
                 <span className="ladda-label">
                 { translate('LOGIN.LOGIN') }
                 </span>
@@ -183,4 +169,4 @@ class Login extends React.Component {
   }
 }
 
-export default Login;
+export default CreateSeed;
