@@ -17,6 +17,7 @@ import Login from './components/Login';
 import Transactions from './components/Transactions';
 import Balance from './components/Balance';
 import Spinner from './components/Spinner';
+import ServerSelect from './components/ServerSelect';
 
 const DASHBOARD_UPDATE_INTERVAL = 120000;
 
@@ -38,6 +39,7 @@ class App extends React.Component {
       saveSeed: null,
       auth: false,
       updateInterval: null,
+      conError: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.login = this.login.bind(this);
@@ -54,6 +56,7 @@ class App extends React.Component {
     this.addCoin = this.addCoin.bind(this);
     this.changeActiveSection = this.changeActiveSection.bind(this);
     this.toggleAutoRefresh = this.toggleAutoRefresh.bind(this);
+    this.switchServer = this.switchServer.bind(this);
   }
 
   componentWillMount() {
@@ -144,10 +147,19 @@ class App extends React.Component {
 
     actions.balance(this.state.coin)
     .then((res) => {
-      this.setState({
-        balance: res,
-      });
-      console.warn(res);
+      if (res &&
+          res.indexOf('error') > -1) {
+        this.setState({
+          balance: null,
+          transactions: null,
+          conError: true,
+        });
+      } else {
+        this.setState({
+          balance: res,
+          conError: false,
+        });
+      }
     });
   }
 
@@ -160,12 +172,24 @@ class App extends React.Component {
 
     actions.transactions(this.state.coin)
     .then((res) => {
-      res = sortBy(res, 'confirmations');
+      if (res &&
+          res.indexOf('error') > -1) {
+        this.setState({
+          balance: null,
+          transactions: null,
+          loading: false,
+          conError: true,
+        });
+      } else {
+        res = sortBy(res, 'confirmations');
 
-      this.setState({
-        transactions: res,
-        loading: false,
-      });
+        this.setState({
+          transactions: res,
+          loading: false,
+          conError: false,
+        });
+      }
+      // conError
     });
   }
 
@@ -246,6 +270,10 @@ class App extends React.Component {
     this.setState({
       displayMenu: !this.state.displayMenu,
     });
+  }
+
+  switchServer() {
+
   }
 
   toggleSend() {
@@ -378,6 +406,13 @@ class App extends React.Component {
           { this.state.loading &&
             this.state.activeSection === 'dashboard' &&
             <Spinner />
+          }
+          { this.state.conError &&
+            <ServerSelect
+              { ...this.state }
+              dashboardRefresh={ this.dashboardRefresh }
+              getServersList={ this.props.actions.getServersList }
+              setDefaultServer={ this.props.actions.setDefaultServer } />
           }
           <Balance { ...this.state } />
           <Transactions { ...this.state } />

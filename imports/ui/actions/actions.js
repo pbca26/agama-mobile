@@ -17,6 +17,38 @@ import { listtransactions } from './listtransactions';
 
 let electrumKeys = {};
 
+function getServersList() {
+  return async function(dispatch) {
+    return new Promise((resolve, reject) => {
+      resolve(electrumServers);
+    });
+  }
+}
+
+function setDefaultServer(network, port, ip) {
+  return async function(dispatch) {
+    return new Promise((resolve, reject) => {
+      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/server/version`, {
+        params: {
+          port,
+          ip,
+        },
+      }, (error, result) => {
+        result = JSON.parse(result.content);
+
+        if (result.msg === 'error') {
+          resolve('error');
+        } else {
+          electrumServers[network].port = port;
+          electrumServers[network].ip = ip;
+
+          resolve(true);
+        }
+      });
+    });
+  }
+}
+
 function clearKeys() {
   return async function(dispatch) {
     return new Promise((resolve, reject) => {
@@ -130,4 +162,6 @@ export default {
   balance,
   transactions,
   sendtx,
+  getServersList,
+  setDefaultServer,
 }

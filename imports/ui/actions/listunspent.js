@@ -115,8 +115,12 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
 
                                 // merkle root verification agains another electrum server
                                 if (verify) {
-                                  verifyMerkleByCoin(_utxoItem['tx_hash'], _utxoItem.height, electrumServer, proxyServer)
-                                  .then((verifyMerkleRes) => {
+                                  verifyMerkleByCoin(
+                                    _utxoItem['tx_hash'],
+                                    _utxoItem.height,
+                                    electrumServer,
+                                    proxyServer
+                                  ).then((verifyMerkleRes) => {
                                     if (verifyMerkleRes &&
                                         verifyMerkleRes === CONNECTION_ERROR_OR_INCOMPLETE_DATA) {
                                       verifyMerkleRes = false;
@@ -128,7 +132,6 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                                 } else {
                                   resolve(_resolveObj);
                                 }
-                                // resolve(_resolveObj);
                               } else {
                                 let _resolveObj = {
                                   txid: _utxoItem['tx_hash'],
@@ -143,8 +146,12 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
 
                                 // merkle root verification agains another electrum server
                                 if (verify) {
-                                  verifyMerkleByCoin(_utxoItem['tx_hash'], _utxoItem.height, electrumServer, proxyServer)
-                                  .then((verifyMerkleRes) => {
+                                  verifyMerkleByCoin(
+                                    _utxoItem['tx_hash'],
+                                    _utxoItem.height,
+                                    electrumServer,
+                                    proxyServer
+                                  ).then((verifyMerkleRes) => {
                                     if (verifyMerkleRes &&
                                         verifyMerkleRes === CONNECTION_ERROR_OR_INCOMPLETE_DATA) {
                                       verifyMerkleRes = false;
@@ -156,7 +163,6 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                                 } else {
                                   resolve(_resolveObj);
                                 }
-                                //resolve(_resolveObj);
                               }
                             }
                           }

@@ -83,7 +83,6 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
                         Promise.all(decodedTx.inputs.map((_decodedInput, index) => {
                           return new Promise((_resolve, _reject) => {
                             if (_decodedInput.txid !== '0000000000000000000000000000000000000000000000000000000000000000') {
-
                               HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction`, {
                                 params: {
                                   port: electrumServer.port,

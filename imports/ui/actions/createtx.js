@@ -2,8 +2,6 @@ import { Promise } from 'meteor/promise';
 import bitcoin from 'bitcoinjs-lib';
 import coinSelect from 'coinselect';
 
-const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
-
 import { devlog } from './dev';
 import {
   kmdCalcInterest,
@@ -11,6 +9,8 @@ import {
 } from './utils';
 import { listunspent } from './listunspent';
 import { isAssetChain } from './utils';
+
+const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
 const electrumJSNetworks = require('./electrumNetworks.js');
 const electrumJSTxDecoder = require('./electrumTxDecoder.js');
@@ -79,8 +79,14 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
   return new Promise((resolve, reject) => {
     devlog('createrawtx =>');
 
-    listunspent(proxyServer, electrumServer, changeAddress, network, true, verify)
-    .then((utxoList) => {
+    listunspent(
+      proxyServer,
+      electrumServer,
+      changeAddress,
+      network,
+      true,
+      verify
+    ).then((utxoList) => {
       if (utxoList &&
           utxoList.length) {
         let utxoListFormatted = [];
@@ -197,10 +203,10 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
 
           resolve(successObj);
         } else {
-          devlog(`maxspend ${_maxSpend} (${_maxSpend * 0.00000001})`, true);
-          devlog(`value ${value}`, true);
-          devlog(`sendto ${outputAddress} amount ${value} (${value * 0.00000001})`, true);
-          devlog(`changeto ${changeAddress} amount ${_change} (${_change * 0.00000001})`, true);
+          devlog(`maxspend ${_maxSpend} (${_maxSpend * 0.00000001})`);
+          devlog(`value ${value}`);
+          devlog(`sendto ${outputAddress} amount ${value} (${value * 0.00000001})`);
+          devlog(`changeto ${changeAddress} amount ${_change} (${_change * 0.00000001})`);
 
           // account for KMD interest
           if ((network === 'komodo' || network === 'kmd') &&
@@ -208,9 +214,9 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
             // account for extra vout
             const _feeOverhead = outputs.length === 1 ? estimateTxSize(0, 1) * feeRate : 0;
 
-            devlog(`max interest to claim ${totalInterest} (${totalInterest * 0.00000001})`, true);
-            devlog(`estimated fee overhead ${_feeOverhead}`, true);
-            devlog(`current change amount ${_change} (${_change * 0.00000001}), boosted change amount ${_change + (totalInterest - _feeOverhead)} (${(_change + (totalInterest - _feeOverhead)) * 0.00000001})`, true);
+            devlog(`max interest to claim ${totalInterest} (${totalInterest * 0.00000001})`);
+            devlog(`estimated fee overhead ${_feeOverhead}`);
+            devlog(`current change amount ${_change} (${_change * 0.00000001}), boosted change amount ${_change + (totalInterest - _feeOverhead)} (${(_change + (totalInterest - _feeOverhead)) * 0.00000001})`);
 
             _change = _change + (totalInterest - _feeOverhead);
           }
@@ -231,8 +237,8 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
 
             const _estimatedFee = vinSum - outputs[0].value - _change;
 
-            devlog(`vin sum ${vinSum} (${vinSum * 0.00000001})`, true);
-            devlog(`estimatedFee ${_estimatedFee} (${_estimatedFee * 0.00000001})`, true);
+            devlog(`vin sum ${vinSum} (${vinSum * 0.00000001})`);
+            devlog(`estimatedFee ${_estimatedFee} (${_estimatedFee * 0.00000001})`);
 
             const _rawtx = buildSignedTx(
               outputAddress,
