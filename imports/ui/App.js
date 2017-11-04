@@ -58,6 +58,7 @@ class App extends React.Component {
     this.addCoin = this.addCoin.bind(this);
     this.changeActiveSection = this.changeActiveSection.bind(this);
     this.toggleAutoRefresh = this.toggleAutoRefresh.bind(this);
+    this.toggleLogin = this.toggleLogin.bind(this);
   }
 
   componentWillMount() {
@@ -303,22 +304,50 @@ class App extends React.Component {
     });
   }
 
+  toggleLogin() {
+    setTimeout(() => {
+      this.toggleMenu();
+    }, 10);
+
+    this.setState({
+      activeSection: this.state.activeSection === 'login' ? 'dashboard' : 'login',
+    });
+  }
+
   renderActiveCoins() {
     let _items = [];
 
-    for (let key in this.state.coins) {
+    if (this.state.coins &&
+        this.state.coins.kmd) {
       _items.push(
         <div
-          onClick={ () => key !== this.state.coin ? this.switchCoin(key) : null }
-          key={ `active-coins-${key}` }
+          onClick={ () => this.state.coin !== 'kmd' ? this.switchCoin('kmd') : null }
+          key={ `active-coins-kmd` }
           className="active-coins">
           <img
-            src={ `/images/cryptologo/${key}.png` } /> <span>{ key.toUpperCase() }</span>
-          { key === this.state.coin &&
+            src={ `/images/cryptologo/kmd.png` } /> <span>KMD</span>
+          { this.state.coin === 'kmd' &&
             <i className="fa fa-check"></i>
           }
         </div>
       );
+    }
+
+    for (let key in this.state.coins) {
+      if (key !== 'kmd') {
+        _items.push(
+          <div
+            onClick={ () => key !== this.state.coin ? this.switchCoin(key) : null }
+            key={ `active-coins-${key}` }
+            className="active-coins">
+            <img
+              src={ `/images/cryptologo/${key}.png` } /> <span>{ key.toUpperCase() }</span>
+            { key === this.state.coin &&
+              <i className="fa fa-check"></i>
+            }
+          </div>
+        );
+      }
     }
 
     return _items;
@@ -357,13 +386,15 @@ class App extends React.Component {
             }
             { !this.state.auth &&
               <div className="nav-menu-items">
-                { this.state.activeSection === 'addcoin' &&
-                  <div onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.LOGIN') }</div>
+                { (this.state.activeSection === 'addcoin' || this.state.activeSection === 'create-seed') &&
+                  <div onClick={ this.toggleLogin }>{ translate('DASHBOARD.LOGIN') }</div>
                 }
                 { this.state.activeSection !== 'addcoin' &&
                   <div onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.ADD_COIN') }</div>
                 }
-                <div onClick={ this.toggleCreateSeed }>{ translate('DASHBOARD.CREATE_SEED') }</div>
+                { this.state.activeSection !== 'create-seed' &&
+                  <div onClick={ this.toggleCreateSeed }>{ translate('DASHBOARD.CREATE_SEED') }</div>
+                }
               </div>
             }
           </div>

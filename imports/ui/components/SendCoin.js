@@ -27,7 +27,7 @@ class SendCoin extends React.Component {
 
   componentWillReceiveProps(props) {
     if (props &&
-        props.activeSection !== 'send') {
+        (props.activeSection !== 'send' || this.props.coin !== props.coin)) {
       // reset form state
       this.setState(this.defaultState);
     }
