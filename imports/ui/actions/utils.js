@@ -1,8 +1,5 @@
 export const kmdCalcInterest = (locktime, value) => { // value in sats
   const timestampDiff = Math.floor(Date.now() / 1000) - locktime - 777;
-  const hoursPassed = Math.floor(timestampDiff / 3600);
-  const minutesPassed = Math.floor((timestampDiff - (hoursPassed * 3600)) / 60);
-  const secondsPassed = timestampDiff - (hoursPassed * 3600) - (minutesPassed * 60);
   let timestampDiffMinutes = timestampDiff / 60;
   let interest = 0;
 

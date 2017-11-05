@@ -1,6 +1,7 @@
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { electrumServers } from './actions/electrumServers';
 
 import actions from './actions/actions';
 import {
@@ -102,6 +103,7 @@ class App extends React.Component {
     this.setState({
       coin: coin,
       address: this.state.pubKeys[coin],
+      activeSection: this.state.activeSection !== 'send' ? 'dashboard' : 'send',
     });
 
     // toggle refresh and update in-mem coins cache obj
@@ -389,7 +391,7 @@ class App extends React.Component {
                 <div>
                 { this.renderActiveCoins() }
                 </div>
-                { this.state.activeSection !== 'addcoin' &&
+                { this.state.activeSection !== 'addcoin' && Object.keys(this.state.coins).length !== Object.keys(electrumServers).length &&
                   <div onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.ADD_COIN') }</div>
                 }
               </div>
