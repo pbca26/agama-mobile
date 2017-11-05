@@ -70,6 +70,9 @@ class SendCoin extends React.Component {
     if (back) {
       this.setState({
         sendCurrentStep: step,
+        validIncorrectAddress: false,
+        validTooMuch: false,
+        validNan: false,
       });
     } else {
       if (!this.validate()) {
@@ -104,7 +107,6 @@ class SendCoin extends React.Component {
               }
             });
 
-            // todo validation
             this.setState({
               sendCurrentStep: 1,
             });
