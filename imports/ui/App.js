@@ -97,6 +97,8 @@ class App extends React.Component {
         activeSection: section,
       });
     }
+
+    document.getElementById('body').style.overflow = 'inherit';
   }
 
   switchCoin(coin) {
