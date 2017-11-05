@@ -391,7 +391,8 @@ class App extends React.Component {
                 <div>
                 { this.renderActiveCoins() }
                 </div>
-                { this.state.activeSection !== 'addcoin' && Object.keys(this.state.coins).length !== Object.keys(electrumServers).length &&
+                { this.state.activeSection !== 'addcoin' &&
+                  Object.keys(this.state.coins).length !== Object.keys(electrumServers).length &&
                   <div onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.ADD_COIN') }</div>
                 }
               </div>
