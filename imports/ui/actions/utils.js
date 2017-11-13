@@ -70,6 +70,12 @@ export function isPositiveNumber(value) {
   return isNumber(value) && (+value) > 0;
 }
 
+export function getRandomIntInclusive(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 // display rounding
 export function formatValue(formatValue) {
   const _valueToStr = formatValue.toString();
