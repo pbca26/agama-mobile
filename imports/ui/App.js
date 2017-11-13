@@ -2,13 +2,13 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { electrumServers } from './actions/electrumServers';
-import random from 'lodash/random';
 
 import actions from './actions/actions';
 import {
   setLocalStorageVar,
   getLocalStorageVar,
   sortBy,
+  getRandomIntInclusive
 } from './actions/utils';
 import { translate } from './translate/translate';
 
@@ -88,7 +88,7 @@ class App extends React.Component {
 
     // pick a random server to communicate with
     if (server.serverList && server.serverList.length > 0) {
-      const randomServerId = random(0, server.serverList.length - 1, false);
+      const randomServerId = getRandomIntInclusive(0, server.serverList.length - 1);
       const randomServer = server.serverList[randomServerId];
       const serverDetails = randomServer.split(':');
 
