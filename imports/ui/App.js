@@ -2,6 +2,7 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { electrumServers } from './actions/electrumServers';
+import random from 'lodash/random';
 
 import actions from './actions/actions';
 import {
@@ -82,6 +83,20 @@ class App extends React.Component {
     this.setState({
       coins,
     });
+
+    const server = electrumServers[coin === 'kmd' ? 'komodo' : coin];
+
+    // pick a random server to communicate with
+    if (server.serverList && server.serverList.length > 0) {
+      const randomServerId = random(0, server.serverList.length - 1, false);
+      const randomServer = server.serverList[randomServerId];
+      const serverDetails = randomServer.split(':');
+
+      if (serverDetails.length === 2) {
+        server.ip = serverDetails[0];
+        server.port = serverDetails[1];
+      }
+    }
 
     setLocalStorageVar('coins', this.state.coins);
   }
