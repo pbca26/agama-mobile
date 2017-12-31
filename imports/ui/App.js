@@ -83,11 +83,11 @@ class App extends React.Component {
     this.setState({
       coins,
     });
-
     const server = electrumServers[coin === 'kmd' ? 'komodo' : coin];
 
     // pick a random server to communicate with
-    if (server.serverList && server.serverList.length > 0) {
+    if (server.serverList &&
+      server.serverList.length > 0) {
       const randomServerId = getRandomIntInclusive(0, server.serverList.length - 1);
       const randomServer = server.serverList[randomServerId];
       const serverDetails = randomServer.split(':');

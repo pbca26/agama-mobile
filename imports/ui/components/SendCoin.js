@@ -49,7 +49,8 @@ class SendCoin extends React.Component {
       _isFailed = true;
     }
 
-    if (this.state.sendTo.length !== 34) {
+    if (this.state.sendTo.length < 34 ||
+        this.state.sendTo.length > 36) {
       this.setState({
         validIncorrectAddress: true,
       });

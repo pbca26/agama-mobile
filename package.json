@@ -6,9 +6,7 @@
   },
   "dependencies": {
     "babel-runtime": "^6.20.0",
-    "bitcoinjs-lib": "^3.2.1",
     "buffer-reverse": "^1.0.1",
-    "coinkey": "^2.0.0",
     "coinselect": "github:bitcoinjs/coinselect",
     "cordova": "^7.1.0",
     "meteor-node-stubs": "~0.2.4",
@@ -18,6 +16,13 @@
     "react-redux": "^5.0.3",
     "redux": "^3.6.0",
     "redux-thunk": "^2.2.0",
-    "sha256": "^0.2.0"
+    "sha256": "^0.2.0",
+    "bigi": "^1.4.2",
+    "bip39": "^2.4.0",
+    "bitcoinforksjs-lib": "git://github.com/bitcoinjs/bitcoinjs-lib#opt-in-bitcoincash-sighash",
+    "bitcoinjs-lib": "git://github.com/SuperNETorg/bitcoinjs-lib",
+    "bitcoinjs-lib-zcash": "git://github.com/pbca26/bitcoinjs-lib#zcash",
+    "bitcoinjs-lib-pos": "git://github.com/KomodoPlatform/bitcoinjs-lib-pos",
+    "js-sha256": "^0.7.1"
   }
 }

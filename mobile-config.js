@@ -1,6 +1,6 @@
 App.info({
   id: 'com.supernet.agama',
-  version: '0.0.3',
+  version: '0.0.4',
   buildNumber: '777',
   name: 'Agama',
   description: 'Agama Mobile is a lightweight wallet application that allows users to manage multiple crypto currencies. It\'s built on top of SPV technology which provides a quick way to retrieve and push transaction data.',
@@ -12,13 +12,13 @@ App.info({
 // Set up resources such as icons and launch screens.
 App.icons({
   // ios
+  'app_store': 'app-assets/icons/app_store.png',
   'iphone': 'app-assets/icons/iphone.png',
   'iphone_2x': 'app-assets/icons/iphone_2x.png',
   'iphone_3x': 'app-assets/icons/iphone_3x.png',
   'ipad': 'app-assets/icons/ipad.png',
   'ipad_2x': 'app-assets/icons/ipad_2x.png',
   'ipad_pro': 'app-assets/icons/ipad_pro.png',
-  'app_store': 'app-assets/icons/app_store.png',
   // android
   'android_mdpi': 'app-assets/icons/48x48.png',
   'android_hdpi': 'app-assets/icons/64x64.png',
