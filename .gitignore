@@ -2,6 +2,7 @@
 logs
 *.log
 npm-debug.log*
+build
 
 # Ignore node.js modules folder
 node_modules

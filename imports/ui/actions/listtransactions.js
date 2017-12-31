@@ -2,11 +2,11 @@ import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
 import { isAssetChain } from './utils';
 import { parseTransactionAddresses } from './parseTransactionAddresses';
+import { electrumJSTxDecoder } from './txDecoder/txDecoder';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
 const electrumJSNetworks = require('./electrumNetworks.js');
-const electrumJSTxDecoder = require('./electrumTxDecoder.js');
 
 export const listtransactions = (proxyServer, electrumServer, address, network, full, verify) => {
   return new Promise((resolve, reject) => {
@@ -71,7 +71,7 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
 
                       // decode tx
                       const _network = electrumJSNetworks[isAssetChain(network) ? 'komodo' : network];
-                      const decodedTx = electrumJSTxDecoder(transaction.raw, _network);
+                      const decodedTx = electrumJSTxDecoder(transaction.raw, network, _network);
 
                       let txInputs = [];
 
@@ -97,7 +97,7 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
                                 result = JSON.parse(result.content);
 
                                 if (result.msg !== 'error') {
-                                  const decodedVinVout = electrumJSTxDecoder(result.result, _network);
+                                  const decodedVinVout = electrumJSTxDecoder(result.result, network, _network);
 
                                   devlog('electrum raw input tx ==>');
 

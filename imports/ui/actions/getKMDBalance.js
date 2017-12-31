@@ -1,11 +1,11 @@
 import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
 import { kmdCalcInterest } from './utils';
+import { electrumJSTxDecoder } from './txDecoder/txDecoder';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
 const electrumJSNetworks = require('./electrumNetworks.js');
-const electrumJSTxDecoder = require('./electrumTxDecoder.js');
 
 export const getKMDBalance = (address, json, proxyServer, electrumServer) => {
   return new Promise((resolve, reject) => {
@@ -67,7 +67,7 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer) => {
 
                     // decode tx
                     const _network = electrumJSNetworks.komodo;
-                    const decodedTx = electrumJSTxDecoder(_rawtxJSON, _network);
+                    const decodedTx = electrumJSTxDecoder(_rawtxJSON, 'kmd', _network);
 
                     if (decodedTx &&
                         decodedTx.format &&

@@ -6,7 +6,6 @@ import { devlog } from './dev';
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
 const electrumJSNetworks = require('./electrumNetworks.js');
-const electrumJSTxDecoder = require('./electrumTxDecoder.js');
 
 // get merkle root
 const getMerkleRoot = (txid, proof, pos) => {

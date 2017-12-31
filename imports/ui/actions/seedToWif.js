@@ -1,9 +1,16 @@
-export const seedToWif = (seed, iguana, network) => {
-  import sha256 from 'sha256';
-  import CoinKey from 'coinkey';
-  const electrumJSNetworks = require('./electrumNetworks.js');
+const sha256 = require('js-sha256');
+const crypto = require('crypto');
+const bigi = require('bigi');
+const bitcoinZcash = require('bitcoinjs-lib-zcash');
+const bitcoin = require('bitcoinjs-lib');
+const bs58check = require('bs58check');
+const electrumJSNetworks = require('./electrumNetworks.js');
 
-  const bytes = sha256(seed, { asBytes: true });
+import { isZcash } from './txDecoder/txDecoder';
+
+export const seedToWif = (seed, iguana, network) => {
+  const hash = sha256.create().update(seed);
+  bytes = hash.array();
 
   if (iguana) {
     bytes[0] &= 248;
@@ -11,26 +18,12 @@ export const seedToWif = (seed, iguana, network) => {
     bytes[31] |= 64;
   }
 
-  const toHexString = (byteArray) => {
-    return Array.from(byteArray, (byte) => {
-      return ('0' + (byte & 0xFF).toString(16)).slice(-2);
-    }).join('');
-  }
-
-  const hex = toHexString(bytes);
-
-  const _wif = electrumJSNetworks[network].wif;
-  const _pkh = electrumJSNetworks[network].pubKeyHash;
-
-  const key = new CoinKey(new Buffer(hex, 'hex'), {
-    private: _wif,
-    public: _pkh,
-  });
-
-  key.compressed = true;
-
-  return {
-    wif: key.privateWif,
-    pub: key.publicAddress,
+  const d = bigi.fromBuffer(bytes);
+  const keyPair = isZcash(network) ? new bitcoinZcash.ECPair(d, null, { network: electrumJSNetworks[network] }) : new bitcoinZcash.ECPair(d, null, { network: electrumJSNetworks[network] });
+  const keys = {
+    pub: keyPair.getAddress(),
+    wif: keyPair.toWIF(),
   };
+
+  return keys;
 }

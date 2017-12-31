@@ -1,8 +1,5 @@
 import { Promise } from 'meteor/promise';
 
-const electrumJSNetworks = require('./electrumNetworks.js');
-const electrumJSTxDecoder = require('./electrumTxDecoder.js');
-
 import { isAssetChain } from './utils';
 import { seedToWif } from './seedToWif';
 import {

@@ -3,11 +3,11 @@ import { devlog } from './dev';
 import { kmdCalcInterest } from './utils';
 import { isAssetChain } from './utils';
 import { verifyMerkleByCoin } from './merkle';
+import { electrumJSTxDecoder } from './txDecoder/txDecoder';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
 const electrumJSNetworks = require('./electrumNetworks.js');
-const electrumJSTxDecoder = require('./electrumTxDecoder.js');
 
 export const listunspent = (proxyServer, electrumServer, address, network, full, verify) => {
   let _atLeastOneDecodeTxFailed = false;
@@ -83,7 +83,7 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
 
                             // decode tx
                             const _network = electrumJSNetworks[isAssetChain(network) ? 'komodo' : network];
-                            const decodedTx = electrumJSTxDecoder(_rawtxJSON, _network);
+                            const decodedTx = electrumJSTxDecoder(_rawtxJSON, network, _network);
 
                             devlog('decoded tx =>');
                             devlog(decodedTx);

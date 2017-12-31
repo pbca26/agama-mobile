@@ -117,7 +117,6 @@ export function isAssetChain(coin) {
 
   if (coin === 'SUPERNET' ||
       coin === 'REVS' ||
-      coin === 'SUPERNET' ||
       coin === 'PANGEA' ||
       coin === 'DEX' ||
       coin === 'JUMBLR' ||
@@ -126,6 +125,7 @@ export function isAssetChain(coin) {
       coin === 'COQUI' ||
       coin === 'HODL' ||
       coin === 'SHARK' ||
+      coin === 'MSHARK' ||
       coin === 'BOTS' ||
       coin === 'MGW' ||
       coin === 'MVP' ||
@@ -159,3 +159,42 @@ export function getLocalStorageVar(name) {
     return null;
   }
 }
+
+export const coinsList = [
+  'SUPERNET',
+  'REVS',
+  'PANGEA',
+  'DEX',
+  'JUMBLR',
+  'BET',
+  'CRYPTO',
+  'COQUI',
+  'HODL',
+  'SHARK',
+  'MSHARK',
+  'BOTS',
+  'MGW',
+  //'MVP',
+  'KV',
+  //'CEAL',
+  'MESH',
+  'WLC',
+  'MNZ',
+  'DOGE',
+  'DGB',
+  'BTG',
+  'BLK',
+  'BCH',
+  'FAIR',
+  'VIA',
+  'MONA',
+  'ZEC',
+  'HUSH',
+  'ARG',
+  'DASH',
+  'CRW',
+  'VTC',
+  'LTC',
+  'NMC',
+  'SIB',
+];
