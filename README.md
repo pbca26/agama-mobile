@@ -3,7 +3,7 @@
 ## How to install
 
 ```
-intall meteor 1.5.x
+intall meteor 1.6.x
 install npm
 install nodejs
 install java8, don't install java9 it won't work with meteor 1.5.x

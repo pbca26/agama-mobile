@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { electrumServers } from '../actions/electrumServers';
+import { coinsList } from '../actions/utils';
 import { translate } from '../translate/translate';
 
 class AddCoin extends React.Component {
@@ -40,8 +40,9 @@ class AddCoin extends React.Component {
       this.props.addCoin('revs');
       this.props.addCoin('jumblr');
     } else if (coin === 'all') {
-      for (let key in electrumServers) {
-        this.props.addCoin(electrumServers[key].abbr.toLowerCase());
+      for (let i = 0; i < coinsList.length; i++) {
+        const key = coinsList[i];
+        this.props.addCoin(key.toLowerCase());
       }
     } else {
       this.props.addCoin(coin);
@@ -76,9 +77,11 @@ class AddCoin extends React.Component {
       </span>
     );
 
-    for (let key in electrumServers) {
+    for (let i = 0; i < coinsList.length; i++) {
+      const key = coinsList[i];
+
       if (key !== 'komodo') {
-        const _coin = electrumServers[key].abbr.toLowerCase();
+        const _coin = key.toLowerCase();
 
         _items.push(
           <span

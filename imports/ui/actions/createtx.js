@@ -9,30 +9,104 @@ import {
 } from './utils';
 import { listunspent } from './listunspent';
 import { isAssetChain } from './utils';
+import {
+  isZcash,
+  isPos,
+} from './txDecoder/txDecoder';
+import { electrumServers } from './electrumServers';
+
+const bitcoinJSForks = require('bitcoinforksjs-lib');
+const bitcoinZcash = require('bitcoinjs-lib-zcash');
+const bitcoinPos = require('bitcoinjs-lib-pos');
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
 const electrumJSNetworks = require('./electrumNetworks.js');
-const electrumJSTxDecoder = require('./electrumTxDecoder.js');
 
-// single sig
-const buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue) => {
-  const _network = electrumJSNetworks[isAssetChain(network) ? 'komodo' : network];
-  let key = bitcoin.ECPair.fromWIF(wif, _network);
-  let tx = new bitcoin.TransactionBuilder(_network);
+// btg/bch
+const buildSignedTxForks = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue) => {
+  const _network = electrumJSNetworks[network];
+  let tx = new bitcoinJSForks.TransactionBuilder(_network);
+  const keyPair = bitcoinJSForks.ECPair.fromWIF(wif, _network);
+  const pk = bitcoinJSForks.crypto.hash160(keyPair.getPublicKeyBuffer());
+  const spk = bitcoinJSForks.script.pubKeyHash.output.encode(pk);
 
-  devlog('buildSignedTx');
-  // devlog(`buildSignedTx priv key ${wif}`);
-  devlog(`buildSignedTx pub key ${key.getAddress().toString()}`);
-
+  devlog(`buildSignedTx${network.toUpperCase()}`);
+  
   for (let i = 0; i < utxo.length; i++) {
-    tx.addInput(utxo[i].txid, utxo[i].vout);
+    tx.addInput(utxo[i].txid, utxo[i].vout, bitcoinJSForks.Transaction.DEFAULT_SEQUENCE, spk);
   }
 
   tx.addOutput(sendTo, Number(spendValue));
 
   if (changeValue > 0) {
     tx.addOutput(changeAddress, Number(changeValue));
+  }
+
+  if (network === 'btg') {
+    tx.enableBitcoinGold(true);
+  } else if (network === 'bch') {
+    tx.enableBitcoinCash(true);
+  }
+
+  tx.setVersion(2);
+
+  devlog('buildSignedTx unsigned tx data vin');
+  devlog(tx.tx.ins);
+  devlog('buildSignedTx unsigned tx data vout');
+  devlog(tx.tx.outs);
+  devlog('buildSignedTx unsigned tx data');
+  devlog(tx);
+
+  const hashType = bitcoinJSForks.Transaction.SIGHASH_ALL | bitcoinJSForks.Transaction.SIGHASH_BITCOINCASHBIP143;
+
+  for (let i = 0; i < utxo.length; i++) {
+    tx.sign(i, keyPair, null, hashType, utxo[i].value);
+  }
+
+  const rawtx = tx.build().toHex();
+
+  devlog('buildSignedTx signed tx hex');
+  devlog(rawtx);
+
+  return rawtx;
+}
+
+// single sig
+const buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue) => {
+  const _network = electrumJSNetworks[isAssetChain(network) ? 'komodo' : network];
+  let key = isZcash(network) ? bitcoinZcash.ECPair.fromWIF(wif, _network) : bitcoin.ECPair.fromWIF(wif, _network);
+  let tx;
+
+  if (isZcash(network)) {
+    tx = new bitcoinZcash.TransactionBuilder(_network);
+  } else if (isPos(network)) {
+    tx = new bitcoinPos.TransactionBuilder(_network);
+  } else {
+    tx = new bitcoin.TransactionBuilder(_network);
+  }
+
+  devlog('buildSignedTx');
+  // devlog(`buildSignedTx priv key ${wif}`);
+  devlog(`buildSignedTx pub key ${key.getAddress().toString()}`);
+
+  
+  for (let i = 0; i < utxo.length; i++) {
+    tx.addInput(utxo[i].txid, utxo[i].vout);
+  }
+
+  if (isPos(network)) {
+    tx.addOutput(sendTo, Number(spendValue), _network);
+  } else {
+    tx.addOutput(sendTo, Number(spendValue));
+  }
+
+  if (changeValue > 0) {
+    if (isPos(network)) {
+      tx.addOutput(changeAddress, Number(changeValue), _network);
+    } else {
+      tx.addOutput(changeAddress, Number(changeValue));
+    }
   }
 
   if (network === 'komodo' ||
@@ -50,7 +124,11 @@ const buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, s
   devlog(tx);
 
   for (let i = 0; i < utxo.length; i++) {
-    tx.sign(i, key);
+    if (isPos(network)) {
+      tx.sign(_network, i, key);
+    } else {
+      tx.sign(i, key);
+    }
   }
 
   const rawtx = tx.build().toHex();
@@ -78,7 +156,8 @@ const maxSpendBalance = (utxoList, fee) => {
 export const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, value, defaultFee, wif, network, verify, push) => {
   return new Promise((resolve, reject) => {
     devlog('createrawtx =>');
-
+    let defaultFee = electrumServers[network].txfee;
+    
     listunspent(
       proxyServer,
       electrumServer,
@@ -128,8 +207,18 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
         }];
         devlog('targets =>');
         devlog(targets);
+        devlog(`create tx network ${network}`)
 
-        const feeRate = 20; // sats/byte
+        const feeRate = network === 'komodo' || network === 'kmd' || network === 'chips' ? 20 : 0; // sats/byte
+        
+        if (!feeRate) {
+          targets[0].value = targets[0].value + defaultFee;
+        }
+
+        devlog(`fee rate ${feeRate}`);
+        devlog(`default fee ${fee}`);
+        devlog(`targets ==>`);
+        devlog(targets);        
 
         // default coin selection algo blackjack with fallback to accumulative
         // make a first run, calc approx tx fee
@@ -148,8 +237,7 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
         devlog('coinselect calculated fee =>');
         devlog(fee);
 
-        if (!inputs &&
-            !outputs) {
+        if (!outputs) {
           targets[0].value = targets[0].value - defaultFee;
           devlog('second run');
           devlog('coinselect adjusted targets =>');
@@ -173,6 +261,14 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
         if (outputs &&
             outputs.length === 2) {
           _change = outputs[1].value;
+        }
+
+        // non komodo coins, subtract fee from output value
+        if (!feeRate) {
+          outputs[0].value = outputs[0].value - defaultFee;
+
+          devlog('non komodo adjusted outputs, value - default fee =>');
+          devlog(outputs);
         }
 
         // check if any outputs are unverified
@@ -221,7 +317,8 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
             _change = _change + (totalInterest - _feeOverhead);
           }
 
-          if (!inputs && !outputs) {
+          if (!inputs &&
+              !outputs) {
             const successObj = {
               msg: 'error',
               result: 'Can\'t find best fit utxo. Try lower amount.',
@@ -239,16 +336,31 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
 
             devlog(`vin sum ${vinSum} (${vinSum * 0.00000001})`);
             devlog(`estimatedFee ${_estimatedFee} (${_estimatedFee * 0.00000001})`);
+            
+            let _rawtx;
 
-            const _rawtx = buildSignedTx(
-              outputAddress,
-              changeAddress,
-              wif,
-              network,
-              inputs,
-              _change,
-              value
-            );
+            if (network === 'btg' ||
+                network === 'bch') {
+              _rawtx = buildSignedTxForks(
+                outputAddress,
+                changeAddress,
+                wif,
+                network,
+                inputs,
+                _change,
+                value
+              );
+            } else {
+              _rawtx = buildSignedTx(
+                outputAddress,
+                changeAddress,
+                wif,
+                network,
+                inputs,
+                _change,
+                value
+              );
+            }
 
             if (!push ||
                 push === 'false') {

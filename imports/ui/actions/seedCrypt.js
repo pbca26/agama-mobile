@@ -1,5 +1,7 @@
 import aes256 from 'nodejs-aes256';
 
+// TODO: check pin strength
+
 export const encryptkey = (ciperKey, string) => {
   // test pin security
   // - at least 1 char in upper case
