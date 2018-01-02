@@ -3,6 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { translate } from '../translate/translate';
 import { isNumber } from '../actions/utils';
+import jsQR from 'jsqr';
 
 class SendCoin extends React.Component {
   constructor() {
@@ -18,11 +19,55 @@ class SendCoin extends React.Component {
       validNan: false,
       validTooMuch: false,
       validIncorrectAddress: false,
+      qrScanError: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.changeSendCoinStep = this.changeSendCoinStep.bind(this);
     this.updateInput = this.updateInput.bind(this);
+    this.scanQR = this.scanQR.bind(this);
     this.validate = this.validate.bind(this);
+  }
+
+  scanQR() {
+    const width = 480;
+    const height = 640;
+
+    MeteorCamera.getPicture({ quality: 100 }, (error, data) => {
+      if (error) {
+        console.warn(error);
+        this.setState({
+          qrScanError: true,
+        });
+      } else {
+        const canvas = document.getElementById('qrScan');
+        const img = new Image();
+        img.src = data;
+        
+        /*console.warn(data);
+        console.warn(img.clientWidth);
+        console.warn(img.clientHeight);*/
+  
+        const canvasContext = canvas.getContext("2d");
+        canvasContext.drawImage(img, 0, 0, Math.floor(width / 2.5), Math.floor(height / 3.5));
+        const image = canvasContext.getImageData(0, 0, width, height);
+  
+        /*console.warn(data.length);
+        console.warn(width * height * 4);*/
+        const decodedQR = jsQR.decodeQRFromImage(image.data, image.width, image.height);
+        console.warn(decodedQR);
+
+        if (!decodedQR) {
+          this.setState({
+            qrScanError: true,
+          });
+        } else {
+          this.setState({
+            qrScanError: false,
+            sendTo: decodedQR,
+          });
+        }
+      }
+    });
   }
 
   componentWillReceiveProps(props) {
@@ -196,6 +241,13 @@ class SendCoin extends React.Component {
               </div>
             }
           </div>
+          { this.state.qrScanError &&
+            <div className="col-lg-12">
+              <div className="error margin-top-15">
+                <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
+              </div>
+            </div>
+          }
           <div className="col-lg-12">
             <button
               type="button"
@@ -214,6 +266,14 @@ class SendCoin extends React.Component {
     if (this.props.activeSection === 'send') {
       return (
         <div className="col-sm-12 send">
+          <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12 btn-back-block">
+            <span
+              className="btn-back"
+              onClick={ () => this.props.changeActiveSection('dashboard') }>
+              <i className="fa fa-arrow-left"></i> { translate('DASHBOARD.BACK') }
+            </span>
+          </div>
+          <canvas id="qrScan" style={{ width: '640px', height: '480px', position: 'absolute', zIndex: '1' }}></canvas>
           <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12 steps-counter">
             <div className="steps row margin-top-10">
               <div className={ 'step col-md-4' + (this.state.sendCurrentStep === 0 ? ' current' : '') }>
@@ -232,7 +292,13 @@ class SendCoin extends React.Component {
             <div className="panel">
               <div className="panel-heading">
                 <div className="margin-bottom-20">
-                  <span className="step-title">{ translate('SEND.FILL_IN_DETAILS') }</span>
+                  <span className="step-title margin-right-40">{ translate('SEND.FILL_IN_DETAILS') }</span>
+                  <button
+                    className="btn btn-default btn-scan-qr"
+                    onClick={ this.scanQR }>
+                    <i className="fa fa-qrcode"></i>
+                    { translate('SEND.SCAN_QR') }
+                  </button>
                 </div>
               </div>
               <div className="panel-body container-fluid">
