@@ -19,11 +19,20 @@ export const seedToWif = (seed, iguana, network) => {
   }
 
   const d = bigi.fromBuffer(bytes);
-  const keyPair = isZcash(network) ? new bitcoinZcash.ECPair(d, null, { network: electrumJSNetworks[network] }) : new bitcoinZcash.ECPair(d, null, { network: electrumJSNetworks[network] });
+  const keyPair = isZcash(network) ? new bitcoinZcash.ECPair(d, null, { network: electrumJSNetworks[network] }) : new bitcoin.ECPair(d, null, { network: electrumJSNetworks[network] });
   const keys = {
     pub: keyPair.getAddress(),
     wif: keyPair.toWIF(),
   };
 
   return keys;
+}
+
+export const wifToWif = (wif, network) => {
+  const key = isZcash(network) ? bitcoinZcash.ECPair.fromWIF(wif, electrumJSNetworks[network], true) : bitcoin.ECPair.fromWIF(wif, electrumJSNetworks[network], true);
+
+  return {
+    priv: key.toWIF(),
+    pub: key.getAddress(),
+  };
 }
