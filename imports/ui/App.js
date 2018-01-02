@@ -8,7 +8,7 @@ import {
   setLocalStorageVar,
   getLocalStorageVar,
   sortBy,
-  getRandomIntInclusive
+  getRandomIntInclusive,
 } from './actions/utils';
 import { translate } from './translate/translate';
 
@@ -21,6 +21,7 @@ import Balance from './components/Balance';
 import Spinner from './components/Spinner';
 import ServerSelect from './components/ServerSelect';
 import CreateSeed from './components/CreateSeed';
+import SendReceive from './components/SendReceive';
 
 const DASHBOARD_UPDATE_INTERVAL = 120000;
 
@@ -75,19 +76,16 @@ class App extends React.Component {
   }
 
   addCoin(coin) {
+    const server = electrumServers[coin === 'kmd' ? 'komodo' : coin];    
     let coins = this.state.coins;
+
     coins[coin] = {
       // defaults
     };
 
-    this.setState({
-      coins,
-    });
-    const server = electrumServers[coin === 'kmd' ? 'komodo' : coin];
-
     // pick a random server to communicate with
     if (server.serverList &&
-      server.serverList.length > 0) {
+        server.serverList.length > 0) {
       const randomServerId = getRandomIntInclusive(0, server.serverList.length - 1);
       const randomServer = server.serverList[randomServerId];
       const serverDetails = randomServer.split(':');
@@ -99,6 +97,28 @@ class App extends React.Component {
     }
 
     setLocalStorageVar('coins', this.state.coins);
+
+    if (!this.state.auth) {
+      this.setState({
+        coins,
+      });
+    } else {
+      const { actions } = this.props;
+      
+      actions.addKeyPair(coin)
+      .then((res) => {
+        console.warn(res);
+
+        this.setState({
+          coins,
+          activeSection: 'dashboard',
+          coin,
+          address: res,
+          loading: true,
+        });
+        this.dashboardRefresh();
+      });
+    }
   }
 
   changeActiveSection(section, toggleMenu) {
@@ -264,7 +284,7 @@ class App extends React.Component {
   login(passphrase) {
     const { actions } = this.props;
 
-    actions.auth(passphrase)
+    actions.auth(passphrase, this.state.coins)
     .then((res) => {
       // select a coin and an address
       let coin;
@@ -397,21 +417,21 @@ class App extends React.Component {
               className="fa fa-bars"></i>
             { this.state.auth &&
               <div className="nav-menu-items">
-                <div onClick={ this.logout }>{ translate('DASHBOARD.LOGOUT') }</div>
-                <div onClick={ this.lock }>{ translate('DASHBOARD.LOCK') }</div>
                 { this.state.activeSection !== 'dashboard' &&
                   <div onClick={ () => this.changeActiveSection('dashboard', true) }>{ translate('DASHBOARD.DASHBOARD') }</div>
                 }
                 { this.state.activeSection !== 'send' &&
                   <div onClick={ this.toggleSend }>{ translate('DASHBOARD.SEND') }</div>
                 }
-                <div>
-                { this.renderActiveCoins() }
-                </div>
+                <div onClick={ this.logout }>{ translate('DASHBOARD.LOGOUT') }</div>
+                <div onClick={ this.lock }>{ translate('DASHBOARD.LOCK') }</div>
                 { this.state.activeSection !== 'addcoin' &&
                   Object.keys(this.state.coins).length !== Object.keys(electrumServers).length &&
                   <div onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.ADD_COIN') }</div>
                 }
+                <div>
+                { this.renderActiveCoins() }
+                </div>
               </div>
             }
             { !this.state.auth &&
@@ -463,7 +483,8 @@ class App extends React.Component {
           { this.renderMenu() }
           <SendCoin
             { ...this.state }
-            sendtx={ this.props.actions.sendtx } />
+            sendtx={ this.props.actions.sendtx }
+            changeActiveSection={ this.changeActiveSection } />
           <AddCoin
             { ...this.state }
             addCoin={ this.addCoin }
@@ -492,6 +513,12 @@ class App extends React.Component {
             </div>
           }
           <Balance { ...this.state } />
+          { this.state.auth &&
+            this.state.activeSection === 'dashboard' &&
+            <SendReceive
+              { ...this.state }
+              changeActiveSection={ this.changeActiveSection } />
+          }
           <Transactions { ...this.state } />
         </div>
       </div>
