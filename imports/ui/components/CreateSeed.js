@@ -93,8 +93,15 @@ class CreateSeed extends React.Component {
     if (this.props.activeSection === 'create-seed') {
       return (
         <div className="col-sm-12">
-          <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12">
+          <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12 create-seed">
             <div className="row">
+              <div className="margin-bottom-30">
+                <span
+                  className="btn-back"
+                  onClick={ () => this.props.changeActiveSection('login') }>
+                  <i className="fa fa-arrow-left"></i> { translate('DASHBOARD.BACK') }
+                </span>
+              </div>
               <h4>{ translate('LOGIN.THIS_IS_YOUR_NEW_SEED') }</h4>
               <div className="seed-gen-box">{ this.state.seed }</div>
               <div className="margin-top-25 margin-bottom-25 warning">

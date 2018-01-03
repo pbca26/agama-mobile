@@ -80,6 +80,10 @@ class App extends React.Component {
     }
   }
 
+  scrollToTop() {
+    window.scrollTo(0, 0);
+  }
+
   globalClick() {
     if (this.state.auth) {
       if (this.globalClickTimeout) {
@@ -134,6 +138,7 @@ class App extends React.Component {
           address: res,
           loading: true,
         });
+        this.scrollToTop();
         this.dashboardRefresh();
       });
     }
@@ -149,6 +154,7 @@ class App extends React.Component {
     
     actions.kmdUnspents()
     .then((res) => {
+      this.scrollToTop();
       this.setState({
         utxo: res,
       });
@@ -166,8 +172,9 @@ class App extends React.Component {
         activeSection: section,
       });
     }
-
+    
     document.getElementById('body').style.overflow = 'inherit';
+    this.scrollToTop();
   }
 
   switchCoin(coin) {
@@ -181,6 +188,7 @@ class App extends React.Component {
     setTimeout(() => {
       this.toggleMenu();
       this.dashboardRefresh();
+      this.scrollToTop();
     }, 10);
   }
 
@@ -293,6 +301,7 @@ class App extends React.Component {
       setTimeout(() => {
         this.setState(this.defaultState);
       }, 20);
+      this.scrollToTop();
     });
   }
 
@@ -312,6 +321,7 @@ class App extends React.Component {
       setTimeout(() => {
         this.setState(lockState);
       }, 20);
+      this.scrollToTop();
     });
   }
 
@@ -343,6 +353,7 @@ class App extends React.Component {
       this.dashboardRefresh();
       this.toggleAutoRefresh();
       this.globalClick();
+      this.scrollToTop();
     });
   }
 
@@ -366,6 +377,7 @@ class App extends React.Component {
     this.setState({
       activeSection: this.state.activeSection === 'send' ? 'dashboard' : 'send',
     });
+    this.scrollToTop();
   }
 
   toggleAddCoin() {
@@ -376,6 +388,7 @@ class App extends React.Component {
     this.setState({
       activeSection: this.state.activeSection === 'addcoin' ? 'dashboard' : 'addcoin',
     });
+    this.scrollToTop();
   }
 
   toggleCreateSeed() {
@@ -386,6 +399,7 @@ class App extends React.Component {
     this.setState({
       activeSection: this.state.activeSection === 'create-seed' ? 'dashboard' : 'create-seed',
     });
+    this.scrollToTop();
   }
 
   toggleLogin() {
@@ -396,6 +410,7 @@ class App extends React.Component {
     this.setState({
       activeSection: this.state.activeSection === 'login' ? 'dashboard' : 'login',
     });
+    this.scrollToTop();
   }
 
   renderActiveCoins() {
@@ -509,7 +524,8 @@ class App extends React.Component {
             login={ this.login } />
           <CreateSeed
             { ...this.state }
-            login={ this.login } />
+            login={ this.login }
+            changeActiveSection={ this.changeActiveSection } />
           { this.state.auth &&
             this.state.activeSection === 'dashboard' &&
             <MyAddress { ...this.state } />

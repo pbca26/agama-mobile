@@ -6,9 +6,7 @@ class MyAddress extends React.Component {
     super();
   }
 
-  render() {
-    console.warn(this.props);
-    
+  render() {    
     return (
       <div className="margin-top-20 margin-left-10">
         <strong>

@@ -17,6 +17,14 @@ class Transactions extends React.Component {
     this.openExternalURL = this.openExternalURL.bind(this);
   }
 
+  componentWillReceiveProps(props) {
+    if (props.coin !== this.props.coin) {
+      this.setState({
+        toggledTxDetails: null,
+      });
+    }
+  }
+
   toggleTxDetails(index) {
     this.setState({
       toggledTxDetails: index === this.state.toggledTxDetails ? null : index,
@@ -26,16 +34,6 @@ class Transactions extends React.Component {
   openExternalURL(url) {
     window.open(url, '_system');
   }
-
-  renderTxDetailIcon() {
-    return (
-      <button
-        type="button"
-        className="btn btn-xs white btn-info">
-        <i className="fa fa-search"></i>
-      </button>
-    );
-  };
 
   renderTxType(category) {
     if (category === 'send' ||
