@@ -274,7 +274,7 @@ class App extends React.Component {
           conError: true,
         });
       } else {
-        res = sortBy(res, 'confirmations');
+        res = sortBy(res, 'timestamp');
 
         this.setState({
           transactions: res,

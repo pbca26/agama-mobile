@@ -116,7 +116,7 @@ class AddCoin extends React.Component {
       <div className="coins-list-shortcuts">
         <div
           onClick={ () => this.addCoin('kmd+chips') }
-          className="combination">
+          className="combination margin-left-25">
           <img
             className={ _coins.kmd ? 'disabled' : '' }
             src="/images/cryptologo/kmd.png" />
@@ -127,7 +127,7 @@ class AddCoin extends React.Component {
         </div>
         <div
           onClick={ () => this.addCoin('kmd+revs+jumblr') }
-          className="combination">
+          className="combination margin-left-25">
           <img
             className={ _coins.kmd ? 'disabled' : '' }
             src="/images/cryptologo/kmd.png" />

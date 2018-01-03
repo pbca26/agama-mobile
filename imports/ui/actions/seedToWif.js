@@ -32,7 +32,7 @@ export const wifToWif = (wif, network) => {
   const key = isZcash(network) ? bitcoinZcash.ECPair.fromWIF(wif, electrumJSNetworks[network], true) : bitcoin.ECPair.fromWIF(wif, electrumJSNetworks[network], true);
 
   return {
-    priv: key.toWIF(),
     pub: key.getAddress(),
+    wif: key.toWIF(),
   };
 }

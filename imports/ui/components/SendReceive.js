@@ -9,12 +9,22 @@ class SendReceive extends React.Component {
       showQR: false,
     };
     this.toggleQR = this.toggleQR.bind(this);
+    this.showClaimButton = this.showClaimButton.bind(this);
   }
 
   toggleQR() {
     this.setState({
       showQR: !this.state.showQR,
     });
+  }
+
+  showClaimButton() {
+    if (this.props.coin === 'kmd' &&
+        this.props.balance &&
+        this.props.balance.interest &&
+        this.props.balance.interest > 0) {
+      return true;
+    }
   }
 
   render() {
@@ -53,10 +63,7 @@ class SendReceive extends React.Component {
             }
           </div>
         }
-        { this.props.coin === 'kmd' &&
-          this.props.balance &&
-          this.props.balance.interest &&
-          this.props.balance.interest > 0 &&
+        { this.showClaimButton() &&
           <button
             type="button"
             className="btn btn-info waves-effect waves-light margin-left-20"

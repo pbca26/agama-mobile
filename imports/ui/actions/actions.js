@@ -173,11 +173,11 @@ function addKeyPair(coin) {
       const _wif = electrumKeys[Object.keys(electrumKeys)[0]].wif;
       let _pubKeys = {};
 
-      const _wifToWif = wifToWif(_wif, isAssetChain(coin) || coin === 'komodo' ? 'komodo' : coin);
+      const _wifToWif = wifToWif(_wif, isAssetChain(coin) ? 'komodo' : coin);
       electrumKeys[coin] = _wifToWif;
       _pubKeys[coin] = _wifToWif.pub;
 
-      // console.warn(electrumKeys);
+      // console.warn(electrumKeys[coin]);
       resolve(_pubKeys[coin]);
     });
   }

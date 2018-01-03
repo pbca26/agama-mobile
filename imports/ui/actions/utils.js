@@ -49,7 +49,7 @@ export const estimateTxSize = (numVins, numOuts) => {
 }
 
 export function sortBy(data, sortKey) {
-  return data.sort(function(a, b) {
+  return data.sort(function(b, a) {
     if (a[sortKey] < b[sortKey]) {
       return -1;
     }
