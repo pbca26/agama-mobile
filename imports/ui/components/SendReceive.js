@@ -27,12 +27,18 @@ class SendReceive extends React.Component {
     }
   }
 
+  showSendButton() {
+    if (this.props.balance &&
+        this.props.balance.balance &&
+        this.props.balance.balance > 0) {
+      return true;
+    }
+  }
+
   render() {
     return (
       <div className="margin-top-20 margin-left-10 send-receive-block">
-        { this.props.balance &&
-          this.props.balance.balance &&
-          this.props.balance.balance > 0 &&
+        { this.showSendButton() &&
           <button
             type="button"
             onClick={ () => this.props.changeActiveSection('send') }
