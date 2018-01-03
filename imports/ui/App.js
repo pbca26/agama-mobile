@@ -8,7 +8,7 @@ import {
   setLocalStorageVar,
   getLocalStorageVar,
   sortBy,
-  getRandomIntInclusive
+  getRandomIntInclusive,
 } from './actions/utils';
 import { translate } from './translate/translate';
 
@@ -21,8 +21,11 @@ import Balance from './components/Balance';
 import Spinner from './components/Spinner';
 import ServerSelect from './components/ServerSelect';
 import CreateSeed from './components/CreateSeed';
+import SendReceive from './components/SendReceive';
+import KMDInterest from './components/KMDInterest';
 
-const DASHBOARD_UPDATE_INTERVAL = 120000;
+const DASHBOARD_UPDATE_INTERVAL = 120000; // 2m
+const DEFAULT_LOCK_INACTIVE_INTERVAL = 600000; // 10m
 
 class App extends React.Component {
   constructor() {
@@ -62,6 +65,9 @@ class App extends React.Component {
     this.changeActiveSection = this.changeActiveSection.bind(this);
     this.toggleAutoRefresh = this.toggleAutoRefresh.bind(this);
     this.toggleLogin = this.toggleLogin.bind(this);
+    this.toggleKMDInterest = this.toggleKMDInterest.bind(this);
+    this.globalClick = this.globalClick.bind(this);
+    this.globalClickTimeout = null;
   }
 
   componentWillMount() {
@@ -74,20 +80,36 @@ class App extends React.Component {
     }
   }
 
+  scrollToTop() {
+    window.scrollTo(0, 0);
+  }
+
+  globalClick() {
+    if (this.state.auth) {
+      if (this.globalClickTimeout) {
+        clearTimeout(this.globalClickTimeout);
+      }
+
+      this.globalClickTimeout = setTimeout(() => {
+        // console.warn(`logout after ${DEFAULT_LOCK_INACTIVE_INTERVAL} inactivity`);
+        this.lock();
+      }, DEFAULT_LOCK_INACTIVE_INTERVAL);
+
+      // console.warn('global click', 'set timer');
+    }
+  }
+
   addCoin(coin) {
+    const server = electrumServers[coin === 'kmd' ? 'komodo' : coin];    
     let coins = this.state.coins;
+
     coins[coin] = {
       // defaults
     };
 
-    this.setState({
-      coins,
-    });
-    const server = electrumServers[coin === 'kmd' ? 'komodo' : coin];
-
     // pick a random server to communicate with
     if (server.serverList &&
-      server.serverList.length > 0) {
+        server.serverList.length > 0) {
       const randomServerId = getRandomIntInclusive(0, server.serverList.length - 1);
       const randomServer = server.serverList[randomServerId];
       const serverDetails = randomServer.split(':');
@@ -99,6 +121,44 @@ class App extends React.Component {
     }
 
     setLocalStorageVar('coins', this.state.coins);
+
+    if (!this.state.auth) {
+      this.setState({
+        coins,
+      });
+    } else {
+      const { actions } = this.props;
+      
+      actions.addKeyPair(coin)
+      .then((res) => {
+        this.setState({
+          coins,
+          activeSection: 'dashboard',
+          coin,
+          address: res,
+          loading: true,
+        });
+        this.scrollToTop();
+        this.dashboardRefresh();
+      });
+    }
+  }
+
+  toggleKMDInterest() {
+    const { actions } = this.props;
+
+    this.setState({
+      utxo: null,
+      activeSection: 'claim',
+    });
+    
+    actions.kmdUnspents()
+    .then((res) => {
+      this.scrollToTop();
+      this.setState({
+        utxo: res,
+      });
+    });
   }
 
   changeActiveSection(section, toggleMenu) {
@@ -112,8 +172,9 @@ class App extends React.Component {
         activeSection: section,
       });
     }
-
+    
     document.getElementById('body').style.overflow = 'inherit';
+    this.scrollToTop();
   }
 
   switchCoin(coin) {
@@ -127,6 +188,7 @@ class App extends React.Component {
     setTimeout(() => {
       this.toggleMenu();
       this.dashboardRefresh();
+      this.scrollToTop();
     }, 10);
   }
 
@@ -212,7 +274,7 @@ class App extends React.Component {
           conError: true,
         });
       } else {
-        res = sortBy(res, 'confirmations');
+        res = sortBy(res, 'timestamp');
 
         this.setState({
           transactions: res,
@@ -239,6 +301,7 @@ class App extends React.Component {
       setTimeout(() => {
         this.setState(this.defaultState);
       }, 20);
+      this.scrollToTop();
     });
   }
 
@@ -258,13 +321,14 @@ class App extends React.Component {
       setTimeout(() => {
         this.setState(lockState);
       }, 20);
+      this.scrollToTop();
     });
   }
 
   login(passphrase) {
     const { actions } = this.props;
 
-    actions.auth(passphrase)
+    actions.auth(passphrase, this.state.coins)
     .then((res) => {
       // select a coin and an address
       let coin;
@@ -288,6 +352,8 @@ class App extends React.Component {
 
       this.dashboardRefresh();
       this.toggleAutoRefresh();
+      this.globalClick();
+      this.scrollToTop();
     });
   }
 
@@ -311,6 +377,7 @@ class App extends React.Component {
     this.setState({
       activeSection: this.state.activeSection === 'send' ? 'dashboard' : 'send',
     });
+    this.scrollToTop();
   }
 
   toggleAddCoin() {
@@ -321,6 +388,7 @@ class App extends React.Component {
     this.setState({
       activeSection: this.state.activeSection === 'addcoin' ? 'dashboard' : 'addcoin',
     });
+    this.scrollToTop();
   }
 
   toggleCreateSeed() {
@@ -331,6 +399,7 @@ class App extends React.Component {
     this.setState({
       activeSection: this.state.activeSection === 'create-seed' ? 'dashboard' : 'create-seed',
     });
+    this.scrollToTop();
   }
 
   toggleLogin() {
@@ -341,6 +410,7 @@ class App extends React.Component {
     this.setState({
       activeSection: this.state.activeSection === 'login' ? 'dashboard' : 'login',
     });
+    this.scrollToTop();
   }
 
   renderActiveCoins() {
@@ -397,21 +467,18 @@ class App extends React.Component {
               className="fa fa-bars"></i>
             { this.state.auth &&
               <div className="nav-menu-items">
-                <div onClick={ this.logout }>{ translate('DASHBOARD.LOGOUT') }</div>
-                <div onClick={ this.lock }>{ translate('DASHBOARD.LOCK') }</div>
                 { this.state.activeSection !== 'dashboard' &&
                   <div onClick={ () => this.changeActiveSection('dashboard', true) }>{ translate('DASHBOARD.DASHBOARD') }</div>
                 }
-                { this.state.activeSection !== 'send' &&
-                  <div onClick={ this.toggleSend }>{ translate('DASHBOARD.SEND') }</div>
-                }
-                <div>
-                { this.renderActiveCoins() }
-                </div>
+                <div onClick={ this.logout }>{ translate('DASHBOARD.LOGOUT') }</div>
+                <div onClick={ this.lock }>{ translate('DASHBOARD.LOCK') }</div>
                 { this.state.activeSection !== 'addcoin' &&
                   Object.keys(this.state.coins).length !== Object.keys(electrumServers).length &&
                   <div onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.ADD_COIN') }</div>
                 }
+                <div>
+                { this.renderActiveCoins() }
+                </div>
               </div>
             }
             { !this.state.auth &&
@@ -437,7 +504,9 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className="app-container">
+      <div
+        className="app-container"
+        onClick={ this.globalClick }>
         <div className="app-header">
           <img src="/images/agama-logo-side.svg" />
           { this.state.auth &&
@@ -455,7 +524,8 @@ class App extends React.Component {
             login={ this.login } />
           <CreateSeed
             { ...this.state }
-            login={ this.login } />
+            login={ this.login }
+            changeActiveSection={ this.changeActiveSection } />
           { this.state.auth &&
             this.state.activeSection === 'dashboard' &&
             <MyAddress { ...this.state } />
@@ -463,7 +533,8 @@ class App extends React.Component {
           { this.renderMenu() }
           <SendCoin
             { ...this.state }
-            sendtx={ this.props.actions.sendtx } />
+            sendtx={ this.props.actions.sendtx }
+            changeActiveSection={ this.changeActiveSection } />
           <AddCoin
             { ...this.state }
             addCoin={ this.addCoin }
@@ -492,6 +563,17 @@ class App extends React.Component {
             </div>
           }
           <Balance { ...this.state } />
+          { this.state.auth &&
+            this.state.activeSection === 'dashboard' &&
+            <SendReceive
+              { ...this.state }
+              changeActiveSection={ this.changeActiveSection }
+              toggleKMDInterest={ this.toggleKMDInterest } />
+          }
+          <KMDInterest
+            { ...this.state }
+            sendtx={ this.props.actions.sendtx }
+            changeActiveSection={ this.changeActiveSection } />
           <Transactions { ...this.state } />
         </div>
       </div>

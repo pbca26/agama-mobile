@@ -1,16 +1,16 @@
 import { Promise } from 'meteor/promise';
 
 import { isAssetChain } from './utils';
-import { seedToWif } from './seedToWif';
 import {
-  encryptKey,
-  decryptKey,
+  seedToWif,
+  wifToWif,
 } from './seedToWif';
 import { proxyServer } from './proxyServers';
 import { electrumServers } from './electrumServers';
 import { getKMDBalance } from './getKMDBalance';
 import { createtx } from './createtx';
 import { listtransactions } from './listtransactions';
+import { listunspent } from './listunspent';
 
 let electrumKeys = {};
 
@@ -133,19 +133,52 @@ function balance(network) {
   }
 }
 
-function auth(seed) {
+function kmdUnspents() {
+  return async function(dispatch) {
+    return new Promise((resolve, reject) => {
+      listunspent(
+        proxyServer,
+        electrumServers.komodo,
+        electrumKeys.kmd.pub,
+        'komodo',
+        true,
+        true,
+      ).then((res) => {
+        resolve(res);
+      });
+    });
+  }
+}
+
+function auth(seed, coins) {
   return async function(dispatch) {
     return new Promise((resolve, reject) => {
       let _pubKeys = {};
 
-      for (let key in electrumServers) {
+      for (let key in coins) {
         const _seedToWif = seedToWif(seed, true, isAssetChain(key) || key === 'komodo' ? 'komodo' : key.toLowerCase());
-        electrumKeys[electrumServers[key].abbr.toLowerCase()] = _seedToWif;
-        _pubKeys[electrumServers[key].abbr.toLowerCase()] = _seedToWif.pub;
+        electrumKeys[key] = _seedToWif;
+        _pubKeys[key] = _seedToWif.pub;
       }
 
       // console.warn(electrumKeys);
       resolve(_pubKeys);
+    });
+  }
+}
+
+function addKeyPair(coin) {
+  return async function(dispatch) {
+    return new Promise((resolve, reject) => {
+      const _wif = electrumKeys[Object.keys(electrumKeys)[0]].wif;
+      let _pubKeys = {};
+
+      const _wifToWif = wifToWif(_wif, isAssetChain(coin) ? 'komodo' : coin);
+      electrumKeys[coin] = _wifToWif;
+      _pubKeys[coin] = _wifToWif.pub;
+
+      // console.warn(electrumKeys[coin]);
+      resolve(_pubKeys[coin]);
     });
   }
 }
@@ -165,4 +198,6 @@ export default {
   sendtx,
   getServersList,
   setDefaultServer,
+  addKeyPair,
+  kmdUnspents,
 }

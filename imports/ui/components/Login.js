@@ -28,10 +28,6 @@ class Login extends React.Component {
     this.toggleCreatePin = this.toggleCreatePin.bind(this);
   }
 
-  componentWillReceiveProps(props) {
-    // console.warn(props);
-  }
-
   updateInput(e) {
     this.setState({
       [e.target.name]: e.target.value,

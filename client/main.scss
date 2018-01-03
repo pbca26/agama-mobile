@@ -1,3 +1,7 @@
+/*
+  TODO: split
+*/
+
 body {
   padding-top: 50px;
 }
@@ -38,9 +42,45 @@ body {
     margin-bottom: 20px;
     overflow-x: hidden;
 
+    .tx-details {
+      padding-top: 10px;
+
+      > div {
+        margin-bottom: 10px;
+      }
+      > div:last-child {
+        margin-bottom: 0;
+      }
+    }
+    .ext-link {
+      position: absolute;
+
+      i {
+        margin-right: 5px;
+      }
+    }
+    .details-toggle {
+      float: right;
+      margin-right: 20px;
+      font-size: 20px;
+      color: #7a7d7d;
+    }
+    &:last-child {
+      border: none;
+    }
     .label {
       font-size: 14px;
       padding: 3px;
+      display: inline-block;
+      width: 45px;
+
+      &.label-danger {
+        i,
+        span {
+          position: relative;
+          left: -1px;
+        }
+      }
     }
     .tx-interest {
       color: #4caf50;
@@ -116,7 +156,17 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-
+  
+  .btn-back-block {
+    margin-bottom: 20px;
+    
+    .btn-back {
+      position: relative;
+      top: 0;
+      left: -6px;
+      z-index: 99;
+    }
+  }
   .table {
     tr {
       display: block;
@@ -200,13 +250,22 @@ h4 {
 
 .coins-list {
   position: relative;
-  left: -20px;
   top: -10px;
+  margin-bottom: 20px;
 
+  > span {
+    width: 96px;
+    display: inline-block;
+    text-align: center;
+
+    > div {
+      position: relative;
+      top: -10px;
+    }
+  }
   img {
     height: 50px;
     margin: 20px;
-    margin-right: 30px;
   }
   i {
     position: absolute;
@@ -434,7 +493,6 @@ input:checked + .slider:before {
   font-size: 16px;
   margin: 20px;
   margin-left: 10px;
-  margin-bottom: 35px;
 }
 
 .con-error {
@@ -451,4 +509,92 @@ input:checked + .slider:before {
 .seed-gen-box {
   border: solid 1px #ccc;
   padding: 15px;
+}
+
+.margin-right-20 {
+  margin-right: 20px;
+}
+
+.margin-left-20 {
+  margin-left: 20px;
+}
+
+.send-receive-block {
+  margin-bottom: 35px;
+
+  .btn {
+    i {
+      margin-right: 5px;
+    }
+  }
+}
+
+.dashboard-title {
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+.receive-qr {
+  position: absolute;
+  background: #fff;
+  height: 100%;
+  width: 100%;
+  top: 54px;
+  left: 0;
+  z-index: 100; 
+
+  canvas {
+    margin: 0 auto;
+    display: block;
+    margin-top: 40px;
+    margin-bottom: 30px;
+  }
+}
+
+.btn-back {
+  position: relative;
+  top: 14px;
+  left: 10px;
+
+  i {
+    margin-right: 5px; 
+  }
+}
+
+.btn-scan-qr {
+  i {
+    margin-right: 5px;
+  }
+}
+
+.claim-interest {
+  .btn-back {
+    top: 0;
+  }
+  .green {
+    color: #66bb6a;
+  }
+  .red {
+    color: #f96868;
+  }
+  .locktime-icon {
+    font-size: 20px;
+  }
+  .color-warning {
+    color: #ff9800;
+  }
+  table {
+    td,
+    th {
+      text-align: center;
+    }
+  }
+}
+
+.addcoin,
+.create-seed {
+  .btn-back {
+    left: 0;
+    top: 0;
+  }
 }

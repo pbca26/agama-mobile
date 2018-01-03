@@ -89,7 +89,6 @@ const buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, s
   devlog('buildSignedTx');
   // devlog(`buildSignedTx priv key ${wif}`);
   devlog(`buildSignedTx pub key ${key.getAddress().toString()}`);
-
   
   for (let i = 0; i < utxo.length; i++) {
     tx.addInput(utxo[i].txid, utxo[i].vout);
@@ -314,7 +313,18 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
             devlog(`estimated fee overhead ${_feeOverhead}`);
             devlog(`current change amount ${_change} (${_change * 0.00000001}), boosted change amount ${_change + (totalInterest - _feeOverhead)} (${(_change + (totalInterest - _feeOverhead)) * 0.00000001})`);
 
-            _change = _change + (totalInterest - _feeOverhead);
+            if (_maxSpend === value) {
+              _change = Math.abs(totalInterest) - _change - _feeOverhead;
+
+              if (outputAddress === changeAddress) {
+                value += _change;
+                _change = 0;
+                devlog(`send to self ${outputAddress} = ${changeAddress}`);
+                devlog(`send to self old val ${value}, new val ${value + _change}`);
+              }
+            } else {
+              _change = _change + (Math.abs(totalInterest) - _feeOverhead);
+            }
           }
 
           if (!inputs &&
@@ -369,6 +379,8 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
                 result: {
                   utxoSet: inputs,
                   change: _change,
+                  inputs,
+                  outputs,
                   // wif,
                   fee,
                   value,
@@ -409,6 +421,8 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
                       result: 'Bad transaction inputs spent',
                       raw: {
                         utxoSet: inputs,
+                        inputs,
+                        outputs,
                         change: _change,
                         fee,
                         value,
@@ -431,6 +445,8 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
                           result: 'Bad transaction inputs spent',
                           raw: {
                             utxoSet: inputs,
+                            inputs,
+                            outputs,
                             change: _change,
                             fee,
                             value,
@@ -449,6 +465,8 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
                           msg: 'success',
                           result: {
                             utxoSet: inputs,
+                            inputs,
+                            outputs,
                             change: _change,
                             fee,
                             // wif,
@@ -472,6 +490,8 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
                           result: 'Bad transaction inputs spent',
                           raw: {
                             utxoSet: inputs,
+                            inputs,
+                            outputs,
                             change: _change,
                             fee,
                             value,
@@ -491,6 +511,8 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
                           result: 'Can\'t broadcast transaction',
                           raw: {
                             utxoSet: inputs,
+                            inputs,
+                            outputs,
                             change: _change,
                             fee,
                             value,

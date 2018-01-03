@@ -112,6 +112,7 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                                   confirmations: Number(_utxoItem.height) === 0 ? 0 : currentHeight - _utxoItem.height,
                                   spendable: true,
                                   verified: false,
+                                  locktime: decodedTx.format.locktime,
                                 };
 
                                 // merkle root verification agains another electrum server

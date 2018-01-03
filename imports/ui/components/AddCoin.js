@@ -74,6 +74,7 @@ class AddCoin extends React.Component {
           !singleSelect &&
           <i className="fa fa-check-circle-o"></i>
         }
+        <div>KMD</div>
       </span>
     );
 
@@ -99,6 +100,7 @@ class AddCoin extends React.Component {
               !singleSelect &&
               <i className="fa fa-check-circle-o"></i>
             }
+            <div>{ key }</div>
           </span>
         );
       }
@@ -114,7 +116,7 @@ class AddCoin extends React.Component {
       <div className="coins-list-shortcuts">
         <div
           onClick={ () => this.addCoin('kmd+chips') }
-          className="combination">
+          className="combination margin-left-25">
           <img
             className={ _coins.kmd ? 'disabled' : '' }
             src="/images/cryptologo/kmd.png" />
@@ -125,7 +127,7 @@ class AddCoin extends React.Component {
         </div>
         <div
           onClick={ () => this.addCoin('kmd+revs+jumblr') }
-          className="combination">
+          className="combination margin-left-25">
           <img
             className={ _coins.kmd ? 'disabled' : '' }
             src="/images/cryptologo/kmd.png" />
@@ -156,9 +158,16 @@ class AddCoin extends React.Component {
         !this.props.coins ||
         (this.props.coins && !Object.keys(this.props.coins).length)) {
       return (
-        <div className="col-sm-12">
+        <div className="col-sm-12 addcoin">
           <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12">
             <div className="row">
+              <div className="margin-bottom-30">
+                <span
+                  className="btn-back"
+                  onClick={ () => this.props.changeActiveSection(this.props.auth ? 'dashboard' : 'login') }>
+                  <i className="fa fa-arrow-left"></i> { translate('DASHBOARD.BACK') }
+                </span>
+              </div>
               <h4>{ translate('ADD_COIN.SHORTCUTS') }</h4>
               <div className="coins-list">
               { this.renderCoins(true) }
@@ -169,7 +178,7 @@ class AddCoin extends React.Component {
               <div className="coins-list">
                 { this.renderCoins() }
               </div>
-              <div className="margin-top-10 padding-bottom-20">
+              <div className="padding-bottom-20">
                 <button
                   className="btn btn-lg btn-primary btn-block ladda-button"
                   onClick={ () => this.addCoin('multi') }>
