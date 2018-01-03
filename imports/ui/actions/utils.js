@@ -48,8 +48,8 @@ export const estimateTxSize = (numVins, numOuts) => {
   return numVins * 180 + numOuts * 34 + 11;
 }
 
-export function sortBy(data, sortKey) {
-  return data.sort(function(b, a) {
+export const sortBy = (data, sortKey) => {
+  return data.sort((b, a) => {
     if (a[sortKey] < b[sortKey]) {
       return -1;
     }
@@ -62,22 +62,23 @@ export function sortBy(data, sortKey) {
   });
 }
 
-export function isNumber(value) {
+export const isNumber = (value) => {
   return !isNaN(parseFloat(value)) && isFinite(value);
 }
 
-export function isPositiveNumber(value) {
+export const isPositiveNumber = (value) => {
   return isNumber(value) && (+value) > 0;
 }
 
-export function getRandomIntInclusive(min, max) {
+export const getRandomIntInclusive = (min, max) => {
   min = Math.ceil(min);
   max = Math.floor(max);
+
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 // display rounding
-export function formatValue(formatValue) {
+export const formatValue = (formatValue) => {
   const _valueToStr = formatValue.toString();
 
   if (_valueToStr.indexOf('.') === -1) {
@@ -101,7 +102,7 @@ export function formatValue(formatValue) {
   }
 }
 
-export function maskPubAddress(pub) {
+export const maskPubAddress = (pub) => {
   // keep 3 first and 3 last chars unmasked
   let masked = '';
 
@@ -112,7 +113,7 @@ export function maskPubAddress(pub) {
   return pub[0] + pub[1] + pub[2] + masked + pub[pub.length - 3] + pub[pub.length - 2] + pub[pub.length - 1];
 }
 
-export function isAssetChain(coin) {
+export const isAssetChain = (coin) => {
   coin = coin.toUpperCase();
 
   if (coin === 'SUPERNET' ||
@@ -142,7 +143,7 @@ export function isAssetChain(coin) {
   return false;
 }
 
-export function setLocalStorageVar(name, json) {
+export const setLocalStorageVar = (name, json) => {
   const _json = JSON.stringify(json);
 
   localStorage.setItem(name, _json);
@@ -161,6 +162,7 @@ export function getLocalStorageVar(name) {
 }
 
 export const coinsList = [
+  'CHIPS',
   'SUPERNET',
   'REVS',
   'PANGEA',

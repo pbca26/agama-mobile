@@ -1,0 +1,42 @@
+.coins-list {
+  position: relative;
+  top: -10px;
+  margin-bottom: 20px;
+
+  > span {
+    width: 96px;
+    display: inline-block;
+    text-align: center;
+
+    > div {
+      position: relative;
+      top: -10px;
+    }
+  }
+  img {
+    height: 50px;
+    margin: 20px;
+  }
+  i {
+    position: absolute;
+    margin-top: 70px;
+    margin-left: -40px;
+    font-size: 20px;
+    color: #46be8a;
+  }
+  .disabled {
+    opacity: 0.3;
+  }
+}
+
+.coins-list-shortcuts {
+  .disabled {
+    opacity: 0.3;
+  }
+  img {
+    height: 50px;
+  }
+  .combination {
+    margin-bottom: 40px;
+  }
+}
