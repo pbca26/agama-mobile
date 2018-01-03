@@ -3,6 +3,7 @@ logs
 *.log
 npm-debug.log*
 build
+.DS_STORE
 
 # Ignore node.js modules folder
 node_modules
