@@ -2,7 +2,11 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { translate } from '../translate/translate';
-import { isNumber } from '../actions/utils';
+import {
+  isNumber,
+  explorers,
+  isAssetChain,
+} from '../actions/utils';
 import jsQR from 'jsqr';
 
 class SendCoin extends React.Component {
@@ -12,8 +16,8 @@ class SendCoin extends React.Component {
       display: false,
       sendAmount: 0,
       sendTo: '',
-      sendCurrentStep: 0,
-      sendResult: null,
+      sendCurrentStep: 2,
+      sendResult: { msg:'success', result: { txid: '000' } },
       spvVerificationWarning: false,
       spvPreflightSendInProgress: false,
       validNan: false,
@@ -26,6 +30,11 @@ class SendCoin extends React.Component {
     this.updateInput = this.updateInput.bind(this);
     this.scanQR = this.scanQR.bind(this);
     this.validate = this.validate.bind(this);
+    this.openExternalURL = this.openExternalURL.bind(this);    
+  }
+
+  openExternalURL(url) {
+    window.open(url, '_system');
   }
 
   scanQR() {
@@ -403,6 +412,21 @@ class SendCoin extends React.Component {
                         <tr>
                           <td>Tx ID</td>
                           <td>{ this.state.sendResult && this.state.sendResult.result && this.state.sendResult.result.txid ? this.state.sendResult.result.txid : translate('SEND.PROCESSING_SM') }</td>
+                        </tr>
+                        <tr>
+                          <td></td>
+                          <td>
+                          { isAssetChain(this.props.coin) &&
+                            this.state.sendResult &&
+                            this.state.sendResult.result &&
+                            this.state.sendResult.result.txid &&
+                            <button
+                              onClick={ () => this.openExternalURL(`${explorers[this.props.coin.toUpperCase()]}/tx/${this.state.sendResult.result.txid}`) }
+                              className="margin-left-20 btn btn-sm white btn-dark waves-effect waves-light ext-link">
+                              <i className="fa fa-external-link"></i>Explorer
+                            </button>
+                          }
+                          </td>
                         </tr>
                       </tbody>
                     </table>
