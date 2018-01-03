@@ -1,5 +1,5 @@
 let config = {
-  dev: true,
+  dev: false,
 };
 
 export const devlog = (msg) => {

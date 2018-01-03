@@ -551,6 +551,7 @@ class App extends React.Component {
             this.state.activeSection === 'dashboard' &&
             <SendReceive
               { ...this.state }
+              changeActiveSection={ this.changeActiveSection }
               toggleKMDInterest={ this.toggleKMDInterest } />
           }
           <KMDInterest

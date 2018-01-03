@@ -14,12 +14,17 @@ class Transactions extends React.Component {
       toggledTxDetails: null,
     };
     this.toggleTxDetails = this.toggleTxDetails.bind(this);
+    this.openExternalURL = this.openExternalURL.bind(this);
   }
 
   toggleTxDetails(index) {
     this.setState({
       toggledTxDetails: index === this.state.toggledTxDetails ? null : index,
     });
+  }
+
+  openExternalURL(url) {
+    window.open(url, '_system');
   }
 
   renderTxDetailIcon() {
@@ -130,13 +135,11 @@ class Transactions extends React.Component {
                   <div>
                   { translate('TRANSACTIONS.TIME') }: { secondsToString(_transactions[i].timestamp) }
                     { isAssetChain(this.props.coin) &&
-                      <a
-                        href={ `${explorers[this.props.coin.toUpperCase()]}/tx/${_transactions[i].txid}` }
-                        target="_blank">
-                        <button className="margin-left-20 btn btn-sm white btn-dark waves-effect waves-light ext-link">
-                          <i className="fa fa-external-link"></i>Explorer
-                        </button>
-                      </a>
+                      <button
+                        onClick={ () => this.openExternalURL(`${explorers[this.props.coin.toUpperCase()]}/tx/${_transactions[i].txid}`) }
+                        className="margin-left-20 btn btn-sm white btn-dark waves-effect waves-light ext-link">
+                        <i className="fa fa-external-link"></i>Explorer
+                      </button>
                     }
                   </div>
                   <div>

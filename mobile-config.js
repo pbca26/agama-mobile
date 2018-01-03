@@ -1,6 +1,6 @@
 App.info({
   id: 'com.supernet.agama',
-  version: '0.0.4',
+  version: '0.0.5',
   buildNumber: '777',
   name: 'Agama',
   description: 'Agama Mobile is a lightweight wallet application that allows users to manage multiple crypto currencies. It\'s built on top of SPV technology which provides a quick way to retrieve and push transaction data.',
@@ -41,8 +41,25 @@ App.launchScreens({
 });
 
 // App.accessRule('http://46.20.235.46');
-App.accessRule('*');
-
+// App.accessRule('*');
+App.accessRule('http://46.20.235.46');
+App.accessRule('http://kmd.komodochainz.info');
+App.accessRule('http://MSHARK.explorer.supernet.org');
+App.accessRule('http://revs.explorer.supernet.org');
+App.accessRule('http://SUPERNET.explorer.supernet.org');
+App.accessRule('http://DEX.explorer.supernet.org');
+App.accessRule('http://PANGEA.explorer.supernet.org');
+App.accessRule('http://JUMBLR.explorer.supernet.org');
+App.accessRule('http://BET.explorer.supernet.org');
+App.accessRule('http://CRYPTO.explorer.supernet.org');
+App.accessRule('http://HODL.explorer.supernet.org');
+App.accessRule('http://SHARK.explorer.supernet.org');
+App.accessRule('http://BOTS.explorer.supernet.org');
+App.accessRule('http://MGW.explorer.supernet.org');
+App.accessRule('http://WIRELESS.explorer.supernet.org');
+App.accessRule('http://CHIPS1.explorer.supernet.org');
+App.accessRule('https://explorer.coqui.cash');
+App.accessRule('https://www.mnzexplorer.com');
 /*App.launchScreens({
   'iphone_2x': 'splash/Default@2x~iphone.png',
   'iphone5': 'splash/Default~iphone5.png',
