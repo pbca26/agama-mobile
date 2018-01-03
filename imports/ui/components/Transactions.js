@@ -2,6 +2,8 @@ import React from 'react';
 import {
   secondsToString,
   formatValue,
+  explorers,
+  isAssetChain,
 } from '../actions/utils';
 import { translate } from '../translate/translate';
 
@@ -9,7 +11,15 @@ class Transactions extends React.Component {
   constructor() {
     super();
     this.state = {
+      toggledTxDetails: null,
     };
+    this.toggleTxDetails = this.toggleTxDetails.bind(this);
+  }
+
+  toggleTxDetails(index) {
+    this.setState({
+      toggledTxDetails: index === this.state.toggledTxDetails ? null : index,
+    });
   }
 
   renderTxDetailIcon() {
@@ -58,7 +68,7 @@ class Transactions extends React.Component {
     }
   };
 
-  renderTxAmount(tx) {
+  renderTxAmount(tx, amountOnly) {
     let _amountNegative;
 
     if ((tx.category === 'send' ||
@@ -74,17 +84,12 @@ class Transactions extends React.Component {
       <span>
         { formatValue(tx.amount) * _amountNegative || translate('TRANSACTIONS.UNKNOWN') }
         { tx.interest &&
+          !amountOnly &&
           <span className="tx-interest margin-left-15">(+{ formatValue(Math.abs(tx.interest)) })</span>
         }
       </span>
     );
   };
-
-/*
-              <div className="margin-top-10">
-              { _transactions[i].address }
-              </div>
-*/
 
   render() {
     if (this.props.activeSection === 'dashboard') {
@@ -101,10 +106,44 @@ class Transactions extends React.Component {
                 { this.renderTxType(_transactions[i].type) }
                 <span className="margin-left-20">{ this.renderTxAmount(_transactions[i]) }</span>
                 <span className="margin-left-20">{ secondsToString(_transactions[i].timestamp) }</span>
+                <span
+                  onClick={ () => this.toggleTxDetails(i) }
+                  className={ 'details-toggle fa ' + (this.state.toggledTxDetails === i ? 'fa-caret-up' : 'fa-caret-down') }></span>
               </div>
-              <div className="margin-top-10 padding-bottom-10 txid-hash">
-              { _transactions[i].txid }
-              </div>
+              { this.state.toggledTxDetails !== i &&
+                <div className="margin-top-10 padding-bottom-10 txid-hash">
+                { _transactions[i].txid }
+                </div>
+              }
+              { this.state.toggledTxDetails === i &&
+                <div className="margin-top-10 padding-bottom-10 tx-details">
+                  <div>{ translate('TRANSACTIONS.DIRECTION') }: { _transactions[i].type }</div>
+                  <div>{ translate('TRANSACTIONS.AMOUNT') }: { this.renderTxAmount(_transactions[i], true) } { this.props.coin.toUpperCase() }</div>
+                  { _transactions[i].interest &&
+                    Math.abs(_transactions[i].interest) > 0 &&
+                    <div>{ translate('TRANSACTIONS.INTEREST') }: { formatValue(Math.abs(_transactions[i].interest)) } KMD</div>
+                  }
+                  <div>{ translate('TRANSACTIONS.CONFIRMATIONS') }: { _transactions[i].confirmations }</div>
+                  { this.props.coin === 'kmd' &&
+                    <div>Locktime: { _transactions[i].locktime }</div>
+                  }
+                  <div>
+                  { translate('TRANSACTIONS.TIME') }: { secondsToString(_transactions[i].timestamp) }
+                    { isAssetChain(this.props.coin) &&
+                      <a
+                        href={ `${explorers[this.props.coin.toUpperCase()]}/tx/${_transactions[i].txid}` }
+                        target="_blank">
+                        <button className="margin-left-20 btn btn-sm white btn-dark waves-effect waves-light ext-link">
+                          <i className="fa fa-external-link"></i>Explorer
+                        </button>
+                      </a>
+                    }
+                  </div>
+                  <div>
+                  { translate('TRANSACTIONS.TX_HASH') } <div className="txid-hash">{ _transactions[i].txid }</div>
+                  </div>
+                </div>
+              }
             </div>
           );
         }
@@ -115,7 +154,12 @@ class Transactions extends React.Component {
           );
         } else {
           return (
-            <div className="txhistory">{ _items }</div>
+            <div className="txhistory">
+              <div className="dashboard-title">
+                <strong>{ translate('DASHBOARD.TRANSACTIONS') }</strong>
+              </div>
+              { _items }
+            </div>
           );
         }
       } else {

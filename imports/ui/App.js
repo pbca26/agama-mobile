@@ -22,8 +22,10 @@ import Spinner from './components/Spinner';
 import ServerSelect from './components/ServerSelect';
 import CreateSeed from './components/CreateSeed';
 import SendReceive from './components/SendReceive';
+import KMDInterest from './components/KMDInterest';
 
-const DASHBOARD_UPDATE_INTERVAL = 120000;
+const DASHBOARD_UPDATE_INTERVAL = 120000; // 2m
+const DEFAULT_LOCK_INACTIVE_INTERVAL = 600000; // 10m
 
 class App extends React.Component {
   constructor() {
@@ -63,6 +65,9 @@ class App extends React.Component {
     this.changeActiveSection = this.changeActiveSection.bind(this);
     this.toggleAutoRefresh = this.toggleAutoRefresh.bind(this);
     this.toggleLogin = this.toggleLogin.bind(this);
+    this.toggleKMDInterest = this.toggleKMDInterest.bind(this);
+    this.globalClick = this.globalClick.bind(this);
+    this.globalClickTimeout = null;
   }
 
   componentWillMount() {
@@ -72,6 +77,21 @@ class App extends React.Component {
       this.setState({
         coins: _localStorageCoins,
       });
+    }
+  }
+
+  globalClick() {
+    if (this.state.auth) {
+      if (this.globalClickTimeout) {
+        clearTimeout(this.globalClickTimeout);
+      }
+
+      this.globalClickTimeout = setTimeout(() => {
+        // console.warn(`logout after ${DEFAULT_LOCK_INACTIVE_INTERVAL} inactivity`);
+        this.lock();
+      }, DEFAULT_LOCK_INACTIVE_INTERVAL);
+
+      // console.warn('global click', 'set timer');
     }
   }
 
@@ -107,8 +127,6 @@ class App extends React.Component {
       
       actions.addKeyPair(coin)
       .then((res) => {
-        console.warn(res);
-
         this.setState({
           coins,
           activeSection: 'dashboard',
@@ -119,6 +137,22 @@ class App extends React.Component {
         this.dashboardRefresh();
       });
     }
+  }
+
+  toggleKMDInterest() {
+    const { actions } = this.props;
+
+    this.setState({
+      utxo: null,
+      activeSection: 'claim',
+    });
+    
+    actions.kmdUnspents()
+    .then((res) => {
+      this.setState({
+        utxo: res,
+      });
+    });
   }
 
   changeActiveSection(section, toggleMenu) {
@@ -308,6 +342,7 @@ class App extends React.Component {
 
       this.dashboardRefresh();
       this.toggleAutoRefresh();
+      this.globalClick();
     });
   }
 
@@ -420,9 +455,6 @@ class App extends React.Component {
                 { this.state.activeSection !== 'dashboard' &&
                   <div onClick={ () => this.changeActiveSection('dashboard', true) }>{ translate('DASHBOARD.DASHBOARD') }</div>
                 }
-                { this.state.activeSection !== 'send' &&
-                  <div onClick={ this.toggleSend }>{ translate('DASHBOARD.SEND') }</div>
-                }
                 <div onClick={ this.logout }>{ translate('DASHBOARD.LOGOUT') }</div>
                 <div onClick={ this.lock }>{ translate('DASHBOARD.LOCK') }</div>
                 { this.state.activeSection !== 'addcoin' &&
@@ -457,7 +489,9 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className="app-container">
+      <div
+        className="app-container"
+        onClick={ this.globalClick }>
         <div className="app-header">
           <img src="/images/agama-logo-side.svg" />
           { this.state.auth &&
@@ -517,8 +551,12 @@ class App extends React.Component {
             this.state.activeSection === 'dashboard' &&
             <SendReceive
               { ...this.state }
-              changeActiveSection={ this.changeActiveSection } />
+              toggleKMDInterest={ this.toggleKMDInterest } />
           }
+          <KMDInterest
+            { ...this.state }
+            sendtx={ this.props.actions.sendtx }
+            changeActiveSection={ this.changeActiveSection } />
           <Transactions { ...this.state } />
         </div>
       </div>

@@ -60,7 +60,7 @@ class SendReceive extends React.Component {
           <button
             type="button"
             className="btn btn-info waves-effect waves-light margin-left-20"
-            onClick={ () => this.props.changeActiveSection('claim') }>
+            onClick={ this.props.toggleKMDInterest }>
             <i className="fa fa-dollar"></i> { translate('DASHBOARD.CLAIM') }
           </button>
         }

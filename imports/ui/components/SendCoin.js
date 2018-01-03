@@ -54,7 +54,7 @@ class SendCoin extends React.Component {
         /*console.warn(data.length);
         console.warn(width * height * 4);*/
         const decodedQR = jsQR.decodeQRFromImage(image.data, image.width, image.height);
-        console.warn(decodedQR);
+        // console.warn(decodedQR);
 
         if (!decodedQR) {
           this.setState({

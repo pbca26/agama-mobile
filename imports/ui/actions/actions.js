@@ -10,6 +10,7 @@ import { electrumServers } from './electrumServers';
 import { getKMDBalance } from './getKMDBalance';
 import { createtx } from './createtx';
 import { listtransactions } from './listtransactions';
+import { listunspent } from './listunspent';
 
 let electrumKeys = {};
 
@@ -132,6 +133,23 @@ function balance(network) {
   }
 }
 
+function kmdUnspents() {
+  return async function(dispatch) {
+    return new Promise((resolve, reject) => {
+      listunspent(
+        proxyServer,
+        electrumServers.komodo,
+        electrumKeys.kmd.pub,
+        'komodo',
+        true,
+        true,
+      ).then((res) => {
+        resolve(res);
+      });
+    });
+  }
+}
+
 function auth(seed, coins) {
   return async function(dispatch) {
     return new Promise((resolve, reject) => {
@@ -181,4 +199,5 @@ export default {
   getServersList,
   setDefaultServer,
   addKeyPair,
+  kmdUnspents,
 }

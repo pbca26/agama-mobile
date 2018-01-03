@@ -7,6 +7,8 @@ class MyAddress extends React.Component {
   }
 
   render() {
+    console.warn(this.props);
+    
     return (
       <div className="margin-top-20 margin-left-10">
         <strong>
