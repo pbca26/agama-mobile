@@ -1,0 +1,58 @@
+.txhistory {
+  margin: 10px;
+
+  .txlist-transaction {
+    border-bottom: solid 1px #ccc;
+    margin-bottom: 20px;
+    overflow-x: hidden;
+
+    .tx-details {
+      padding-top: 10px;
+
+      > div {
+        margin-bottom: 10px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+    .ext-link {
+      position: absolute;
+
+      i {
+        margin-right: 5px;
+      }
+    }
+    .details-toggle {
+      float: right;
+      margin-right: 20px;
+      font-size: 20px;
+      color: #7a7d7d;
+    }
+    &:last-child {
+      border: none;
+    }
+    .label {
+      font-size: 14px;
+      padding: 3px;
+      display: inline-block;
+      width: 45px;
+
+      &.label-danger {
+        i,
+        span {
+          position: relative;
+          left: -1px;
+        }
+      }
+    }
+    .tx-interest {
+      color: #4caf50;
+    }
+    .txid-hash {
+      width: calc(100vw - 40px);
+      overflow-x: auto;
+    }
+  }
+}

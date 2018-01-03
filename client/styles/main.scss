@@ -1,0 +1,147 @@
+body {
+  padding-top: 50px;
+}
+
+.app-header {
+  height: 50px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+
+  img {
+    height: 80%;
+    margin-top: 5px;
+    margin-left: 5px;
+  }
+
+  .fa {
+    float: right;
+    font-size: 34px;
+    margin-right: 20px;
+    margin-top: 7px;
+  }
+}
+
+.app-main {
+  margin-top: 20px;
+}
+
+.no-padding-left {
+  padding-left: 0;
+}
+
+.dashboard-refresh {
+  font-size: 24px;
+  float: right;
+  margin-right: 26px;
+  margin-top: 22px;
+}
+
+.block {
+  display: block;
+}
+
+.center {
+  text-align: center;
+}
+
+h4 {
+  font-size: 16px;
+}
+
+.error {
+  color: #f96868;
+}
+.warning {
+  color: #f2a654;
+}
+
+.balance {
+  font-size: 16px;
+  margin: 20px;
+  margin-left: 10px;
+}
+
+.con-error {
+  float: left;
+  width: calc(100% - 64px);
+  margin-top: 22px;
+  margin-left: 10px;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.seed-gen-box {
+  border: solid 1px #ccc;
+  padding: 15px;
+}
+
+.margin-right-20 {
+  margin-right: 20px;
+}
+
+.margin-left-20 {
+  margin-left: 20px;
+}
+
+.send-receive-block {
+  margin-bottom: 35px;
+
+  .btn {
+    i {
+      margin-right: 5px;
+    }
+  }
+}
+
+.dashboard-title {
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+.receive-qr {
+  position: absolute;
+  background: #fff;
+  height: 100%;
+  width: 100%;
+  top: 54px;
+  left: 0;
+  z-index: 100; 
+
+  canvas {
+    margin: 0 auto;
+    display: block;
+    margin-top: 40px;
+    margin-bottom: 30px;
+  }
+}
+
+.btn-back {
+  position: relative;
+  top: 14px;
+  left: 10px;
+
+  i {
+    margin-right: 5px; 
+  }
+}
+
+.btn-scan-qr {
+  i {
+    margin-right: 5px;
+  }
+}
+
+.addcoin,
+.create-seed {
+  .btn-back {
+    left: 0;
+    top: 0;
+  }
+}
