@@ -164,7 +164,7 @@ body {
       position: relative;
       top: 0;
       left: -6px;
-      z-index: 110;
+      z-index: 99;
     }
   }
   .table {
@@ -252,11 +252,21 @@ h4 {
   position: relative;
   left: -20px;
   top: -10px;
+  margin-bottom: 20px;
 
+  > span {
+    width: 96px;
+    display: inline-block;
+    text-align: center;
+
+    > div {
+      position: relative;
+      top: -10px;
+    }
+  }
   img {
     height: 50px;
     margin: 20px;
-    margin-right: 30px;
   }
   i {
     position: absolute;
@@ -579,5 +589,13 @@ input:checked + .slider:before {
     th {
       text-align: center;
     }
+  }
+}
+
+.addcoin,
+.create-seed {
+  .btn-back {
+    left: 0;
+    top: 0;
   }
 }

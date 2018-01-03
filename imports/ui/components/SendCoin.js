@@ -190,7 +190,7 @@ class SendCoin extends React.Component {
         autoComplete="off">
         <div className="row">
           <div className="col-xlg-12 form-group form-material">
-            <label className="control-label padding-bottom-10">{ translate('SEND.SEND_FROM') }</label>
+            <label className="control-label padding-bottom-10">{ translate('SEND.FROM') }</label>
             <div>{ this.props.address }</div>
           </div>
         </div>
@@ -198,7 +198,7 @@ class SendCoin extends React.Component {
           <div className="col-xlg-12 form-group form-material">
             <label
               className="control-label"
-              htmlFor="kmdWalletSendTo">{ translate('SEND.SEND_TO') }</label>
+              htmlFor="kmdWalletSendTo">{ translate('SEND.TO') }</label>
             <input
               type="text"
               className="form-control"
@@ -374,6 +374,30 @@ class SendCoin extends React.Component {
                           </td>
                           <td>
                             <span className="label label-success">{ translate('SEND.SUCCESS') }</span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                          { translate('SEND.FROM') }
+                          </td>
+                          <td>
+                            { this.props.address }
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                          { translate('SEND.TO') }
+                          </td>
+                          <td>
+                            { this.state.sendTo }
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                          { translate('SEND.AMOUNT') }
+                          </td>
+                          <td>
+                            { this.state.sendAmount } { this.props.coin.toUpperCase() }
                           </td>
                         </tr>
                         <tr>
