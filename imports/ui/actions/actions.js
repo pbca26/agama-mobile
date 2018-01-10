@@ -151,7 +151,7 @@ const balance = (network) => {
 
 const kmdUnspents = () => {
   return async (dispatch) => {
-    const _electrumServer = getLocalStorageVar('coins').komodo.server;
+    const _electrumServer = getLocalStorageVar('coins').kmd.server;
 
     return new Promise((resolve, reject) => {
       listunspent(
