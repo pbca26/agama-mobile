@@ -13,7 +13,6 @@ cd to project's folder
 meteor npm install sha256
 meteor npm install nodejs-aes256
 meteor npm install bitcoinjs-lib
-meteor npm install coinkey
 meteor npm install coinselect
 meteor npm install buffer-reverse
 meteor update

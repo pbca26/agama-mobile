@@ -59,6 +59,7 @@ const verifyMerkle = (txid, height, serverList, electrumServer, proxyServer) => 
       params: {
         port: electrumServer.port,
         ip: electrumServer.ip,
+        proto: electrumServer.proto,
         txid,
         height,
       },
@@ -83,6 +84,7 @@ const verifyMerkle = (txid, height, serverList, electrumServer, proxyServer) => 
             params: {
               port: _randomServer[1],
               ip: _randomServer[0],
+              proto: electrumServer.proto,
               height,
             },
           }, (error, result) => {

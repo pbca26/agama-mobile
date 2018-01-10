@@ -366,6 +366,28 @@ export let electrumServers = {
       '136.243.45.140:50013'
     ],
   },
+  xmy: {
+    ip: 'cetus.cryptap.us',
+    port: 50004,
+    proto: 'ssl',
+    txfee: 5000,
+    abbr: 'XMY',
+    serverList: [
+      'cetus.cryptap.us:50004',
+      'kraken.cryptap.us:50004'
+    ],
+  },
+  zcl: {
+    ip: 'electrum1.cipig.net',
+    port: 50055,
+    proto: 'tcp',
+    txfee: 1000,
+    abbr: 'ZCL',
+    serverList: [
+      'electrum1.cipig.net:10055',
+      'electrum2.cipig.net:10055'
+    ],
+  },
 };
 
 electrumServers.crw = electrumServers.crown;

@@ -13,6 +13,7 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer) => {
       params: {
         port: electrumServer.port,
         ip: electrumServer.ip,
+        proto: electrumServer.proto,
         address,
       },
     }, (error, result) => {
@@ -49,6 +50,7 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer) => {
                   params: {
                     port: electrumServer.port,
                     ip: electrumServer.ip,
+                    proto: electrumServer.proto,
                     address,
                     txid: _utxoItem['tx_hash'],
                   },
@@ -85,14 +87,14 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer) => {
             }))
             .then(promiseResult => {
               resolve({
-                  balance: Number((0.00000001 * json.confirmed).toFixed(8)),
-                  unconfirmed: Number((0.00000001 * json.unconfirmed).toFixed(8)),
-                  unconfirmedSats: json.unconfirmed,
-                  balanceSats: json.confirmed,
-                  interest: Number(interestTotal.toFixed(8)),
-                  interestSats: Math.floor(interestTotal * 100000000),
-                  total: interestTotal > 0 ? Number((0.00000001 * json.confirmed + interestTotal).toFixed(8)) : 0,
-                  totalSats: interestTotal > 0 ?json.confirmed + Math.floor(interestTotal * 100000000) : 0,
+                balance: Number((0.00000001 * json.confirmed).toFixed(8)),
+                unconfirmed: Number((0.00000001 * json.unconfirmed).toFixed(8)),
+                unconfirmedSats: json.unconfirmed,
+                balanceSats: json.confirmed,
+                interest: Number(interestTotal.toFixed(8)),
+                interestSats: Math.floor(interestTotal * 100000000),
+                total: interestTotal > 0 ? Number((0.00000001 * json.confirmed + interestTotal).toFixed(8)) : 0,
+                totalSats: interestTotal > 0 ?json.confirmed + Math.floor(interestTotal * 100000000) : 0,
               });
             });
           } else {
