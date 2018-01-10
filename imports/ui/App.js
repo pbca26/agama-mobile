@@ -122,8 +122,6 @@ class App extends React.Component {
 
     setLocalStorageVar('coins', this.state.coins);
 
-    console.warn(server);
-
     if (!this.state.auth) {
       this.setState({
         coins,
@@ -185,7 +183,6 @@ class App extends React.Component {
       address: this.state.pubKeys[coin],
       activeSection: this.state.activeSection !== 'send' ? 'dashboard' : 'send',
     });
-    console.warn(this.state.coins);
 
     // toggle refresh and update in-mem coins cache obj
     setTimeout(() => {
