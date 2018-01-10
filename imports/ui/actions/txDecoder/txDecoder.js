@@ -10,7 +10,9 @@ export const isZcash = (network) => {
       network === 'zcash' ||
       network === 'ZCASH' ||
       network === 'HUSH' ||
-      network === 'hush') {
+      network === 'hush' ||
+      network === 'ZCL' ||
+      network === 'zcl') {
     return true;
   }
 };

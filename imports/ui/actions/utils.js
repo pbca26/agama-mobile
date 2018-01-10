@@ -199,6 +199,8 @@ export const coinsList = [
   'LTC',
   'NMC',
   'SIB',
+  'XMY',
+  'ZCL'
 ];
 
 export const explorers = {

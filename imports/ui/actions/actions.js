@@ -1,11 +1,15 @@
 import { Promise } from 'meteor/promise';
 
-import { isAssetChain } from './utils';
+import {
+  isAssetChain,
+  getRandomIntInclusive,
+  getLocalStorageVar,
+} from './utils';
 import {
   seedToWif,
   wifToWif,
 } from './seedToWif';
-import { proxyServer } from './proxyServers';
+import { proxyServers } from './proxyServers';
 import { electrumServers } from './electrumServers';
 import { getKMDBalance } from './getKMDBalance';
 import { createtx } from './createtx';
@@ -13,6 +17,13 @@ import { listtransactions } from './listtransactions';
 import { listunspent } from './listunspent';
 
 let electrumKeys = {};
+let proxyServer = {};
+// pick a random proxy server
+const _randomServer = proxyServers[getRandomIntInclusive(0, proxyServers.length - 1)];
+proxyServer = {
+  ip: _randomServer.ip,
+  port: _randomServer.port,
+};
 
 function getServersList() {
   return async function(dispatch) {
@@ -59,10 +70,11 @@ function sendtx(network, outputAddress, value, verify, push) {
   return async function(dispatch) {
     return new Promise((resolve, reject) => {
       const changeAddress = electrumKeys[network].pub;
+      const _electrumServer = getLocalStorageVar('coins')[network].server;
 
       createtx(
         proxyServer,
-        electrumServers[network === 'kmd' ? 'komodo' : network],
+        _electrumServer,
         outputAddress,
         changeAddress,
         value,
@@ -81,9 +93,11 @@ function sendtx(network, outputAddress, value, verify, push) {
 function transactions(network) {
   return async function(dispatch) {
     return new Promise((resolve, reject) => {
+      const _electrumServer = getLocalStorageVar('coins')[network].server;
+
       listtransactions(
         proxyServer,
-        electrumServers[network === 'kmd' ? 'komodo' : network],
+        _electrumServer,
         electrumKeys[network].pub,
         network === 'kmd' ? 'komodo' : network,
         true
@@ -97,13 +111,15 @@ function transactions(network) {
 function balance(network) {
   return async function(dispatch) {
     const address = electrumKeys[network].pub;
+    const _electrumServer = getLocalStorageVar('coins')[network].server;
 
     return new Promise((resolve, reject) => {
       HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`, {
         params: {
-          port: electrumServers[network === 'kmd' ? 'komodo' : network].port,
-          ip: electrumServers[network === 'kmd' ? 'komodo' : network].ip,
-          address: address,
+          port: _electrumServer.port,
+          ip: _electrumServer.ip,
+          proto: _electrumServer.proto,
+          address,
         },
       }, (error, result) => {
         if (!result) {
@@ -115,7 +131,7 @@ function balance(network) {
               address,
               JSON.parse(result.content).result,
               proxyServer,
-              electrumServers[network === 'kmd' ? 'komodo' : network]
+              _electrumServer
             ).then((res) => {
               resolve(res);
             });
@@ -135,10 +151,12 @@ function balance(network) {
 
 function kmdUnspents() {
   return async function(dispatch) {
+    const _electrumServer = getLocalStorageVar('coins').komodo.server;
+
     return new Promise((resolve, reject) => {
       listunspent(
         proxyServer,
-        electrumServers.komodo,
+        _electrumServer,
         electrumKeys.kmd.pub,
         'komodo',
         true,

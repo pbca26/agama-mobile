@@ -26,13 +26,13 @@ const electrumJSNetworks = require('./electrumNetworks.js');
 // btg/bch
 const buildSignedTxForks = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue) => {
   const _network = electrumJSNetworks[network];
-  let tx = new bitcoinJSForks.TransactionBuilder(_network);
   const keyPair = bitcoinJSForks.ECPair.fromWIF(wif, _network);
   const pk = bitcoinJSForks.crypto.hash160(keyPair.getPublicKeyBuffer());
   const spk = bitcoinJSForks.script.pubKeyHash.output.encode(pk);
+  let tx = new bitcoinJSForks.TransactionBuilder(_network);
 
   devlog(`buildSignedTx${network.toUpperCase()}`);
-  
+
   for (let i = 0; i < utxo.length; i++) {
     tx.addInput(utxo[i].txid, utxo[i].vout, bitcoinJSForks.Transaction.DEFAULT_SEQUENCE, spk);
   }
@@ -89,7 +89,7 @@ const buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, s
   devlog('buildSignedTx');
   // devlog(`buildSignedTx priv key ${wif}`);
   devlog(`buildSignedTx pub key ${key.getAddress().toString()}`);
-  
+
   for (let i = 0; i < utxo.length; i++) {
     tx.addInput(utxo[i].txid, utxo[i].vout);
   }
@@ -154,9 +154,10 @@ const maxSpendBalance = (utxoList, fee) => {
 
 export const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, value, defaultFee, wif, network, verify, push) => {
   return new Promise((resolve, reject) => {
-    devlog('createrawtx =>');
     let defaultFee = electrumServers[network].txfee;
-    
+
+    devlog('createrawtx =>');
+
     listunspent(
       proxyServer,
       electrumServer,
@@ -209,7 +210,7 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
         devlog(`create tx network ${network}`)
 
         const feeRate = network === 'komodo' || network === 'kmd' || network === 'chips' ? 20 : 0; // sats/byte
-        
+
         if (!feeRate) {
           targets[0].value = targets[0].value + defaultFee;
         }
@@ -217,7 +218,7 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
         devlog(`fee rate ${feeRate}`);
         devlog(`default fee ${fee}`);
         devlog(`targets ==>`);
-        devlog(targets);        
+        devlog(targets);
 
         // default coin selection algo blackjack with fallback to accumulative
         // make a first run, calc approx tx fee
@@ -346,7 +347,7 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
 
             devlog(`vin sum ${vinSum} (${vinSum * 0.00000001})`);
             devlog(`estimatedFee ${_estimatedFee} (${_estimatedFee * 0.00000001})`);
-            
+
             let _rawtx;
 
             if (network === 'btg' ||
@@ -402,6 +403,7 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
                   rawtx: _rawtx,
                   port: electrumServer.port,
                   ip: electrumServer.ip,
+                  proto: electrum.proto,
                 },
               }, (error, result) => {
                 result = JSON.parse(result.content);

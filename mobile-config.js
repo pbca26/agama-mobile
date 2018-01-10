@@ -1,6 +1,6 @@
 App.info({
   id: 'com.supernet.agama',
-  version: '0.0.5',
+  version: '0.0.6',
   buildNumber: '777',
   name: 'Agama',
   description: 'Agama Mobile is a lightweight wallet application that allows users to manage multiple crypto currencies. It\'s built on top of SPV technology which provides a quick way to retrieve and push transaction data.',
@@ -42,7 +42,8 @@ App.launchScreens({
 
 // App.accessRule('http://46.20.235.46');
 // App.accessRule('*');
-App.accessRule('http://46.20.235.46');
+App.accessRule('http://94.130.225.86');
+App.accessRule('http://94.130.98.74');
 App.accessRule('http://kmd.komodochainz.info');
 App.accessRule('http://MSHARK.explorer.supernet.org');
 App.accessRule('http://revs.explorer.supernet.org');
@@ -60,11 +61,6 @@ App.accessRule('http://WIRELESS.explorer.supernet.org');
 App.accessRule('http://CHIPS1.explorer.supernet.org');
 App.accessRule('https://explorer.coqui.cash');
 App.accessRule('https://www.mnzexplorer.com');
-/*App.launchScreens({
-  'iphone_2x': 'splash/Default@2x~iphone.png',
-  'iphone5': 'splash/Default~iphone5.png',
-  // More screen sizes and platforms...
-});*/
 
 // Set PhoneGap/Cordova preferences.
 App.setPreference('BackgroundColor', '0xffffffff');
