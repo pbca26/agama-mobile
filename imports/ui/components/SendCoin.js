@@ -201,7 +201,7 @@ class SendCoin extends React.Component {
         <div className="row">
           <div className="col-xlg-12 form-group form-material">
             <label className="control-label padding-bottom-10">
-              { translate('SEND.FROM') } <strong>[{ formatValue(this.props.balance.balance) } KMD]</strong>
+              { translate('SEND.FROM') } <strong>[{ formatValue(this.props.balance.balance) } { this.props.coin.toUpperCase() }]</strong>
             </label>
             <div>{ this.props.address }</div>
           </div>
