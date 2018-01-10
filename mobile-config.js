@@ -40,8 +40,6 @@ App.launchScreens({
   'android_xxxhdpi_portrait': 'app-assets/splash/drawable-xxxhdpi/agama.9.png',
 });
 
-// App.accessRule('http://46.20.235.46');
-// App.accessRule('*');
 App.accessRule('http://94.130.225.86');
 App.accessRule('http://94.130.98.74');
 App.accessRule('http://kmd.komodochainz.info');
