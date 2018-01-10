@@ -25,16 +25,16 @@ proxyServer = {
   port: _randomServer.port,
 };
 
-function getServersList() {
-  return async function(dispatch) {
+const getServersList = () => {
+  return async (dispatch) => {
     return new Promise((resolve, reject) => {
       resolve(electrumServers);
     });
   }
 }
 
-function setDefaultServer(network, port, ip) {
-  return async function(dispatch) {
+const setDefaultServer = (network, port, ip) => {
+  return async (dispatch) => {
     return new Promise((resolve, reject) => {
       HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/server/version`, {
         params: {
@@ -57,8 +57,8 @@ function setDefaultServer(network, port, ip) {
   }
 }
 
-function clearKeys() {
-  return async function(dispatch) {
+const clearKeys = () => {
+  return async (dispatch) => {
     return new Promise((resolve, reject) => {
       electrumKeys = {};
       resolve(true);
@@ -66,8 +66,8 @@ function clearKeys() {
   }
 }
 
-function sendtx(network, outputAddress, value, verify, push) {
-  return async function(dispatch) {
+const sendtx = (network, outputAddress, value, verify, push) => {
+  return async (dispatch) => {
     return new Promise((resolve, reject) => {
       const changeAddress = electrumKeys[network].pub;
       const _electrumServer = getLocalStorageVar('coins')[network].server;
@@ -90,8 +90,8 @@ function sendtx(network, outputAddress, value, verify, push) {
   }
 }
 
-function transactions(network) {
-  return async function(dispatch) {
+const transactions = (network) => {
+  return async (dispatch) => {
     return new Promise((resolve, reject) => {
       const _electrumServer = getLocalStorageVar('coins')[network].server;
 
@@ -108,8 +108,8 @@ function transactions(network) {
   }
 }
 
-function balance(network) {
-  return async function(dispatch) {
+const balance = (network) => {
+  return async (dispatch) => {
     const address = electrumKeys[network].pub;
     const _electrumServer = getLocalStorageVar('coins')[network].server;
 
@@ -149,8 +149,8 @@ function balance(network) {
   }
 }
 
-function kmdUnspents() {
-  return async function(dispatch) {
+const kmdUnspents = () => {
+  return async (dispatch) => {
     const _electrumServer = getLocalStorageVar('coins').komodo.server;
 
     return new Promise((resolve, reject) => {
@@ -168,8 +168,8 @@ function kmdUnspents() {
   }
 }
 
-function auth(seed, coins) {
-  return async function(dispatch) {
+const auth = (seed, coins) => {
+  return async (dispatch) => {
     return new Promise((resolve, reject) => {
       let _pubKeys = {};
 
@@ -185,8 +185,8 @@ function auth(seed, coins) {
   }
 }
 
-function addKeyPair(coin) {
-  return async function(dispatch) {
+const addKeyPair = (coin) => {
+  return async (dispatch) => {
     return new Promise((resolve, reject) => {
       const _wif = electrumKeys[Object.keys(electrumKeys)[0]].wif;
       let _pubKeys = {};
@@ -201,8 +201,8 @@ function addKeyPair(coin) {
   }
 }
 
-function getKeys() {
-  return async function(dispatch) {
+const getKeys = () => {
+  return async (dispatch) => {
     // todo
   }
 }
