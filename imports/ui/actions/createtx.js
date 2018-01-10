@@ -403,7 +403,7 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
                   rawtx: _rawtx,
                   port: electrumServer.port,
                   ip: electrumServer.ip,
-                  proto: electrum.proto,
+                  proto: electrumServer.proto,
                 },
               }, (error, result) => {
                 result = JSON.parse(result.content);
