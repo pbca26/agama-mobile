@@ -6,6 +6,7 @@ import {
   isNumber,
   explorers,
   isAssetChain,
+  formatValue,
 } from '../actions/utils';
 import jsQR from 'jsqr';
 
@@ -30,7 +31,7 @@ class SendCoin extends React.Component {
     this.updateInput = this.updateInput.bind(this);
     this.scanQR = this.scanQR.bind(this);
     this.validate = this.validate.bind(this);
-    this.openExternalURL = this.openExternalURL.bind(this);    
+    this.openExternalURL = this.openExternalURL.bind(this);
   }
 
   openExternalURL(url) {
@@ -43,7 +44,7 @@ class SendCoin extends React.Component {
 
     MeteorCamera.getPicture({ quality: 100 }, (error, data) => {
       if (error) {
-        console.warn(error);
+        // console.warn(error);
         this.setState({
           qrScanError: true,
         });
@@ -51,15 +52,15 @@ class SendCoin extends React.Component {
         const canvas = document.getElementById('qrScan');
         const img = new Image();
         img.src = data;
-        
+
         /*console.warn(data);
         console.warn(img.clientWidth);
         console.warn(img.clientHeight);*/
-  
+
         const canvasContext = canvas.getContext("2d");
         canvasContext.drawImage(img, 0, 0, Math.floor(width / 2.5), Math.floor(height / 3.5));
         const image = canvasContext.getImageData(0, 0, width, height);
-  
+
         /*console.warn(data.length);
         console.warn(width * height * 4);*/
         const decodedQR = jsQR.decodeQRFromImage(image.data, image.width, image.height);
@@ -199,7 +200,9 @@ class SendCoin extends React.Component {
         autoComplete="off">
         <div className="row">
           <div className="col-xlg-12 form-group form-material">
-            <label className="control-label padding-bottom-10">{ translate('SEND.FROM') }</label>
+            <label className="control-label padding-bottom-10">
+              { translate('SEND.FROM') } <strong>[{ formatValue(this.props.balance.balance) } KMD]</strong>
+            </label>
             <div>{ this.props.address }</div>
           </div>
         </div>
@@ -442,6 +445,10 @@ class SendCoin extends React.Component {
                         <strong>{ translate('SEND.ERROR') }</strong>
                       </div>
                       <div>{ this.state.sendResult.result }</div>
+                      { this.state.sendResult.raw &&
+                        this.state.sendResult.raw.txid &&
+                        <div>{ this.state.sendResult.raw.txid.replace(/\[.*\]/, '') }</div>
+                      }
                     </div>
                   }
                 </div>
