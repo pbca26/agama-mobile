@@ -39,6 +39,7 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
               params: {
                 port: electrumServer.port,
                 ip: electrumServer.ip,
+                proto: electrumServer.proto,
               },
             }, (error, result) => {
               result = JSON.parse(result.content);
