@@ -100,12 +100,8 @@ class App extends React.Component {
   }
 
   addCoin(coin) {
-    const server = electrumServers[coin === 'kmd' ? 'komodo' : coin];    
+    const server = electrumServers[coin === 'kmd' ? 'komodo' : coin];
     let coins = this.state.coins;
-
-    coins[coin] = {
-      // defaults
-    };
 
     // pick a random server to communicate with
     if (server.serverList &&
@@ -120,6 +116,10 @@ class App extends React.Component {
       }
     }
 
+    coins[coin] = {
+      server,
+    };
+
     setLocalStorageVar('coins', this.state.coins);
 
     if (!this.state.auth) {
@@ -128,7 +128,7 @@ class App extends React.Component {
       });
     } else {
       const { actions } = this.props;
-      
+
       actions.addKeyPair(coin)
       .then((res) => {
         this.setState({
@@ -151,7 +151,7 @@ class App extends React.Component {
       utxo: null,
       activeSection: 'claim',
     });
-    
+
     actions.kmdUnspents()
     .then((res) => {
       this.scrollToTop();
@@ -172,7 +172,7 @@ class App extends React.Component {
         activeSection: section,
       });
     }
-    
+
     document.getElementById('body').style.overflow = 'inherit';
     this.scrollToTop();
   }
@@ -358,11 +358,7 @@ class App extends React.Component {
   }
 
   toggleMenu() {
-    if (!this.state.displayMenu) {
-      document.getElementById('body').style.overflow = 'hidden';
-    } else {
-      document.getElementById('body').style.overflow = 'inherit';
-    }
+    document.getElementById('body').style.overflow = !this.state.displayMenu ? 'hidden' : 'inherit';
 
     this.setState({
       displayMenu: !this.state.displayMenu,

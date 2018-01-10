@@ -136,6 +136,28 @@ export let electrumServers = {
       'electrum2.cipig.net:10014'
     ],
   },
+  mgw: { // !estimatefee
+    ip: 'electrum1.cipig.net',
+    port: 10015,
+    proto: 'tcp',
+    txfee: 10000,
+    abbr: 'MGW',
+    serverList: [
+      'electrum1.cipig.net:10015',
+      'electrum2.cipig.net:10015'
+    ],
+  },
+  btch: { // !estimatefee
+    address: 'electrum1.cipig.net',
+    port: 10020,
+    proto: 'tcp',
+    txfee: 10000,
+    abbr: 'BTCH',
+    serverList: [
+      'electrum1.cipig.net:10020',
+      'electrum2.cipig.net:10020'
+    ],
+  },
   jumblr: { // !estimatefee
     ip: 'electrum1.cipig.net',
     port: 10004,
@@ -364,6 +386,28 @@ export let electrumServers = {
     serverList: [
       '173.212.225.176:50013',
       '136.243.45.140:50013'
+    ],
+  },
+  xmy: {
+    ip: 'cetus.cryptap.us',
+    port: 50004,
+    proto: 'ssl',
+    txfee: 5000,
+    abbr: 'XMY',
+    serverList: [
+      'cetus.cryptap.us:50004',
+      'kraken.cryptap.us:50004'
+    ],
+  },
+  zcl: {
+    ip: 'electrum1.cipig.net',
+    port: 50055,
+    proto: 'tcp',
+    txfee: 1000,
+    abbr: 'ZCL',
+    serverList: [
+      'electrum1.cipig.net:10055',
+      'electrum2.cipig.net:10055'
     ],
   },
 };

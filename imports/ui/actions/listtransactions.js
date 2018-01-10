@@ -15,6 +15,7 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
       params: {
         port: electrumServer.port,
         ip: electrumServer.ip,
+        proto: electrumServer.proto,
       },
     }, (error, result) => {
       result = JSON.parse(result.content);
@@ -31,6 +32,7 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
           params: {
             port: electrumServer.port,
             ip: electrumServer.ip,
+            proto: electrumServer.proto,
             address,
             raw: true,
           },
@@ -53,6 +55,7 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
                     params: {
                       port: electrumServer.port,
                       ip: electrumServer.ip,
+                      proto: electrumServer.proto,
                       address,
                       height: transaction.height,
                     },
@@ -87,6 +90,7 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
                                 params: {
                                   port: electrumServer.port,
                                   ip: electrumServer.ip,
+                                  proto: electrumServer.proto,
                                   address,
                                   txid: _decodedInput.txid,
                                 },

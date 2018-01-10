@@ -18,6 +18,7 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
         params: {
           port: electrumServer.port,
           ip: electrumServer.ip,
+          proto: electrumServer.proto,
           address,
         },
       }, (error, result) => {
@@ -38,6 +39,7 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
               params: {
                 port: electrumServer.port,
                 ip: electrumServer.ip,
+                proto: electrumServer.proto,
               },
             }, (error, result) => {
               result = JSON.parse(result.content);
@@ -65,6 +67,7 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                           params: {
                             port: electrumServer.port,
                             ip: electrumServer.ip,
+                            proto: electrumServer.proto,
                             address,
                             txid: _utxoItem['tx_hash'],
                           },
@@ -198,6 +201,7 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
         params: {
           port: electrumServer.port,
           ip: electrumServer.ip,
+          proto: electrumServer.proto,
           address,
         },
       }, (error, result) => {
