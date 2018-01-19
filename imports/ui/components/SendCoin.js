@@ -7,6 +7,7 @@ import {
   explorers,
   isAssetChain,
   formatValue,
+  convertURIToImageData,
 } from '../actions/utils';
 import jsQR from 'jsqr';
 
@@ -49,33 +50,25 @@ class SendCoin extends React.Component {
           qrScanError: true,
         });
       } else {
-        const canvas = document.getElementById('qrScan');
-        const img = new Image();
-        img.src = data;
+        convertURIToImageData(data)
+        .then((imageData) => {
+          /*console.log(imageData.data);
+          console.log(imageData.height);
+          console.log(imageData.width);*/
+          const decodedQR = jsQR.decodeQRFromImage(imageData.data, imageData.width, imageData.height);
+          // console.warn(decodedQR);
 
-        /*console.warn(data);
-        console.warn(img.clientWidth);
-        console.warn(img.clientHeight);*/
-
-        const canvasContext = canvas.getContext("2d");
-        canvasContext.drawImage(img, 0, 0, Math.floor(width / 2.5), Math.floor(height / 3.5));
-        const image = canvasContext.getImageData(0, 0, width, height);
-
-        /*console.warn(data.length);
-        console.warn(width * height * 4);*/
-        const decodedQR = jsQR.decodeQRFromImage(image.data, image.width, image.height);
-        // console.warn(decodedQR);
-
-        if (!decodedQR) {
-          this.setState({
-            qrScanError: true,
-          });
-        } else {
-          this.setState({
-            qrScanError: false,
-            sendTo: decodedQR,
-          });
-        }
+          if (!decodedQR) {
+            this.setState({
+              qrScanError: true,
+            });
+          } else {
+            this.setState({
+              qrScanError: false,
+              sendTo: decodedQR,
+            });
+          }
+        });
       }
     });
   }
@@ -285,7 +278,6 @@ class SendCoin extends React.Component {
               <i className="fa fa-arrow-left"></i> { translate('DASHBOARD.BACK') }
             </span>
           </div>
-          <canvas id="qrScan" style={{ width: '640px', height: '480px', position: 'absolute', zIndex: '1' }}></canvas>
           <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12 steps-counter">
             <div className="steps row margin-top-10">
               <div className={ 'step col-md-4' + (this.state.sendCurrentStep === 0 ? ' current' : '') }>
