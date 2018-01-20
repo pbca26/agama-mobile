@@ -24,6 +24,7 @@ class Login extends React.Component {
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.updateInput = this.updateInput.bind(this);
+    this.triggerKey = this.triggerKey.bind(this);
     this.login = this.login.bind(this);
     this.toggleCreatePin = this.toggleCreatePin.bind(this);
   }
@@ -89,6 +90,66 @@ class Login extends React.Component {
     });
   }
 
+  triggerKey(key) {
+    if (key === 'back') {
+      this.setState({
+        pin: this.state.pin.slice(0, -1),
+        wrongPin: false,
+      });
+    } else if (key === 'remove') {
+      this.setState({
+        pin: '',
+        wrongPin: false,
+      });
+    } else {
+      this.setState({
+        pin: this.state.pin + key,
+        wrongPin: false,
+      });
+    }
+  }
+
+  renderKeyPad() {
+    let _items = [];
+
+    for (let i = 0; i < 10; i++) {
+      _items.push(
+        <button
+          key={ `login-keypad-${i}` }
+          className="btn btn-lg btn-primary"
+          onClick={ () => this.triggerKey(i) }>
+          <span className="ladda-label">
+          { i }
+          </span>
+        </button>
+      );
+    }
+
+    _items.push(
+      <button
+        key={ `login-keypad-remove` }
+        className="btn btn-lg btn-primary"
+        onClick={ () => this.triggerKey('remove') }>
+        <span className="ladda-label padding-fix">
+        <i className="fa fa-remove"></i>
+        </span>
+      </button>
+    );
+
+    _items.push(
+      <button
+        key={ `login-keypad-back` }
+        className="btn btn-lg btn-primary"
+        onClick={ () => this.triggerKey('back') }>
+        <span className="ladda-label padding-fix">
+        <i className="fa fa-long-arrow-left"></i>
+        </span>
+      </button>
+    );
+
+    return _items;
+  }
+
   render() {
     if ((this.props.activeSection === 'login' || (!this.props.auth && this.props.activeSection !== 'addcoin')) &&
         this.props.coins &&
@@ -98,77 +159,83 @@ class Login extends React.Component {
         <div className="col-sm-12">
           <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12">
             <div className="row">
-              <h4 className="padding-bottom-10">{ translate('LOGIN.PIN_ACCESS') }</h4>
-              <input
-                type="password"
-                className="form-control margin-bottom-30"
-                name="pin"
-                onChange={ this.updateInput }
-                placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
-                value={ this.state.pin || '' } />
-              { this.state.wrongPin &&
-                <div className="error margin-bottom-25">
-                  <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
-                </div>
-              }
-              <button
-                className="btn btn-lg btn-primary btn-block ladda-button"
-                onClick={ () => this.login(true) }>
-                <span className="ladda-label">
-                { translate('LOGIN.LOGIN') }
-                </span>
-              </button>
-
-              <hr />
-
-              <h4 className="padding-bottom-10">{ translate('LOGIN.PASSPHRASE_ACCESS') }</h4>
-              <input
-                type="password"
-                className="form-control margin-bottom-10"
-                name="passphrase"
-                onChange={ this.updateInput }
-                placeholder={ translate('LOGIN.ENTER_PASSPHRASE') }
-                value={ this.state.passphrase || '' } />
-
-              <div className="margin-bottom-25 margin-top-30">
-                <label className="switch">
-                  <input
-                    type="checkbox"
-                    value="on"
-                    checked={ this.state.createPin } />
-                  <div
-                    className="slider"
-                    onClick={ this.toggleCreatePin }></div>
-                </label>
-                <div
-                  className="toggle-label pointer"
-                  onClick={ this.toggleCreatePin }>
-                  { translate('LOGIN.OVERRIDE_PIN') }
-                </div>
-                { this.state.createPin &&
+              { getLocalStorageVar('seed') &&
+                <div>
+                  <h4 className="padding-bottom-10">{ translate('LOGIN.PIN_ACCESS') }</h4>
                   <input
                     type="password"
-                    className="form-control margin-top-20"
-                    name="pinOverride"
+                    className="form-control margin-bottom-30"
+                    name="pin"
                     onChange={ this.updateInput }
                     placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
-                    value={ this.state.pinOverride || '' } />
-                }
-                { this.state.createPin &&
-                  this.state.pinOverrideTooShort &&
-                  <div className="error margin-top-15">
-                    <i className="fa fa-warning"></i> { translate('LOGIN.PIN_TOO_SHORT') }
-                  </div>
-                }
-              </div>
+                    value={ this.state.pin || '' } />
+                  { this.state.wrongPin &&
+                    <div className="error margin-bottom-25">
+                      <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
+                    </div>
+                  }
+                  <div className="margin-top-40 margin-bottom-30 login-keypad">{ this.renderKeyPad() }</div>
+                  <button
+                    className="btn btn-lg btn-primary btn-block ladda-button"
+                    onClick={ () => this.login(true) }>
+                    <span className="ladda-label">
+                    { translate('LOGIN.LOGIN') }
+                    </span>
+                  </button>
+                </div>
+              }
+              { !getLocalStorageVar('seed') &&
+                <div>
+                  <h4 className="padding-bottom-10">Create PIN</h4>
+                  <input
+                    type="password"
+                    className="form-control margin-bottom-10"
+                    name="passphrase"
+                    onChange={ this.updateInput }
+                    placeholder={ translate('LOGIN.ENTER_PASSPHRASE') }
+                    value={ this.state.passphrase || '' } />
 
-              <button
-                className="btn btn-lg btn-primary btn-block ladda-button"
-                onClick={ () => this.login(false) }>
-                <span className="ladda-label">
-                { translate('LOGIN.LOGIN') }
-                </span>
-              </button>
+                  <div className="margin-bottom-25 margin-top-30">
+                    <label className="switch">
+                      <input
+                        type="checkbox"
+                        value="on"
+                        checked={ this.state.createPin } />
+                      <div
+                        className="slider"
+                        onClick={ this.toggleCreatePin }></div>
+                    </label>
+                    <div
+                      className="toggle-label pointer"
+                      onClick={ this.toggleCreatePin }>
+                      { translate('LOGIN.OVERRIDE_PIN') }
+                    </div>
+                    { this.state.createPin &&
+                      <input
+                        type="password"
+                        className="form-control margin-top-20"
+                        name="pinOverride"
+                        onChange={ this.updateInput }
+                        placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
+                        value={ this.state.pinOverride || '' } />
+                    }
+                    { this.state.createPin &&
+                      this.state.pinOverrideTooShort &&
+                      <div className="error margin-top-15">
+                        <i className="fa fa-warning"></i> { translate('LOGIN.PIN_TOO_SHORT') }
+                      </div>
+                    }
+                  </div>
+
+                  <button
+                    className="btn btn-lg btn-primary btn-block ladda-button"
+                    onClick={ () => this.login(false) }>
+                    <span className="ladda-label">
+                    { translate('LOGIN.LOGIN') }
+                    </span>
+                  </button>
+                </div>
+              }
             </div>
           </div>
         </div>
