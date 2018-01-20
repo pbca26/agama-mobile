@@ -94,8 +94,6 @@ export const buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeV
     tx.addInput(utxo[i].txid, utxo[i].vout);
   }
 
-  console.log('add ins');
-
   if (isPos(network)) {
     tx.addOutput(sendTo, Number(spendValue), _network);
   } else {

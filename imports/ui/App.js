@@ -9,6 +9,7 @@ import {
   getLocalStorageVar,
   sortBy,
   getRandomIntInclusive,
+  convertURIToImageData,
 } from './actions/utils';
 import { translate } from './translate/translate';
 
@@ -23,6 +24,8 @@ import ServerSelect from './components/ServerSelect';
 import CreateSeed from './components/CreateSeed';
 import SendReceive from './components/SendReceive';
 import KMDInterest from './components/KMDInterest';
+import OfflineSigning from './components/OfflineSigning';
+import Pin from './components/Pin';
 
 const DASHBOARD_UPDATE_INTERVAL = 120000; // 2m
 const DEFAULT_LOCK_INACTIVE_INTERVAL = 600000; // 10m
@@ -66,6 +69,8 @@ class App extends React.Component {
     this.toggleAutoRefresh = this.toggleAutoRefresh.bind(this);
     this.toggleLogin = this.toggleLogin.bind(this);
     this.toggleKMDInterest = this.toggleKMDInterest.bind(this);
+    this.toggleOffileSig = this.toggleOffileSig.bind(this);
+    this.togglePin = this.togglePin.bind(this);
     this.globalClick = this.globalClick.bind(this);
     this.globalClickTimeout = null;
   }
@@ -365,6 +370,28 @@ class App extends React.Component {
     });
   }
 
+  togglePin() {
+    setTimeout(() => {
+      this.toggleMenu();
+    }, 10);
+
+    this.setState({
+      activeSection: this.state.activeSection === 'pin' ? 'dashboard' : 'pin',
+    });
+    this.scrollToTop();
+  }
+
+  toggleOffileSig() {
+    setTimeout(() => {
+      this.toggleMenu();
+    }, 10);
+
+    this.setState({
+      activeSection: this.state.activeSection === 'offlinesig' ? 'dashboard' : 'offlinesig',
+    });
+    this.scrollToTop();
+  }
+
   toggleSend() {
     setTimeout(() => {
       this.toggleMenu();
@@ -488,6 +515,15 @@ class App extends React.Component {
                 { this.state.activeSection !== 'create-seed' &&
                   <div onClick={ this.toggleCreateSeed }>{ translate('DASHBOARD.CREATE_SEED') }</div>
                 }
+                { this.state.activeSection !== 'pin' &&
+                  <div onClick={ this.togglePin }>PIN override</div>
+                }
+                { this.state.activeSection !== 'offlinesig' &&
+                  <div onClick={ this.toggleOffileSig }>Offline Signing</div>
+                }
+                { (this.state.activeSection === 'offlinesig' || this.state.activeSection === 'pin') &&
+                  <div onClick={ this.toggleLogin }>Login</div>
+                }
               </div>
             }
           </div>
@@ -515,13 +551,17 @@ class App extends React.Component {
             className="fa fa-bars"></i>
         </div>
         <div className="app-main">
-          <Login
-            { ...this.state }
-            login={ this.login } />
-          <CreateSeed
-            { ...this.state }
-            login={ this.login }
-            changeActiveSection={ this.changeActiveSection } />
+          { (this.state.activeSection !== 'pin' || this.state.activeSection !== 'offlinesig') &&
+            <Login
+              { ...this.state }
+              login={ this.login } />
+          }
+          { this.state.activeSection === 'create-seed' &&
+            <CreateSeed
+              { ...this.state }
+              login={ this.login }
+              changeActiveSection={ this.changeActiveSection } />
+          }
           { this.state.auth &&
             this.state.activeSection === 'dashboard' &&
             <MyAddress { ...this.state } />
@@ -571,6 +611,14 @@ class App extends React.Component {
             sendtx={ this.props.actions.sendtx }
             changeActiveSection={ this.changeActiveSection } />
           <Transactions { ...this.state } />
+          { !this.state.auth &&
+            this.state.activeSection === 'offlinesig' &&
+            <OfflineSigning />
+          }
+          { !this.state.auth &&
+            this.state.activeSection === 'pin' &&
+            <Pin />
+          }
         </div>
       </div>
     )
