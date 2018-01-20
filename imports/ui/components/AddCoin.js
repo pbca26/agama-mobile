@@ -158,43 +158,49 @@ class AddCoin extends React.Component {
   }
 
   render() {
-    if (this.props.activeSection === 'addcoin' ||
-        !this.props.coins ||
-        (this.props.coins && !Object.keys(this.props.coins).length)) {
-      return (
-        <div className="col-sm-12 addcoin">
-          <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12">
-            <div className="row">
-              <div className="margin-bottom-30">
-                <span
-                  className="btn-back"
-                  onClick={ () => this.props.changeActiveSection(this.props.auth ? 'dashboard' : 'login') }>
-                  <i className="fa fa-arrow-left"></i> { translate('DASHBOARD.BACK') }
-                </span>
-              </div>
-              <h4>{ translate('ADD_COIN.SHORTCUTS') }</h4>
-              <div className="coins-list">
-              { this.renderCoins(true) }
-              </div>
-              { this.renderCoinShortcuts() }
-              <hr />
-              <h4>{ translate('ADD_COIN.MULTI_SELECT') }</h4>
-              <div className="coins-list">
-                { this.renderCoins() }
-              </div>
-              <div className="padding-bottom-20">
-                <button
-                  className="btn btn-lg btn-primary btn-block ladda-button"
-                  onClick={ () => this.addCoin('multi') }>
-                  <span className="ladda-label">
-                  { translate('ADD_COIN.ADD_SELECTED_COINS') }
+    if (this.props.activeSection !== 'create-seed' &&
+        this.props.activeSection !== 'pin' &&
+        this.props.activeSection !== 'offlinesig') {
+      if (this.props.activeSection === 'addcoin' ||
+          !this.props.coins ||
+          (this.props.coins && !Object.keys(this.props.coins).length)) {
+        return (
+          <div className="col-sm-12 addcoin">
+            <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12">
+              <div className="row">
+                <div className="margin-bottom-30">
+                  <span
+                    className="btn-back"
+                    onClick={ () => this.props.changeActiveSection(this.props.auth ? 'dashboard' : 'login') }>
+                    <i className="fa fa-arrow-left"></i> { translate('DASHBOARD.BACK') }
                   </span>
-                </button>
+                </div>
+                <h4>{ translate('ADD_COIN.SHORTCUTS') }</h4>
+                <div className="coins-list">
+                { this.renderCoins(true) }
+                </div>
+                { this.renderCoinShortcuts() }
+                <hr />
+                <h4>{ translate('ADD_COIN.MULTI_SELECT') }</h4>
+                <div className="coins-list">
+                  { this.renderCoins() }
+                </div>
+                <div className="padding-bottom-20">
+                  <button
+                    className="btn btn-lg btn-primary btn-block ladda-button"
+                    onClick={ () => this.addCoin('multi') }>
+                    <span className="ladda-label">
+                    { translate('ADD_COIN.ADD_SELECTED_COINS') }
+                    </span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      );
+        );
+      } else {
+        return null;
+      }
     } else {
       return null;
     }

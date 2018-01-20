@@ -227,7 +227,7 @@ export const explorers = {
 
 export const convertURIToImageData = (URI) => {
   return new Promise((resolve, reject) => {
-    if (URI == null) {
+    if (URI === null) {
       return reject();
     }
     

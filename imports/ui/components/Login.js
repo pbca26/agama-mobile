@@ -154,7 +154,9 @@ class Login extends React.Component {
     if ((this.props.activeSection === 'login' || (!this.props.auth && this.props.activeSection !== 'addcoin')) &&
         this.props.coins &&
         Object.keys(this.props.coins).length &&
-        this.props.activeSection !== 'create-seed') {
+        this.props.activeSection !== 'create-seed' &&
+        this.props.activeSection !== 'offlinesig' &&
+        this.props.activeSection !== 'pin') {
       return (
         <div className="col-sm-12">
           <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12">

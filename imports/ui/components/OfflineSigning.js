@@ -1,0 +1,261 @@
+import React from 'react';
+import { translate } from '../translate/translate';
+import jsQR from 'jsqr';
+import QRCode from 'qrcode.react';
+import {
+  isAssetChain,  
+  getLocalStorageVar,
+  convertURIToImageData,
+} from '../actions/utils';
+import {
+  encryptkey,
+  decryptkey,
+} from '../actions/seedCrypt';
+import {
+  seedToWif,
+  wifToWif,
+} from '../actions/seedToWif';
+import { devlog } from '../actions/dev';
+
+import {
+  buildSignedTxForks,
+  buildSignedTx,
+} from '../actions/createtx';
+
+class OfflineSigning extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      pin: null,
+      wrongPin: false,
+      qrScanError: false,
+      sendTo: null,
+      sendFrom: null,
+      amount: 0,
+      change: 0,
+      network: null,
+      utxo: null,
+      signedTx: null,
+      failedToSign: false,
+    };
+    this.defaultState = JSON.parse(JSON.stringify(this.state));
+    this.scanQR = this.scanQR.bind(this);
+    this.sign = this.sign.bind(this);
+    this.updateInput = this.updateInput.bind(this);
+  }
+
+  updateInput(e) {
+    this.setState({
+      [e.target.name]: e.target.value,
+    });
+  }
+
+  sign() {
+    // decrypt
+    const _encryptedKey = getLocalStorageVar('seed');
+    
+    if (_encryptedKey &&
+        _encryptedKey.encryptedKey &&
+        this.state.pin &&
+        this.state.pin.length >= 6) {
+      const _decryptedKey = decryptkey(this.state.pin, _encryptedKey.encryptedKey);
+
+      if (_decryptedKey) {
+        this.setState({
+          wrongPin: false,
+        });
+        console.warn(_decryptedKey);
+        const network = this.state.network.toLowerCase();
+        const wif = seedToWif(_decryptedKey, true, isAssetChain(network) || network === 'kmd' ? 'komodo' : network.toLowerCase()).wif;
+        let _rawtx;
+        
+        if (network === 'btg' ||
+            network === 'bch') {
+          _rawtx = buildSignedTxForks(
+            this.state.sendTo,
+            this.state.sendFrom,
+            wif,
+            network,
+            this.state.utxo,
+            this.state.change,
+            this.state.amount
+          );
+        } else {
+          _rawtx = buildSignedTx(
+            this.state.sendTo,
+            this.state.sendFrom,
+            wif,
+            network,
+            this.state.utxo,
+            this.state.change,
+            this.state.amount
+          );
+        }
+
+        console.warn(_rawtx);
+
+        if (_rawtx) {
+          this.setState({
+            signedTx: network + ':' + _rawtx,
+          });
+        } else {
+          this.setState({
+            failedToSign: true,
+          });
+        }
+      } else {
+        this.setState({
+          wrongPin: true,
+        });
+      }
+    } else {
+      this.setState({
+        wrongPin: true,
+      });
+    }
+  }
+
+  scanQR() {
+    const width = 1920;
+    const height = 1080;
+
+    this.setState(this.defaultState);
+
+    MeteorCamera.getPicture({ quality: 100, width, height }, (error, data) => {
+      if (error) {
+        this.setState({
+          qrScanError: true,
+        });
+      } else {
+        convertURIToImageData(data)
+        .then((imageData) => {
+          const decodedQR = jsQR.decodeQRFromImage(imageData.data, imageData.width, imageData.height);
+
+          if (!decodedQR ||
+              (decodedQR && decodedQR.indexOf('agtx') === -1)) {
+            this.setState({
+              qrScanError: true,
+            });
+          } else {
+            devlog(decodedQR);
+            const _tx = decodedQR.split(':');
+            const _network = _tx[1];
+            const _sendTo = _tx[2];
+            const _changeTo = _tx[3];
+            const _amount = parseInt(_tx[4]);
+            const _change = parseInt(_tx[5]);
+
+            devlog(_tx);
+
+            const _utxo = decodedQR.split(':u:')[1].split('-');
+            let _formattedUTXO = [];
+
+            for (let i = 0; i < _utxo.length; i++) {
+              const _utxoData = _utxo[i].split(':');
+              _formattedUTXO.push({
+                txid: _utxoData[0],
+                value: parseInt(_utxoData[1]),
+                vout: parseInt(_utxoData[2]),
+              });
+            }
+
+            this.setState({
+              qrScanError: false,
+              sendTo: _sendTo,
+              sendFrom: _changeTo,
+              amount: _amount,
+              change: _change,
+              network: _network,
+              utxo: _formattedUTXO,
+            });
+          }
+        });
+      }
+    });
+  }
+
+  render() {
+    return (
+      <div className="margin-top-20 margin-left-10">
+        <h4 className="padding-bottom-10">Offline Transaction Signing</h4>
+        <button
+          className="btn btn-default btn-scan-qr margin-bottom-30"
+          onClick={ this.scanQR }>
+          <i className="fa fa-qrcode"></i>
+          { translate('SEND.SCAN_QR') }
+        </button>
+        { this.state.qrScanError &&
+          <div className="col-lg-12">
+            <div className="error margin-top-15">
+              <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
+            </div>
+          </div>
+        }
+        { this.state.sendFrom &&
+          <div>
+            <div className="margin-bottom-20">
+              <div>
+                <div>
+                  <strong>Send from</strong>
+                </div>
+                { this.state.sendFrom }
+              </div>
+              <div className="margin-top-10">
+                <div>
+                  <strong>Send to</strong>
+                </div>
+                { this.state.sendTo }
+              </div>
+              <div className="margin-top-10">
+                <div>
+                  <strong>Amount</strong>
+                </div>
+                { this.state.amount * 0.00000001 } { this.state.network }
+              </div>
+            </div>
+
+            <hr />
+
+            <h5 className="margin-bottom-25">To confirm transaction provide PIN and press the button below.</h5>
+            <input
+              type="password"
+              className="form-control margin-bottom-30"
+              name="pin"
+              onChange={ this.updateInput }
+              placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
+              value={ this.state.pin || '' } />
+            { this.state.wrongPin &&
+              <div className="error margin-bottom-25">
+                <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
+              </div>
+            }
+            <button
+              className="btn btn-lg btn-primary btn-block ladda-button"
+              onClick={ this.sign }>
+              <span className="ladda-label">
+              Confirm
+              </span>
+            </button>
+
+            { this.state.failedToSign &&
+              <div className="error margin-bottom-25 margin-top-20">
+                <i className="fa fa-warning"></i> failed to sign transaction
+              </div>
+            }
+
+            { this.state.signedTx &&
+              <div className="margin-top-50 margin-bottom-50">
+                <hr />
+                <QRCode
+                value={ this.state.signedTx }
+                size={ 320 } />
+              </div>
+            }
+          </div>
+        }
+      </div>
+    );
+  }
+}
+
+export default OfflineSigning;
