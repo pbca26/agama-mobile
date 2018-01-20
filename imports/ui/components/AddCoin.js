@@ -70,11 +70,13 @@ class AddCoin extends React.Component {
         <img
           onClick={ () => singleSelect ? this.addCoin('kmd') : this.toggleMultiSelectCoin('kmd') }
           src={ `/images/cryptologo/kmd.png` } />
-        { this.state.multiSelect.kmd &&
-          !singleSelect &&
-          <i className="fa fa-check-circle-o"></i>
-        }
-        <div>KMD</div>
+        <div>
+          KMD
+          { this.state.multiSelect.kmd &&
+            !singleSelect &&
+            <i className="fa fa-check-circle-o"></i>
+          }        
+        </div>
       </span>
     );
 
@@ -96,11 +98,13 @@ class AddCoin extends React.Component {
                 onClick={ () => singleSelect ? this.addCoin(_coin) : this.toggleMultiSelectCoin(_coin) }
                 src={ `/images/cryptologo/${_coin}.png` } />
             }
-            { this.state.multiSelect[_coin] &&
-              !singleSelect &&
-              <i className="fa fa-check-circle-o"></i>
-            }
-            <div>{ key }</div>
+            <div>
+              { key }
+              { this.state.multiSelect[_coin] &&
+                !singleSelect &&
+                <i className="fa fa-check-circle-o"></i>
+              }
+            </div>
           </span>
         );
       }
