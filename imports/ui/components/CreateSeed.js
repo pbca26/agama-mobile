@@ -128,7 +128,7 @@ class CreateSeed extends React.Component {
                 </div>
               }
               <div className="margin-bottom-25 margin-top-30">
-                <label className="switch">
+                <label className="switch hide">
                   <input
                     type="checkbox"
                     value="on"
@@ -138,7 +138,7 @@ class CreateSeed extends React.Component {
                     onClick={ this.toggleCreatePin }></div>
                 </label>
                 <div
-                  className="toggle-label pointer"
+                  className="toggle-label pointer hide"
                   onClick={ this.toggleCreatePin }>
                   { translate('LOGIN.OVERRIDE_PIN') }
                 </div>
