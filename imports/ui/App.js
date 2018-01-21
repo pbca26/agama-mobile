@@ -26,6 +26,9 @@ import SendReceive from './components/SendReceive';
 import KMDInterest from './components/KMDInterest';
 import OfflineSigning from './components/OfflineSigning';
 import Pin from './components/Pin';
+import Recovery from './components/Recovery';
+import Overview  from './components/Overview';
+import Settings  from './components/Settings';
 
 const DASHBOARD_UPDATE_INTERVAL = 120000; // 2m
 const DEFAULT_LOCK_INACTIVE_INTERVAL = 600000; // 10m
@@ -50,6 +53,7 @@ class App extends React.Component {
       updateInterval: null,
       conError: false,
       proxyError: false,
+      overview: null,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.login = this.login.bind(this);
@@ -71,8 +75,13 @@ class App extends React.Component {
     this.toggleKMDInterest = this.toggleKMDInterest.bind(this);
     this.toggleOffileSig = this.toggleOffileSig.bind(this);
     this.togglePin = this.togglePin.bind(this);
+    this.toggleSettings = this.toggleSettings.bind(this);
+    this.toggleRecovery = this.toggleRecovery.bind(this);
+    this.toggleOverview = this.toggleOverview.bind(this);
+    this.toggle = this.toggleOverview.bind(this);
     this.globalClick = this.globalClick.bind(this);
     this.globalClickTimeout = null;
+    this.overviewInterval = null;
   }
 
   componentWillMount() {
@@ -200,6 +209,7 @@ class App extends React.Component {
   toggleAutoRefresh(disable) {
     if (disable) {
       clearInterval(this.state.updateInterval);
+      clearInterval(this.state.overviewInterval);
 
       this.setState({
         updateInterval: null,
@@ -370,6 +380,67 @@ class App extends React.Component {
     });
   }
 
+  toggleSettings() {
+    setTimeout(() => {
+      this.toggleMenu();
+    }, 10);
+
+    this.setState({
+      activeSection: this.state.activeSection === 'settings' ? 'dashboard' : 'settings',
+    });
+    this.scrollToTop();
+  }
+
+  toggleOverview() {
+    const { actions } = this.props;
+    
+    actions.getOverview(this.state.coins)
+    .then((res) => {
+      this.setState({
+        overview: res,
+      });
+      console.warn('overview', res);      
+    });
+
+    if (!this.state.overviewInterval) {
+      const _updateInterval = setInterval(() => {
+        if (this.state.activeSection === 'overview') {
+          actions.getOverview(this.state.coins)
+          .then((res) => {
+            this.setState({
+              overview: res,
+            });
+            console.warn('overview', res);
+          });
+        }
+      }, DASHBOARD_UPDATE_INTERVAL);
+
+      this.setState({
+        overviewInterval: _updateInterval,
+      });
+    }
+
+    setTimeout(() => {
+      this.toggleMenu();
+    }, 10);
+
+    this.setState({
+      activeSection: this.state.activeSection === 'overview' ? 'dashboard' : 'overview',
+    });
+    this.scrollToTop();
+  }
+
+  toggleRecovery() {
+    setTimeout(() => {
+      this.toggleMenu();
+    }, 10);
+
+    this.setState({
+      activeSection: this.state.activeSection === 'recovery' ? 'dashboard' : 'recovery',
+    });
+    this.scrollToTop();
+  }
+
   togglePin() {
     setTimeout(() => {
       this.toggleMenu();
@@ -490,8 +561,17 @@ class App extends React.Component {
               className="fa fa-bars"></i>
             { this.state.auth &&
               <div className="nav-menu-items">
+                { this.state.activeSection !== 'overview' &&
+                  <div onClick={ this.toggleOverview }>Overview</div>
+                }
                 { this.state.activeSection !== 'dashboard' &&
                   <div onClick={ () => this.changeActiveSection('dashboard', true) }>{ translate('DASHBOARD.DASHBOARD') }</div>
+                }
+                { this.state.activeSection !== 'recovery' &&
+                  <div onClick={ this.toggleRecovery }>Recovery</div>
+                }
+                { this.state.activeSection !== 'settings' &&
+                  <div onClick={ this.toggleSettings }>Settings</div>
                 }
                 <div onClick={ this.logout }>{ translate('DASHBOARD.LOGOUT') }</div>
                 <div onClick={ this.lock }>{ translate('DASHBOARD.LOCK') }</div>
@@ -618,6 +698,17 @@ class App extends React.Component {
           { !this.state.auth &&
             this.state.activeSection === 'pin' &&
             <Pin />
+          }
+          { this.state.auth &&
+            this.state.activeSection === 'recovery' &&
+            <Recovery { ...this.state } />
+          }
+          { this.state.auth &&
+            this.state.activeSection === 'overview' &&
+            <Overview { ...this.state } />
+          }
+          { this.state.activeSection === 'settings' &&
+            <Settings />
           }
         </div>
       </div>

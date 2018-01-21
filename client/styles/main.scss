@@ -177,3 +177,34 @@ h4 {
     margin-bottom: 25px;
   }
 }
+
+.decoded-seed {
+  text-align: center;
+
+  .fs-16 {
+    font-size: 16px;
+  }
+}
+
+.overview {
+  .overview-row {
+    margin-top: 30px;
+
+    .overview-row-icon-title {
+      position: relative;
+      top: 3px;
+      left: 8px;
+    }
+    .overview-row-icon {
+      display: inline-block;
+    }
+    .overview-row-balance {
+      float: right;
+      text-align: right;
+    }
+  }
+  .overview-usd-balance {
+    text-align: center;
+    margin-top: 30px;
+  }
+}

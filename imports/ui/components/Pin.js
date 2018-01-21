@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {
-  maskPubAddress,
   setLocalStorageVar,
   getLocalStorageVar,
 } from '../actions/utils';

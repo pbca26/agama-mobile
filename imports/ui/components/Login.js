@@ -19,7 +19,7 @@ class Login extends React.Component {
       createPin: false,
       pinOverride: null,
       pinOverrideTooShort: false,
-      pin: '',
+      pin: '112233',
       wrongPin: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
@@ -127,22 +127,22 @@ class Login extends React.Component {
 
     _items.push(
       <button
-        key={ `login-keypad-remove` }
+        key={ `login-keypad-back` }
         className="btn btn-lg btn-primary"
-        onClick={ () => this.triggerKey('remove') }>
+        onClick={ () => this.triggerKey('back') }>
         <span className="ladda-label padding-fix">
-        <i className="fa fa-remove"></i>
+        <i className="fa fa-long-arrow-left"></i>
         </span>
       </button>
     );
 
     _items.push(
       <button
-        key={ `login-keypad-back` }
+        key={ `login-keypad-remove` }
         className="btn btn-lg btn-primary"
-        onClick={ () => this.triggerKey('back') }>
+        onClick={ () => this.triggerKey('remove') }>
         <span className="ladda-label padding-fix">
-        <i className="fa fa-long-arrow-left"></i>
+        <i className="fa fa-remove"></i>
         </span>
       </button>
     );

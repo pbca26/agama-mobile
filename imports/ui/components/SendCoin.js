@@ -8,16 +8,17 @@ import {
   isAssetChain,
   formatValue,
   convertURIToImageData,
+  getLocalStorageVar,
 } from '../actions/utils';
+import { decryptkey } from '../actions/seedCrypt';
 import jsQR from 'jsqr';
 
 class SendCoin extends React.Component {
   constructor() {
     super();
     this.state = {
-      display: false,
-      sendAmount: 0,
-      sendTo: '',
+      sendAmount: 0.001,
+      sendTo: 'RDbGxL8QYdEp8sMULaVZS2E6XThcTKT9Jd',
       sendCurrentStep: 0,
       sendResult: null,
       spvVerificationWarning: false,
@@ -26,13 +27,35 @@ class SendCoin extends React.Component {
       validTooMuch: false,
       validIncorrectAddress: false,
       qrScanError: false,
+      wrongPin: false,
+      pin: '',
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.changeSendCoinStep = this.changeSendCoinStep.bind(this);
     this.updateInput = this.updateInput.bind(this);
     this.scanQR = this.scanQR.bind(this);
     this.validate = this.validate.bind(this);
+    this.decodeSeed = this.decodeSeed.bind(this);
     this.openExternalURL = this.openExternalURL.bind(this);
+  }
+
+  decodeSeed() {
+    const _encryptedKey = getLocalStorageVar('seed');
+    const _decryptedKey = decryptkey(this.state.pin, _encryptedKey.encryptedKey);
+
+    if (_decryptedKey) {
+      this.setState({
+        wrongPin: false,
+      });
+
+      return true;
+    } else {
+      this.setState({
+        wrongPin: true,
+      });
+
+      return false;
+    }
   }
 
   openExternalURL(url) {
@@ -112,6 +135,13 @@ class SendCoin extends React.Component {
       _isFailed = true;
     }
 
+    if (this.state.sendCurrentStep === 1 &&
+        getLocalStorageVar('settings') &&
+        getLocalStorageVar('settings').requirePin &&
+        !this.decodeSeed()) {
+      _isFailed = true;
+    }
+
     return _isFailed;
   }
 
@@ -122,6 +152,8 @@ class SendCoin extends React.Component {
         validIncorrectAddress: false,
         validTooMuch: false,
         validNan: false,
+        pin: '',
+        wrongPin: false,
       });
     } else {
       if (!this.validate()) {
@@ -142,7 +174,8 @@ class SendCoin extends React.Component {
               Math.abs(this.state.sendAmount * 100000000),
               true,
               false
-            ).then((sendPreflight) => {
+            )
+            .then((sendPreflight) => {
               if (sendPreflight &&
                   sendPreflight.msg === 'success') {
                 this.setState({
@@ -171,7 +204,8 @@ class SendCoin extends React.Component {
               Math.abs(this.state.sendAmount * 100000000),
               null,
               true
-            ).then((res) => {
+            )
+            .then((res) => {
               // console.warn('sendtx result');
               // console.warn(res);
 
@@ -318,7 +352,7 @@ class SendCoin extends React.Component {
                   <div className="col-xs-12 margin-bottom-20">
                     <span className="step-title">{ translate('SEND.CONFIRM') }</span>
                   </div>
-                  <div className="col-xs-12">
+                  <div className="col-xs-12 margin-top-5">
                     <strong>{ translate('SEND.TO') }</strong>
                   </div>
                   <div className="col-lg-6 col-sm-6 col-xs-12">{ this.state.sendTo }</div>
@@ -336,6 +370,24 @@ class SendCoin extends React.Component {
                     style={{ fontSize: '15px' }}>
                     <i className="fa fa-warning warning"></i> <strong className="warning">{ translate('SEND.WARNING') }:</strong> { translate('SEND.WARNING_SPV_P1') }<br />
                     { translate('SEND.WARNING_SPV_P2') }
+                  </div>
+                }
+                { getLocalStorageVar('settings') &&
+                  getLocalStorageVar('settings').requirePin &&
+                  <div className="padding-top-20">
+                    <input
+                      type="password"
+                      className="form-control"
+                      name="pin"
+                      value={ this.state.pin }
+                      onChange={ this.updateInput }
+                      placeholder="Enter your PIN"
+                      autoComplete="off" />
+                  </div>
+                }
+                { this.state.wrongPin &&
+                  <div className="error margin-top-15 margin-bottom-25">
+                    <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
                   </div>
                 }
                 <div className="widget-body-footer">
@@ -411,7 +463,7 @@ class SendCoin extends React.Component {
                         <tr>
                           <td></td>
                           <td>
-                          { isAssetChain(this.props.coin) &&
+                          { (isAssetChain(this.props.coin) || this.props.coin === 'chips') &&
                             this.state.sendResult &&
                             this.state.sendResult.result &&
                             this.state.sendResult.result.txid &&

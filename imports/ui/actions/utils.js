@@ -220,7 +220,7 @@ export const explorers = {
   BOTS: 'http://BOTS.explorer.supernet.org',
   MGW: 'http://MGW.explorer.supernet.org',
   WLC: 'http://WIRELESS.explorer.supernet.org',
-  CHIPS: 'http://CHIPS1.explorer.supernet.org',
+  CHIPS: 'http://chips1.explorer.supernet.org',
   COQUI: 'https://explorer.coqui.cash',
   MNZ: 'https://www.mnzexplorer.com',
 };
