@@ -121,7 +121,11 @@ class OfflineSigning extends React.Component {
 
     this.setState(this.defaultState);
 
-    MeteorCamera.getPicture({ quality: 100, width, height }, (error, data) => {
+    MeteorCamera.getPicture({
+      quality: 100,
+      width,
+      height
+    }, (error, data) => {
       if (error) {
         this.setState({
           qrScanError: true,
@@ -137,7 +141,6 @@ class OfflineSigning extends React.Component {
               qrScanError: true,
             });
           } else {
-            devlog(decodedQR);
             const _tx = decodedQR.split(':');
             const _network = _tx[1];
             const _sendTo = _tx[2];
@@ -145,6 +148,7 @@ class OfflineSigning extends React.Component {
             const _amount = parseInt(_tx[4]);
             const _change = parseInt(_tx[5]);
 
+            devlog(decodedQR);
             devlog(_tx);
 
             const _utxo = decodedQR.split(':u:')[1].split('-');
@@ -247,8 +251,8 @@ class OfflineSigning extends React.Component {
               <div className="margin-top-50 margin-bottom-50">
                 <hr />
                 <QRCode
-                value={ this.state.signedTx }
-                size={ 320 } />
+                  value={ this.state.signedTx }
+                  size={ 320 } />
               </div>
             }
           </div>

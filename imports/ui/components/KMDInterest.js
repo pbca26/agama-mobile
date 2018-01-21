@@ -1,4 +1,6 @@
 import React from 'react';
+import Spinner from './Spinner';
+
 import { translate } from '../translate/translate';
 import {
   secondsToString,
@@ -30,9 +32,8 @@ class KMDInterest extends React.Component {
       this.props.balance.balanceSats,
       true,
       false
-    ).then((sendPreflight) => {
-      console.warn('claim preflight', sendPreflight);
-
+    )
+    .then((sendPreflight) => {
       if (sendPreflight &&
           sendPreflight.msg === 'success') {
         this.setState({
@@ -51,10 +52,11 @@ class KMDInterest extends React.Component {
     this.props.sendtx(
       this.props.coin,
       this.props.address,
-      this.props.balance.balanceSats,
+      Number(this.props.balance.balanceSats) - 10000,
       null,
       true
-    ).then((res) => {
+    )
+    .then((res) => {
       if (res &&
           res.msg === 'success') {
         this.setState({
@@ -160,6 +162,9 @@ class KMDInterest extends React.Component {
           }
           { this.state.success &&
             <div className="padding-top-40 text-center green bold">{ translate('CLAIM.YOU_SUCCESFULLY_CLAIMED') } { formatValue(this.props.balance.interest) } KMD</div>
+          }
+          { !this.props.utxo &&
+            <Spinner />
           }
           { this.props.utxo &&
             this.props.utxo.length &&

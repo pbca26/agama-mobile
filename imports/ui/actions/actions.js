@@ -83,7 +83,8 @@ const sendtx = (network, outputAddress, value, verify, push) => {
         network,
         verify,
         push
-      ).then((res) => {
+      )
+      .then((res) => {
         resolve(res);
       });
     });
@@ -101,7 +102,8 @@ const transactions = (network) => {
         electrumKeys[network].pub,
         network === 'kmd' ? 'komodo' : network,
         true
-      ).then((res) => {
+      )
+      .then((res) => {
         resolve(res);
       });
     });
@@ -132,7 +134,8 @@ const balance = (network) => {
               JSON.parse(result.content).result,
               proxyServer,
               _electrumServer
-            ).then((res) => {
+            )
+            .then((res) => {
               resolve(res);
             });
           } else {
@@ -161,7 +164,8 @@ const kmdUnspents = () => {
         'komodo',
         true,
         true,
-      ).then((res) => {
+      )
+      .then((res) => {
         resolve(res);
       });
     });
@@ -201,15 +205,107 @@ const addKeyPair = (coin) => {
   }
 }
 
-const getKeys = () => {
+const getOverview = (coins) => {
   return async (dispatch) => {
-    // todo
+    return new Promise((resolve, reject) => {
+      let _keys = [];
+
+      for (let key in coins) {
+        _keys.push({
+          pub: electrumKeys[key].pub,
+          coin: key,
+        });
+      }
+
+      Promise.all(_keys.map((pair, index) => {
+        return new Promise((resolve, reject) => {
+          const _electrumServer = getLocalStorageVar('coins')[pair.coin].server;
+      
+          HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`, {
+            params: {
+              port: _electrumServer.port,
+              ip: _electrumServer.ip,
+              proto: _electrumServer.proto,
+              address: pair.pub,
+            },
+          }, (error, result) => {
+            if (!result) {
+              resolve('proxy-error');
+            } else {
+              const _balance = JSON.parse(result.content).result;
+
+              resolve({
+                coin: pair.coin,
+                pub: pair.pub,
+                balance: Number((0.00000001 * _balance.confirmed).toFixed(8)),
+                unconfirmed: Number((0.00000001 * _balance.unconfirmed).toFixed(8)),
+              });
+            }
+          });
+        });
+      }))
+      .then(promiseResult => {
+        const _pricesUrl = [
+          'http://atomicexplorer.com/api/rates/kmd',
+          'http://atomicexplorer.com/api/mm/prices'
+        ];
+
+        Promise.all(_pricesUrl.map((url, index) => {
+          return new Promise((resolve, reject) => {
+            HTTP.call('GET', url, {
+            }, (error, result) => {
+              if (!result) {
+                resolve('prices-error');
+              } else {
+                const _prices = JSON.parse(result.content).result;    
+                resolve(_prices);
+              }
+            });
+          });
+        }))
+        .then(pricesResult => {
+          let _kmdRates = {
+            BTC: 0,
+            USD: 0,
+          };
+
+          if (pricesResult[0].BTC &&
+              pricesResult[0].USD) {
+            _kmdRates.BTC = pricesResult[0].BTC;
+            _kmdRates.USD = pricesResult[0].USD;
+          }
+
+          let _overviewItems = [];
+
+          for (let i = 0; i < promiseResult.length; i++) {
+            let _coinKMDPrice = 0;
+            let _usdPricePerItem = 0;
+
+            if (pricesResult[1][`${promiseResult[i].coin.toUpperCase()}/KMD`]) {
+              _coinKMDPrice = pricesResult[1][`${promiseResult[i].coin.toUpperCase()}/KMD`].low;
+            } else if (promiseResult[i].coin === 'kmd') {
+              _coinKMDPrice = 1;
+            }
+
+            _overviewItems.push({
+              coin: promiseResult[i].coin,
+              balanceNative: promiseResult[i].balance,
+              balanceKMD: promiseResult[i].balance * _coinKMDPrice,
+              balanceUSD: promiseResult[i].balance * _coinKMDPrice * _kmdRates.USD,
+              usdPricePerItem: _coinKMDPrice * _kmdRates.USD,
+            });
+          }
+
+          resolve(_overviewItems);
+        });
+      });
+    });
   }
 }
 
 export default {
   auth,
-  getKeys,
+  getOverview,
   clearKeys,
   balance,
   transactions,
