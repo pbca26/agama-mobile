@@ -1,9 +1,10 @@
 import React from 'react';
-
+import jsQR from 'jsqr';
 import {
   maskPubAddress,
   setLocalStorageVar,
   getLocalStorageVar,
+  convertURIToImageData,
 } from '../actions/utils';
 import {
   encryptkey,
@@ -19,19 +20,49 @@ class Login extends React.Component {
       createPin: false,
       pinOverride: null,
       pinOverrideTooShort: false,
-      pin: '112233',
+      pin: '',
       wrongPin: false,
+      qrScanError: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.updateInput = this.updateInput.bind(this);
     this.triggerKey = this.triggerKey.bind(this);
     this.login = this.login.bind(this);
     this.toggleCreatePin = this.toggleCreatePin.bind(this);
+    this.scanQR = this.scanQR.bind(this);    
   }
 
   updateInput(e) {
     this.setState({
       [e.target.name]: e.target.value,
+    });
+  }
+
+  scanQR() {
+    MeteorCamera.getPicture({
+      quality: 100,
+    }, (error, data) => {
+      if (error) {
+        this.setState({
+          qrScanError: true,
+        });
+      } else {
+        convertURIToImageData(data)
+        .then((imageData) => {
+          const decodedQR = jsQR.decodeQRFromImage(imageData.data, imageData.width, imageData.height);
+
+          if (!decodedQR) {
+            this.setState({
+              qrScanError: true,
+            });
+          } else {
+            this.setState({
+              qrScanError: false,
+              passphrase: decodedQR,
+            });
+          }
+        });
+      }
     });
   }
 
@@ -188,15 +219,27 @@ class Login extends React.Component {
               }
               { !getLocalStorageVar('seed') &&
                 <div>
-                  <h4 className="padding-bottom-10">Create PIN</h4>
+                  <h4 className="padding-bottom-20">Create PIN</h4>
+                  <button
+                    className="btn btn-default btn-scan-qr margin-bottom-30"
+                    onClick={ this.scanQR }>
+                    <i className="fa fa-qrcode"></i>
+                    { translate('SEND.SCAN_QR') }
+                  </button>
+                  { this.state.qrScanError &&
+                    <div className="col-lg-12">
+                      <div className="error margin-top-15">
+                        <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
+                      </div>
+                    </div>
+                  }
                   <input
                     type="password"
                     className="form-control margin-bottom-10"
                     name="passphrase"
                     onChange={ this.updateInput }
-                    placeholder={ translate('LOGIN.ENTER_PASSPHRASE') }
+                    placeholder={ translate('LOGIN.ENTER_PASSPHRASE') + ' or WIF' }
                     value={ this.state.passphrase || '' } />
-
                   <div className="margin-bottom-25 margin-top-30">
                     <label className="switch">
                       <input

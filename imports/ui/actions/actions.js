@@ -1,3 +1,5 @@
+const bs58check = require('bs58check');
+
 import { Promise } from 'meteor/promise';
 
 import {
@@ -178,8 +180,21 @@ const auth = (seed, coins) => {
       let _pubKeys = {};
 
       for (let key in coins) {
-        const _seedToWif = seedToWif(seed, true, isAssetChain(key) || key === 'komodo' ? 'komodo' : key.toLowerCase());
-        electrumKeys[key] = _seedToWif;
+        let isWif = false;
+        let _seedToWif;
+
+        try {
+          bs58check.decode(seed);
+          isWif = true;
+        } catch (e) {}
+
+        if (isWif) {
+          _seedToWif = wifToWif(seed, isAssetChain(key) || key === 'komodo' ? 'komodo' : key.toLowerCase());
+        } else {
+          _seedToWif = seedToWif(seed, true, isAssetChain(key) || key === 'komodo' ? 'komodo' : key.toLowerCase());
+        }
+
+          electrumKeys[key] = _seedToWif;
         _pubKeys[key] = _seedToWif.pub;
       }
 
