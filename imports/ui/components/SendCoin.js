@@ -17,8 +17,8 @@ class SendCoin extends React.Component {
   constructor() {
     super();
     this.state = {
-      sendAmount: 0.001,
-      sendTo: 'RDbGxL8QYdEp8sMULaVZS2E6XThcTKT9Jd',
+      sendAmount: 0,
+      sendTo: '',
       sendCurrentStep: 0,
       sendResult: null,
       spvVerificationWarning: false,
