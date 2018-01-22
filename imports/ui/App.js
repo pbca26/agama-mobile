@@ -31,7 +31,7 @@ import Overview  from './components/Overview';
 import Settings  from './components/Settings';
 
 const DASHBOARD_UPDATE_INTERVAL = 120000; // 2m
-const DEFAULT_LOCK_INACTIVE_INTERVAL = 600000; // 10m
+const DEFAULT_LOCK_INACTIVE_INTERVAL = getLocalStorageVar('settings') && getLocalStorageVar('settings').autoLockTimeout ? getLocalStorageVar('settings').autoLockTimeout : 600000; // 10m
 
 class App extends React.Component {
   constructor() {

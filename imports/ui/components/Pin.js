@@ -75,7 +75,7 @@ class Pin extends React.Component {
       setTimeout(() => {
         this.setState(this.defaultState);
         this.props.changeActiveSection('login');
-      }, 5000);
+      }, 500);
     } else {
       this.setState({
         pinOverrideTooShort: true,
