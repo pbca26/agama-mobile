@@ -220,7 +220,28 @@ export const explorers = {
   BOTS: 'http://BOTS.explorer.supernet.org',
   MGW: 'http://MGW.explorer.supernet.org',
   WLC: 'http://WIRELESS.explorer.supernet.org',
-  CHIPS: 'http://CHIPS1.explorer.supernet.org',
+  CHIPS: 'http://chips1.explorer.supernet.org',
   COQUI: 'https://explorer.coqui.cash',
   MNZ: 'https://www.mnzexplorer.com',
+};
+
+export const convertURIToImageData = (URI) => {
+  return new Promise((resolve, reject) => {
+    if (URI === null) {
+      return reject();
+    }
+    
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    const image = new Image();
+    
+    image.addEventListener('load', () => {
+      canvas.width = image.width;
+      canvas.height = image.height;
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      resolve(context.getImageData(0, 0, canvas.width, canvas.height));
+    }, false);
+
+    image.src = URI;
+  });
 };

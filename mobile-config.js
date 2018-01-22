@@ -1,6 +1,6 @@
 App.info({
   id: 'com.supernet.agama',
-  version: '0.0.6',
+  version: '0.0.7',
   buildNumber: '777',
   name: 'Agama',
   description: 'Agama Mobile is a lightweight wallet application that allows users to manage multiple crypto currencies. It\'s built on top of SPV technology which provides a quick way to retrieve and push transaction data.',
@@ -40,6 +40,7 @@ App.launchScreens({
   'android_xxxhdpi_portrait': 'app-assets/splash/drawable-xxxhdpi/agama.9.png',
 });
 
+App.accessRule('http://atomicexplorer.com');
 App.accessRule('http://94.130.225.86');
 App.accessRule('http://94.130.98.74');
 App.accessRule('http://kmd.komodochainz.info');

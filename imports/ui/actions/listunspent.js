@@ -207,11 +207,7 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
       }, (error, result) => {
         result = JSON.parse(result.content);
 
-        if (result.msg === 'error') {
-          resolve('error');
-        } else {
-          resolve(result.result);
-        }
+        resolve(result.msg === 'error' ? 'error' : result.result);
       });
     });
   }

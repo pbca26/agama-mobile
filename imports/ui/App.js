@@ -9,6 +9,7 @@ import {
   getLocalStorageVar,
   sortBy,
   getRandomIntInclusive,
+  convertURIToImageData,
 } from './actions/utils';
 import { translate } from './translate/translate';
 
@@ -23,9 +24,14 @@ import ServerSelect from './components/ServerSelect';
 import CreateSeed from './components/CreateSeed';
 import SendReceive from './components/SendReceive';
 import KMDInterest from './components/KMDInterest';
+import OfflineSigning from './components/OfflineSigning';
+import Pin from './components/Pin';
+import Recovery from './components/Recovery';
+import Overview  from './components/Overview';
+import Settings  from './components/Settings';
 
 const DASHBOARD_UPDATE_INTERVAL = 120000; // 2m
-const DEFAULT_LOCK_INACTIVE_INTERVAL = 600000; // 10m
+const DEFAULT_LOCK_INACTIVE_INTERVAL = getLocalStorageVar('settings') && getLocalStorageVar('settings').autoLockTimeout ? getLocalStorageVar('settings').autoLockTimeout : 600000; // 10m
 
 class App extends React.Component {
   constructor() {
@@ -47,6 +53,7 @@ class App extends React.Component {
       updateInterval: null,
       conError: false,
       proxyError: false,
+      overview: null,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.login = this.login.bind(this);
@@ -66,8 +73,15 @@ class App extends React.Component {
     this.toggleAutoRefresh = this.toggleAutoRefresh.bind(this);
     this.toggleLogin = this.toggleLogin.bind(this);
     this.toggleKMDInterest = this.toggleKMDInterest.bind(this);
+    this.toggleOffileSig = this.toggleOffileSig.bind(this);
+    this.togglePin = this.togglePin.bind(this);
+    this.toggleSettings = this.toggleSettings.bind(this);
+    this.toggleRecovery = this.toggleRecovery.bind(this);
+    this.toggleOverview = this.toggleOverview.bind(this);
+    this.toggle = this.toggleOverview.bind(this);
     this.globalClick = this.globalClick.bind(this);
     this.globalClickTimeout = null;
+    this.overviewInterval = null;
   }
 
   componentWillMount() {
@@ -195,6 +209,7 @@ class App extends React.Component {
   toggleAutoRefresh(disable) {
     if (disable) {
       clearInterval(this.state.updateInterval);
+      clearInterval(this.state.overviewInterval);
 
       this.setState({
         updateInterval: null,
@@ -365,6 +380,87 @@ class App extends React.Component {
     });
   }
 
+  toggleSettings() {
+    setTimeout(() => {
+      this.toggleMenu();
+    }, 10);
+
+    this.setState({
+      activeSection: this.state.activeSection === 'settings' ? 'dashboard' : 'settings',
+    });
+    this.scrollToTop();
+  }
+
+  toggleOverview() {
+    const { actions } = this.props;
+    
+    actions.getOverview(this.state.coins)
+    .then((res) => {
+      this.setState({
+        overview: res,
+      });
+    });
+
+    if (!this.state.overviewInterval) {
+      const _updateInterval = setInterval(() => {
+        if (this.state.activeSection === 'overview') {
+          actions.getOverview(this.state.coins)
+          .then((res) => {
+            this.setState({
+              overview: res,
+            });
+          });
+        }
+      }, DASHBOARD_UPDATE_INTERVAL);
+
+      this.setState({
+        overviewInterval: _updateInterval,
+      });
+    }
+
+    setTimeout(() => {
+      this.toggleMenu();
+    }, 10);
+
+    this.setState({
+      activeSection: this.state.activeSection === 'overview' ? 'dashboard' : 'overview',
+    });
+    this.scrollToTop();
+  }
+
+  toggleRecovery() {
+    setTimeout(() => {
+      this.toggleMenu();
+    }, 10);
+
+    this.setState({
+      activeSection: this.state.activeSection === 'recovery' ? 'dashboard' : 'recovery',
+    });
+    this.scrollToTop();
+  }
+
+  togglePin() {
+    setTimeout(() => {
+      this.toggleMenu();
+    }, 10);
+
+    this.setState({
+      activeSection: this.state.activeSection === 'pin' ? 'dashboard' : 'pin',
+    });
+    this.scrollToTop();
+  }
+
+  toggleOffileSig() {
+    setTimeout(() => {
+      this.toggleMenu();
+    }, 10);
+
+    this.setState({
+      activeSection: this.state.activeSection === 'offlinesig' ? 'dashboard' : 'offlinesig',
+    });
+    this.scrollToTop();
+  }
+
   toggleSend() {
     setTimeout(() => {
       this.toggleMenu();
@@ -463,8 +559,17 @@ class App extends React.Component {
               className="fa fa-bars"></i>
             { this.state.auth &&
               <div className="nav-menu-items">
+                { this.state.activeSection !== 'overview' &&
+                  <div onClick={ this.toggleOverview }>Overview</div>
+                }
                 { this.state.activeSection !== 'dashboard' &&
                   <div onClick={ () => this.changeActiveSection('dashboard', true) }>{ translate('DASHBOARD.DASHBOARD') }</div>
+                }
+                { this.state.activeSection !== 'recovery' &&
+                  <div onClick={ this.toggleRecovery }>Recovery</div>
+                }
+                { this.state.activeSection !== 'settings' &&
+                  <div onClick={ this.toggleSettings }>Settings</div>
                 }
                 <div onClick={ this.logout }>{ translate('DASHBOARD.LOGOUT') }</div>
                 <div onClick={ this.lock }>{ translate('DASHBOARD.LOCK') }</div>
@@ -487,6 +592,15 @@ class App extends React.Component {
                 }
                 { this.state.activeSection !== 'create-seed' &&
                   <div onClick={ this.toggleCreateSeed }>{ translate('DASHBOARD.CREATE_SEED') }</div>
+                }
+                { this.state.activeSection !== 'pin' &&
+                  <div onClick={ this.togglePin }>PIN override</div>
+                }
+                { this.state.activeSection !== 'offlinesig' &&
+                  <div onClick={ this.toggleOffileSig }>Offline Signing</div>
+                }
+                { (this.state.activeSection === 'offlinesig' || this.state.activeSection === 'pin') &&
+                  <div onClick={ this.toggleLogin }>Login</div>
                 }
               </div>
             }
@@ -515,13 +629,17 @@ class App extends React.Component {
             className="fa fa-bars"></i>
         </div>
         <div className="app-main">
-          <Login
-            { ...this.state }
-            login={ this.login } />
-          <CreateSeed
-            { ...this.state }
-            login={ this.login }
-            changeActiveSection={ this.changeActiveSection } />
+          { (this.state.activeSection !== 'pin' || this.state.activeSection !== 'offlinesig') &&
+            <Login
+              { ...this.state }
+              login={ this.login } />
+          }
+          { this.state.activeSection === 'create-seed' &&
+            <CreateSeed
+              { ...this.state }
+              login={ this.login }
+              changeActiveSection={ this.changeActiveSection } />
+          }
           { this.state.auth &&
             this.state.activeSection === 'dashboard' &&
             <MyAddress { ...this.state } />
@@ -571,6 +689,25 @@ class App extends React.Component {
             sendtx={ this.props.actions.sendtx }
             changeActiveSection={ this.changeActiveSection } />
           <Transactions { ...this.state } />
+          { !this.state.auth &&
+            this.state.activeSection === 'offlinesig' &&
+            <OfflineSigning />
+          }
+          { !this.state.auth &&
+            this.state.activeSection === 'pin' &&
+            <Pin changeActiveSection={ this.changeActiveSection } />
+          }
+          { this.state.auth &&
+            this.state.activeSection === 'recovery' &&
+            <Recovery { ...this.state } />
+          }
+          { this.state.auth &&
+            this.state.activeSection === 'overview' &&
+            <Overview { ...this.state } />
+          }
+          { this.state.activeSection === 'settings' &&
+            <Settings />
+          }
         </div>
       </div>
     )

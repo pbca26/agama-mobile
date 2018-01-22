@@ -7,14 +7,16 @@ import {
   explorers,
   isAssetChain,
   formatValue,
+  convertURIToImageData,
+  getLocalStorageVar,
 } from '../actions/utils';
+import { decryptkey } from '../actions/seedCrypt';
 import jsQR from 'jsqr';
 
 class SendCoin extends React.Component {
   constructor() {
     super();
     this.state = {
-      display: false,
       sendAmount: 0,
       sendTo: '',
       sendCurrentStep: 0,
@@ -25,13 +27,35 @@ class SendCoin extends React.Component {
       validTooMuch: false,
       validIncorrectAddress: false,
       qrScanError: false,
+      wrongPin: false,
+      pin: '',
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.changeSendCoinStep = this.changeSendCoinStep.bind(this);
     this.updateInput = this.updateInput.bind(this);
     this.scanQR = this.scanQR.bind(this);
     this.validate = this.validate.bind(this);
+    this.decodeSeed = this.decodeSeed.bind(this);
     this.openExternalURL = this.openExternalURL.bind(this);
+  }
+
+  decodeSeed() {
+    const _encryptedKey = getLocalStorageVar('seed');
+    const _decryptedKey = decryptkey(this.state.pin, _encryptedKey.encryptedKey);
+
+    if (_decryptedKey) {
+      this.setState({
+        wrongPin: false,
+      });
+
+      return true;
+    } else {
+      this.setState({
+        wrongPin: true,
+      });
+
+      return false;
+    }
   }
 
   openExternalURL(url) {
@@ -49,33 +73,25 @@ class SendCoin extends React.Component {
           qrScanError: true,
         });
       } else {
-        const canvas = document.getElementById('qrScan');
-        const img = new Image();
-        img.src = data;
+        convertURIToImageData(data)
+        .then((imageData) => {
+          /*console.log(imageData.data);
+          console.log(imageData.height);
+          console.log(imageData.width);*/
+          const decodedQR = jsQR.decodeQRFromImage(imageData.data, imageData.width, imageData.height);
+          // console.warn(decodedQR);
 
-        /*console.warn(data);
-        console.warn(img.clientWidth);
-        console.warn(img.clientHeight);*/
-
-        const canvasContext = canvas.getContext("2d");
-        canvasContext.drawImage(img, 0, 0, Math.floor(width / 2.5), Math.floor(height / 3.5));
-        const image = canvasContext.getImageData(0, 0, width, height);
-
-        /*console.warn(data.length);
-        console.warn(width * height * 4);*/
-        const decodedQR = jsQR.decodeQRFromImage(image.data, image.width, image.height);
-        // console.warn(decodedQR);
-
-        if (!decodedQR) {
-          this.setState({
-            qrScanError: true,
-          });
-        } else {
-          this.setState({
-            qrScanError: false,
-            sendTo: decodedQR,
-          });
-        }
+          if (!decodedQR) {
+            this.setState({
+              qrScanError: true,
+            });
+          } else {
+            this.setState({
+              qrScanError: false,
+              sendTo: decodedQR,
+            });
+          }
+        });
       }
     });
   }
@@ -119,6 +135,13 @@ class SendCoin extends React.Component {
       _isFailed = true;
     }
 
+    if (this.state.sendCurrentStep === 1 &&
+        getLocalStorageVar('settings') &&
+        getLocalStorageVar('settings').requirePin &&
+        !this.decodeSeed()) {
+      _isFailed = true;
+    }
+
     return _isFailed;
   }
 
@@ -129,6 +152,8 @@ class SendCoin extends React.Component {
         validIncorrectAddress: false,
         validTooMuch: false,
         validNan: false,
+        pin: '',
+        wrongPin: false,
       });
     } else {
       if (!this.validate()) {
@@ -149,7 +174,8 @@ class SendCoin extends React.Component {
               Math.abs(this.state.sendAmount * 100000000),
               true,
               false
-            ).then((sendPreflight) => {
+            )
+            .then((sendPreflight) => {
               if (sendPreflight &&
                   sendPreflight.msg === 'success') {
                 this.setState({
@@ -178,7 +204,8 @@ class SendCoin extends React.Component {
               Math.abs(this.state.sendAmount * 100000000),
               null,
               true
-            ).then((res) => {
+            )
+            .then((res) => {
               // console.warn('sendtx result');
               // console.warn(res);
 
@@ -285,7 +312,6 @@ class SendCoin extends React.Component {
               <i className="fa fa-arrow-left"></i> { translate('DASHBOARD.BACK') }
             </span>
           </div>
-          <canvas id="qrScan" style={{ width: '640px', height: '480px', position: 'absolute', zIndex: '1' }}></canvas>
           <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12 steps-counter">
             <div className="steps row margin-top-10">
               <div className={ 'step col-md-4' + (this.state.sendCurrentStep === 0 ? ' current' : '') }>
@@ -326,7 +352,7 @@ class SendCoin extends React.Component {
                   <div className="col-xs-12 margin-bottom-20">
                     <span className="step-title">{ translate('SEND.CONFIRM') }</span>
                   </div>
-                  <div className="col-xs-12">
+                  <div className="col-xs-12 margin-top-5">
                     <strong>{ translate('SEND.TO') }</strong>
                   </div>
                   <div className="col-lg-6 col-sm-6 col-xs-12">{ this.state.sendTo }</div>
@@ -344,6 +370,24 @@ class SendCoin extends React.Component {
                     style={{ fontSize: '15px' }}>
                     <i className="fa fa-warning warning"></i> <strong className="warning">{ translate('SEND.WARNING') }:</strong> { translate('SEND.WARNING_SPV_P1') }<br />
                     { translate('SEND.WARNING_SPV_P2') }
+                  </div>
+                }
+                { getLocalStorageVar('settings') &&
+                  getLocalStorageVar('settings').requirePin &&
+                  <div className="padding-top-20">
+                    <input
+                      type="password"
+                      className="form-control"
+                      name="pin"
+                      value={ this.state.pin }
+                      onChange={ this.updateInput }
+                      placeholder="Enter your PIN"
+                      autoComplete="off" />
+                  </div>
+                }
+                { this.state.wrongPin &&
+                  <div className="error margin-top-15 margin-bottom-25">
+                    <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
                   </div>
                 }
                 <div className="widget-body-footer">
@@ -419,7 +463,7 @@ class SendCoin extends React.Component {
                         <tr>
                           <td></td>
                           <td>
-                          { isAssetChain(this.props.coin) &&
+                          { (isAssetChain(this.props.coin) || this.props.coin === 'chips') &&
                             this.state.sendResult &&
                             this.state.sendResult.result &&
                             this.state.sendResult.result.txid &&

@@ -1,4 +1,5 @@
 import React from 'react';
+import QRCode from 'qrcode.react';
 
 import {
   setLocalStorageVar,
@@ -93,7 +94,7 @@ class CreateSeed extends React.Component {
     if (this.props.activeSection === 'create-seed') {
       return (
         <div className="col-sm-12">
-          <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12 create-seed">
+          <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12 create-seed margin-bottom-40">
             <div className="row">
               <div className="margin-bottom-30">
                 <span
@@ -104,6 +105,11 @@ class CreateSeed extends React.Component {
               </div>
               <h4>{ translate('LOGIN.THIS_IS_YOUR_NEW_SEED') }</h4>
               <div className="seed-gen-box">{ this.state.seed }</div>
+              <div className="text-center margin-top-30">
+                <QRCode
+                  value={ this.state.seed }
+                  size={ 320 } />
+              </div>
               <div className="margin-top-25 margin-bottom-25 warning">
                 <strong>{ translate('LOGIN.PLEASE_MAKE_SURE_TO') }</strong>
               </div>
@@ -128,7 +134,7 @@ class CreateSeed extends React.Component {
                 </div>
               }
               <div className="margin-bottom-25 margin-top-30">
-                <label className="switch">
+                <label className="switch hide">
                   <input
                     type="checkbox"
                     value="on"
@@ -138,7 +144,7 @@ class CreateSeed extends React.Component {
                     onClick={ this.toggleCreatePin }></div>
                 </label>
                 <div
-                  className="toggle-label pointer"
+                  className="toggle-label pointer hide"
                   onClick={ this.toggleCreatePin }>
                   { translate('LOGIN.OVERRIDE_PIN') }
                 </div>

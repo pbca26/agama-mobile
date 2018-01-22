@@ -24,7 +24,7 @@ const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data
 const electrumJSNetworks = require('./electrumNetworks.js');
 
 // btg/bch
-const buildSignedTxForks = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue) => {
+export const buildSignedTxForks = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue) => {
   const _network = electrumJSNetworks[network];
   const keyPair = bitcoinJSForks.ECPair.fromWIF(wif, _network);
   const pk = bitcoinJSForks.crypto.hash160(keyPair.getPublicKeyBuffer());
@@ -73,7 +73,7 @@ const buildSignedTxForks = (sendTo, changeAddress, wif, network, utxo, changeVal
 }
 
 // single sig
-const buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue) => {
+export const buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue) => {
   const _network = electrumJSNetworks[isAssetChain(network) ? 'komodo' : network];
   let key = isZcash(network) ? bitcoinZcash.ECPair.fromWIF(wif, _network) : bitcoin.ECPair.fromWIF(wif, _network);
   let tx;
@@ -165,7 +165,8 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
       network,
       true,
       verify
-    ).then((utxoList) => {
+    )
+    .then((utxoList) => {
       if (utxoList &&
           utxoList.length) {
         let utxoListFormatted = [];
@@ -209,14 +210,10 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
         devlog(targets);
         devlog(`create tx network ${network}`)
 
-        const feeRate = network === 'komodo' || network === 'kmd' || network === 'chips' ? 20 : 0; // sats/byte
+        targets[0].value = targets[0].value + defaultFee;
 
-        if (!feeRate) {
-          targets[0].value = targets[0].value + defaultFee;
-        }
-
-        devlog(`fee rate ${feeRate}`);
-        devlog(`default fee ${fee}`);
+        // devlog(`fee rate ${feeRate}`);
+        devlog(`default fee ${defaultFee}`);
         devlog(`targets ==>`);
         devlog(targets);
 
@@ -227,7 +224,7 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
           inputs,
           outputs,
           fee
-        } = coinSelect(utxoListFormatted, targets, feeRate);
+        } = coinSelect(utxoListFormatted, targets, 0);
 
         devlog('coinselect res =>');
         devlog('coinselect inputs =>');
@@ -243,7 +240,7 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
           devlog('coinselect adjusted targets =>');
           devlog(targets);
 
-          const secondRun = coinSelect(utxoListFormatted, targets, feeRate);
+          const secondRun = coinSelect(utxoListFormatted, targets, 0);
           inputs = secondRun.inputs;
           outputs = secondRun.outputs;
           fee = secondRun.fee;
@@ -263,13 +260,10 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
           _change = outputs[1].value;
         }
 
-        // non komodo coins, subtract fee from output value
-        if (!feeRate) {
-          outputs[0].value = outputs[0].value - defaultFee;
+        outputs[0].value = outputs[0].value - defaultFee;
 
-          devlog('non komodo adjusted outputs, value - default fee =>');
-          devlog(outputs);
-        }
+        devlog('adjusted outputs, value - default fee =>');
+        devlog(outputs);
 
         // check if any outputs are unverified
         if (inputs &&
@@ -308,7 +302,8 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
           if ((network === 'komodo' || network === 'kmd') &&
               totalInterest > 0) {
             // account for extra vout
-            const _feeOverhead = outputs.length === 1 ? estimateTxSize(0, 1) * feeRate : 0;
+            // const _feeOverhead = outputs.length === 1 ? estimateTxSize(0, 1) * feeRate : 0;
+            const _feeOverhead = 0;
 
             devlog(`max interest to claim ${totalInterest} (${totalInterest * 0.00000001})`);
             devlog(`estimated fee overhead ${_feeOverhead}`);

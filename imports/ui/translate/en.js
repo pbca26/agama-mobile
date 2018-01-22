@@ -79,7 +79,7 @@ export const _lang = {
       'IN': 'in',
       'MINE': 'mine',
       'IMMATURE': 'immature',
-      'UKNOWN': 'uknown',
+      'UNKNOWN': 'unknown',
       'NO_HISTORY': 'No history',
       'DIRECTION': 'Direction',
       'CONFIRMATIONS': 'Confirmations',
