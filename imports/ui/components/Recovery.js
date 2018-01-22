@@ -40,6 +40,7 @@ class Recovery extends React.Component {
     if (_decryptedKey) {
       this.setState({
         wrongPin: false,
+        pin: null,
         passphrase: _decryptedKey,
       });
     } else {
@@ -82,7 +83,7 @@ class Recovery extends React.Component {
             </button>
             { this.state.passphrase &&
               <div className="margin-bottom-25 margin-top-70 decoded-seed">
-                <div className="margin-bottom-40 fs-16">{ this.state.passphrase }</div>
+                <div className="margin-bottom-40 fs-16 seed-string">{ this.state.passphrase }</div>
                 <QRCode
                   value={ this.state.passphrase }
                   size={ 240 } />

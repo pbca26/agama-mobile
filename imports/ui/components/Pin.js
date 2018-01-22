@@ -1,8 +1,9 @@
 import React from 'react';
-
+import jsQR from 'jsqr';
 import {
   setLocalStorageVar,
   getLocalStorageVar,
+  convertURIToImageData,
 } from '../actions/utils';
 import {
   encryptkey,
@@ -18,15 +19,45 @@ class Pin extends React.Component {
       pinOverride: null,
       pinOverrideTooShort: false,
       pinSet: false,
+      qrScanError: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.updateInput = this.updateInput.bind(this);
+    this.scanQR = this.scanQR.bind(this);
     this.save = this.save.bind(this);
   }
 
   updateInput(e) {
     this.setState({
       [e.target.name]: e.target.value,
+    });
+  }
+
+  scanQR() {
+    MeteorCamera.getPicture({
+      quality: 100,
+    }, (error, data) => {
+      if (error) {
+        this.setState({
+          qrScanError: true,
+        });
+      } else {
+        convertURIToImageData(data)
+        .then((imageData) => {
+          const decodedQR = jsQR.decodeQRFromImage(imageData.data, imageData.width, imageData.height);
+
+          if (!decodedQR) {
+            this.setState({
+              qrScanError: true,
+            });
+          } else {
+            this.setState({
+              qrScanError: false,
+              passphrase: decodedQR,
+            });
+          }
+        });
+      }
     });
   }
 
@@ -38,14 +69,17 @@ class Pin extends React.Component {
       this.setState({
         pinSet: true,
         pinOverrideTooShort: false,
+        qrScanError: false,
       });
 
       setTimeout(() => {
-        this.setState(this.defaultState);        
+        this.setState(this.defaultState);
+        this.props.changeActiveSection('login');
       }, 5000);
     } else {
       this.setState({
         pinOverrideTooShort: true,
+        qrScanError: false,
       });
     }
   }
@@ -56,17 +90,29 @@ class Pin extends React.Component {
         <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12">
           <div className="row">
             <h4 className="padding-bottom-15">Override PIN</h4>
-            <div className="padding-bottom-10">
+            <div className="padding-bottom-20">
             Provide a seed and enter 6 digit PIN number in the form below.
             </div>
+            <button
+              className="btn btn-default btn-scan-qr margin-bottom-30"
+              onClick={ this.scanQR }>
+              <i className="fa fa-qrcode"></i>
+              { translate('SEND.SCAN_QR') }
+            </button>
+            { this.state.qrScanError &&
+              <div className="col-lg-12">
+                <div className="error margin-top-15">
+                  <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
+                </div>
+              </div>
+            }
             <input
               type="password"
               className="form-control margin-bottom-10"
               name="passphrase"
               onChange={ this.updateInput }
-              placeholder={ translate('LOGIN.ENTER_PASSPHRASE') }
+              placeholder={ translate('LOGIN.ENTER_PASSPHRASE') + ' or WIF' }
               value={ this.state.passphrase || '' } />
-
             <div className="margin-bottom-25 margin-top-30">
               <input
                 type="password"

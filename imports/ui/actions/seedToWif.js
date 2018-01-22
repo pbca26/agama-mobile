@@ -3,7 +3,6 @@ const crypto = require('crypto');
 const bigi = require('bigi');
 const bitcoinZcash = require('bitcoinjs-lib-zcash');
 const bitcoin = require('bitcoinjs-lib');
-const bs58check = require('bs58check');
 const electrumJSNetworks = require('./electrumNetworks.js');
 
 import { isZcash } from './txDecoder/txDecoder';

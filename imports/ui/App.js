@@ -399,7 +399,6 @@ class App extends React.Component {
       this.setState({
         overview: res,
       });
-      console.warn('overview', res);      
     });
 
     if (!this.state.overviewInterval) {
@@ -410,7 +409,6 @@ class App extends React.Component {
             this.setState({
               overview: res,
             });
-            console.warn('overview', res);
           });
         }
       }, DASHBOARD_UPDATE_INTERVAL);
@@ -697,7 +695,7 @@ class App extends React.Component {
           }
           { !this.state.auth &&
             this.state.activeSection === 'pin' &&
-            <Pin />
+            <Pin changeActiveSection={ this.changeActiveSection } />
           }
           { this.state.auth &&
             this.state.activeSection === 'recovery' &&
