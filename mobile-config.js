@@ -40,29 +40,13 @@ App.launchScreens({
   'android_xxxhdpi_portrait': 'app-assets/splash/drawable-xxxhdpi/agama.9.png',
 });
 
-App.accessRule('http://atomicexplorer.com');
+// proxies
 App.accessRule('http://94.130.225.86');
 App.accessRule('http://94.130.98.74');
-App.accessRule('http://kmd.komodochainz.info');
-App.accessRule('http://MSHARK.explorer.supernet.org');
-App.accessRule('http://revs.explorer.supernet.org');
+// prices source
+App.accessRule('http://atomicexplorer.com');
+// explorers
 App.accessRule('http://SUPERNET.explorer.supernet.org');
-App.accessRule('http://DEX.explorer.supernet.org');
-App.accessRule('http://PANGEA.explorer.supernet.org');
-App.accessRule('http://JUMBLR.explorer.supernet.org');
-App.accessRule('http://BET.explorer.supernet.org');
-App.accessRule('http://CRYPTO.explorer.supernet.org');
-App.accessRule('http://HODL.explorer.supernet.org');
-App.accessRule('http://SHARK.explorer.supernet.org');
-App.accessRule('http://BOTS.explorer.supernet.org');
-App.accessRule('http://MGW.explorer.supernet.org');
-App.accessRule('http://WIRELESS.explorer.supernet.org');
-App.accessRule('http://CHIPS1.explorer.supernet.org');
-App.accessRule('https://explorer.coqui.cash');
-App.accessRule('https://www.mnzexplorer.com');
 
 // Set PhoneGap/Cordova preferences.
 App.setPreference('BackgroundColor', '0xffffffff');
-/*App.setPreference('HideKeyboardFormAccessoryBar', true);
-App.setPreference('Orientation', 'default');
-App.setPreference('Orientation', 'all', 'ios');*/
