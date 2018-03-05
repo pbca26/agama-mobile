@@ -6,19 +6,19 @@
 const whitelabel = {
   electrum: {
     ip: 'electrum1.cipig.net',
-    port: 10005,
+    port: 10003,
     proto: 'tcp',
     txfee: 10000,
-    abbr: 'SUPERNET',
+    abbr: 'COQUI',
     serverList: [
-      'electrum1.cipig.net:10005',
-      'electrum2.cipig.net:10005'
+      'electrum1.cipig.net:10003',
+      'electrum2.cipig.net:10003'
     ],
   },
-  explorer: 'http://SUPERNET.explorer.supernet.org',
-  name: 'supernet',
-  title: 'SuperNET',
-  logo: 'supernet',
+  explorer: 'https://explorer.coqui.cash',
+  name: 'coqui',
+  title: 'Coqui',
+  logo: 'coqui',
   disablePrices: true,
   disableExperimental: true,
 };

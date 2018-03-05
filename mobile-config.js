@@ -1,12 +1,12 @@
 App.info({
-  id: 'com.supernet.agama',
-  version: '0.0.7',
-  buildNumber: '777',
-  name: 'Agama',
-  description: 'Agama Mobile is a lightweight wallet application that allows users to manage multiple crypto currencies. It\'s built on top of SPV technology which provides a quick way to retrieve and push transaction data.',
-  author: 'SuperNET',
-  email: 'dev@supernet.org',
-  website: 'http://supernet.org'
+  id: 'com.supernet.coqui',
+  version: '0.0.1',
+  buildNumber: '10',
+  name: 'Coqui',
+  description: 'Coqui Mobile is a lightweight wallet application that allows users to manage multiple crypto currencies. It\'s built on top of SPV technology which provides a quick way to retrieve and push transaction data.',
+  author: 'coqui',
+  email: 'dev@coqui.cash',
+  website: 'http://coqui.cash'
 });
 
 // Set up resources such as icons and launch screens.
