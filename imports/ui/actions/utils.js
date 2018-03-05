@@ -1,3 +1,5 @@
+import whitelabel from '../../../whitelabel';
+
 export const kmdCalcInterest = (locktime, value) => { // value in sats
   const timestampDiff = Math.floor(Date.now() / 1000) - locktime - 777;
   let timestampDiffMinutes = timestampDiff / 60;
@@ -114,34 +116,7 @@ export const maskPubAddress = (pub) => {
 }
 
 export const isAssetChain = (coin) => {
-  coin = coin.toUpperCase();
-
-  if (coin === 'SUPERNET' ||
-      coin === 'REVS' ||
-      coin === 'PANGEA' ||
-      coin === 'DEX' ||
-      coin === 'JUMBLR' ||
-      coin === 'BET' ||
-      coin === 'CRYPTO' ||
-      coin === 'COQUI' ||
-      coin === 'HODL' ||
-      coin === 'SHARK' ||
-      coin === 'MSHARK' ||
-      coin === 'BOTS' ||
-      coin === 'MGW' ||
-      coin === 'MVP' ||
-      coin === 'KV' ||
-      coin === 'CEAL' ||
-      coin === 'MESH' ||
-      coin === 'WLC' ||
-      coin === 'MNZ' ||
-      coin === 'BTCH' ||
-      coin === 'komodo' ||
-      coin === 'KMD') {
-    return true;
-  }
-
-  return false;
+  return true;
 }
 
 export const setLocalStorageVar = (name, json) => {
@@ -162,68 +137,17 @@ export function getLocalStorageVar(name) {
   }
 }
 
-export const coinsList = [
-  'CHIPS',
-  'SUPERNET',
-  'REVS',
-  'PANGEA',
-  'DEX',
-  'JUMBLR',
-  'BET',
-  'CRYPTO',
-  'COQUI',
-  'HODL',
-  'SHARK',
-  'MSHARK',
-  'BOTS',
-  'MGW',
-  'BTCH',
-  //'MVP',
-  'KV',
-  //'CEAL',
-  'MESH',
-  'WLC',
-  'MNZ',
-  'DOGE',
-  'DGB',
-  'BTG',
-  'BLK',
-  'BCH',
-  'FAIR',
-  'VIA',
-  'MONA',
-  'ZEC',
-  'HUSH',
-  'ARG',
-  'DASH',
-  'CRW',
-  'VTC',
-  'LTC',
-  'NMC',
-  'SIB',
-  'XMY',
-  'ZCL'
+export const _coinsList = [
 ];
 
-export const explorers = {
-  KMD: 'http://kmd.komodochainz.info',
-  MSHARK: 'http://MSHARK.explorer.supernet.org',
-  REVS: 'http://revs.explorer.supernet.org',
-  SUPERNET: 'http://SUPERNET.explorer.supernet.org',
-  DEX: 'http://DEX.explorer.supernet.org',
-  PANGEA: 'http://PANGEA.explorer.supernet.org',
-  JUMBLR: 'http://JUMBLR.explorer.supernet.org',
-  BET: 'http://BET.explorer.supernet.org',
-  CRYPTO: 'http://CRYPTO.explorer.supernet.org',
-  HODL: 'http://HODL.explorer.supernet.org',
-  SHARK: 'http://SHARK.explorer.supernet.org',
-  BOTS: 'http://BOTS.explorer.supernet.org',
-  MGW: 'http://MGW.explorer.supernet.org',
-  WLC: 'http://WIRELESS.explorer.supernet.org',
-  CHIPS: 'http://chips1.explorer.supernet.org',
-  COQUI: 'https://explorer.coqui.cash',
-  MNZ: 'https://www.mnzexplorer.com',
+export let coinsList = [];
+coinsList.push(whitelabel.name);
+
+export const _explorers = {
 };
+
+export let explorers = [];
+coinsList.push({ [whitelabel.name.toUpperCase()]: whitelabel.explorer });
 
 export const convertURIToImageData = (URI) => {
   return new Promise((resolve, reject) => {

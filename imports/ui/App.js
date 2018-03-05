@@ -2,6 +2,7 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { electrumServers } from './actions/electrumServers';
+import whitelabel from '../../whitelabel';
 
 import actions from './actions/actions';
 import {
@@ -87,7 +88,10 @@ class App extends React.Component {
   componentWillMount() {
     const _localStorageCoins = getLocalStorageVar('coins');
 
-    if (_localStorageCoins) {
+    if (!_localStorageCoins ||
+      (_localStorageCoins && !_localStorageCoins[whitelabel.name])) {
+      this.addCoin(whitelabel.name);
+    } else {
       this.setState({
         coins: _localStorageCoins,
       });
@@ -560,6 +564,7 @@ class App extends React.Component {
             { this.state.auth &&
               <div className="nav-menu-items">
                 { this.state.activeSection !== 'overview' &&
+                  !whitelabel.disablePrices &&
                   <div onClick={ this.toggleOverview }>Overview</div>
                 }
                 { this.state.activeSection !== 'dashboard' &&
@@ -571,24 +576,13 @@ class App extends React.Component {
                 { this.state.activeSection !== 'settings' &&
                   <div onClick={ this.toggleSettings }>Settings</div>
                 }
-                <div onClick={ this.logout }>{ translate('DASHBOARD.LOGOUT') }</div>
-                <div onClick={ this.lock }>{ translate('DASHBOARD.LOCK') }</div>
-                { this.state.activeSection !== 'addcoin' &&
-                  Object.keys(this.state.coins).length !== Object.keys(electrumServers).length &&
-                  <div onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.ADD_COIN') }</div>
-                }
-                <div>
-                { this.renderActiveCoins() }
-                </div>
+                <div onClick={ this.lock }>{ translate('DASHBOARD.LOGOUT') }</div>
               </div>
             }
             { !this.state.auth &&
               <div className="nav-menu-items">
                 { (this.state.activeSection === 'addcoin' || this.state.activeSection === 'create-seed') &&
                   <div onClick={ this.toggleLogin }>{ translate('DASHBOARD.LOGIN') }</div>
-                }
-                { this.state.activeSection !== 'addcoin' &&
-                  <div onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.ADD_COIN') }</div>
                 }
                 { this.state.activeSection !== 'create-seed' &&
                   <div onClick={ this.toggleCreateSeed }>{ translate('DASHBOARD.CREATE_SEED') }</div>
@@ -597,6 +591,7 @@ class App extends React.Component {
                   <div onClick={ this.togglePin }>PIN override</div>
                 }
                 { this.state.activeSection !== 'offlinesig' &&
+                  !whitelabel.disableExperimental &&
                   <div onClick={ this.toggleOffileSig }>Offline Signing</div>
                 }
                 { (this.state.activeSection === 'offlinesig' || this.state.activeSection === 'pin') &&
@@ -618,11 +613,11 @@ class App extends React.Component {
         className="app-container"
         onClick={ this.globalClick }>
         <div className="app-header">
-          <img src="/images/agama-logo-side.svg" />
-          { this.state.auth &&
-            <img
-              className="margin-left-20"
-              src={ `/images/cryptologo/${this.state.coin}.png` } />
+          <img
+            className="whitelabel-logo"
+            src={ `/images/${whitelabel.logo}.png` } />
+          { whitelabel.title &&
+            <span className="whitelabel-title">{ whitelabel.title }</span>
           }
           <i
             onClick={ this.toggleMenu }
@@ -649,10 +644,6 @@ class App extends React.Component {
             { ...this.state }
             sendtx={ this.props.actions.sendtx }
             changeActiveSection={ this.changeActiveSection } />
-          <AddCoin
-            { ...this.state }
-            addCoin={ this.addCoin }
-            changeActiveSection={ this.changeActiveSection } />
           { !this.state.loading &&
             this.state.auth &&
             this.state.activeSection === 'dashboard' &&
@@ -676,21 +667,23 @@ class App extends React.Component {
               <i className="fa fa-warning error"></i> <span className="error">{ translate('DASHBOARD.PROXY_ERROR') }</span>
             </div>
           }
-          <Balance { ...this.state } />
+          { !this.state.proxyError &&
+            !this.state.conError &&
+            <Balance { ...this.state } />
+          }
           { this.state.auth &&
             this.state.activeSection === 'dashboard' &&
+            !this.state.proxyError &&
+            !this.state.conError &&
             <SendReceive
               { ...this.state }
               changeActiveSection={ this.changeActiveSection }
               toggleKMDInterest={ this.toggleKMDInterest } />
           }
-          <KMDInterest
-            { ...this.state }
-            sendtx={ this.props.actions.sendtx }
-            changeActiveSection={ this.changeActiveSection } />
           <Transactions { ...this.state } />
           { !this.state.auth &&
             this.state.activeSection === 'offlinesig' &&
+            !whitelabel.disableExperimental &&
             <OfflineSigning />
           }
           { !this.state.auth &&
@@ -703,6 +696,7 @@ class App extends React.Component {
           }
           { this.state.auth &&
             this.state.activeSection === 'overview' &&
+            !whitelabel.disablePrices &&
             <Overview { ...this.state } />
           }
           { this.state.activeSection === 'settings' &&

@@ -15,6 +15,8 @@ import './styles/send.scss';
 import './styles/spinner.scss';
 import './styles/switch.scss';
 import './styles/transactions.scss';
+// whitelabel styling
+import './styles/whitelabel.scss';
 
 import appReducer from '../imports/ui/reducers';
 import App from '../imports/ui/App';
