@@ -6,7 +6,7 @@
 const whitelabel = {
   electrum: {
     ip: 'electrum1.cipig.net',
-    port: 10003,
+    port: 10011,
     proto: 'tcp',
     txfee: 10000,
     abbr: 'COQUI',
