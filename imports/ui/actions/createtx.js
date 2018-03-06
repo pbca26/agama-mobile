@@ -15,76 +15,15 @@ import {
 } from './txDecoder/txDecoder';
 import { electrumServers } from './electrumServers';
 
-const bitcoinJSForks = require('bitcoinforksjs-lib');
-const bitcoinZcash = require('bitcoinjs-lib-zcash');
-const bitcoinPos = require('bitcoinjs-lib-pos');
-
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
 const electrumJSNetworks = require('./electrumNetworks.js');
 
-// btg/bch
-export const buildSignedTxForks = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue) => {
-  const _network = electrumJSNetworks[network];
-  const keyPair = bitcoinJSForks.ECPair.fromWIF(wif, _network);
-  const pk = bitcoinJSForks.crypto.hash160(keyPair.getPublicKeyBuffer());
-  const spk = bitcoinJSForks.script.pubKeyHash.output.encode(pk);
-  let tx = new bitcoinJSForks.TransactionBuilder(_network);
-
-  devlog(`buildSignedTx${network.toUpperCase()}`);
-
-  for (let i = 0; i < utxo.length; i++) {
-    tx.addInput(utxo[i].txid, utxo[i].vout, bitcoinJSForks.Transaction.DEFAULT_SEQUENCE, spk);
-  }
-
-  tx.addOutput(sendTo, Number(spendValue));
-
-  if (changeValue > 0) {
-    tx.addOutput(changeAddress, Number(changeValue));
-  }
-
-  if (network === 'btg') {
-    tx.enableBitcoinGold(true);
-  } else if (network === 'bch') {
-    tx.enableBitcoinCash(true);
-  }
-
-  tx.setVersion(2);
-
-  devlog('buildSignedTx unsigned tx data vin');
-  devlog(tx.tx.ins);
-  devlog('buildSignedTx unsigned tx data vout');
-  devlog(tx.tx.outs);
-  devlog('buildSignedTx unsigned tx data');
-  devlog(tx);
-
-  const hashType = bitcoinJSForks.Transaction.SIGHASH_ALL | bitcoinJSForks.Transaction.SIGHASH_BITCOINCASHBIP143;
-
-  for (let i = 0; i < utxo.length; i++) {
-    tx.sign(i, keyPair, null, hashType, utxo[i].value);
-  }
-
-  const rawtx = tx.build().toHex();
-
-  devlog('buildSignedTx signed tx hex');
-  devlog(rawtx);
-
-  return rawtx;
-}
-
 // single sig
 export const buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue) => {
   const _network = electrumJSNetworks[isAssetChain(network) ? 'komodo' : network];
-  let key = isZcash(network) ? bitcoinZcash.ECPair.fromWIF(wif, _network) : bitcoin.ECPair.fromWIF(wif, _network);
-  let tx;
-
-  if (isZcash(network)) {
-    tx = new bitcoinZcash.TransactionBuilder(_network);
-  } else if (isPos(network)) {
-    tx = new bitcoinPos.TransactionBuilder(_network);
-  } else {
-    tx = new bitcoin.TransactionBuilder(_network);
-  }
+  let key = bitcoin.ECPair.fromWIF(wif, _network);
+  let tx = new bitcoin.TransactionBuilder(_network);
 
   devlog('buildSignedTx');
   // devlog(`buildSignedTx priv key ${wif}`);
@@ -94,18 +33,10 @@ export const buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeV
     tx.addInput(utxo[i].txid, utxo[i].vout);
   }
 
-  if (isPos(network)) {
-    tx.addOutput(sendTo, Number(spendValue), _network);
-  } else {
-    tx.addOutput(sendTo, Number(spendValue));
-  }
+  tx.addOutput(sendTo, Number(spendValue));
 
   if (changeValue > 0) {
-    if (isPos(network)) {
-      tx.addOutput(changeAddress, Number(changeValue), _network);
-    } else {
-      tx.addOutput(changeAddress, Number(changeValue));
-    }
+    tx.addOutput(changeAddress, Number(changeValue));
   }
 
   if (network === 'komodo' ||
@@ -123,11 +54,7 @@ export const buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeV
   devlog(tx);
 
   for (let i = 0; i < utxo.length; i++) {
-    if (isPos(network)) {
-      tx.sign(_network, i, key);
-    } else {
-      tx.sign(i, key);
-    }
+    tx.sign(i, key);
   }
 
   const rawtx = tx.build().toHex();
@@ -345,28 +272,15 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
 
             let _rawtx;
 
-            if (network === 'btg' ||
-                network === 'bch') {
-              _rawtx = buildSignedTxForks(
-                outputAddress,
-                changeAddress,
-                wif,
-                network,
-                inputs,
-                _change,
-                value
-              );
-            } else {
-              _rawtx = buildSignedTx(
-                outputAddress,
-                changeAddress,
-                wif,
-                network,
-                inputs,
-                _change,
-                value
-              );
-            }
+            _rawtx = buildSignedTx(
+              outputAddress,
+              changeAddress,
+              wif,
+              network,
+              inputs,
+              _change,
+              value
+            );
 
             if (!push ||
                 push === 'false') {
