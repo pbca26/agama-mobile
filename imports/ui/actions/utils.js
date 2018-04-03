@@ -124,6 +124,7 @@ export const isAssetChain = (coin) => {
       coin === 'BET' ||
       coin === 'CRYPTO' ||
       coin === 'COQUI' ||
+      coin === 'OOT' ||
       coin === 'HODL' ||
       coin === 'SHARK' ||
       coin === 'MSHARK' ||
@@ -172,6 +173,7 @@ export const coinsList = [
   'BET',
   'CRYPTO',
   'COQUI',
+  'OOT',
   'HODL',
   'SHARK',
   'MSHARK',
@@ -222,6 +224,7 @@ export const explorers = {
   WLC: 'http://WIRELESS.explorer.supernet.org',
   CHIPS: 'http://chips1.explorer.supernet.org',
   COQUI: 'https://explorer.coqui.cash',
+  OOT: 'https://explorer.utrum.io',
   MNZ: 'https://www.mnzexplorer.com',
 };
 
