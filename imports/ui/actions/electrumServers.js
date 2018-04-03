@@ -10,6 +10,17 @@ export let electrumServers = {
       'electrum2.cipig.net:10011'
     ],
   },
+  oot: { // !estimatefee
+    ip: 'electrum1.utrum.io',
+    port: 10088,
+    proto: 'tcp',
+    txfee: 10000,
+    abbr: 'OOT',
+    serverList: [
+      'electrum1.utrum.io:10088',
+      'electrum2.utrum.io:10088'
+    ],
+  },
   revs: { // !estimatefee
     ip: 'electrum1.cipig.net',
     port: 10003,
