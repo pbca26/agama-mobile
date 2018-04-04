@@ -59,6 +59,7 @@ App.accessRule('http://MGW.explorer.supernet.org');
 App.accessRule('http://WIRELESS.explorer.supernet.org');
 App.accessRule('http://CHIPS1.explorer.supernet.org');
 App.accessRule('https://explorer.coqui.cash');
+App.accessRule('https://explorer.utrum.io');
 App.accessRule('https://www.mnzexplorer.com');
 
 // Set PhoneGap/Cordova preferences.
