@@ -137,6 +137,7 @@ export const isAssetChain = (coin) => {
       coin === 'WLC' ||
       coin === 'MNZ' ||
       coin === 'BTCH' ||
+      coin === 'BNTN' ||
       coin === 'komodo' ||
       coin === 'KMD') {
     return true;
@@ -186,6 +187,7 @@ export const coinsList = [
   'MESH',
   'WLC',
   'MNZ',
+  'BNTN',
   'DOGE',
   'DGB',
   'BTG',
