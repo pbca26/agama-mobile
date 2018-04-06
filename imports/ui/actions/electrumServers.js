@@ -1,4 +1,15 @@
 export let electrumServers = {
+  bntn: { // !estimatefee
+    address: 'electrum1.cipig.net',
+    port: 10026,
+    proto: 'tcp',
+    txfee: 10000,
+    abbr: 'BNTN',
+    serverList: [
+      'electrum1.cipig.net:10026',
+      'electrum2.cipig.net:10026'
+    ],
+  },
   coqui: { // !estimatefee
     ip: 'electrum1.cipig.net',
     port: 10011,
