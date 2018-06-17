@@ -6,6 +6,7 @@ import {
   isAssetChain,
 } from '../actions/utils';
 import { translate } from '../translate/translate';
+import Spinner from './Spinner';
 
 class Transactions extends React.Component {
   constructor() {
@@ -15,6 +16,14 @@ class Transactions extends React.Component {
     };
     this.toggleTxDetails = this.toggleTxDetails.bind(this);
     this.openExternalURL = this.openExternalURL.bind(this);
+    this.isInterestDefined = this.isInterestDefined.bind(this);
+  }
+
+  isInterestDefined() {
+    if (this.props.balance.interest &&
+        this.props.balance.interest > 0) {
+      return true;
+    }
   }
 
   componentWillReceiveProps(props) {
@@ -103,6 +112,18 @@ class Transactions extends React.Component {
         for (let i = 0; i < _transactions.length; i++) {
           _items.push(
             <div
+              className={ `item ${_transactions[i].type}` }
+              key={ `transaction-${i}` }>
+              <div className="direction">{ _transactions[i].type }</div>
+              <div className="date">{ secondsToString(_transactions[i].timestamp) }</div>
+              <div className="amount-fiat">$1233.45</div>
+              <div className="amount-native">{ this.renderTxAmount(_transactions[i]) } { this.props.coin.toUpperCase() }</div>
+              <div className="direction-icon"></div>
+              <img className="line" src="/images/template/transactions/trends-rectangle-7.png" />
+            </div>
+          );
+          /*_items.push(
+            <div
               className="txlist-transaction"
               key={ `transaction-${i}` }>
               <div>
@@ -146,7 +167,7 @@ class Transactions extends React.Component {
                 </div>
               }
             </div>
-          );
+          );*/
         }
 
         if (!_items.length) {
@@ -155,11 +176,43 @@ class Transactions extends React.Component {
           );
         } else {
           return (
-            <div className="txhistory">
-              <div className="dashboard-title">
-                <strong>{ translate('DASHBOARD.TRANSACTIONS') }</strong>
+            <div className="transactions-ui">
+              <div className="individualportfolio">
+                <div className="individualportfolio-inner">
+                  <div className="lasttransactions">Last Transactions</div>
+                  <div className="cryptocardbtc">
+                    <img className="group8" src="/images/template/transactions/gradient.png" />
+                    <img
+                      className="coin-icon"
+                      src={ `/images/cryptologo/${this.props.coin}.png` } />
+                    <div className="coin-title">{ translate('COINS.' + this.props.coin.toUpperCase()) }</div>
+                    <div className="coin-balance">
+                      <div className="balance">
+                      { translate('BALANCE.BALANCE') }: { formatValue(this.props.balance.balance) } { this.props.coin.toUpperCase() }
+                      </div>
+                      { this.isInterestDefined() &&
+                        <div className="interest">
+                        { translate('BALANCE.INTEREST') }: { formatValue(this.props.balance.interest) } { this.props.coin.toUpperCase() }
+                        </div>
+                      }
+                    </div>
+                    { !this.props.loading &&
+                      this.props.auth &&
+                      this.props.activeSection === 'dashboard' &&
+                      <i
+                        onClick={ this.props.dashboardRefresh }
+                        className="fa fa-refresh dashboard-refresh"></i>
+                      }
+                      { this.props.loading &&
+                        this.props.activeSection === 'dashboard' &&
+                        <Spinner />
+                      }
+                  </div>
+                  <div className="transactions-list">
+                  { _items }
+                  </div>
+                </div>
               </div>
-              { _items }
             </div>
           );
         }
@@ -173,3 +226,12 @@ class Transactions extends React.Component {
 }
 
 export default Transactions;
+
+/*
+<div className="txhistory">
+              <div className="dashboard-title">
+                <strong>{ translate('DASHBOARD.TRANSACTIONS') }</strong>
+              </div>
+              { _items }
+            </div>
+*/
