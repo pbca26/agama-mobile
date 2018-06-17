@@ -20,7 +20,7 @@ class Login extends React.Component {
       createPin: false,
       pinOverride: null,
       pinOverrideTooShort: false,
-      pin: '',
+      pin: '112233',
       wrongPin: false,
       qrScanError: false,
     };
@@ -189,7 +189,47 @@ class Login extends React.Component {
         this.props.activeSection !== 'offlinesig' &&
         this.props.activeSection !== 'pin') {
       return (
-        <div className="col-sm-12">
+        <div className="login">
+          <div className="login-inner">
+            <div className="signintoyourcryp">Sign In to your Agama account.</div>
+            <div className="group">
+              <img className="rectangle10" src="/images/template/login/reset-password-rectangle-10.png" />
+              <div className="exampleexamplecom">
+                <input
+                  type="password"
+                  className="form-control margin-bottom-30"
+                  name="pin"
+                  onChange={ this.updateInput }
+                  placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
+                  value={ this.state.pin || '' } />
+                { this.state.wrongPin &&
+                  <div className="error margin-bottom-25">
+                    <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
+                  </div>
+                }
+              </div>
+            </div>
+            <div
+              onClick={ () => this.login(true) }
+              className="group3">
+              <div className="rectangle10copy"></div>
+              <div className="signin">Sign In</div>
+              <div className="group2">
+                <div className="rectangle8copy"></div>
+                <img className="path6" src="/images/template/login/reset-password-path-6.png" />
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    } else {
+      return null;
+    }
+  }
+}
+
+/*
+<div className="col-sm-12">
           <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12">
             <div className="row">
               { getLocalStorageVar('seed') &&
@@ -284,11 +324,6 @@ class Login extends React.Component {
             </div>
           </div>
         </div>
-      );
-    } else {
-      return null;
-    }
-  }
-}
+*/
 
 export default Login;

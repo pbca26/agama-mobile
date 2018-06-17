@@ -64,6 +64,21 @@ class AddCoin extends React.Component {
     let _items = [];
 
     _items.push(
+      <div
+        onClick={ () => this.addCoin('kmd') }
+        key={ `overview-coins-kmd` }
+        className={ 'overview-coin' + (_coins.kmd ? ' disabled' : '') }>
+          <img className="div1" src="/images/template/home/trends-rectangle-7.png" />
+          <div className="btc">
+            <img
+              className="oval4"
+              src={ `/images/cryptologo/kmd.png` } />
+          </div>
+          <div className="bitcoin">{ translate('COINS.KMD') }</div>
+      </div>
+    );
+
+    /*_items.push(
       <span
         className={ _coins.kmd ? 'disabled' : '' }
         key={ `addcoin-kmd` }>
@@ -78,7 +93,7 @@ class AddCoin extends React.Component {
           }        
         </div>
       </span>
-    );
+    );*/
 
     for (let i = 0; i < coinsList.length; i++) {
       const key = coinsList[i];
@@ -87,6 +102,21 @@ class AddCoin extends React.Component {
         const _coin = key.toLowerCase();
 
         _items.push(
+          <div
+            onClick={ () => this.addCoin(_coin) }
+            key={ `overview-coins-${_coin}` }
+            className={ 'overview-coin' + (_coins[_coin] ? ' disabled' : '') }>
+              <img className="div1" src="/images/template/home/trends-rectangle-7.png" />
+              <div className="btc">
+                <img
+                  className="oval4"
+                  src={ `/images/cryptologo/${_coin}.png` } />
+              </div>
+              <div className="bitcoin">{ translate('COINS.' + _coin.toUpperCase()) }</div>
+          </div>
+        );
+
+        /*_items.push(
           <span
             className={ _coins[key] ? 'disabled' : '' }
             key={ `addcoin-${key}` }>
@@ -106,7 +136,7 @@ class AddCoin extends React.Component {
               }
             </div>
           </span>
-        );
+        );*/
       }
     }
 
@@ -157,6 +187,39 @@ class AddCoin extends React.Component {
     );
   }
 
+/*<div className="col-sm-12 addcoin">
+  <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12">
+    <div className="row">
+      <div className="margin-bottom-30">
+        <span
+          className="btn-back"
+          onClick={ () => this.props.changeActiveSection(this.props.auth ? 'dashboard' : 'login') }>
+          <i className="fa fa-arrow-left"></i> { translate('DASHBOARD.BACK') }
+        </span>
+      </div>
+      <h4>{ translate('ADD_COIN.SHORTCUTS') }</h4>
+      <div className="coins-list">
+      { this.renderCoins(true) }
+      </div>
+      { this.renderCoinShortcuts() }
+      <hr />
+      <h4>{ translate('ADD_COIN.MULTI_SELECT') }</h4>
+      <div className="coins-list">
+        { this.renderCoins() }
+      </div>
+      <div className="padding-bottom-20">
+        <button
+          className="btn btn-lg btn-primary btn-block ladda-button"
+          onClick={ () => this.addCoin('multi') }>
+          <span className="ladda-label">
+          { translate('ADD_COIN.ADD_SELECTED_COINS') }
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>*/
+
   render() {
     if (this.props.activeSection !== 'create-seed' &&
         this.props.activeSection !== 'pin' &&
@@ -165,35 +228,10 @@ class AddCoin extends React.Component {
           !this.props.coins ||
           (this.props.coins && !Object.keys(this.props.coins).length)) {
         return (
-          <div className="col-sm-12 addcoin">
-            <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12">
-              <div className="row">
-                <div className="margin-bottom-30">
-                  <span
-                    className="btn-back"
-                    onClick={ () => this.props.changeActiveSection(this.props.auth ? 'dashboard' : 'login') }>
-                    <i className="fa fa-arrow-left"></i> { translate('DASHBOARD.BACK') }
-                  </span>
-                </div>
-                <h4>{ translate('ADD_COIN.SHORTCUTS') }</h4>
-                <div className="coins-list">
-                { this.renderCoins(true) }
-                </div>
-                { this.renderCoinShortcuts() }
-                <hr />
-                <h4>{ translate('ADD_COIN.MULTI_SELECT') }</h4>
-                <div className="coins-list">
-                  { this.renderCoins() }
-                </div>
-                <div className="padding-bottom-20">
-                  <button
-                    className="btn btn-lg btn-primary btn-block ladda-button"
-                    onClick={ () => this.addCoin('multi') }>
-                    <span className="ladda-label">
-                    { translate('ADD_COIN.ADD_SELECTED_COINS') }
-                    </span>
-                  </button>
-                </div>
+          <div className="addcoin-ui">
+            <div className="home">
+              <div className="home-inner">
+                <div className="overview-coins">{ this.renderCoins() }</div>
               </div>
             </div>
           </div>

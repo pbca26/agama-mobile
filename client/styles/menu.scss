@@ -1,59 +1,331 @@
-.nav-menu {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 200;
-  background: rgba(0, 0, 0, 0.5);
+.menu-ui {
+  min-height: 100vh;
+  padding-top: 30px;
 
-  .nav-menu-overlay {
-    position: absolute;
-    width: 100%;
+  .sidemenu-inner {
+    width: 375px;
     height: 100%;
-    z-index: 100;
+    position:relative;
+    margin: auto;
+    min-height: 100vh;
   }
-  &-inner {
-    width: 200px;
-    background: #fff;
-    height: 100%;
-    float: right;
+
+  .sidemenu {
+    width: 100%;
+    min-width: 375px;
+    height: 100vh;
+    min-height: 667px;
     position: relative;
-    z-index: 120;
-    overflow-y: auto;
+    overflow: hidden;
+    margin: 0;
+    background-color: rgba(255, 255, 255, 1.0)
+  }
 
-    .fa {
-      float: right;
-      font-size: 34px;
-      margin-right: 20px;
-      margin-top: 7px;
-    }
-    .nav-menu-items {
-      margin-top: 70px;
+  a {
+    text-decoration: none
+  }
 
-      div {
-        margin-bottom: 25px;
-        font-size: 16px;
-        margin-left: 20px;
-      }
-      .active-coins {
-        margin-left: 0;
+  div {
+    -webkit-text-size-adjust: none
+  }
 
-        span {
-          position: relative;
-          top: 2px;
-          left: 10px;
-        }
-        img {
-          height: 42px;
-        }
-        .fa {
-          font-size: 20px;
-          margin-right: 10px;
-          margin-top: 10px;
-          color: #46be8a;
-        }
-      }
-    }
+  .sidemenu .group {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 110px;
+    height: 500px;
+    width: 385px;
+    position: absolute;
+    margin: 0;
+    left: 250px
+  }
+
+  .sidemenu .group .rectangle9copy3 {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 77px;
+    height: 346px;
+    width: 305px;
+    position: absolute;
+    margin: 0;
+    left: 0;
+    opacity: .5
+  }
+
+  .sidemenu .group .rectangle9copy2 {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 23px;
+    height: 455px;
+    width: 305px;
+    position: absolute;
+    margin: 0;
+    left: 40px;
+    opacity: .5
+  }
+
+  .sidemenu .group .rectangle9copy {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 0;
+    height: 500px;
+    width: 305px;
+    position: absolute;
+    margin: 0;
+    left: 80px
+  }
+
+  .sidemenu .menu {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 42px;
+    height: auto;
+    width: auto;
+    position: absolute;
+    margin: 0;
+    left: 165px;
+    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+    font-size: 18.0px;
+    color: rgba(255, 255, 255, 1.0);
+    text-align: left;
+    letter-spacing: -.56px;
+    line-height: 22.0px
+  }
+
+  .sidemenu .combinedshape {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 44px;
+    height: 15px;
+    width: 21px;
+    position: absolute;
+    margin: 0;
+    left: 19px
+  }
+
+  .sidemenu .home {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 124px;
+    height: auto;
+    width: auto;
+    position: absolute;
+    margin: 0;
+    left: 60px;
+    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+    font-size: 18.0px;
+    color: rgba(255, 255, 255, 1.0);
+    text-align: left;
+    letter-spacing: -.56px;
+    line-height: 22.0px
+  }
+
+  .sidemenu .trends {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 177px;
+    height: auto;
+    width: auto;
+    position: absolute;
+    margin: 0;
+    left: 60px;
+    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+    font-size: 18.0px;
+    color: rgba(255, 255, 255, 1.0);
+    text-align: left;
+    letter-spacing: -.56px;
+    line-height: 22.0px
+  }
+
+  .sidemenu .kyc {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 230px;
+    height: auto;
+    width: auto;
+    position: absolute;
+    margin: 0;
+    left: 60px;
+    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+    font-size: 18.0px;
+    color: rgba(255, 255, 255, 1.0);
+    text-align: left;
+    letter-spacing: -.56px;
+    line-height: 22.0px
+  }
+
+  .sidemenu .profile {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 283px;
+    height: auto;
+    width: auto;
+    position: absolute;
+    margin: 0;
+    left: 60px;
+    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+    font-size: 18.0px;
+    color: rgba(255, 255, 255, 1.0);
+    text-align: left;
+    letter-spacing: -.56px;
+    line-height: 22.0px
+  }
+
+  .sidemenu .settings {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 336px;
+    height: auto;
+    width: auto;
+    position: absolute;
+    margin: 0;
+    left: 60px;
+    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+    font-size: 18.0px;
+    color: rgba(255, 255, 255, 1.0);
+    text-align: left;
+    letter-spacing: -.56px;
+    line-height: 22.0px
+  }
+
+  .sidemenu .aboutus {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 389px;
+    height: auto;
+    width: auto;
+    position: absolute;
+    margin: 0;
+    left: 60px;
+    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+    font-size: 18.0px;
+    color: rgba(255, 255, 255, 1.0);
+    text-align: left;
+    letter-spacing: -.56px;
+    line-height: 22.0px
+  }
+
+  .sidemenu .feedback {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 442px;
+    height: auto;
+    width: auto;
+    position: absolute;
+    margin: 0;
+    left: 60px;
+    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+    font-size: 18.0px;
+    color: rgba(255, 255, 255, 1.0);
+    text-align: left;
+    letter-spacing: -.56px;
+    line-height: 22.0px
+  }
+
+  .sidemenu .signout {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 495px;
+    height: auto;
+    width: auto;
+    position: absolute;
+    margin: 0;
+    left: 60px;
+    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+    font-size: 18.0px;
+    color: rgba(255, 255, 255, 1.0);
+    text-align: left;
+    letter-spacing: -.56px;
+    line-height: 22.0px
+  }
+
+  .sidemenu .rectangle3 {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 160px;
+    height: 2px;
+    width: 200px;
+    position: absolute;
+    margin: 0;
+    left: 0;
+    border-radius: 1px;
+    opacity: .1
+  }
+
+  .sidemenu .rectangle3copy {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 213px;
+    height: 2px;
+    width: 200px;
+    position: absolute;
+    margin: 0;
+    left: 0;
+    border-radius: 1px;
+    opacity: .1
+  }
+
+  .sidemenu .rectangle3copy2 {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 266px;
+    height: 2px;
+    width: 200px;
+    position: absolute;
+    margin: 0;
+    left: 0;
+    border-radius: 1px;
+    opacity: .1
+  }
+
+  .sidemenu .rectangle3copy3 {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 319px;
+    height: 2px;
+    width: 200px;
+    position: absolute;
+    margin: 0;
+    left: 0;
+    border-radius: 1px;
+    opacity: .1
+  }
+
+  .sidemenu .rectangle3copy4 {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 372px;
+    height: 2px;
+    width: 200px;
+    position: absolute;
+    margin: 0;
+    left: 0;
+    border-radius: 1px;
+    opacity: .1
+  }
+
+  .sidemenu .rectangle3copy5 {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 425px;
+    height: 2px;
+    width: 200px;
+    position: absolute;
+    margin: 0;
+    left: 0;
+    border-radius: 1px;
+    opacity: .1
+  }
+
+  .sidemenu .rectangle3copy6 {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 478px;
+    height: 2px;
+    width: 200px;
+    position: absolute;
+    margin: 0;
+    left: 0;
+    border-radius: 1px;
+    opacity: .1
+  }
+
+  .sidemenu .combinedshape1 {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 41px;
+    height: 22px;
+    width: 20px;
+    position: absolute;
+    margin: 0;
+    left: 333px
+  }
+
+  .sidemenu .oval {
+    background-color: rgba(255, 255, 255, 0.0);
+    top: 40px;
+    height: 8px;
+    width: 8px;
+    position: absolute;
+    margin: 0;
+    left: 347px
   }
 }

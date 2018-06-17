@@ -35,13 +35,14 @@ const getServersList = () => {
   }
 }
 
-const setDefaultServer = (network, port, ip) => {
+const setDefaultServer = (network, port, ip, proto) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
       HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/server/version`, {
         params: {
           port,
           ip,
+          proto,
         },
       }, (error, result) => {
         result = JSON.parse(result.content);
@@ -51,6 +52,7 @@ const setDefaultServer = (network, port, ip) => {
         } else {
           electrumServers[network].port = port;
           electrumServers[network].ip = ip;
+          electrumServers[network].proto = proto;
 
           resolve(true);
         }
@@ -261,8 +263,8 @@ const getOverview = (coins) => {
       }))
       .then(promiseResult => {
         const _pricesUrl = [
-          'http://atomicexplorer.com/api/rates/kmd',
-          'http://atomicexplorer.com/api/mm/prices'
+          'https://www.atomicexplorer.com/api/rates/kmd',
+          'https://www.atomicexplorer.com/api/mm/prices'
         ];
 
         Promise.all(_pricesUrl.map((url, index) => {
@@ -302,10 +304,16 @@ const getOverview = (coins) => {
               _coinKMDPrice = 1;
             }
 
+
+            if (!promiseResult[i].balance) {
+              promiseResult[i].balance = 0;
+            }
+
             _overviewItems.push({
               coin: promiseResult[i].coin,
               balanceNative: promiseResult[i].balance,
               balanceKMD: promiseResult[i].balance * _coinKMDPrice,
+              balanceBTC: promiseResult[i].balance * _kmdRates.BTC,
               balanceUSD: promiseResult[i].balance * _coinKMDPrice * _kmdRates.USD,
               usdPricePerItem: _coinKMDPrice * _kmdRates.USD,
             });

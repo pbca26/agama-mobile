@@ -18,8 +18,6 @@ import MyAddress from './components/MyAddress';
 import AddCoin from './components/AddCoin';
 import Login from './components/Login';
 import Transactions from './components/Transactions';
-import Balance from './components/Balance';
-import Spinner from './components/Spinner';
 import ServerSelect from './components/ServerSelect';
 import CreateSeed from './components/CreateSeed';
 import SendReceive from './components/SendReceive';
@@ -114,7 +112,7 @@ class App extends React.Component {
   }
 
   addCoin(coin) {
-    const server = electrumServers[coin === 'kmd' ? 'komodo' : coin];
+    const server = electrumServers[coin];
     let coins = this.state.coins;
 
     // pick a random server to communicate with
@@ -124,9 +122,10 @@ class App extends React.Component {
       const randomServer = server.serverList[randomServerId];
       const serverDetails = randomServer.split(':');
 
-      if (serverDetails.length === 2) {
+      if (serverDetails.length === 3) {
         server.ip = serverDetails[0];
         server.port = serverDetails[1];
+        server.proto = serverDetails[2];
       }
     }
 
@@ -618,15 +617,11 @@ class App extends React.Component {
         className="app-container"
         onClick={ this.globalClick }>
         <div className="app-header">
-          <img src="/images/agama-logo-side.svg" />
-          { this.state.auth &&
-            <img
-              className="margin-left-20"
-              src={ `/images/cryptologo/${this.state.coin}.png` } />
-          }
-          <i
+          <img
             onClick={ this.toggleMenu }
-            className="fa fa-bars"></i>
+            className="combinedshape"
+            src="/images/template/home/home-combined-shape.png" />
+          <div className="ui-title">{ this.state.activeSection }</div>
         </div>
         <div className="app-main">
           { (this.state.activeSection !== 'pin' || this.state.activeSection !== 'offlinesig') &&
@@ -640,9 +635,9 @@ class App extends React.Component {
               login={ this.login }
               changeActiveSection={ this.changeActiveSection } />
           }
-          { this.state.auth &&
+          { /*this.state.auth &&
             this.state.activeSection === 'dashboard' &&
-            <MyAddress { ...this.state } />
+            <MyAddress { ...this.state } />*/
           }
           { this.renderMenu() }
           <SendCoin
@@ -653,17 +648,6 @@ class App extends React.Component {
             { ...this.state }
             addCoin={ this.addCoin }
             changeActiveSection={ this.changeActiveSection } />
-          { !this.state.loading &&
-            this.state.auth &&
-            this.state.activeSection === 'dashboard' &&
-            <i
-              onClick={ this.dashboardRefresh }
-              className="fa fa-refresh dashboard-refresh"></i>
-          }
-          { this.state.loading &&
-            this.state.activeSection === 'dashboard' &&
-            <Spinner />
-          }
           { this.state.conError &&
             <ServerSelect
               { ...this.state }
@@ -676,7 +660,7 @@ class App extends React.Component {
               <i className="fa fa-warning error"></i> <span className="error">{ translate('DASHBOARD.PROXY_ERROR') }</span>
             </div>
           }
-          <Balance { ...this.state } />
+          {  /*<Balance { ...this.state } /> */ }
           { this.state.auth &&
             this.state.activeSection === 'dashboard' &&
             <SendReceive
@@ -688,7 +672,9 @@ class App extends React.Component {
             { ...this.state }
             sendtx={ this.props.actions.sendtx }
             changeActiveSection={ this.changeActiveSection } />
-          <Transactions { ...this.state } />
+          <Transactions
+            { ...this.state }
+            dashboardRefresh={ this.dashboardRefresh } />
           { !this.state.auth &&
             this.state.activeSection === 'offlinesig' &&
             <OfflineSigning />
