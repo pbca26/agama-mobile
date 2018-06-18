@@ -1,7 +1,30 @@
 .menu-ui {
   min-height: 100vh;
-  padding-top: 30px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #45485F;
+  z-index: 100;
 
+  .active-coins {
+    padding-left: 45px;
+    padding-top: 20px;
+
+    img {
+      width: 40px;
+      padding-right: 10px;
+    }
+    span,
+    i {
+      position: relative;
+      top: -13px;
+    }
+    i {
+      padding-left: 5px;
+    }
+  }
+  
   .sidemenu-inner {
     width: 375px;
     height: 100%;
@@ -14,11 +37,9 @@
     width: 100%;
     min-width: 375px;
     height: 100vh;
-    min-height: 667px;
     position: relative;
-    overflow: hidden;
+    overflow: auto;
     margin: 0;
-    background-color: rgba(255, 255, 255, 1.0)
   }
 
   a {
@@ -97,216 +118,43 @@
     left: 19px
   }
 
-  .sidemenu .home {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 124px;
+  .sidemenu .items {
+    position: absolute;
+    top: 100px;
+  }
+
+  .sidemenu .item {
+    padding-top: 20px;
     height: auto;
     width: auto;
-    position: absolute;
     margin: 0;
-    left: 60px;
     font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
     font-size: 18.0px;
     color: rgba(255, 255, 255, 1.0);
     text-align: left;
     letter-spacing: -.56px;
-    line-height: 22.0px
-  }
+    line-height: 22.0px;
 
-  .sidemenu .trends {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 177px;
-    height: auto;
-    width: auto;
-    position: absolute;
-    margin: 0;
-    left: 60px;
-    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-    font-size: 18.0px;
-    color: rgba(255, 255, 255, 1.0);
-    text-align: left;
-    letter-spacing: -.56px;
-    line-height: 22.0px
-  }
-
-  .sidemenu .kyc {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 230px;
-    height: auto;
-    width: auto;
-    position: absolute;
-    margin: 0;
-    left: 60px;
-    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-    font-size: 18.0px;
-    color: rgba(255, 255, 255, 1.0);
-    text-align: left;
-    letter-spacing: -.56px;
-    line-height: 22.0px
-  }
-
-  .sidemenu .profile {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 283px;
-    height: auto;
-    width: auto;
-    position: absolute;
-    margin: 0;
-    left: 60px;
-    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-    font-size: 18.0px;
-    color: rgba(255, 255, 255, 1.0);
-    text-align: left;
-    letter-spacing: -.56px;
-    line-height: 22.0px
-  }
-
-  .sidemenu .settings {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 336px;
-    height: auto;
-    width: auto;
-    position: absolute;
-    margin: 0;
-    left: 60px;
-    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-    font-size: 18.0px;
-    color: rgba(255, 255, 255, 1.0);
-    text-align: left;
-    letter-spacing: -.56px;
-    line-height: 22.0px
-  }
-
-  .sidemenu .aboutus {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 389px;
-    height: auto;
-    width: auto;
-    position: absolute;
-    margin: 0;
-    left: 60px;
-    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-    font-size: 18.0px;
-    color: rgba(255, 255, 255, 1.0);
-    text-align: left;
-    letter-spacing: -.56px;
-    line-height: 22.0px
-  }
-
-  .sidemenu .feedback {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 442px;
-    height: auto;
-    width: auto;
-    position: absolute;
-    margin: 0;
-    left: 60px;
-    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-    font-size: 18.0px;
-    color: rgba(255, 255, 255, 1.0);
-    text-align: left;
-    letter-spacing: -.56px;
-    line-height: 22.0px
-  }
-
-  .sidemenu .signout {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 495px;
-    height: auto;
-    width: auto;
-    position: absolute;
-    margin: 0;
-    left: 60px;
-    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-    font-size: 18.0px;
-    color: rgba(255, 255, 255, 1.0);
-    text-align: left;
-    letter-spacing: -.56px;
-    line-height: 22.0px
-  }
-
-  .sidemenu .rectangle3 {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 160px;
-    height: 2px;
-    width: 200px;
-    position: absolute;
-    margin: 0;
-    left: 0;
-    border-radius: 1px;
-    opacity: .1
-  }
-
-  .sidemenu .rectangle3copy {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 213px;
-    height: 2px;
-    width: 200px;
-    position: absolute;
-    margin: 0;
-    left: 0;
-    border-radius: 1px;
-    opacity: .1
-  }
-
-  .sidemenu .rectangle3copy2 {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 266px;
-    height: 2px;
-    width: 200px;
-    position: absolute;
-    margin: 0;
-    left: 0;
-    border-radius: 1px;
-    opacity: .1
-  }
-
-  .sidemenu .rectangle3copy3 {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 319px;
-    height: 2px;
-    width: 200px;
-    position: absolute;
-    margin: 0;
-    left: 0;
-    border-radius: 1px;
-    opacity: .1
-  }
-
-  .sidemenu .rectangle3copy4 {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 372px;
-    height: 2px;
-    width: 200px;
-    position: absolute;
-    margin: 0;
-    left: 0;
-    border-radius: 1px;
-    opacity: .1
-  }
-
-  .sidemenu .rectangle3copy5 {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 425px;
-    height: 2px;
-    width: 200px;
-    position: absolute;
-    margin: 0;
-    left: 0;
-    border-radius: 1px;
-    opacity: .1
-  }
-
-  .sidemenu .rectangle3copy6 {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 478px;
-    height: 2px;
-    width: 200px;
-    position: absolute;
-    margin: 0;
-    left: 0;
-    border-radius: 1px;
-    opacity: .1
+    .title {
+      padding-left: 50px;      
+    }
+    .line {
+      padding-top: 10px;
+      background-color: rgba(255, 255, 255, 0.0);
+      height: 2px;
+      width: 200px;
+      margin: 0;
+      border-radius: 1px;
+      opacity: .1;
+      display: block;
+      position: relative;
+      left: 20px;
+    }
+    &:last-child {
+      .line {
+        display: none;
+      }
+    }
   }
 
   .sidemenu .combinedshape1 {
