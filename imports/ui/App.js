@@ -543,9 +543,7 @@ class App extends React.Component {
     return _items;
   }
 
-  renderMenu() {
-    if (this.state.displayMenu) {
-      return (
+/*
         <div className="nav-menu">
           <div
             onClick={ this.toggleMenu }
@@ -603,6 +601,139 @@ class App extends React.Component {
                 }
               </div>
             }
+          </div>
+        </div>
+*/
+
+  renderMenu() {
+    if (this.state.displayMenu) {
+      return (
+        <div className="menu-ui">
+          <div className="sidemenu">
+            <div className="sidemenu-inner">
+              <div className="group">
+                  <img className="rectangle9copy3" src="/images/template/menu/sidemenu-rectangle-9-copy-3.png" />
+                  <img className="rectangle9copy2" src="/images/template/menu/sidemenu-rectangle-9-copy-2.png" />
+                  <img className="rectangle9copy" src="/images/template/menu/sidemenu-rectangle-9-copy.png" />
+              </div>
+              <div className="menu">Menu</div>
+              <img
+                onClick={ this.toggleMenu }
+                className="combinedshape"
+                src="/images/template/menu/trends-combined-shape.png" />
+              { this.state.auth &&
+                <div className="items">
+                  { this.state.activeSection !== 'overview' &&
+                    <div className="item">
+                      <div
+                        className="title"
+                        onClick={ this.toggleOverview }>Overview</div>
+                      <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                    </div>
+                  }
+                  { this.state.activeSection !== 'dashboard' &&
+                    <div className="item">
+                      <div
+                        className="title"
+                        onClick={ () => this.changeActiveSection('dashboard', true) }>{ translate('DASHBOARD.DASHBOARD') }</div>
+                      <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                    </div>
+                  }
+                  { this.state.activeSection !== 'recovery' &&
+                    <div className="item">
+                      <div
+                        className="title"
+                        onClick={ this.toggleRecovery }>Recovery</div>
+                      <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                    </div>
+                  }
+                  { this.state.activeSection !== 'settings' &&
+                    <div className="item">
+                      <div
+                        className="title"
+                        onClick={ this.toggleSettings }>Settings</div>
+                      <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                    </div>
+                  }
+                  <div className="item">
+                    <div
+                      className="title"
+                      onClick={ this.logout }>{ translate('DASHBOARD.LOGOUT') }</div>
+                    <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                  </div>
+                  <div className="item">
+                    <div
+                      className="title"
+                      onClick={ this.lock }>{ translate('DASHBOARD.LOCK') }</div>
+                    <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                  </div>
+                  { this.state.activeSection !== 'addcoin' &&
+                    Object.keys(this.state.coins).length !== Object.keys(electrumServers).length &&
+                    <div className="item">
+                      <div
+                        className="title"
+                        onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.ADD_COIN') }</div>
+                      <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                    </div>
+                  }
+                  <div>
+                  { this.renderActiveCoins() }
+                  </div>
+                </div>
+              }
+            { !this.state.auth &&
+              <div className="items">
+                { (this.state.activeSection === 'addcoin' || this.state.activeSection === 'create-seed') &&
+                  <div className="item">
+                    <div
+                      className="title"
+                      onClick={ this.toggleLogin }>{ translate('DASHBOARD.LOGIN') }</div>
+                    <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                  </div>
+                }
+                { this.state.activeSection !== 'addcoin' &&
+                  <div className="item">
+                    <div
+                      className="title"
+                      onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.ADD_COIN') }</div>
+                    <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                  </div>
+                }
+                { this.state.activeSection !== 'create-seed' &&
+                  <div className="item">
+                    <div
+                      className="title"
+                      onClick={ this.toggleCreateSeed }>{ translate('DASHBOARD.CREATE_SEED') }</div>
+                    <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                  </div>
+                }
+                { this.state.activeSection !== 'pin' &&
+                  <div className="item">
+                    <div
+                      className="title"
+                      onClick={ this.togglePin }>PIN override</div>
+                    <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                  </div>
+                }
+                { /*this.state.activeSection !== 'offlinesig' &&
+                  <div className="item">
+                    <div
+                      className="title"
+                      onClick={ this.toggleOffileSig }>Offline Signing</div>
+                    <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                  </div>*/
+                }
+                { (this.state.activeSection === 'offlinesig' || this.state.activeSection === 'pin') &&
+                  <div className="item">
+                    <div
+                      className="title"
+                      onClick={ this.toggleLogin }>Login</div>
+                    <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                  </div>
+                }
+              </div>
+            }
+            </div>
           </div>
         </div>
       );
