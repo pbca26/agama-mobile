@@ -8,6 +8,11 @@
   z-index: 100;
 
   .active-coins {
+    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+    font-size: 18.0px;
+    color: white;
+    letter-spacing: -.56px;
+    line-height: 22.0px;
     padding-left: 45px;
     padding-top: 20px;
 
@@ -108,16 +113,6 @@
     line-height: 22.0px
   }
 
-  .sidemenu .combinedshape {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 44px;
-    height: 15px;
-    width: 21px;
-    position: absolute;
-    margin: 0;
-    left: 19px
-  }
-
   .sidemenu .items {
     position: absolute;
     top: 100px;
@@ -175,5 +170,52 @@
     position: absolute;
     margin: 0;
     left: 347px
+  }
+}
+
+.menu-icon {
+  background-color: rgba(255, 255, 255, 0.0);
+  top: 44px;
+  height: 15px;
+  width: 21px;
+  position: absolute;
+  margin: 0;
+  right: -19px;
+  z-index: 10;
+}
+
+.menu-back {
+  background-color: rgba(255, 255, 255, 0.0);
+  top: 44px;
+  height: 15px;
+  width: 21px;
+  position: absolute;
+  margin: 0;
+  left: -10px;
+  z-index: 10;
+}
+
+.app-header {
+  width: 375px;
+  height: 100%;
+  position: relative;
+  margin: auto;
+  height: 40px;
+  padding-top: 22px;
+
+  .ui-title {
+    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+    font-size: 18.0px;
+    color: rgba(255, 255, 255, 1.0);
+    letter-spacing: -.56px;
+    line-height: 22.0px;
+    width: 100%;
+    text-transform: capitalize;
+    text-align: center;
+    position: absolute;
+    top: 39px;
+  }
+  .combinedshape {
+    position: absolute;
   }
 }

@@ -1,6 +1,8 @@
 body {
   background-color: #45485F;
   color: #fff;
+  font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+  color: white;
 }
 
 .overview-ui,
@@ -643,29 +645,6 @@ body {
   z-index: 100;
 }
 
-.app-header {
-  width: 375px;
-  height: 100%;
-  position: relative;
-  margin: auto;
-  height: 20px;
-  padding-top: 22px;
-
-  .ui-title {
-    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-    font-size: 18.0px;
-    color: rgba(255, 255, 255, 1.0);
-    letter-spacing: -.56px;
-    line-height: 22.0px;
-    width: 100%;
-    text-transform: capitalize;
-    text-align: center;
-  }
-  .combinedshape {
-    position: absolute;
-  }
-}
-
 .addcoin-ui .home {
   height: inherit;
   padding-bottom: 10px;
@@ -728,4 +707,24 @@ body {
   right: 11px;
   z-index: 10;
   font-size: 20px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.error {
+  color: rgba(255, 117, 117, 1.0);
+  font-size: 14px;
+
+  .fa {
+    margin-right: 5px;
+  }
+}
+.warning {
+  color: #f2a654;
+  font-size: 14px;
+}
+.hide {
+  display: none;
 }
