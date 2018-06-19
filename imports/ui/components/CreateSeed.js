@@ -10,7 +10,7 @@ import {
   decryptkey,
 } from '../actions/seedCrypt';
 import { translate } from '../translate/translate';
-import { PassPhraseGenerator } from './seedGen/passphrasegenerator';
+import passphraseGenerator from 'agama-wallet-lib/src/crypto/passphrasegenerator';
 
 class CreateSeed extends React.Component {
   constructor() {
@@ -23,7 +23,7 @@ class CreateSeed extends React.Component {
       pin: '',
       pinConfirm: false,
       confirmSeedSaved: false,
-      seed: PassPhraseGenerator.generatePassPhrase(256),
+      seed: passphraseGenerator.generatePassPhrase(256),
       pristine: true,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
@@ -35,7 +35,7 @@ class CreateSeed extends React.Component {
 
   componentWillMount() {
     this.setState({
-      seed: PassPhraseGenerator.generatePassPhrase(256),
+      seed: passphraseGenerator.generatePassPhrase(256),
     });
   }
 
