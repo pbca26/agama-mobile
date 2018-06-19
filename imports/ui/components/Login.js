@@ -189,12 +189,11 @@ class Login extends React.Component {
         this.props.activeSection !== 'offlinesig' &&
         this.props.activeSection !== 'pin') {
       return (
-        <div className="login">
-          <div className="login-inner">
-            <div className="signintoyourcryp">Sign In to your Agama account.</div>
+        <div className="form">
+          <div className="form-inner">
+            <div className="title">Sign In to your Agama account.</div>
             <div className="group">
-              <img className="rectangle10" src="/images/template/login/reset-password-rectangle-10.png" />
-              <div className="exampleexamplecom">
+              <div className="edit">
                 <input
                   type="password"
                   className="form-control margin-bottom-30"
@@ -213,7 +212,7 @@ class Login extends React.Component {
               onClick={ () => this.login(true) }
               className="group3">
               <div className="rectangle10copy"></div>
-              <div className="signin">Sign In</div>
+              <div className="btn">Sign In</div>
               <div className="group2">
                 <div className="rectangle8copy"></div>
                 <img className="path6" src="/images/template/login/reset-password-path-6.png" />
