@@ -16,6 +16,7 @@ class Pin extends React.Component {
     super();
     this.state = {
       passphrase: null,
+      passphraseTooShort: false,
       pinOverride: null,
       pinOverrideTooShort: false,
       pinSet: false,
@@ -62,81 +63,93 @@ class Pin extends React.Component {
   }
 
   save() {
-    if (this.state.pinOverride.length >= 6) {
-      const _encryptedKey = encryptkey(this.state.pinOverride, this.state.passphrase);
-
-      setLocalStorageVar('seed', { encryptedKey: _encryptedKey });
+    if (!this.state.passphrase) {
       this.setState({
-        pinSet: true,
-        pinOverrideTooShort: false,
-        qrScanError: false,
+        passphraseTooShort: true,
       });
-
-      setTimeout(() => {
-        this.setState(this.defaultState);
-        this.props.changeActiveSection('login');
-      }, 500);
     } else {
-      this.setState({
-        pinOverrideTooShort: true,
-        qrScanError: false,
-      });
+      if (this.state.pinOverride &&
+          this.state.pinOverride.length >= 6) {
+        const _encryptedKey = encryptkey(this.state.pinOverride, this.state.passphrase);
+
+        setLocalStorageVar('seed', { encryptedKey: _encryptedKey });
+        this.setState({
+          pinSet: true,
+          pinOverrideTooShort: false,
+          qrScanError: false,
+          passphraseTooShort: false,
+        });
+
+        setTimeout(() => {
+          this.setState(this.defaultState);
+          this.props.changeActiveSection('login');
+        }, 500);
+      } else {
+        this.setState({
+          pinOverrideTooShort: true,
+          qrScanError: false,
+          passphraseTooShort: false,
+        });
+      }
     }
   }
 
   render() {
     return (
-      <div className="col-sm-12">
-        <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12">
-          <div className="row">
-            <h4 className="padding-bottom-15">Override PIN</h4>
-            <div className="padding-bottom-20">
-            Provide a seed and enter 6 digit PIN number in the form below.
-            </div>
-            <button
-              className="btn btn-default btn-scan-qr margin-bottom-30"
-              onClick={ this.scanQR }>
-              <i className="fa fa-qrcode"></i>
-              { translate('SEND.SCAN_QR') }
-            </button>
-            { this.state.qrScanError &&
-              <div className="col-lg-12">
-                <div className="error margin-top-15">
-                  <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
-                </div>
-              </div>
-            }
-            <input
-              type="password"
-              className="form-control margin-bottom-10"
-              name="passphrase"
-              onChange={ this.updateInput }
-              placeholder={ translate('LOGIN.ENTER_PASSPHRASE') + ' or WIF' }
-              value={ this.state.passphrase || '' } />
-            <div className="margin-bottom-25 margin-top-30">
-              <input
-                type="password"
-                className="form-control margin-top-20"
-                name="pinOverride"
-                onChange={ this.updateInput }
-                placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
-                value={ this.state.pinOverride || '' } />
-              { this.state.pinOverrideTooShort &&
-                <div className="error margin-top-15">
-                  <i className="fa fa-warning"></i> { translate('LOGIN.PIN_TOO_SHORT') }
-                </div>
-              }
-            </div>
-            { this.state.pinSet &&
-              <div className="margin-bottom-15 margin-top-15">Seed is encrypted with provided PIN. Use the PIN to login or sign a transaction.</div>
-            }
-            <button
-              className="btn btn-lg btn-primary btn-block ladda-button"
-              onClick={ this.save }>
-              <span className="ladda-label">
-              Save
-              </span>
-            </button>
+      <div className="form pin-override">
+        <div className="margin-top-40 padding-bottom-30 text-center">
+        Provide a seed and enter 6 digit PIN number in the form below.
+        </div>
+        <div
+          onClick={ this.scanQR }
+          className="group3 margin-bottom-10">
+          <div className="rectangle10copy"></div>
+          <div className="btn">{ translate('SEND.SCAN_QR') }</div>
+          <div className="group2">
+            <i className="fa fa-qrcode"></i>
+          </div>
+        </div>
+        { this.state.qrScanError &&
+          <div className="error margin-top-15 text-center">
+            { translate('SEND.QR_SCAN_ERR') } <i className="fa fa-warning"></i>
+          </div>
+        }
+        <div className="edit margin-bottom-10">
+          <input
+            type="password"
+            name="passphrase"
+            onChange={ this.updateInput }
+            placeholder={ translate('LOGIN.ENTER_PASSPHRASE') + ' or WIF' }
+            value={ this.state.passphrase || '' } />
+        </div>
+        { this.state.passphraseTooShort &&
+          <div className="error margin-top-15 text-center">
+            <i className="fa fa-warning"></i> Provide passhprase or WIF
+          </div>
+        }
+        <div className="margin-bottom-25 margin-top-40 edit">
+          <input
+            type="password"
+            name="pinOverride"
+            onChange={ this.updateInput }
+            placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
+            value={ this.state.pinOverride || '' } />
+        </div>
+        { this.state.pinOverrideTooShort &&
+          <div className="error margin-top-15 text-center">
+            <i className="fa fa-warning"></i> { translate('LOGIN.PIN_TOO_SHORT') }
+          </div>
+        }
+        { this.state.pinSet &&
+          <div className="margin-bottom-15 margin-top-15 text-center">Seed is encrypted with provided PIN. Use the PIN to login or sign a transaction.</div>
+        }
+        <div
+          onClick={ this.save }
+          className="group3 margin-top-40">
+          <div className="rectangle10copy"></div>
+          <div className="btn">Save</div>
+          <div className="group2">
+            <i className="fa fa-save"></i>
           </div>
         </div>
       </div>
