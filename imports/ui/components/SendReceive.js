@@ -56,11 +56,6 @@ class SendReceive extends React.Component {
           <div className="receive-qr">
             { this.props.address &&
               <div>
-                <span
-                  className="btn-back"
-                  onClick={ this.toggleQR }>
-                  <i className="fa fa-arrow-left"></i> { translate('DASHBOARD.BACK') }
-                </span>
                 <QRCode
                   value={ this.props.address }
                   size={ 198 } />
@@ -72,7 +67,7 @@ class SendReceive extends React.Component {
         { this.showClaimButton() &&
           <button
             type="button"
-            className="btn btn-info waves-effect waves-light margin-left-20"
+            className="btn btn-info waves-effect waves-light margin-left-20 btn-claim"
             onClick={ this.props.toggleKMDInterest }>
             <i className="fa fa-dollar"></i> { translate('DASHBOARD.CLAIM') }
           </button>
