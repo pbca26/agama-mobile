@@ -105,6 +105,19 @@ export const _lang = {
       'REQ_TO_CLAIM_P2': 'spend transaction was made at least 1 hour ago, locktime field is set and amount is greater than 10 KMD',
       'CLAIM': 'Claim',
     },
+    'APP_TITLE': {
+      'PIN': 'Override PIN',
+      'LOGIN': 'Sign in',
+      'DASHBOARD': 'Dashboard',
+      'OVERVIEW': 'Overview',
+      'SETTINGS': 'Settings',
+      'RECOVERY': 'Recovery',
+      'SEND': 'Send',
+      'OFFLINESIG': 'Offline signing',
+      'ADDCOIN': 'Add coin',
+      'CREATE-SEED': 'Create seed',
+      '': '',
+    },
     'COINS': {
       // asset chains
       'BET': 'BET',
