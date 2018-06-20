@@ -56,48 +56,45 @@ class Settings extends React.Component {
 
   render() {
     return (
-      <div className="col-sm-12">
-        <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12">
-          <div className="row">
-            <h4 className="padding-bottom-15">Settings</h4>
-            <div className="padding-bottom-10">
-              Auto lock timeout
-            </div>
-            <div className="margin-bottom-20">
-              <select
-                className="form-control form-material"
-                name="autoLockTimeout"
-                value={ this.state.autoLockTimeout }
-                onChange={ (event) => this.updateInput(event) }
-                autoFocus>
-                <option value="600000">10 minutes</option>
-                <option value="1200000">20 minutes</option>
-                <option value="1800000">30 minutes</option>
-              </select>
-            </div>
-            <div className="margin-bottom-40 margin-top-45">
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  value="on"
-                  checked={ this.state.requirePin } />
-                <div
-                  className="slider"
-                  onClick={ this.toggleConfirmPin }></div>
-              </label>
-              <div
-                className="toggle-label"
-                onClick={ this.toggleConfirmPin }>
-                Require PIN to confirm transaction
-              </div>
-            </div>
-            <button
-              className="btn btn-lg btn-primary btn-block ladda-button"
-              onClick={ this.save }>
-              <span className="ladda-label">
-              Save
-              </span>
-            </button>
+      <div className="form settings">
+        <div className="margin-top-20 item">
+          <div className="padding-bottom-20">
+            Auto lock timeout
+          </div>
+          <select
+            className="form-control form-material"
+            name="autoLockTimeout"
+            value={ this.state.autoLockTimeout }
+            onChange={ (event) => this.updateInput(event) }
+            autoFocus>
+            <option value="600000">10 minutes</option>
+            <option value="1200000">20 minutes</option>
+            <option value="1800000">30 minutes</option>
+          </select>
+        </div>
+        <div className="item last">
+          <label className="switch">
+            <input
+              type="checkbox"
+              value="on"
+              checked={ this.state.requirePin } />
+            <div
+              className="slider"
+              onClick={ this.toggleConfirmPin }></div>
+          </label>
+          <div
+            className="toggle-label"
+            onClick={ this.toggleConfirmPin }>
+            Require PIN to confirm transaction
+          </div>
+        </div>
+        <div
+          onClick={ this.save }
+          className="group3 margin-top-25">
+          <div className="rectangle10copy"></div>
+          <div className="btn">Save</div>
+          <div className="group2">
+            <i className="fa fa-save"></i>
           </div>
         </div>
       </div>

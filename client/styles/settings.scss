@@ -1,0 +1,22 @@
+.form.settings {
+  .group3 {
+    top: 0;
+    left: 0;
+    position: relative;
+    margin: 0 auto;
+
+    .fa {
+      font-size: 20px;
+      position: relative;
+      top: -4px;
+    }
+  }
+  .item {
+    border-bottom: solid 2px #5F6277;
+    padding: 30px 0 40px 10px;
+
+    &.last {
+      border: none;
+    }
+  }
+}
