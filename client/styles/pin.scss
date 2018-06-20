@@ -1,0 +1,30 @@
+.form.pin-override {
+  .seed-gen-box {
+    background-color: #373A4C;
+    height: auto;
+    width: auto;
+    margin: 0;
+    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+    font-size: 16.0px;
+    color: #fff;
+    text-align: left;
+    line-height: 26px;
+    padding: 20px 20px;
+  }
+  .edit {
+    width: 95%;
+    padding: 10px 10px 10px 10px;
+  }
+  .group3 {
+    top: 0;
+    left: 0;
+    position: relative;
+    margin: 0 auto;
+
+    .fa {
+      font-size: 20px;
+      position: relative;
+      top: -4px;
+    }
+  }
+}
