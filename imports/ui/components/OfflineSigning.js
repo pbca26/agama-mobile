@@ -1,3 +1,5 @@
+// TODO
+
 import React from 'react';
 import { translate } from '../translate/translate';
 import jsQR from 'jsqr';

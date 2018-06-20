@@ -19,11 +19,11 @@ class ServerSelect extends React.Component {
   componentWillMount() {
     this.props.getServersList()
     .then((res) => {
-      const _coin = this.props.coin === 'kmd' ? 'komodo' : this.props.coin;
+      const _coin = this.props.coin;
 
       this.setState({
-        selectedOption: res[_coin].ip + ':' + res[_coin].port,
-        electrumServer: res[_coin].ip + ':' + res[_coin].port,
+        selectedOption: res[_coin].ip + ':' + res[_coin].port + ':' + res[_coin].proto,
+        electrumServer: res[_coin].ip + ':' + res[_coin].port + ':' + res[_coin].proto,
         serverList: res[_coin].serverList,
       });
     });
@@ -41,7 +41,7 @@ class ServerSelect extends React.Component {
     const _server = this.state.selectedOption.split(':');
 
     this.props.setDefaultServer(
-      this.props.coin === 'kmd' ? 'komodo' : this.props.coin,
+      this.props.coin,
       _server[1],
       _server[0]
     ).then((res) => {
@@ -77,12 +77,11 @@ class ServerSelect extends React.Component {
 
   render() {
     return (
-      <div className="con-error">
+      <div className="margin-top-40 form server-select">
         <span className="bold">
           <i className="fa fa-warning error"></i> <span className="error">{ translate('DASHBOARD.CON_ERROR', this.props.coin.toUpperCase()) }</span>
         </span>
-        <div>
-          <hr />
+        <div className="server-select-inner">
           <div>
             <select
               className="form-control form-material"
@@ -103,13 +102,14 @@ class ServerSelect extends React.Component {
             { translate('DASHBOARD.CONNECTING_TO_NEW_SERVER') }
             </div>
           }
-          <div className="margin-top-30 center">
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={ this.setElectrumServer }>
-                { translate('DASHBOARD.SWITCH_SERVER') }
-            </button>
+          <div
+            onClick={ this.setElectrumServer }
+            className="group3 margin-top-50">
+            <div className="rectangle10copy"></div>
+            <div className="btn">{ translate('DASHBOARD.SWITCH_SERVER') }</div>
+            <div className="group2">
+              <i className="fa fa-eye"></i>
+            </div>
           </div>
         </div>
       </div>
