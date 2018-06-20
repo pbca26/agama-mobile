@@ -45,13 +45,14 @@ class App extends React.Component {
       coin: null,
       coins: {},
       pubKeys: {},
-      activeSection: null,
+      activeSection: 'login',
       saveSeed: null,
       auth: false,
       updateInterval: null,
       conError: false,
       proxyError: false,
       overview: null,
+      history: null,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.login = this.login.bind(this);
@@ -80,6 +81,8 @@ class App extends React.Component {
     this.globalClick = this.globalClick.bind(this);
     this.globalClickTimeout = null;
     this.overviewInterval = null;
+    this.historyBack = this.historyBack.bind(this);
+    this.scrollToTop = this.scrollToTop.bind(this);
   }
 
   componentWillMount() {
@@ -92,7 +95,15 @@ class App extends React.Component {
     }
   }
 
+  historyBack() {
+    this.setState({
+      activeSection: this.state.history,
+      history: null,
+    });
+  }
+
   scrollToTop() {
+    console.warn(this.state);
     window.scrollTo(0, 0);
   }
 
@@ -123,9 +134,11 @@ class App extends React.Component {
       const serverDetails = randomServer.split(':');
 
       if (serverDetails.length === 3) {
-        server.ip = serverDetails[0];
-        server.port = serverDetails[1];
-        server.proto = serverDetails[2];
+        server = {
+          ip: serverDetails[0],
+          port: serverDetails[1],
+          proto: serverDetails[2],
+        };
       }
     }
 
@@ -146,6 +159,7 @@ class App extends React.Component {
       .then((res) => {
         this.setState({
           coins,
+          history: this.state.activeSection,
           activeSection: 'dashboard',
           coin,
           address: res,
@@ -162,6 +176,7 @@ class App extends React.Component {
 
     this.setState({
       utxo: null,
+      history: this.state.activeSection,
       activeSection: 'claim',
     });
 
@@ -178,10 +193,12 @@ class App extends React.Component {
     if (toggleMenu) {
       this.setState({
         displayMenu: false,
+        history: this.state.activeSection,
         activeSection: section,
       });
     } else {
       this.setState({
+        history: this.state.activeSection,        
         activeSection: section,
       });
     }
@@ -194,6 +211,7 @@ class App extends React.Component {
     this.setState({
       coin: coin,
       address: this.state.pubKeys[coin],
+      history: this.state.activeSection,
       activeSection: this.state.activeSection !== 'send' ? 'dashboard' : 'send',
     });
 
@@ -361,6 +379,7 @@ class App extends React.Component {
         pubKeys: res,
         coin,
         address,
+        history: this.state.activeSection,
         activeSection: 'dashboard',
       });
 
@@ -385,6 +404,7 @@ class App extends React.Component {
     }, 10);
 
     this.setState({
+      history: this.state.activeSection,
       activeSection: this.state.activeSection === 'settings' ? 'dashboard' : 'settings',
     });
     this.scrollToTop();
@@ -422,6 +442,7 @@ class App extends React.Component {
     }, 10);
 
     this.setState({
+      history: this.state.activeSection,
       activeSection: this.state.activeSection === 'overview' ? 'dashboard' : 'overview',
     });
     this.scrollToTop();
@@ -433,6 +454,7 @@ class App extends React.Component {
     }, 10);
 
     this.setState({
+      history: this.state.activeSection,
       activeSection: this.state.activeSection === 'recovery' ? 'dashboard' : 'recovery',
     });
     this.scrollToTop();
@@ -444,6 +466,7 @@ class App extends React.Component {
     }, 10);
 
     this.setState({
+      history: this.state.activeSection,
       activeSection: this.state.activeSection === 'pin' ? 'dashboard' : 'pin',
     });
     this.scrollToTop();
@@ -455,6 +478,7 @@ class App extends React.Component {
     }, 10);
 
     this.setState({
+      history: this.state.activeSection,
       activeSection: this.state.activeSection === 'offlinesig' ? 'dashboard' : 'offlinesig',
     });
     this.scrollToTop();
@@ -466,6 +490,7 @@ class App extends React.Component {
     }, 10);
 
     this.setState({
+      history: this.state.activeSection,
       activeSection: this.state.activeSection === 'send' ? 'dashboard' : 'send',
     });
     this.scrollToTop();
@@ -477,6 +502,7 @@ class App extends React.Component {
     }, 10);
 
     this.setState({
+      history: this.state.activeSection,
       activeSection: this.state.activeSection === 'addcoin' ? 'dashboard' : 'addcoin',
     });
     this.scrollToTop();
@@ -488,6 +514,7 @@ class App extends React.Component {
     }, 10);
 
     this.setState({
+      history: this.state.activeSection,
       activeSection: this.state.activeSection === 'create-seed' ? 'dashboard' : 'create-seed',
     });
     this.scrollToTop();
@@ -499,6 +526,7 @@ class App extends React.Component {
     }, 10);
 
     this.setState({
+      history: this.state.activeSection,
       activeSection: this.state.activeSection === 'login' ? 'dashboard' : 'login',
     });
     this.scrollToTop();
@@ -543,68 +571,6 @@ class App extends React.Component {
     return _items;
   }
 
-/*
-        <div className="nav-menu">
-          <div
-            onClick={ this.toggleMenu }
-            className="nav-menu-overlay"></div>
-          <div
-            id="nav-menu-inner"
-            className="nav-menu-inner">
-            <i
-              onClick={ this.toggleMenu }
-              className="fa fa-bars"></i>
-            { this.state.auth &&
-              <div className="nav-menu-items">
-                { this.state.activeSection !== 'overview' &&
-                  <div onClick={ this.toggleOverview }>Overview</div>
-                }
-                { this.state.activeSection !== 'dashboard' &&
-                  <div onClick={ () => this.changeActiveSection('dashboard', true) }>{ translate('DASHBOARD.DASHBOARD') }</div>
-                }
-                { this.state.activeSection !== 'recovery' &&
-                  <div onClick={ this.toggleRecovery }>Recovery</div>
-                }
-                { this.state.activeSection !== 'settings' &&
-                  <div onClick={ this.toggleSettings }>Settings</div>
-                }
-                <div onClick={ this.logout }>{ translate('DASHBOARD.LOGOUT') }</div>
-                <div onClick={ this.lock }>{ translate('DASHBOARD.LOCK') }</div>
-                { this.state.activeSection !== 'addcoin' &&
-                  Object.keys(this.state.coins).length !== Object.keys(electrumServers).length &&
-                  <div onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.ADD_COIN') }</div>
-                }
-                <div>
-                { this.renderActiveCoins() }
-                </div>
-              </div>
-            }
-            { !this.state.auth &&
-              <div className="nav-menu-items">
-                { (this.state.activeSection === 'addcoin' || this.state.activeSection === 'create-seed') &&
-                  <div onClick={ this.toggleLogin }>{ translate('DASHBOARD.LOGIN') }</div>
-                }
-                { this.state.activeSection !== 'addcoin' &&
-                  <div onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.ADD_COIN') }</div>
-                }
-                { this.state.activeSection !== 'create-seed' &&
-                  <div onClick={ this.toggleCreateSeed }>{ translate('DASHBOARD.CREATE_SEED') }</div>
-                }
-                { this.state.activeSection !== 'pin' &&
-                  <div onClick={ this.togglePin }>PIN override</div>
-                }
-                { this.state.activeSection !== 'offlinesig' &&
-                  <div onClick={ this.toggleOffileSig }>Offline Signing</div>
-                }
-                { (this.state.activeSection === 'offlinesig' || this.state.activeSection === 'pin') &&
-                  <div onClick={ this.toggleLogin }>Login</div>
-                }
-              </div>
-            }
-          </div>
-        </div>
-*/
-
   renderMenu() {
     if (this.state.displayMenu) {
       return (
@@ -612,14 +578,20 @@ class App extends React.Component {
           <div className="sidemenu">
             <div className="sidemenu-inner">
               <div className="group">
-                  <img className="rectangle9copy3" src="/images/template/menu/sidemenu-rectangle-9-copy-3.png" />
-                  <img className="rectangle9copy2" src="/images/template/menu/sidemenu-rectangle-9-copy-2.png" />
-                  <img className="rectangle9copy" src="/images/template/menu/sidemenu-rectangle-9-copy.png" />
+                <img
+                  className="rectangle9copy3"
+                  src="/images/template/menu/sidemenu-rectangle-9-copy-3.png" />
+                <img
+                  className="rectangle9copy2"
+                  src="/images/template/menu/sidemenu-rectangle-9-copy-2.png" />
+                <img
+                  className="rectangle9copy"
+                  src="/images/template/menu/sidemenu-rectangle-9-copy.png" />
               </div>
               <div className="menu">Menu</div>
               <img
                 onClick={ this.toggleMenu }
-                className="combinedshape"
+                className="menu-back"
                 src="/images/template/menu/trends-combined-shape.png" />
               { this.state.auth &&
                 <div className="items">
@@ -628,7 +600,9 @@ class App extends React.Component {
                       <div
                         className="title"
                         onClick={ this.toggleOverview }>Overview</div>
-                      <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                      <img
+                        className="line"
+                        src="/images/template/menu/sidemenu-rectangle-3.png" />
                     </div>
                   }
                   { this.state.activeSection !== 'dashboard' &&
@@ -636,7 +610,9 @@ class App extends React.Component {
                       <div
                         className="title"
                         onClick={ () => this.changeActiveSection('dashboard', true) }>{ translate('DASHBOARD.DASHBOARD') }</div>
-                      <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                      <img
+                        className="line"
+                        src="/images/template/menu/sidemenu-rectangle-3.png" />
                     </div>
                   }
                   { this.state.activeSection !== 'recovery' &&
@@ -644,7 +620,9 @@ class App extends React.Component {
                       <div
                         className="title"
                         onClick={ this.toggleRecovery }>Recovery</div>
-                      <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                      <img
+                        className="line"
+                        src="/images/template/menu/sidemenu-rectangle-3.png" />
                     </div>
                   }
                   { this.state.activeSection !== 'settings' &&
@@ -652,20 +630,26 @@ class App extends React.Component {
                       <div
                         className="title"
                         onClick={ this.toggleSettings }>Settings</div>
-                      <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                      <img
+                        className="line"
+                        src="/images/template/menu/sidemenu-rectangle-3.png" />
                     </div>
                   }
                   <div className="item">
                     <div
                       className="title"
                       onClick={ this.logout }>{ translate('DASHBOARD.LOGOUT') }</div>
-                    <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                    <img
+                      className="line"
+                      src="/images/template/menu/sidemenu-rectangle-3.png" />
                   </div>
                   <div className="item">
                     <div
                       className="title"
                       onClick={ this.lock }>{ translate('DASHBOARD.LOCK') }</div>
-                    <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                    <img
+                      className="line"
+                      src="/images/template/menu/sidemenu-rectangle-3.png" />
                   </div>
                   { this.state.activeSection !== 'addcoin' &&
                     Object.keys(this.state.coins).length !== Object.keys(electrumServers).length &&
@@ -673,7 +657,9 @@ class App extends React.Component {
                       <div
                         className="title"
                         onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.ADD_COIN') }</div>
-                      <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                      <img
+                        className="line"
+                        src="/images/template/menu/sidemenu-rectangle-3.png" />
                     </div>
                   }
                   <div>
@@ -688,7 +674,9 @@ class App extends React.Component {
                     <div
                       className="title"
                       onClick={ this.toggleLogin }>{ translate('DASHBOARD.LOGIN') }</div>
-                    <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                    <img
+                      className="line"
+                      src="/images/template/menu/sidemenu-rectangle-3.png" />
                   </div>
                 }
                 { this.state.activeSection !== 'addcoin' &&
@@ -696,7 +684,9 @@ class App extends React.Component {
                     <div
                       className="title"
                       onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.ADD_COIN') }</div>
-                    <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                    <img
+                      className="line"
+                      src="/images/template/menu/sidemenu-rectangle-3.png" />
                   </div>
                 }
                 { this.state.activeSection !== 'create-seed' &&
@@ -704,7 +694,9 @@ class App extends React.Component {
                     <div
                       className="title"
                       onClick={ this.toggleCreateSeed }>{ translate('DASHBOARD.CREATE_SEED') }</div>
-                    <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                    <img
+                      className="line"
+                      src="/images/template/menu/sidemenu-rectangle-3.png" />
                   </div>
                 }
                 { this.state.activeSection !== 'pin' &&
@@ -712,7 +704,9 @@ class App extends React.Component {
                     <div
                       className="title"
                       onClick={ this.togglePin }>PIN override</div>
-                    <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                    <img
+                      className="line"
+                      src="/images/template/menu/sidemenu-rectangle-3.png" />
                   </div>
                 }
                 { /*this.state.activeSection !== 'offlinesig' &&
@@ -728,7 +722,9 @@ class App extends React.Component {
                     <div
                       className="title"
                       onClick={ this.toggleLogin }>Login</div>
-                    <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                    <img
+                      className="line"
+                      src="/images/template/menu/sidemenu-rectangle-3.png" />
                   </div>
                 }
               </div>
@@ -748,11 +744,17 @@ class App extends React.Component {
         className="app-container"
         onClick={ this.globalClick }>
         <div className="app-header">
+          { this.state.history &&
+            <img
+              onClick={ this.historyBack }
+              className="menu-back"
+              src="/images/template/menu/trends-combined-shape.png" />
+          }
           <img
             onClick={ this.toggleMenu }
-            className="combinedshape"
+            className="menu-icon"
             src="/images/template/home/home-combined-shape.png" />
-          <div className="ui-title">{ this.state.activeSection }</div>
+          <div className="ui-title">{ translate('APP_TITLE.' + this.state.activeSection.toUpperCase()) }</div>
         </div>
         <div className="app-main">
           { (this.state.activeSection !== 'pin' || this.state.activeSection !== 'offlinesig') &&
