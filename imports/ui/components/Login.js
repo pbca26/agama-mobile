@@ -222,7 +222,7 @@ class Login extends React.Component {
             </div>
           }
           { !getLocalStorageVar('seed') &&
-            <div className="form-inner">
+            <div className="form-inner login-create-pin">
               <div className="title">Create a pin to Sign In.</div>
               <div>
                 <div

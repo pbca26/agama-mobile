@@ -94,10 +94,10 @@ class Transactions extends React.Component {
 
     return (
       <span>
-        { formatValue(tx.amount) * _amountNegative || translate('TRANSACTIONS.UNKNOWN') }
+        { formatValue(tx.amount) * _amountNegative || translate('TRANSACTIONS.UNKNOWN') } { this.props.coin.toUpperCase() }
         { tx.interest &&
           !amountOnly &&
-          <span className="tx-interest margin-left-15">(+{ formatValue(Math.abs(tx.interest)) })</span>
+          <div className="tx-interest">+{ formatValue(Math.abs(tx.interest)) }</div>
         }
       </span>
     );
@@ -117,7 +117,7 @@ class Transactions extends React.Component {
               <div className="direction">{ _transactions[i].type }</div>
               <div className="date">{ secondsToString(_transactions[i].timestamp) }</div>
               { /*<div className="amount-fiat">$0</div> */ }
-              <div className="amount-native">{ this.renderTxAmount(_transactions[i]) } { this.props.coin.toUpperCase() }</div>
+              <div className="amount-native">{ this.renderTxAmount(_transactions[i]) }</div>
               <div className="direction-icon"></div>
               <img className="line" src="/images/template/transactions/trends-rectangle-7.png" />
             </div>
