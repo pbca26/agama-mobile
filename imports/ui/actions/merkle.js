@@ -82,9 +82,9 @@ const verifyMerkle = (txid, height, serverList, electrumServer, proxyServer) => 
 
           HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getblockinfo`, {
             params: {
-              port: _randomServer[1],
               ip: _randomServer[0],
-              proto: electrumServer.proto,
+              port: _randomServer[1],
+              proto: _randomServer[2],
               height,
             },
           }, (error, result) => {
@@ -137,7 +137,7 @@ export const verifyMerkleByCoin = (txid, height, electrumServer, proxyServer) =>
       let _filteredServerList = [];
 
       for (let i = 0; i < _serverList.length; i++) {
-        if (_serverList[i] !== electrumServer.ip + ':' + electrumServer.port) {
+        if (_serverList[i] !== electrumServer.ip + ':' + electrumServer.port + ':' + electrumServer.proto) {
           _filteredServerList.push(_serverList[i]);
         }
       }
@@ -148,7 +148,8 @@ export const verifyMerkleByCoin = (txid, height, electrumServer, proxyServer) =>
         _filteredServerList,
         electrumServer,
         proxyServer
-      ).then((proof) => {
+      )
+      .then((proof) => {
         resolve(proof);
       });
     } else {

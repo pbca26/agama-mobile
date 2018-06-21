@@ -74,7 +74,8 @@ const sendtx = (network, outputAddress, value, verify, push) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
       const changeAddress = electrumKeys[network].pub;
-      const _electrumServer = getLocalStorageVar('coins')[network].server;
+      let _electrumServer = getLocalStorageVar('coins')[network].server;
+      _electrumServer.serverList = electrumServers[network].serverList;
 
       createtx(
         proxyServer,
@@ -98,7 +99,8 @@ const sendtx = (network, outputAddress, value, verify, push) => {
 const transactions = (network) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
-      const _electrumServer = getLocalStorageVar('coins')[network].server;
+      let _electrumServer = getLocalStorageVar('coins')[network].server;
+      _electrumServer.serverList = electrumServers[network].serverList;
 
       listtransactions(
         proxyServer,
@@ -117,7 +119,8 @@ const transactions = (network) => {
 const balance = (network) => {
   return async (dispatch) => {
     const address = electrumKeys[network].pub;
-    const _electrumServer = getLocalStorageVar('coins')[network].server;
+    let _electrumServer = getLocalStorageVar('coins')[network].server;
+    _electrumServer.serverList = electrumServers[network].serverList;
 
     return new Promise((resolve, reject) => {
       HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`, {
@@ -158,7 +161,8 @@ const balance = (network) => {
 
 const kmdUnspents = () => {
   return async (dispatch) => {
-    const _electrumServer = getLocalStorageVar('coins').kmd.server;
+    let _electrumServer = getLocalStorageVar('coins').kmd.server;
+    _electrumServer.serverList = electrumServers.kmd.serverList;
 
     return new Promise((resolve, reject) => {
       listunspent(

@@ -183,25 +183,27 @@
 }
 
 .form.login {
-  .scan-qr {
-    top: 0;
-  }
-  .title {
-    padding: 30px 0;
-    top: 0;
-  }
-  .group {
-    position: inherit;
-    top: 0;
-    left: 0;
-    height: 40px;
-
-    input {
-      width: 100%;
+  .login-create-pin {
+    .scan-qr {
+      top: 0;
     }
-  }
-  .group3:last-child {
-    top: 0;
-    margin-top: 60px;
+    .title {
+      padding: 30px 0;
+      top: 0;
+    }
+    .group {
+      position: inherit;
+      top: 0;
+      left: 0;
+      height: 40px;
+
+      input {
+        width: 100%;
+      }
+    }
+    .group3:last-child {
+      top: 0;
+      margin-top: 60px;
+    }
   }
 }
