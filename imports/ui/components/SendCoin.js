@@ -20,7 +20,7 @@ class SendCoin extends React.Component {
       sendAmount: 0,
       sendTo: '',
       sendCurrentStep: 0,
-      sendResult: null,
+      sendResult: {},
       spvVerificationWarning: false,
       spvPreflightSendInProgress: false,
       validNan: false,
@@ -29,6 +29,7 @@ class SendCoin extends React.Component {
       qrScanError: false,
       wrongPin: false,
       pin: '',
+      processing: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.changeSendCoinStep = this.changeSendCoinStep.bind(this);
@@ -37,6 +38,18 @@ class SendCoin extends React.Component {
     this.validate = this.validate.bind(this);
     this.decodeSeed = this.decodeSeed.bind(this);
     this.openExternalURL = this.openExternalURL.bind(this);
+  }
+
+  renderTxID() {
+    const _txid1 = this.state.sendResult.result.txid.substr(0, 31);
+    const _txid2 = this.state.sendResult.result.txid.substr(31, 64);
+
+    return (
+      <div>
+        <div>{ _txid1 }</div>
+        <div>{ _txid2 }</div>
+      </div>
+    );
   }
 
   decodeSeed() {
@@ -112,26 +125,23 @@ class SendCoin extends React.Component {
 
   validate() {
     let _isFailed = false;
+    let validTooMuch = false;
+    let validIncorrectAddress = false;
+    let validNan = false;
 
     if (this.state.sendAmount > this.props.balance.balance) {
-      this.setState({
-        validTooMuch: true,
-      });
+      validTooMuch = true;
       _isFailed = true;
     }
 
     if (this.state.sendTo.length < 34 ||
         this.state.sendTo.length > 36) {
-      this.setState({
-        validIncorrectAddress: true,
-      });
+      validIncorrectAddress = true;
       _isFailed = true;
     }
 
     if (!isNumber(this.state.sendAmount)) {
-      this.setState({
-        validNan: true,
-      });
+      validNan = true;
       _isFailed = true;
     }
 
@@ -142,10 +152,17 @@ class SendCoin extends React.Component {
       _isFailed = true;
     }
 
+    this.setState({
+      validTooMuch,
+      validIncorrectAddress,
+      validNan,
+    });
+
     return _isFailed;
   }
 
   changeSendCoinStep(step, back) {
+    console.warn(step);
     if (back) {
       this.setState({
         sendCurrentStep: step,
@@ -156,6 +173,7 @@ class SendCoin extends React.Component {
         wrongPin: false,
       });
     } else {
+      console.warn(this.validate());
       if (!this.validate()) {
         switch(step) {
           case 0:
@@ -196,6 +214,7 @@ class SendCoin extends React.Component {
           case 2:
             this.setState({
               sendCurrentStep: 2,
+              processing: true,
             });
 
             this.props.sendtx(
@@ -211,6 +230,7 @@ class SendCoin extends React.Component {
 
               this.setState({
                 sendResult: res,
+                processing: false,
               });
             });
             break;
@@ -222,19 +242,16 @@ class SendCoin extends React.Component {
   sendFormRender() {
     return (
       <form
-        className="extcoin-send-form"
         method="post"
         autoComplete="off">
-        <div className="row">
-          <div className="col-xlg-12 form-group form-material">
-            <label className="control-label padding-bottom-10">
-              { translate('SEND.FROM') } <strong>[{ formatValue(this.props.balance.balance) } { this.props.coin.toUpperCase() }]</strong>
-            </label>
-            <div>{ this.props.address }</div>
-          </div>
+        <div className="edit">
+          <label className="control-label padding-bottom-10">
+            { translate('SEND.FROM') } <strong>[ { formatValue(this.props.balance.balance) } { this.props.coin.toUpperCase() } ]</strong>
+          </label>
+          <div className="shade">{ this.props.address }</div>
         </div>
         <div className="row">
-          <div className="col-xlg-12 form-group form-material">
+          <div className="edit">
             <label
               className="control-label"
               htmlFor="kmdWalletSendTo">{ translate('SEND.TO') }</label>
@@ -254,7 +271,7 @@ class SendCoin extends React.Component {
             </div>
           }
           </div>
-          <div className="col-lg-12 form-group form-material">
+          <div className="edit">
             <label
               className="control-label"
               htmlFor="kmdWalletAmount">
@@ -281,20 +298,25 @@ class SendCoin extends React.Component {
             }
           </div>
           { this.state.qrScanError &&
-            <div className="col-lg-12">
-              <div className="error margin-top-15">
-                <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
-              </div>
+            <div className="error margin-top-15 text-center">
+              <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
             </div>
           }
-          <div className="col-lg-12">
-            <button
-              type="button"
-              className="btn btn-primary waves-effect waves-light pull-right"
+          <div>
+            <div
+              disabled={
+                !this.state.sendTo ||
+                !this.state.sendAmount
+              }
               onClick={ () => this.changeSendCoinStep(1) }
-              disabled={ !this.state.sendTo || !this.state.sendAmount }>
-              { translate('SEND.SEND') } { this.state.sendAmount } { this.state.coin }
-            </button>
+              className="group3 margin-top-50">
+              <div className="rectangle10copy"></div>
+              <div className="btn">{ translate('SEND.SEND') }</div>
+              <div className="group2">
+                <div className="rectangle8copy"></div>
+                <img className="path6" src="/images/template/login/reset-password-path-6.png" />
+              </div>
+            </div>
           </div>
         </div>
       </form>
@@ -304,208 +326,160 @@ class SendCoin extends React.Component {
   render() {
     if (this.props.activeSection === 'send') {
       return (
-        <div className="col-sm-12 send">
-          <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12 btn-back-block">
-            <span
-              className="btn-back"
-              onClick={ () => this.props.changeActiveSection('dashboard') }>
-              <i className="fa fa-arrow-left"></i> { translate('DASHBOARD.BACK') }
-            </span>
+        <div className="form send">
+          <div className="steps margin-top-10">
+            <div className={ 'step' + (this.state.sendCurrentStep === 0 ? ' current' : '') }></div>
+            <div className={ 'step' + (this.state.sendCurrentStep === 1 ? ' current' : '') }></div>
+            <div className={ 'step' + (this.state.sendCurrentStep === 2 ? ' current' : '') }></div>
           </div>
-          <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12 steps-counter">
-            <div className="steps row margin-top-10">
-              <div className={ 'step col-md-4' + (this.state.sendCurrentStep === 0 ? ' current' : '') }>
-                <span className="step-number">1</span>
-              </div>
-              <div className={ 'step col-md-4' + (this.state.sendCurrentStep === 1 ? ' current' : '') }>
-                <span className="step-number">2</span>
-              </div>
-              <div className={ 'step col-md-4' + (this.state.sendCurrentStep === 2 ? ' current' : '') }>
-                <span className="step-number">3</span>
+
+          <div className={ 'send-step' + (this.state.sendCurrentStep === 0 ? '' : ' hide') }>
+            <div className="margin-bottom-40">
+              <div className="step-title">{ translate('SEND.FILL_IN_DETAILS') }</div>
+              <div
+                onClick={ this.scanQR }
+                className="scan-qr">
+                <i className="fa fa-qrcode"></i>
               </div>
             </div>
+            { this.sendFormRender() }
           </div>
 
-          <div className={ 'col-xlg-12 col-md-12 col-sm-12 col-xs-12 send-step' + (this.state.sendCurrentStep === 0 ? '' : ' hide') }>
-            <div className="panel">
-              <div className="panel-heading">
-                <div className="margin-bottom-20">
-                  <span className="step-title margin-right-40">{ translate('SEND.FILL_IN_DETAILS') }</span>
-                  <button
-                    className="btn btn-default btn-scan-qr"
-                    onClick={ this.scanQR }>
-                    <i className="fa fa-qrcode"></i>
-                    { translate('SEND.SCAN_QR') }
-                  </button>
-                </div>
+          <div className={ 'send-step' + (this.state.sendCurrentStep === 1 ? '' : ' hide') }>
+            <div className="send-step2">
+              <div className="margin-bottom-35">
+                <div className="step-title">{ translate('SEND.CONFIRM') }</div>
               </div>
-              <div className="panel-body container-fluid">
-              { this.sendFormRender() }
+              <div className="margin-top-5 edit">
+                <strong>{ translate('SEND.TO') }</strong>
+              </div>
+              <div className="edit">
+                <span className="shade">{ this.state.sendTo }</span>
+              </div>
+              <div className="padding-top-15 edit">
+                <strong>{ translate('SEND.AMOUNT') }</strong>
+              </div>
+              <div className="edit">
+                <span className="shade">
+                { this.state.sendAmount } { this.props.coin.toUpperCase() }
+                </span>
               </div>
             </div>
-          </div>
 
-          <div className={ 'col-xlg-12 col-md-12 col-sm-12 col-xs-12 send-step' + (this.state.sendCurrentStep === 1 ? '' : ' hide') }>
-            <div className="panel">
-              <div className="panel-heading">
-                <div className="row">
-                  <div className="col-xs-12 margin-bottom-20">
-                    <span className="step-title">{ translate('SEND.CONFIRM') }</span>
-                  </div>
-                  <div className="col-xs-12 margin-top-5">
-                    <strong>{ translate('SEND.TO') }</strong>
-                  </div>
-                  <div className="col-lg-6 col-sm-6 col-xs-12">{ this.state.sendTo }</div>
-                  <div className="col-lg-6 col-sm-6 col-xs-6 margin-top-10">
-                    { this.state.sendAmount } { this.props.coin.toUpperCase() }
-                  </div>
+            { this.state.spvPreflightSendInProgress &&
+              <div className="padding-top-20 fs14 text-center">{ translate('SEND.SPV_VERIFYING') }...</div>
+            }
+            { this.state.spvVerificationWarning &&
+              <div className="padding-top-20 fs14 lh25">
+                <i className="fa fa-warning warning"></i> <strong className="warning">{ translate('SEND.WARNING') }:</strong> { translate('SEND.WARNING_SPV_P1') }<br />
+                { translate('SEND.WARNING_SPV_P2') }
+              </div>
+            }
+            { getLocalStorageVar('settings') &&
+              getLocalStorageVar('settings').requirePin &&
+              <div className="padding-top-20">
+                <div className="edit pin-confirm">
+                  <input
+                    type="password"
+                    className="form-control"
+                    name="pin"
+                    value={ this.state.pin }
+                    onChange={ this.updateInput }
+                    placeholder="Enter your PIN"
+                    autoComplete="off" />
                 </div>
-
-                { this.state.spvPreflightSendInProgress &&
-                  <div className="padding-top-20">{ translate('SEND.SPV_VERIFYING') }...</div>
-                }
-                { this.state.spvVerificationWarning &&
-                  <div
-                    className="padding-top-20"
-                    style={{ fontSize: '15px' }}>
-                    <i className="fa fa-warning warning"></i> <strong className="warning">{ translate('SEND.WARNING') }:</strong> { translate('SEND.WARNING_SPV_P1') }<br />
-                    { translate('SEND.WARNING_SPV_P2') }
-                  </div>
-                }
-                { getLocalStorageVar('settings') &&
-                  getLocalStorageVar('settings').requirePin &&
-                  <div className="padding-top-20">
-                    <input
-                      type="password"
-                      className="form-control"
-                      name="pin"
-                      value={ this.state.pin }
-                      onChange={ this.updateInput }
-                      placeholder="Enter your PIN"
-                      autoComplete="off" />
-                  </div>
-                }
-                { this.state.wrongPin &&
-                  <div className="error margin-top-15 margin-bottom-25">
-                    <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
-                  </div>
-                }
-                <div className="widget-body-footer">
-                  <a
-                    className="btn btn-default waves-effect waves-light"
-                    onClick={ () => this.changeSendCoinStep(0, true) }>{ translate('SEND.BACK') }</a>
-                  <div className="widget-actions pull-right">
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={ () => this.changeSendCoinStep(2) }>
-                        { translate('SEND.CONFIRM') }
-                    </button>
-                  </div>
+              </div>
+            }
+            { this.state.wrongPin &&
+              <div className="error margin-top-15 margin-bottom-25 fs14">
+                <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
+              </div>
+            }
+            <div className="widget-body-footer">
+              {/*<a
+                className="btn btn-default waves-effect waves-light"
+              onClick={ () => this.changeSendCoinStep(0, true) }>{ translate('SEND.BACK') }</a>*/}
+              <div
+                onClick={ () => this.changeSendCoinStep(2) }
+                className="group3 margin-top-50">
+                <div className="rectangle10copy"></div>
+                <div className="btn">{ translate('SEND.CONFIRM') }</div>
+                <div className="group2">
+                  <div className="rectangle8copy"></div>
+                  <img className="path6" src="/images/template/login/reset-password-path-6.png" />
                 </div>
               </div>
             </div>
           </div>
-
-          <div className={ 'col-xlg-12 col-md-12 col-sm-12 col-xs-12 send-step' + (this.state.sendCurrentStep === 2 ? '' : ' hide') }>
-            <div className="panel">
-              <div className="panel-heading">
-                <h4 className="panel-title">
-                  { translate('SEND.TX_RESULT') }
-                </h4>
-                <div>
-                  { this.state.sendResult &&
-                    this.state.sendResult.msg === 'success' &&
-                    <table className="table table-hover table-striped margin-top-20">
-                      <thead>
-                        <tr>
-                          <th>{ translate('SEND.KEY') }</th>
-                          <th>{ translate('SEND.INFO') }</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>
-                          { translate('SEND.RESULT') }
-                          </td>
-                          <td>
-                            <span className="label label-success">{ translate('SEND.SUCCESS') }</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                          { translate('SEND.FROM') }
-                          </td>
-                          <td>
-                            { this.props.address }
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                          { translate('SEND.TO') }
-                          </td>
-                          <td>
-                            { this.state.sendTo }
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                          { translate('SEND.AMOUNT') }
-                          </td>
-                          <td>
-                            { this.state.sendAmount } { this.props.coin.toUpperCase() }
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Tx ID</td>
-                          <td>{ this.state.sendResult && this.state.sendResult.result && this.state.sendResult.result.txid ? this.state.sendResult.result.txid : translate('SEND.PROCESSING_SM') }</td>
-                        </tr>
-                        <tr>
-                          <td></td>
-                          <td>
-                          { (isAssetChain(this.props.coin) || this.props.coin === 'chips') &&
-                            this.state.sendResult &&
-                            this.state.sendResult.result &&
-                            this.state.sendResult.result.txid &&
-                            <button
-                              onClick={ () => this.openExternalURL(`${explorers[this.props.coin.toUpperCase()]}/tx/${this.state.sendResult.result.txid}`) }
-                              className="margin-left-20 btn btn-sm white btn-dark waves-effect waves-light ext-link">
-                              <i className="fa fa-external-link"></i>Explorer
-                            </button>
-                          }
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  }
-                  { !this.state.sendResult &&
-                    <div className="padding-top-20">{ translate('SEND.PROCESSING_TX') }</div>
-                  }
-                  { this.state.sendResult &&
-                    this.state.sendResult.msg &&
-                    this.state.sendResult.msg === 'error' &&
-                    <div className="padding-top-20">
-                      <div>
-                        <strong>{ translate('SEND.ERROR') }</strong>
-                      </div>
-                      <div>{ this.state.sendResult.result }</div>
-                      { this.state.sendResult.raw &&
-                        this.state.sendResult.raw.txid &&
-                        <div>{ this.state.sendResult.raw.txid.replace(/\[.*\]/, '') }</div>
-                      }
+          <div className={ 'send-step' + (this.state.sendCurrentStep === 2 ? '' : ' hide') }>
+            <div className="step-title">{ translate('SEND.TX_RESULT') }</div>
+            <div className="margin-top-35">
+              { this.state.sendResult &&
+                this.state.sendResult.msg === 'success' &&
+                <div className="send-result">
+                  <div className="edit success">
+                    Success <i className="fa fa-check"></i>
+                  </div>
+                  <div className="edit">
+                    { translate('SEND.FROM') }
+                    <div className="shade margin-top-5">{ this.props.address }</div>
+                  </div>
+                  <div className="edit">
+                    { translate('SEND.TO') }
+                    <div className="shade margin-top-5">{ this.state.sendTo }</div>
+                  </div>
+                  <div className="edit">
+                    { translate('SEND.AMOUNT') }
+                    <div className="shade margin-top-5">{ this.state.sendAmount } { this.props.coin.toUpperCase() }</div>
+                  </div>
+                  <div className="edit">
+                    Transaction ID
+                    <div className="shade margin-top-5">{ this.state.sendResult && this.state.sendResult.result && this.state.sendResult.result.txid ? this.renderTxID() : translate('SEND.PROCESSING_SM') }</div>
+                  </div>
+                  { (isAssetChain(this.props.coin) || this.props.coin === 'chips') &&
+                      this.state.sendResult &&
+                      this.state.sendResult.result &&
+                      this.state.sendResult.result.txid &&
+                    <div className="edit">
+                      <span onClick={ () => this.openExternalURL(`${explorers[this.props.coin.toUpperCase()]}/tx/${this.state.sendResult.result.txid}`) }>
+                        Open in explorer<i className="fa fa-external-link margin-left-10"></i>
+                      </span>
                     </div>
                   }
                 </div>
-                <div className="widget-body-footer">
-                  <div className="widget-actions margin-bottom-15">
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={ () => this.changeSendCoinStep(0) }>
-                        { translate('SEND.MAKE_ANOTHER_TX') }
-                    </button>
+              }
+              { (!this.state.sendResult || this.state.processing) &&
+                <div className="send-result">
+                  <div className="edit">
+                  { translate('SEND.PROCESSING_TX') }
                   </div>
                 </div>
+              }
+              { this.state.sendResult &&
+                this.state.sendResult.msg &&
+                this.state.sendResult.msg === 'error' &&
+                <div className="send-result">
+                  <div className="edit error">
+                  { translate('SEND.ERROR') } <i className="fa fa-close"></i>
+                  </div>
+                  <div className="edit">
+                    <div className="shade">{ this.state.sendResult.result }</div>
+                    { this.state.sendResult.raw &&
+                      this.state.sendResult.raw.txid &&
+                      <div className="shade">{ this.state.sendResult.raw.txid.replace(/\[.*\]/, '') }</div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+            <div
+              onClick={ () => this.changeSendCoinStep(0) }
+              className="group3 margin-top-50">
+              <div className="rectangle10copy"></div>
+              <div className="btn">{ translate('SEND.MAKE_ANOTHER_TX') }</div>
+              <div className="group2">
+                <div className="rectangle8copy"></div>
+                <img className="path6" src="/images/template/login/reset-password-path-6.png" />
               </div>
             </div>
           </div>

@@ -210,7 +210,7 @@ export const coinsList = [
 ];
 
 export const explorers = {
-  KMD: 'http://kmd.komodochainz.info',
+  KMD: 'http://kmdexplorer.ru',
   MSHARK: 'http://MSHARK.explorer.supernet.org',
   REVS: 'http://revs.explorer.supernet.org',
   SUPERNET: 'http://SUPERNET.explorer.supernet.org',

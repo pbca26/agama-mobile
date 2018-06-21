@@ -37,7 +37,7 @@ class SendReceive extends React.Component {
 
   render() {
     return (
-      <div className="margin-top-20 margin-left-10 send-receive-block">
+      <div className="margin-top-20 send-receive-block">
         { this.showSendButton() &&
           <button
             type="button"

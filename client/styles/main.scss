@@ -25,7 +25,7 @@ body {
 }
 
 .error {
-  color: rgba(255, 117, 117, 1.0);
+  color: rgba(255, 117, 117, 1.0) !important;
   font-size: 14px;
 
   .fa {
@@ -35,6 +35,14 @@ body {
 .warning {
   color: #f2a654;
   font-size: 14px;
+}
+.success {
+  color: rgba(142, 204, 96, 1.0) !important;
+  font-size: 14px;
+
+  .fa {
+    margin-right: 5px;
+  }
 }
 .hide {
   display: none;
@@ -53,4 +61,11 @@ div[disabled] {
   .fa {
     margin-right: 5px;
   }
+}
+
+.fs14 {
+  font-size: 14px;
+}
+.lh25 {
+  line-height: 25px;
 }

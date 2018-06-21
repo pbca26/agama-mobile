@@ -1,0 +1,106 @@
+.form.send {
+  .edit {
+    font-size: 14px;
+    width: 95%;
+    padding: 15px 10px 10px 10px;
+
+    input {
+      font-size: 12px;
+      margin-top: 6px;
+      opacity: 0.8;
+    }
+  }
+  .group3 {
+    top: 0;
+    left: 0;
+    position: relative;
+    margin: 0 auto;
+
+    .fa {
+      font-size: 20px;
+      position: relative;
+      top: -4px;
+    }
+  }
+
+  .steps {
+    padding: 22px 0 38px 0;
+    text-align: center;
+
+    div {
+      display: inline-block;
+      margin: 0 5px;
+      height: 12px;
+      width: 12px;
+      border-radius: 50%;
+      background-color: #383a4e;
+
+      &.current {
+        background-color: #fff;
+      }
+    }
+  }
+  .step-title {
+    text-align: center;
+  }
+  .control-label {
+    font-size: 14px;
+    display: block;
+  }
+  .scan-qr {
+    display: inline-block;
+    position: absolute;
+    right: 15px;
+    margin-top: 50px;
+    font-size: 28px;
+  }
+  .shade {
+    opacity: 0.8; 
+  }
+  .table {
+    background-color: #373A4C;
+    padding: 10px 10px;
+    font-size: 14px;
+    width: 100%;
+
+    td {
+      padding-bottom: 20px;
+    }
+  }
+  .send-step2 {
+    .edit {
+      padding: 0 10px 10px 10px;
+    }
+    .margin-top-5.edit,
+    .padding-top-15.edit {
+      padding: 15px 10px 10px 10px;
+    }
+  }
+  .pin-confirm {
+    input {
+      margin-top: 0;
+      opacity: 1;        
+    }
+  }
+  .group3.explorer {
+    height: 72px;
+    width: 200px;
+
+    .rectangle10copy {
+      background: none;
+      border: solid 1px #acaebf;
+      width: 130px;
+    }
+    .btn {
+      font-size: 14px;
+    }
+    .group2 {
+      left: 108px;
+
+      .fa {
+        font-size: 16px;
+        top: -2px;
+      }
+    }
+  }
+}
