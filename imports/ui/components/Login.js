@@ -189,36 +189,116 @@ class Login extends React.Component {
         this.props.activeSection !== 'offlinesig' &&
         this.props.activeSection !== 'pin') {
       return (
-        <div className="form">
-          <div className="form-inner">
-            <div className="title">Sign In to your Agama account.</div>
-            <div className="group">
-              <div className="edit">
-                <input
-                  type="password"
-                  className="form-control margin-bottom-30"
-                  name="pin"
-                  onChange={ this.updateInput }
-                  placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
-                  value={ this.state.pin || '' } />
-                { this.state.wrongPin &&
-                  <div className="error margin-bottom-25">
-                    <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
+        <div className="form login">
+          { getLocalStorageVar('seed') &&
+            <div className="form-inner">
+              <div className="title">Sign In to your Agama account.</div>
+              <div className="group">
+                <div className="edit">
+                  <input
+                    type="password"
+                    className="form-control margin-bottom-30"
+                    name="pin"
+                    onChange={ this.updateInput }
+                    placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
+                    value={ this.state.pin || '' } />
+                  { this.state.wrongPin &&
+                    <div className="error margin-bottom-25">
+                      <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
+                    </div>
+                  }
+                </div>
+              </div>
+              <div
+                onClick={ () => this.login(true) }
+                className="group3">
+                <div className="rectangle10copy"></div>
+                <div className="btn">Sign In</div>
+                <div className="group2">
+                  <div className="rectangle8copy"></div>
+                  <img className="path6" src="/images/template/login/reset-password-path-6.png" />
+                </div>
+              </div>
+            </div>
+          }
+          { !getLocalStorageVar('seed') &&
+            <div className="form-inner">
+              <div className="title">Create a pin to Sign In.</div>
+              <div>
+                <div
+                  onClick={ this.scanQR }
+                  className="group3 margin-bottom-20 scan-qr">
+                  <div className="rectangle10copy"></div>
+                  <div className="btn">{ translate('SEND.SCAN_QR') }</div>
+                  <div className="group2">
+                    <i className="fa fa-qrcode"></i>
+                  </div>
+                </div>
+                { this.state.qrScanError &&
+                  <div className="error margin-top-15 text-center">
+                    <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
                   </div>
                 }
+                <div className="group">
+                  <div className="edit">
+                    <input
+                      type="password"
+                      className="form-control"
+                      name="passphrase"
+                      onChange={ this.updateInput }
+                      placeholder={ translate('LOGIN.ENTER_PASSPHRASE') + ' or WIF' }
+                      value={ this.state.passphrase || '' } />
+                  </div>
+                </div>
+                <div className="margin-bottom-35 margin-top-40">
+                  <label className="switch">
+                    <input
+                      type="checkbox"
+                      value="on"
+                      checked={ this.state.createPin } />
+                    <div
+                      className="slider"
+                      onClick={ this.toggleCreatePin }></div>
+                  </label>
+                  <div
+                    className="toggle-label pointer"
+                    onClick={ this.toggleCreatePin }>
+                    { translate('LOGIN.OVERRIDE_PIN') }
+                  </div>
+                </div>
+              </div>
+              { this.state.createPin &&
+                <div className="group">
+                  <div className="edit">
+                    <input
+                      type="password"
+                      className="form-control margin-bottom-30"
+                      name="pinOverride"
+                      onChange={ this.updateInput }
+                      placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
+                      value={ this.state.pinOverride || '' } />
+                  </div>
+                </div>
+              }
+              { this.state.createPin &&
+                this.state.pinOverrideTooShort &&
+                <div className="error margin-top-15">
+                  <i className="fa fa-warning"></i> { translate('LOGIN.PIN_TOO_SHORT') }
+                </div>
+              }
+              <div
+                disabled={ !this.state.passphrase }
+                onClick={ () => this.login(false) }
+                className="group3">
+                <div className="rectangle10copy"></div>
+                <div className="btn">Sign In</div>
+                <div className="group2">
+                  <div className="rectangle8copy"></div>
+                  <img className="path6" src="/images/template/login/reset-password-path-6.png" />
+                </div>
               </div>
             </div>
-            <div
-              onClick={ () => this.login(true) }
-              className="group3">
-              <div className="rectangle10copy"></div>
-              <div className="btn">Sign In</div>
-              <div className="group2">
-                <div className="rectangle8copy"></div>
-                <img className="path6" src="/images/template/login/reset-password-path-6.png" />
-              </div>
-            </div>
-          </div>
+          }
         </div>
       );
     } else {
