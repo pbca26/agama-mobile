@@ -37,7 +37,7 @@ export const _lang = {
       'PROCESSING_SM': 'processing...',
       'PROCESSING_TX': 'Processing transaction...',
       'ERROR': 'Error',
-      'MAKE_ANOTHER_TX': 'Make another tx',
+      'MAKE_ANOTHER_TX': 'Send another',
       'NAN': 'Not a number',
       'TOO_MUCH': 'Number is too big. Max. available amount is @template@',
       'ADDRESS_IS_INCORECT': 'Address is incorrect',

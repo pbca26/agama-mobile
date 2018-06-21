@@ -180,7 +180,7 @@
   width: 21px;
   position: absolute;
   margin: 0;
-  right: -19px;
+  right: 14px;
   z-index: 10;
 }
 
@@ -191,12 +191,12 @@
   width: 21px;
   position: absolute;
   margin: 0;
-  left: -10px;
+  left: 10px;
   z-index: 10;
 }
 
 .app-header {
-  width: 375px;
+  width: auto;
   height: 100%;
   position: relative;
   margin: auto;

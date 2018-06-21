@@ -796,6 +796,7 @@ class App extends React.Component {
           {  /*<Balance { ...this.state } /> */ }
           { this.state.auth &&
             this.state.activeSection === 'dashboard' &&
+            !this.state.proxyError &&
             <SendReceive
               { ...this.state }
               changeActiveSection={ this.changeActiveSection }
