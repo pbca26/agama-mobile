@@ -97,7 +97,7 @@ class Pin extends React.Component {
   render() {
     return (
       <div className="form pin-override">
-        <div className="margin-top-40 padding-bottom-30 text-center">
+        <div className="margin-top-40 padding-bottom-30 text-center fs14">
         Provide a seed and enter 6 digit PIN number in the form below.
         </div>
         <div

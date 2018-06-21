@@ -14,7 +14,6 @@ import {
 import { translate } from './translate/translate';
 
 import SendCoin from './components/SendCoin';
-import MyAddress from './components/MyAddress';
 import AddCoin from './components/AddCoin';
 import Login from './components/Login';
 import Transactions from './components/Transactions';
@@ -767,10 +766,6 @@ class App extends React.Component {
               { ...this.state }
               login={ this.login }
               changeActiveSection={ this.changeActiveSection } />
-          }
-          { /*this.state.auth &&
-            this.state.activeSection === 'dashboard' &&
-            <MyAddress { ...this.state } />*/
           }
           { this.renderMenu() }
           <SendCoin
