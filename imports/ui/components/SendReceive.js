@@ -38,14 +38,13 @@ class SendReceive extends React.Component {
   render() {
     return (
       <div className={ 'margin-top-20 send-receive-block' + (this.showClaimButton() ? ' three-btn' : '') }>
-        { this.showSendButton() &&
-          <button
-            type="button"
-            onClick={ () => this.props.changeActiveSection('send') }
-            className="btn btn-primary waves-effect waves-light margin-right-20">
-            <i className="fa fa-send"></i> { translate('DASHBOARD.SEND') }
-          </button>
-        }
+        <button
+          disabled={ !this.showSendButton() }
+          type="button"
+          onClick={ () => this.props.changeActiveSection('send') }
+          className="btn btn-primary waves-effect waves-light margin-right-20">
+          <i className="fa fa-send"></i> { translate('DASHBOARD.SEND') }
+        </button>
         <button
           type="button"
           className="btn btn-success waves-effect waves-light"
