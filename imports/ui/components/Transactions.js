@@ -170,52 +170,49 @@ class Transactions extends React.Component {
           );*/
         }
 
-        if (!_items.length) {
-          return (
-            <div className="txhistory">{ translate('TRANSACTIONS.NO_HISTORY') }</div>
-          );
-        } else {
-          return (
-            <div className="transactions-ui">
-              <div className="individualportfolio">
-                <div className="individualportfolio-inner">
-                  <div className="lasttransactions">Last Transactions</div>
-                  <div className="cryptocardbtc">
-                    <img className="group8" src="/images/template/transactions/gradient.png" />
-                    <img
-                      className="coin-icon"
-                      src={ `/images/cryptologo/${this.props.coin}.png` } />
-                    <div className="coin-title">{ translate('COINS.' + this.props.coin.toUpperCase()) }</div>
-                    <div className="coin-balance">
-                      <div className="balance">
-                      { translate('BALANCE.BALANCE') }: { formatValue(this.props.balance.balance) } { this.props.coin.toUpperCase() }
-                      </div>
-                      { this.isInterestDefined() &&
-                        <div className="interest">
-                        { translate('BALANCE.INTEREST') }: { formatValue(this.props.balance.interest) } { this.props.coin.toUpperCase() }
-                        </div>
-                      }
+        return (
+          <div className="transactions-ui">
+            <div className="individualportfolio">
+              <div className="individualportfolio-inner">
+                <div className="lasttransactions">{ !_items.length ? translate('TRANSACTIONS.NO_HISTORY') : 'Last Transactions' }</div>
+                <div className="cryptocardbtc">
+                  <img className="group8" src="/images/template/transactions/gradient.png" />
+                  <img
+                    className="coin-icon"
+                    src={ `/images/cryptologo/${this.props.coin}.png` } />
+                  <div className="coin-title">{ translate('COINS.' + this.props.coin.toUpperCase()) }</div>
+                  <div className="coin-balance">
+                    <div className="balance">
+                    { translate('BALANCE.BALANCE') }: { formatValue(this.props.balance.balance) } { this.props.coin.toUpperCase() }
                     </div>
-                    { !this.props.loading &&
-                      this.props.auth &&
-                      this.props.activeSection === 'dashboard' &&
-                      <i
-                        onClick={ this.props.dashboardRefresh }
-                        className="fa fa-refresh dashboard-refresh"></i>
-                      }
-                      { this.props.loading &&
-                        this.props.activeSection === 'dashboard' &&
-                        <Spinner />
-                      }
+                    { this.isInterestDefined() &&
+                      <div className="interest">
+                      { translate('BALANCE.INTEREST') }: { formatValue(this.props.balance.interest) } { this.props.coin.toUpperCase() }
+                      </div>
+                    }
                   </div>
+                  { !this.props.loading &&
+                    this.props.auth &&
+                    this.props.activeSection === 'dashboard' &&
+                    (_items && _items.length > 0) &&
+                    <i
+                      onClick={ this.props.dashboardRefresh }
+                      className="fa fa-refresh dashboard-refresh"></i>
+                    }
+                    { this.props.loading &&
+                      this.props.activeSection === 'dashboard' &&
+                      <Spinner />
+                    }
+                </div>
+                { (_items && _items.length > 0) &&
                   <div className="transactions-list">
                   { _items }
                   </div>
-                </div>
+                }
               </div>
             </div>
-          );
-        }
+          </div>
+        );
       } else {
         return null;
       }
