@@ -587,11 +587,6 @@ class App extends React.Component {
                   className="rectangle9copy"
                   src="/images/template/menu/sidemenu-rectangle-9-copy.png" />
               </div>
-              <div className="menu">Menu</div>
-              <img
-                onClick={ this.toggleMenu }
-                className="menu-back"
-                src="/images/template/menu/trends-combined-shape.png" />
               { this.state.auth &&
                 <div className="items">
                   { this.state.activeSection !== 'overview' &&
@@ -744,6 +739,7 @@ class App extends React.Component {
         onClick={ this.globalClick }>
         <div className="app-header">
           { this.state.history &&
+            !this.state.displayMenu &&
             <img
               onClick={ this.historyBack }
               className="menu-back"
@@ -753,7 +749,7 @@ class App extends React.Component {
             onClick={ this.toggleMenu }
             className="menu-icon"
             src="/images/template/home/home-combined-shape.png" />
-          <div className="ui-title">{ translate('APP_TITLE.' + this.state.activeSection.toUpperCase()) }</div>
+          <div className="ui-title">{ this.state.displayMenu ? 'Menu' : translate('APP_TITLE.' + this.state.activeSection.toUpperCase()) }</div>
         </div>
         <div className="app-main">
           { (this.state.activeSection !== 'pin' || this.state.activeSection !== 'offlinesig') &&

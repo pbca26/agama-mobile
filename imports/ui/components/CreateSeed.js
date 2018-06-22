@@ -121,7 +121,7 @@ class CreateSeed extends React.Component {
             </div>
             { !this.state.confirmSeedSaved &&
               !this.state.pristine &&
-              <div className="error margin-top-15">
+              <div className="error margin-top-15 sz350">
                 <i className="fa fa-warning"></i> { translate('LOGIN.CONFIRMATION_REQUIRED') }
               </div>
             }
@@ -154,7 +154,7 @@ class CreateSeed extends React.Component {
             }
             { this.state.createPin &&
               this.state.pinOverrideTooShort &&
-              <div className="error margin-top-15">
+              <div className="error margin-top-15 sz350">
                 <i className="fa fa-warning"></i> { translate('LOGIN.PIN_TOO_SHORT') }
               </div>
             }
@@ -162,11 +162,12 @@ class CreateSeed extends React.Component {
           <div
             onClick={ this.login }
             className="group3">
-            <div className="rectangle10copy"></div>
-            <div className="btn">Sign In</div>
-            <div className="group2">
-              <div className="rectangle8copy"></div>
-              <img className="path6" src="/images/template/login/reset-password-path-6.png" />
+            <div className="btn-inner">
+              <div className="btn">Sign In</div>
+              <div className="group2">
+                <div className="rectangle8copy"></div>
+                <img className="path6" src="/images/template/login/reset-password-path-6.png" />
+              </div>
             </div>
           </div>
         </div>

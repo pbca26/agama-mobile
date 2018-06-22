@@ -1,8 +1,9 @@
 body {
-  background-color: #45485F;
+  background-color: #4c4f69;
   color: #fff;
   font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
   color: white;
+  margin: 0;
 }
 
 .nav-menu {
@@ -48,7 +49,8 @@ body {
   display: none;
 }
 
-div[disabled] {
+div[disabled],
+button:disabled {
   opacity: 0.5;
   pointer-events: none;
 }
@@ -68,4 +70,42 @@ div[disabled] {
 }
 .lh25 {
   line-height: 25px;
+}
+
+.form {
+  .group3 {
+    position: inherit;
+    height: 60px;
+    width: 100%;
+    text-align: center;
+    margin-top: 55px;
+    
+    .btn-inner {
+      background-color: #acaebf;
+      height: 42px;
+      display: inline-block;
+      padding: 0 20px;
+
+      .group2 {
+        float: right;
+        margin-top: 12px;
+        top: 2px;
+        left: 0;
+        position: relative;
+      }
+      .btn {
+        position: inherit;
+        float: left;
+        margin-top: 12px;
+        font-size: 16px;
+        padding-right: 38px;
+      }
+    }
+  }
+}
+
+.sz350 {
+  width: 95%;
+  margin: 0 auto;
+  max-width: 350px;
 }

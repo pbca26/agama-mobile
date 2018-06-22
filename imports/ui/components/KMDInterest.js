@@ -115,9 +115,9 @@ class KMDInterest extends React.Component {
     if (this.props.activeSection === 'claim') {
       return (
         <div className="form claim-interest">
-          <div className="margin-top-40 margin-left-10">
+          <div className="margin-top-40">
             <p>
-              <strong>{ translate('CLAIM.REQ_TO_CLAIM_P1') }:</strong> { translate('CLAIM.REQ_TO_CLAIM_P2') }.
+              <strong className="green">{ translate('CLAIM.REQ_TO_CLAIM_P1') }:</strong> { translate('CLAIM.REQ_TO_CLAIM_P2') }.
             </p>
           </div>
           <div className="text-center margin-top-35">

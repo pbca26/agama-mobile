@@ -20,7 +20,7 @@ class Login extends React.Component {
       createPin: false,
       pinOverride: null,
       pinOverrideTooShort: false,
-      pin: '112233',
+      pin: '',
       wrongPin: false,
       qrScanError: false,
     };
@@ -197,26 +197,27 @@ class Login extends React.Component {
                 <div className="edit">
                   <input
                     type="password"
-                    className="form-control margin-bottom-30"
+                    className="form-control"
                     name="pin"
                     onChange={ this.updateInput }
                     placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
                     value={ this.state.pin || '' } />
-                  { this.state.wrongPin &&
-                    <div className="error margin-bottom-25">
-                      <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
-                    </div>
-                  }
                 </div>
+                { this.state.wrongPin &&
+                  <div className="error margin-top-10 margin-bottom-25 sz350">
+                    <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
+                  </div>
+                }
               </div>
               <div
                 onClick={ () => this.login(true) }
                 className="group3">
-                <div className="rectangle10copy"></div>
-                <div className="btn">Sign In</div>
-                <div className="group2">
-                  <div className="rectangle8copy"></div>
-                  <img className="path6" src="/images/template/login/reset-password-path-6.png" />
+                <div className="btn-inner">
+                  <div className="btn">Sign In</div>
+                  <div className="group2">
+                    <div className="rectangle8copy"></div>
+                    <img className="path6" src="/images/template/login/reset-password-path-6.png" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -235,7 +236,7 @@ class Login extends React.Component {
                   </div>
                 </div>
                 { this.state.qrScanError &&
-                  <div className="error margin-top-15 text-center">
+                  <div className="error margin-top-15 sz350">
                     <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
                   </div>
                 }
@@ -282,7 +283,7 @@ class Login extends React.Component {
               }
               { this.state.createPin &&
                 this.state.pinOverrideTooShort &&
-                <div className="error margin-top-15">
+                <div className="error margin-top-15 sz350">
                   <i className="fa fa-warning"></i> { translate('LOGIN.PIN_TOO_SHORT') }
                 </div>
               }
@@ -290,11 +291,12 @@ class Login extends React.Component {
                 disabled={ !this.state.passphrase }
                 onClick={ () => this.login(false) }
                 className="group3">
-                <div className="rectangle10copy"></div>
-                <div className="btn">Sign In</div>
-                <div className="group2">
-                  <div className="rectangle8copy"></div>
-                  <img className="path6" src="/images/template/login/reset-password-path-6.png" />
+                <div className="btn-inner">
+                  <div className="btn">Sign In</div>
+                  <div className="group2">
+                    <div className="rectangle8copy"></div>
+                    <img className="path6" src="/images/template/login/reset-password-path-6.png" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -306,103 +308,5 @@ class Login extends React.Component {
     }
   }
 }
-
-/*
-<div className="col-sm-12">
-          <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12">
-            <div className="row">
-              { getLocalStorageVar('seed') &&
-                <div>
-                  <h4 className="padding-bottom-10">{ translate('LOGIN.PIN_ACCESS') }</h4>
-                  <input
-                    type="password"
-                    className="form-control margin-bottom-30"
-                    name="pin"
-                    onChange={ this.updateInput }
-                    placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
-                    value={ this.state.pin || '' } />
-                  { this.state.wrongPin &&
-                    <div className="error margin-bottom-25">
-                      <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
-                    </div>
-                  }
-                  <div className="margin-top-40 margin-bottom-30 login-keypad">{ this.renderKeyPad() }</div>
-                  <button
-                    className="btn btn-lg btn-primary btn-block ladda-button"
-                    onClick={ () => this.login(true) }>
-                    <span className="ladda-label">
-                    { translate('LOGIN.LOGIN') }
-                    </span>
-                  </button>
-                </div>
-              }
-              { !getLocalStorageVar('seed') &&
-                <div>
-                  <h4 className="padding-bottom-20">Create PIN</h4>
-                  <button
-                    className="btn btn-default btn-scan-qr margin-bottom-30"
-                    onClick={ this.scanQR }>
-                    <i className="fa fa-qrcode"></i>
-                    { translate('SEND.SCAN_QR') }
-                  </button>
-                  { this.state.qrScanError &&
-                    <div className="col-lg-12">
-                      <div className="error margin-top-15">
-                        <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
-                      </div>
-                    </div>
-                  }
-                  <input
-                    type="password"
-                    className="form-control margin-bottom-10"
-                    name="passphrase"
-                    onChange={ this.updateInput }
-                    placeholder={ translate('LOGIN.ENTER_PASSPHRASE') + ' or WIF' }
-                    value={ this.state.passphrase || '' } />
-                  <div className="margin-bottom-25 margin-top-30">
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        value="on"
-                        checked={ this.state.createPin } />
-                      <div
-                        className="slider"
-                        onClick={ this.toggleCreatePin }></div>
-                    </label>
-                    <div
-                      className="toggle-label pointer"
-                      onClick={ this.toggleCreatePin }>
-                      { translate('LOGIN.OVERRIDE_PIN') }
-                    </div>
-                    { this.state.createPin &&
-                      <input
-                        type="password"
-                        className="form-control margin-top-20"
-                        name="pinOverride"
-                        onChange={ this.updateInput }
-                        placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
-                        value={ this.state.pinOverride || '' } />
-                    }
-                    { this.state.createPin &&
-                      this.state.pinOverrideTooShort &&
-                      <div className="error margin-top-15">
-                        <i className="fa fa-warning"></i> { translate('LOGIN.PIN_TOO_SHORT') }
-                      </div>
-                    }
-                  </div>
-
-                  <button
-                    className="btn btn-lg btn-primary btn-block ladda-button"
-                    onClick={ () => this.login(false) }>
-                    <span className="ladda-label">
-                    { translate('LOGIN.LOGIN') }
-                    </span>
-                  </button>
-                </div>
-              }
-            </div>
-          </div>
-        </div>
-*/
 
 export default Login;

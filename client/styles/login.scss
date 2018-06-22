@@ -1,6 +1,6 @@
 .form {
   width: 100%;
-  min-width: 375px;
+  // min-width: 375px;
   /*height: 100vh;
   min-height: 667px;*/
   position: relative;
@@ -8,11 +8,12 @@
   margin: 0;
 
   .form-inner {
-    width: 375px;
+    // width: 375px;
     height: 100%;
     position:relative;
     margin: auto;
-    background-color: #45485F;
+    padding: 10px 0;
+    // background-color: #45485F;
   }
 
   a {
@@ -29,11 +30,9 @@
 
   .title {
     background-color: rgba(255, 255, 255, 0.0);
-    top: 30px;
     height: auto;
     width: 100%;
-    position: relative;
-    margin: 0;
+    padding-top: 30px;
     opacity: .8;
     font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
     font-size: 16.0px;
@@ -43,13 +42,12 @@
   }
 
   .group3 {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 120px;
+    /*top: 120px;
     height: 72px;
     width: 209px;
     position: relative;
     margin: 0;
-    left: 84px;
+    left: 84px;*/
   }
 
   .group3 .rectangle10copy2 {
@@ -90,12 +88,8 @@
 
   .group {
     background-color: rgba(255, 255, 255, 0);
-    top: 65px;
-    height: 42px;
-    width: 335px;
-    position: relative;
+    padding-top: 45px;
     margin: 0;
-    left: 20px;
   }
 
   .group .rectangle10 {
@@ -113,22 +107,20 @@
     background-color: #373A4C;
     height: auto;
     width: auto;
-    margin: 0;
-    opacity: 1;
+    margin: 0 auto;
+    max-width: 350px;
     font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
     font-size: 16.0px;
     color: #fff;
     text-align: left;
     line-height: 19px;
-    width: 98%;
     height: 100%;
-    padding: 3px 10px 1px 10px;
+    padding: 10px 10px 10px 10px;
     
     input {
       background: none;
       color: #fff;
       width: 100%;
-      height: 80%;
       border: none;
       outline: none;
     }

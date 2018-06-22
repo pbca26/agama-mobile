@@ -1,15 +1,15 @@
 .menu-ui {
   min-height: 100vh;
   position: fixed;
-  top: 0;
+  top: 52px;
   left: 0;
   width: 100%;
-  background-color: #45485F;
+  background-color: #4c4f69;
   z-index: 100;
 
   .active-coins {
     font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-    font-size: 18.0px;
+    font-size: 16.0px;
     color: white;
     letter-spacing: -.56px;
     line-height: 22.0px;
@@ -17,8 +17,11 @@
     padding-top: 20px;
 
     img {
-      width: 40px;
-      padding-right: 10px;
+      width: 36px;
+      margin-right: 10px;
+      border-radius: 50%;
+      border: solid 1px #fff;
+      background: #fff;
     }
     span,
     i {
@@ -26,7 +29,8 @@
       top: -13px;
     }
     i {
-      padding-left: 5px;
+      padding-left: 7px;
+      font-size: 14px;
     }
   }
   
@@ -57,7 +61,7 @@
 
   .sidemenu .group {
     background-color: rgba(255, 255, 255, 0.0);
-    top: 110px;
+    top: 50px;
     height: 500px;
     width: 385px;
     position: absolute;
@@ -99,14 +103,14 @@
 
   .sidemenu .menu {
     background-color: rgba(255, 255, 255, 0.0);
-    top: 42px;
+    top: 14px;
     height: auto;
     width: auto;
     position: absolute;
     margin: 0;
     left: 165px;
     font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-    font-size: 18.0px;
+    font-size: 16px;
     color: rgba(255, 255, 255, 1.0);
     text-align: left;
     letter-spacing: -.56px;
@@ -115,7 +119,7 @@
 
   .sidemenu .items {
     position: absolute;
-    top: 100px;
+    top: 20px;
   }
 
   .sidemenu .item {
@@ -124,14 +128,14 @@
     width: auto;
     margin: 0;
     font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-    font-size: 18.0px;
+    font-size: 16.0px;
     color: rgba(255, 255, 255, 1.0);
     text-align: left;
     letter-spacing: -.56px;
     line-height: 22.0px;
 
     .title {
-      padding-left: 50px;      
+      padding-left: 40px;      
     }
     .line {
       padding-top: 10px;
@@ -175,7 +179,7 @@
 
 .menu-icon {
   background-color: rgba(255, 255, 255, 0.0);
-  top: 44px;
+  top: 18px;
   height: 15px;
   width: 21px;
   position: absolute;
@@ -186,7 +190,7 @@
 
 .menu-back {
   background-color: rgba(255, 255, 255, 0.0);
-  top: 44px;
+  top: 18px;
   height: 15px;
   width: 21px;
   position: absolute;
@@ -196,16 +200,19 @@
 }
 
 .app-header {
-  width: auto;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: 100%;
-  position: relative;
-  margin: auto;
-  height: 40px;
-  padding-top: 22px;
+  position: fixed;
+  height: 50px;
+  z-index: 100;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .2), 0 2px 0 rgba(0, 0, 0, .06);
+  background: #45485F;
 
   .ui-title {
     font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-    font-size: 18.0px;
+    font-size: 16px;
     color: rgba(255, 255, 255, 1.0);
     letter-spacing: -.56px;
     line-height: 22.0px;
@@ -213,9 +220,13 @@
     text-transform: capitalize;
     text-align: center;
     position: absolute;
-    top: 39px;
+    top: 14px;
   }
   .combinedshape {
     position: absolute;
   }
+}
+
+.app-main {
+  padding-top: 52px;
 }

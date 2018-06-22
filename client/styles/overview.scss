@@ -1,5 +1,4 @@
-.overview-ui,
-.addcoin-ui {
+.overview-ui {
   min-height: 100vh;
 
   .home-inner {
@@ -61,7 +60,7 @@
   .home .group7 .cryptocardbg {
     background-color: rgba(255, 255, 255, 0.0);
     top: 0;
-    height: 190px;
+    height: 150px;
     width: 345px;
     position: absolute;
     margin: 0;
@@ -71,7 +70,7 @@
   .home .group7 .cryptocardbg .rectangle5 {
     background-color: rgba(255, 255, 255, 0.0);
     top: 0;
-    height: 190px;
+    height: 150px;
     width: 345px;
     position: relative;
     margin: 0;
@@ -117,12 +116,12 @@
 
   .home .group7 .totalvalue {
     background-color: rgba(255, 255, 255, 0);
-    top: 147px;
+    top: 107px;
     height: auto;
     width: auto;
     position: absolute;
     margin: 0;
-    left: 15px;
+    left: 21px;
     opacity: 0.9;
     font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
     font-size: 11px;
@@ -134,7 +133,7 @@
 
   .home .group7 .a3467812 {
     background-color: rgba(255, 255, 255, 0.0);
-    top: 118px;
+    top: 77px;
     height: auto;
     width: auto;
     position: absolute;
@@ -149,7 +148,7 @@
 
   .home .group7 .label1 {
     background-color: rgba(255, 255, 255, 0.0);
-    top: 122px;
+    top: 78px;
     height: auto;
     width: auto;
     position: absolute;
@@ -165,7 +164,7 @@
 
   .home .group7 .cryptocardgraph {
     background-color: rgba(255, 255, 255, 0.0);
-    top: 35px;
+    top: 16px;
     height: 120px;
     width: 135px;
     position: absolute;
@@ -497,6 +496,8 @@
     width: 40px;
     margin: 0;
     border-radius: 50%;
+    border: solid 2px #fff;
+    background: #fff;
   }
 
   .home .btc .shape {
@@ -516,7 +517,7 @@
     width: auto;
     position: absolute;
     margin: 0;
-    left: 70px;
+    left: 76px;
     font-family: 'Helvetica', Helvetica, Arial, serif;
     font-size: 14.0px;
     color: rgba(255, 255, 255, 1.0);
@@ -532,7 +533,7 @@
     width: auto;
     position: absolute;
     margin: 0;
-    left: 70px;
+    left: 76px;
     opacity: .65;
     font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
     font-size: 14.0px;
@@ -607,7 +608,7 @@
 
   .home .yourcoins {
     background-color: rgba(255, 255, 255, 0.0);
-    top: 274px;
+    top: 220px;
     height: auto;
     width: auto;
     position: absolute;
@@ -632,40 +633,6 @@
   }
 }
 
-.addcoin-ui .home {
-  height: inherit;
-  padding-bottom: 10px;
-
-  .home-inner {
-    background-color: #45485F;
-  }
-  .overview-coins {
-    padding-top: 24px;
-    top: 0;
-    position: relative;
-    height: 100%;
-
-    .overview-coin {
-      height: 80px;
-
-      &:last-child {
-        .div1 {
-          display: none;
-        }
-      }
-      &.disabled {
-        display: none;
-      }
-    }
-
-    .bitcoin {
-      padding-top: 34px;
-      text-transform: uppercase;
-      left: 74px;
-    }
-  }
-}
-
 .overview-ui {
   height: 100%;
 
@@ -673,13 +640,8 @@
     height: inherit;
     overflow: visible;
 
-    .home-inner {
-      background-color: #45485F;
-      padding-bottom: 360px;
-    }
-
     .overview-coins {
-      top: 300px;
+      top: 240px;
       height: 100%;
       width: 375px;
       position: relative;

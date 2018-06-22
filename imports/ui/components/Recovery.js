@@ -67,7 +67,7 @@ class Recovery extends React.Component {
               value={ this.state.pin || '' } />
           </div>
           { this.state.wrongPin &&
-            <div className="error margin-top-15">
+            <div className="error margin-top-15 sz350">
               <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
             </div>
           }
@@ -76,10 +76,11 @@ class Recovery extends React.Component {
           disabled={ !this.state.pin }
           onClick={ this.decodeSeed }
           className="group3 margin-top-40">
-          <div className="rectangle10copy"></div>
-          <div className="btn">Show</div>
-          <div className="group2">
-            <i className="fa fa-eye"></i>
+          <div className="btn-inner">
+            <div className="btn">Show</div>
+            <div className="group2">
+              <i className="fa fa-eye"></i>
+            </div>
           </div>
         </div>
         { this.state.passphrase &&

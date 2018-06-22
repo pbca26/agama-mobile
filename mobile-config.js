@@ -40,10 +40,13 @@ App.launchScreens({
   'android_xxxhdpi_portrait': 'app-assets/splash/drawable-xxxhdpi/agama.9.png',
 });
 
-App.accessRule('http://atomicexplorer.com');
+// proxies
 App.accessRule('http://94.130.225.86');
 App.accessRule('http://94.130.98.74');
-App.accessRule('http://kmd.komodochainz.info');
+// atomic
+App.accessRule('https://www.atomicexplorer.com');
+// coin explorers
+App.accessRule('http://kmdexplorer.ru');
 App.accessRule('http://MSHARK.explorer.supernet.org');
 App.accessRule('http://revs.explorer.supernet.org');
 App.accessRule('http://SUPERNET.explorer.supernet.org');
@@ -63,7 +66,7 @@ App.accessRule('https://explorer.utrum.io');
 App.accessRule('https://www.mnzexplorer.com');
 
 // Set PhoneGap/Cordova preferences.
-App.setPreference('BackgroundColor', '0xffffffff');
+App.setPreference('BackgroundColor', '0x45485FFF');
 /*App.setPreference('HideKeyboardFormAccessoryBar', true);
 App.setPreference('Orientation', 'default');
 App.setPreference('Orientation', 'all', 'ios');*/

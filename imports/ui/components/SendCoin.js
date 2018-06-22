@@ -246,7 +246,7 @@ class SendCoin extends React.Component {
         autoComplete="off">
         <div className="edit">
           <label className="control-label padding-bottom-10">
-            { translate('SEND.FROM') } <strong>[ { formatValue(this.props.balance.balance) } { this.props.coin.toUpperCase() } ]</strong>
+            { translate('SEND.FROM') } <strong>[ <span className="success">{ formatValue(this.props.balance.balance) } { this.props.coin.toUpperCase() }</span> ]</strong>
           </label>
           <div className="shade">{ this.props.address }</div>
         </div>
@@ -310,11 +310,12 @@ class SendCoin extends React.Component {
               }
               onClick={ () => this.changeSendCoinStep(1) }
               className="group3 margin-top-50">
-              <div className="rectangle10copy"></div>
-              <div className="btn">{ translate('SEND.SEND') }</div>
-              <div className="group2">
-                <div className="rectangle8copy"></div>
-                <img className="path6" src="/images/template/login/reset-password-path-6.png" />
+              <div className="btn-inner">
+                <div className="btn">{ translate('SEND.SEND') }</div>
+                <div className="group2">
+                  <div className="rectangle8copy"></div>
+                  <img className="path6" src="/images/template/login/reset-password-path-6.png" />
+                </div>
               </div>
             </div>
           </div>
@@ -396,17 +397,23 @@ class SendCoin extends React.Component {
               </div>
             }
             <div className="widget-body-footer">
-              {/*<a
-                className="btn btn-default waves-effect waves-light"
-              onClick={ () => this.changeSendCoinStep(0, true) }>{ translate('SEND.BACK') }</a>*/}
-              <div
-                onClick={ () => this.changeSendCoinStep(2) }
-                className="group3 margin-top-50">
-                <div className="rectangle10copy"></div>
-                <div className="btn">{ translate('SEND.CONFIRM') }</div>
-                <div className="group2">
-                  <div className="rectangle8copy"></div>
-                  <img className="path6" src="/images/template/login/reset-password-path-6.png" />
+              <div className="group3 margin-top-50">
+                <div
+                  onClick={ () => this.changeSendCoinStep(0, true) }
+                  className="btn-inner pull-left">
+                  <div className="btn">{ translate('SEND.BACK') }</div>
+                  <div className="group2">
+                    <img className="path6" src="/images/template/menu/trends-combined-shape.png" />
+                  </div>
+                </div>
+                <div
+                  onClick={ () => this.changeSendCoinStep(2) }
+                  className="btn-inner pull-right">
+                  <div className="btn">{ translate('SEND.CONFIRM') }</div>
+                  <div className="group2">
+                    <div className="rectangle8copy"></div>
+                    <img className="path6" src="/images/template/login/reset-password-path-6.png" />
+                  </div>
                 </div>
               </div>
             </div>

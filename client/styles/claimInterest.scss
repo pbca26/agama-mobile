@@ -3,6 +3,8 @@
 
   p {
     line-height: 22px;
+    width: calc(100% - 10vw);
+    margin: 0 auto;
   }
 
   .group3.claim-btn {
@@ -26,7 +28,8 @@
         position: inherit;
         float: right;
         margin-top: 12px;
-        font-size: 14px;        
+        font-size: 14px;
+        padding-right: 6px;
       }
     }
   }
