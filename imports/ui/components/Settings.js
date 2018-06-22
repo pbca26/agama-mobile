@@ -57,7 +57,7 @@ class Settings extends React.Component {
   render() {
     return (
       <div className="form settings">
-        <div className="margin-top-20 item">
+        <div className="margin-top-10 item">
           <div className="padding-bottom-20">
             Auto lock timeout
           </div>
@@ -91,10 +91,11 @@ class Settings extends React.Component {
         <div
           onClick={ this.save }
           className="group3 margin-top-25">
-          <div className="rectangle10copy"></div>
-          <div className="btn">Save</div>
-          <div className="group2">
-            <i className="fa fa-save"></i>
+          <div className="btn-inner">
+            <div className="btn">Save</div>
+            <div className="group2">
+              <i className="fa fa-save"></i>
+            </div>
           </div>
         </div>
       </div>

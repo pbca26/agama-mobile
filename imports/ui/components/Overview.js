@@ -28,7 +28,6 @@ class Overview extends React.Component {
         <div
           className="group7"
           key={ `overview-coins-usd-balance` }>
-          <img className="rectangle5copy" src="/images/template/home/home-rectangle-5-copy.png" />
           <div className="cryptocardbg">
             <img className="rectangle5" src="/images/template/home/home-rectangle-5.png" />
           </div>

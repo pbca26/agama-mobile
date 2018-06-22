@@ -106,13 +106,12 @@ class AddCoin extends React.Component {
             onClick={ () => this.addCoin(_coin) }
             key={ `overview-coins-${_coin}` }
             className={ 'overview-coin' + (_coins[_coin] ? ' disabled' : '') }>
-              <img className="div1" src="/images/template/home/trends-rectangle-7.png" />
-              <div className="btc">
-                <img
-                  className="oval4"
-                  src={ `/images/cryptologo/${_coin}.png` } />
-              </div>
-              <div className="bitcoin">{ translate('COINS.' + _coin.toUpperCase()) }</div>
+            <div className="btc">
+              <img
+                className="oval4"
+                src={ `/images/cryptologo/${_coin}.png` } />
+            </div>
+            <div className="bitcoin">{ translate('COINS.' + _coin.toUpperCase()) }</div>
           </div>
         );
 

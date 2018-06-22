@@ -97,20 +97,21 @@ class Pin extends React.Component {
   render() {
     return (
       <div className="form pin-override">
-        <div className="margin-top-40 padding-bottom-30 text-center fs14">
+        <div className="margin-top-40 padding-bottom-30 text-center fs14 sz350">
         Provide a seed and enter 6 digit PIN number in the form below.
         </div>
         <div
           onClick={ this.scanQR }
-          className="group3 margin-bottom-10">
-          <div className="rectangle10copy"></div>
-          <div className="btn">{ translate('SEND.SCAN_QR') }</div>
-          <div className="group2">
-            <i className="fa fa-qrcode"></i>
+          className="group3 margin-bottom-20">
+          <div className="btn-inner">
+            <div className="btn">{ translate('SEND.SCAN_QR') }</div>
+            <div className="group2">
+              <i className="fa fa-qrcode"></i>
+            </div>
           </div>
         </div>
         { this.state.qrScanError &&
-          <div className="error margin-top-15 text-center">
+          <div className="error margin-top-5 margin-bottom-15 sz350">
             { translate('SEND.QR_SCAN_ERR') } <i className="fa fa-warning"></i>
           </div>
         }
@@ -123,7 +124,7 @@ class Pin extends React.Component {
             value={ this.state.passphrase || '' } />
         </div>
         { this.state.passphraseTooShort &&
-          <div className="error margin-top-15 text-center">
+          <div className="error margin-top-15 sz350">
             <i className="fa fa-warning"></i> Provide passhprase or WIF
           </div>
         }
@@ -136,20 +137,21 @@ class Pin extends React.Component {
             value={ this.state.pinOverride || '' } />
         </div>
         { this.state.pinOverrideTooShort &&
-          <div className="error margin-top-15 text-center">
+          <div className="error margin-top-15 sz350">
             <i className="fa fa-warning"></i> { translate('LOGIN.PIN_TOO_SHORT') }
           </div>
         }
         { this.state.pinSet &&
-          <div className="margin-bottom-15 margin-top-15 text-center">Seed is encrypted with provided PIN. Use the PIN to login or sign a transaction.</div>
+          <div className="margin-bottom-15 margin-top-15 sz350">Seed is encrypted with provided PIN. Use the PIN to login or sign a transaction.</div>
         }
         <div
           onClick={ this.save }
           className="group3 margin-top-40">
-          <div className="rectangle10copy"></div>
-          <div className="btn">Save</div>
-          <div className="group2">
-            <i className="fa fa-save"></i>
+          <div className="btn-inner">
+            <div className="btn">Save</div>
+            <div className="group2">
+              <i className="fa fa-save"></i>
+            </div>
           </div>
         </div>
       </div>
