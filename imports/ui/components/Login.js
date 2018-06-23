@@ -49,6 +49,11 @@ class Login extends React.Component {
         this.setState({
           qrScanError: true,
         });
+        setTimeout(() => {
+          this.setState({
+            qrScanError: false,
+          });
+        }, 5000);
       } else {
         convertURIToImageData(data)
         .then((imageData) => {
@@ -58,6 +63,12 @@ class Login extends React.Component {
             this.setState({
               qrScanError: true,
             });
+
+            setTimeout(() => {
+              this.setState({
+                qrScanError: false,
+              });
+            }, 5000);
           } else {
             this.setState({
               qrScanError: false,
