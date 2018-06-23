@@ -31,6 +31,9 @@ class Pin extends React.Component {
   updateInput(e) {
     this.setState({
       [e.target.name]: e.target.value,
+      passphraseTooShort: false,
+      pinOverrideTooShort: false,
+      qrScanError: false,
     });
   }
 

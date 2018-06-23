@@ -35,6 +35,9 @@ class Login extends React.Component {
   updateInput(e) {
     this.setState({
       [e.target.name]: e.target.value,
+      wrongPin: false,
+      qrScanError: false,
+      pinOverrideTooShort: false,
     });
   }
 
