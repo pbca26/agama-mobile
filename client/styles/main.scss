@@ -4,6 +4,7 @@ body {
   font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
   color: white;
   margin: 0;
+  overflow-x: hidden;
 }
 
 .nav-menu {
@@ -15,8 +16,8 @@ body {
 
 .dashboard-refresh {
   position: absolute;
-  top: 117px;
-  right: 11px;
+  top: 115px;
+  right: 13px;
   z-index: 10;
   font-size: 20px;
 }
@@ -105,7 +106,7 @@ button:disabled {
 }
 
 .sz350 {
-  width: 95%;
+  width: 100%;
   margin: 0 auto;
-  max-width: 350px;
+  max-width: 330px;
 }

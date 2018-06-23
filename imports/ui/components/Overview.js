@@ -19,7 +19,6 @@ class Overview extends React.Component {
       let _totalBTCBalance = 0;
 
       for (let i = 0; i < _overview.length; i++) {
-        console.warn(_overview[i]);
         _totalUSDBalance += _overview[i].balanceUSD;
         _totalBTCBalance += _overview[i].balanceBTC;
       }
@@ -29,7 +28,9 @@ class Overview extends React.Component {
           className="group7"
           key={ `overview-coins-usd-balance` }>
           <div className="cryptocardbg">
-            <img className="rectangle5" src="/images/template/home/home-rectangle-5.png" />
+            <img
+              className="rectangle5"
+              src="/images/template/home/home-rectangle-5.png" />
           </div>
           <div className="totalvalue">Total Value</div>
           <div className="a3467812">{ formatValue(_totalUSDBalance) }</div>
@@ -56,10 +57,18 @@ class Overview extends React.Component {
                 <div className="rectangle6copy6"></div>
               </div>
               <div className="group3">
-                <img className="path4" src="/images/template/home/home-path-4.png" />
-                <img className="oval3" src="/images/template/home/home-oval-3.png" />
-                <img className="oval3copy" src="/images/template/home/home-oval-3.png" />
-                <img className="oval3copy2" src="/images/template/home/home-oval-3.png" />
+                <img
+                  className="path4"
+                  src="/images/template/home/home-path-4.png" />
+                <img
+                  className="oval3"
+                  src="/images/template/home/home-oval-3.png" />
+                <img
+                  className="oval3copy"
+                  src="/images/template/home/home-oval-3.png" />
+                <img
+                  className="oval3copy2"
+                  src="/images/template/home/home-oval-3.png" />
               </div>
             </div>
           </div>
@@ -71,7 +80,9 @@ class Overview extends React.Component {
           <div
           key={ `overview-coins-${_overview[i].coin}` }
             className="overview-coin">
-            <img className="div1" src="/images/template/home/trends-rectangle-7.png" />
+            <img
+              className="div1"
+              src="/images/template/home/trends-rectangle-7.png" />
             <div className="a1241">~ $ { formatValue(_overview[i].usdPricePerItem) } per coin</div>
             { /*<img className="path5" src="/images/template/home/home-path-5.png" />*/ }
             <div className="btc">

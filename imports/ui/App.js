@@ -398,7 +398,7 @@ class App extends React.Component {
   }
 
   toggleMenu() {
-    document.getElementById('body').style.overflow = !this.state.displayMenu ? 'hidden' : 'inherit';
+    // document.getElementById('body').style.overflow = !this.state.displayMenu ? 'hidden' : 'inherit';
 
     this.setState({
       displayMenu: !this.state.displayMenu,

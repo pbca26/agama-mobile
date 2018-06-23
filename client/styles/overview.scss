@@ -1,6 +1,7 @@
 .overview-ui {
   min-height: 100vh;
-
+  padding: 0 10px;
+  
   .home-inner {
     width: 375px;
     height: 100%;
@@ -11,7 +12,6 @@
 
   .home {
     width: 100%;
-    min-width: 375px;
     height: 100vh;
     min-height: 100vh;
     position: relative;
@@ -34,7 +34,7 @@
     width: 375px;
     position: absolute;
     margin: 0;
-    left: 0
+    left: 0;
   }
 
   .home .group7 {
@@ -44,7 +44,7 @@
     width: 347px;
     position: absolute;
     margin: 0;
-    left: 14px
+    left: 0;
   }
 
   .home .group7 .rectangle5copy {
@@ -54,7 +54,7 @@
     width: 347px;
     position: absolute;
     margin: 0;
-    left: 0
+    left: 0;
   }
 
   .home .group7 .cryptocardbg {
@@ -96,22 +96,6 @@
     position: relative;
     margin: 0;
     left: 0
-  }
-
-  .home .group7 .hivivek {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 80px;
-    height: auto;
-    width: auto;
-    position: absolute;
-    margin: 0;
-    left: 26px;
-    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-    font-size: 16.0px;
-    color: rgba(255, 255, 255, 1.0);
-    text-align: left;
-    letter-spacing: -1.0px;
-    line-height: 18.0px
   }
 
   .home .group7 .totalvalue {
@@ -432,11 +416,15 @@
   /* coin */
   .home {
     .overview-coins {
-      width: 375px;
+      width: 347px;
       margin: 0;
 
       .overview-coin {
         height: 80px;
+
+        .div1 {
+          width: 347px;
+        }
 
         &:last-child {
           .div1 {
@@ -487,7 +475,7 @@
     width: 40px;
     position: absolute;
     margin: 0;
-    left: 20px;
+    left: 5px;
   }
 
   .home .btc .oval4 {
@@ -507,7 +495,7 @@
     width: 13px;
     position: absolute;
     margin: 0;
-    left: 13px
+    left: 13px;
   }
 
   .home .bitcoin {
@@ -517,7 +505,7 @@
     width: auto;
     position: absolute;
     margin: 0;
-    left: 76px;
+    left: 61px;
     font-family: 'Helvetica', Helvetica, Arial, serif;
     font-size: 14.0px;
     color: rgba(255, 255, 255, 1.0);
@@ -533,7 +521,7 @@
     width: auto;
     position: absolute;
     margin: 0;
-    left: 76px;
+    left: 61px;
     opacity: .65;
     font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
     font-size: 14.0px;
@@ -551,7 +539,7 @@
     width: auto;
     position: absolute;
     margin: 0;
-    left: 280px;
+    left: 262px;
     font-family: 'Helvetica', Helvetica, Arial, serif;
     font-size: 14.0px;
     color: rgba(255, 255, 255, 1.0);
@@ -613,7 +601,7 @@
     width: auto;
     position: absolute;
     margin: 0;
-    left: 20px;
+    left: 5px;
     font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
     font-size: 18.0px;
     color: rgba(255, 255, 255, 1.0);
@@ -643,7 +631,7 @@
     .overview-coins {
       top: 240px;
       height: 100%;
-      width: 375px;
+      width: 347px;
       position: relative;
       margin: 0;
       left: 0;

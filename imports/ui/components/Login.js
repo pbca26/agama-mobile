@@ -228,11 +228,12 @@ class Login extends React.Component {
               <div>
                 <div
                   onClick={ this.scanQR }
-                  className="group3 margin-bottom-20 scan-qr">
-                  <div className="rectangle10copy"></div>
-                  <div className="btn">{ translate('SEND.SCAN_QR') }</div>
-                  <div className="group2">
-                    <i className="fa fa-qrcode"></i>
+                  className="group3 scan-qr">
+                  <div className="btn-inner">
+                    <div className="btn">{ translate('SEND.SCAN_QR') }</div>
+                    <div className="group2">
+                      <i className="fa fa-qrcode"></i>
+                    </div>
                   </div>
                 </div>
                 { this.state.qrScanError &&
@@ -251,7 +252,7 @@ class Login extends React.Component {
                       value={ this.state.passphrase || '' } />
                   </div>
                 </div>
-                <div className="margin-bottom-35 margin-top-40">
+                <div className="margin-bottom-35 margin-top-40 sz350">
                   <label className="switch">
                     <input
                       type="checkbox"
@@ -269,11 +270,11 @@ class Login extends React.Component {
                 </div>
               </div>
               { this.state.createPin &&
-                <div className="group">
+                <div className="group no-padding-top">
                   <div className="edit">
                     <input
                       type="password"
-                      className="form-control margin-bottom-30"
+                      className="form-control"
                       name="pinOverride"
                       onChange={ this.updateInput }
                       placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }

@@ -1,5 +1,6 @@
 .transactions-ui {
   min-height: 100vh;
+  padding: 0 10px;
   padding-top: 30px;
   
   .individualportfolio-inner {
@@ -12,7 +13,6 @@
 
   .individualportfolio {
     width: 100%;
-    min-width: 375px;
     min-height: 100vh;
     position: relative;
     overflow: hidden;
@@ -34,7 +34,7 @@
     width: auto;
     position: absolute;
     margin: 0;
-    left: 20px;
+    left: 0;
     font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
     font-size: 18.0px;
     color: rgba(255, 255, 255, 1.0);
@@ -43,27 +43,26 @@
     line-height: 22.0px
   }
 
-  .individualportfolio .yourcoins {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 42px;
-    height: 21px;
-    width: 88px;
-    position: absolute;
-    margin: 0;
-    left: 144px
+  .cryptocardbtc-block {
+    border-radius: 4px;
+    max-width: 345px;
+    width: calc(100vw - 20px);
+    height: 145px;
+    background: url('/images/template/transactions/gradient.png') no-repeat;  
   }
 
   .individualportfolio .cryptocardbtc {
     background-color: rgba(255, 255, 255, 0.0);
     height: 145px;
-    width: 347px;
+    max-width: 347px;
+    width: calc(100vw - 20px);
     position: absolute;
     margin: 0;
-    left: 14px;
+    left: 0;
 
     .coin-icon {
       position: absolute;
-      right: 8px;
+      right: 13px;
       top: 10px;
       width: 60px;
     }
@@ -75,7 +74,7 @@
       width: auto;
       position: absolute;
       margin: 0;
-      left: 25px;
+      left: 19px;
       font-family: 'San Francisco', Helvetica, Arial, serif;
       font-size: 24.0px;
       color: white;
@@ -90,7 +89,7 @@
       width: auto;
       position: absolute;
       margin: 0;
-      left: 25px;
+      left: 20px;
       font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
       font-size: 15.0px;
       color: white;
@@ -104,7 +103,7 @@
     background-color: rgba(255, 255, 255, 0.0);
     top: 0;
     height: 145px;
-    width: 347px;
+    width: 345px;
     position: relative;
     margin: 0;
     left: 0
@@ -134,7 +133,7 @@
   .individualportfolio .transactions-list {
     top: 292px;
     position: absolute;
-    left: 20px;
+    left: 0;
   
     .item {
       height: 88px;
@@ -274,36 +273,55 @@
   text-align: center;
   z-index: 10;
 
-  button {
-    background-color: rgba(255, 255, 255, 0);
-    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-    font-size: 14.0px;
-    color: white;
+  .send-receive-block-inner {
+    display: inline-block;
     text-align: left;
-    line-height: 18.0px;
-    height: 40px;
-    width: 120px;
-    margin: 0;
-    border-radius: 4px;
-    border: solid 1px rgba(255, 255, 255, 0.5);
-    text-align: center;
-    outline: none;
+    margin: 0 auto;
+    width: 278px;
 
-    i {
-      margin-right: 5px;
-    }
-
-    &:first-child {
-      margin-right: 40px;
+    button {
+      background-color: rgba(255, 255, 255, 0);
+      font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+      font-size: 14.0px;
+      color: white;
+      text-align: left;
+      line-height: 18.0px;
+      height: 40px;
+      width: 120px;
+      margin: 0;
+      border-radius: 4px;
+      border: solid 1px rgba(255, 255, 255, 0.5);
+      text-align: center;
+      outline: none;
 
       i {
-        color: rgba(255, 117, 117, 1.0);
+        margin-right: 5px;
+      }
+
+      &:first-child {
+        margin-right: 40px;
+
+        i {
+          color: rgba(255, 117, 117, 1.0);
+        }
+      }
+      &:last-child,
+      &:nth-child(2) {
+        i {
+          color: rgba(142, 204, 96, 1.0);
+        }
       }
     }
-    &:last-child,
-    &:nth-child(2) {
-      i {
-        color: rgba(142, 204, 96, 1.0);
+  }
+  &.three-btn {
+    padding: 0 10px;
+
+    .send-receive-block-inner {
+      text-align: left;
+      width: 393px;
+
+      button {
+        width: 101px;
       }
     }
   }
@@ -311,12 +329,6 @@
 
 .interest {
   margin-top: 16px;
-}
-
-.three-btn {
-  button {
-    width: 100px;
-  }
 }
 
 .tx-interest {

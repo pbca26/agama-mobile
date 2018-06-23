@@ -66,7 +66,7 @@ App.accessRule('https://explorer.utrum.io');
 App.accessRule('https://www.mnzexplorer.com');
 
 // Set PhoneGap/Cordova preferences.
-App.setPreference('BackgroundColor', '0x45485FFF');
+App.setPreference('BackgroundColor', '0xffffffff'); // 0x45485FFF
 /*App.setPreference('HideKeyboardFormAccessoryBar', true);
 App.setPreference('Orientation', 'default');
 App.setPreference('Orientation', 'all', 'ios');*/
