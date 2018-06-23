@@ -610,6 +610,7 @@ class App extends React.Component {
                     </div>
                   }
                   { this.state.activeSection !== 'recovery' &&
+                    getLocalStorageVar('seed') &&
                     <div className="item">
                       <div
                         className="title"
@@ -694,6 +695,7 @@ class App extends React.Component {
                   </div>
                 }
                 { this.state.activeSection !== 'pin' &&
+                  getLocalStorageVar('seed') &&
                   <div className="item">
                     <div
                       className="title"
