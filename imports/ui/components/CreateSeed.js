@@ -104,7 +104,7 @@ class CreateSeed extends React.Component {
           <div className="margin-top-25 margin-bottom-25 text-center warning">
             <strong>{ translate('LOGIN.PLEASE_MAKE_SURE_TO') }</strong>
           </div>
-          <div className="margin-top-35 margin-bottom-35">
+          <div className="margin-top-35 margin-bottom-35 sz350">
             <label className="switch">
               <input
                 type="checkbox"
@@ -121,7 +121,7 @@ class CreateSeed extends React.Component {
             </div>
             { !this.state.confirmSeedSaved &&
               !this.state.pristine &&
-              <div className="error margin-top-15 sz350">
+              <div className="error margin-top-15">
                 <i className="fa fa-warning"></i> { translate('LOGIN.CONFIRMATION_REQUIRED') }
               </div>
             }

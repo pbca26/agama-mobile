@@ -1,19 +1,13 @@
 .form {
   width: 100%;
-  // min-width: 375px;
-  /*height: 100vh;
-  min-height: 667px;*/
   position: relative;
-  // overflow: hidden;
   margin: 0;
 
   .form-inner {
-    // width: 375px;
     height: 100%;
     position:relative;
     margin: auto;
     padding: 10px 0;
-    // background-color: #45485F;
   }
 
   a {
@@ -39,15 +33,6 @@
     color: rgba(255, 255, 255, 1.0);
     text-align: center;
     line-height: 24.0px
-  }
-
-  .group3 {
-    /*top: 120px;
-    height: 72px;
-    width: 209px;
-    position: relative;
-    margin: 0;
-    left: 84px;*/
   }
 
   .group3 .rectangle10copy2 {
@@ -106,16 +91,16 @@
   .edit {
     background-color: #373A4C;
     height: auto;
-    width: auto;
+    width: 100%;
     margin: 0 auto;
-    max-width: 350px;
+    max-width: 310px;
     font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
     font-size: 16.0px;
     color: #fff;
     text-align: left;
     line-height: 19px;
     height: 100%;
-    padding: 10px 10px 10px 10px;
+    padding: 10px 10px 11px 10px;
     
     input {
       background: none;
@@ -180,14 +165,13 @@
       top: 0;
     }
     .title {
-      padding: 30px 0;
+      padding: 30px 0 0 0;
       top: 0;
     }
     .group {
       position: inherit;
       top: 0;
       left: 0;
-      height: 40px;
 
       input {
         width: 100%;
@@ -195,7 +179,7 @@
     }
     .group3:last-child {
       top: 0;
-      margin-top: 60px;
+      margin-top: 40px;
     }
   }
 }

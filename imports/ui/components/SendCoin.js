@@ -366,19 +366,9 @@ class SendCoin extends React.Component {
                 </span>
               </div>
             </div>
-
-            { this.state.spvPreflightSendInProgress &&
-              <div className="padding-top-20 fs14 text-center">{ translate('SEND.SPV_VERIFYING') }...</div>
-            }
-            { this.state.spvVerificationWarning &&
-              <div className="padding-top-20 fs14 lh25">
-                <i className="fa fa-warning warning"></i> <strong className="warning">{ translate('SEND.WARNING') }:</strong> { translate('SEND.WARNING_SPV_P1') }<br />
-                { translate('SEND.WARNING_SPV_P2') }
-              </div>
-            }
             { getLocalStorageVar('settings') &&
               getLocalStorageVar('settings').requirePin &&
-              <div className="padding-top-20">
+              <div>
                 <div className="edit pin-confirm">
                   <input
                     type="password"
@@ -394,6 +384,15 @@ class SendCoin extends React.Component {
             { this.state.wrongPin &&
               <div className="error margin-top-15 margin-bottom-25 fs14">
                 <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
+              </div>
+            }
+            { this.state.spvPreflightSendInProgress &&
+              <div className="padding-top-20 fs14 text-center">{ translate('SEND.SPV_VERIFYING') }...</div>
+            }
+            { this.state.spvVerificationWarning &&
+              <div className="padding-top-20 fs14 lh25">
+                <i className="fa fa-warning warning"></i> <strong className="warning">{ translate('SEND.WARNING') }:</strong> { translate('SEND.WARNING_SPV_P1') }<br />
+                { translate('SEND.WARNING_SPV_P2') }
               </div>
             }
             <div className="widget-body-footer">

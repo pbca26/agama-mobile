@@ -38,39 +38,41 @@ class SendReceive extends React.Component {
   render() {
     return (
       <div className={ 'margin-top-20 send-receive-block' + (this.showClaimButton() ? ' three-btn' : '') }>
-        <button
-          disabled={ !this.showSendButton() }
-          type="button"
-          onClick={ () => this.props.changeActiveSection('send') }
-          className="btn btn-primary waves-effect waves-light margin-right-20">
-          <i className="fa fa-send"></i> { translate('DASHBOARD.SEND') }
-        </button>
-        <button
-          type="button"
-          className="btn btn-success waves-effect waves-light"
-          onClick={ this.toggleQR }>
-          <i className="fa fa-inbox"></i> { translate('DASHBOARD.RECEIVE') }
-        </button>
-        { this.state.showQR &&
-          <div className="receive-qr">
-            { this.props.address &&
-              <div>
-                <QRCode
-                  value={ this.props.address }
-                  size={ 198 } />
-                <div className="text-center">{ this.props.address }</div>
-              </div>
-            }
-          </div>
-        }
-        { this.showClaimButton() &&
+        <div className="send-receive-block-inner">
+          <button
+            disabled={ !this.showSendButton() }
+            type="button"
+            onClick={ () => this.props.changeActiveSection('send') }
+            className="btn btn-primary waves-effect waves-light margin-right-20">
+            <i className="fa fa-send"></i> { translate('DASHBOARD.SEND') }
+          </button>
           <button
             type="button"
-            className="btn btn-info waves-effect waves-light margin-left-20 btn-claim"
-            onClick={ this.props.toggleKMDInterest }>
-            <i className="fa fa-dollar"></i> { translate('DASHBOARD.CLAIM') }
+            className="btn btn-success waves-effect waves-light"
+            onClick={ this.toggleQR }>
+            <i className="fa fa-inbox"></i> { translate('DASHBOARD.RECEIVE') }
           </button>
-        }
+          { this.state.showQR &&
+            <div className="receive-qr">
+              { this.props.address &&
+                <div>
+                  <QRCode
+                    value={ this.props.address }
+                    size={ 198 } />
+                  <div className="text-center">{ this.props.address }</div>
+                </div>
+              }
+            </div>
+          }
+          { this.showClaimButton() &&
+            <button
+              type="button"
+              className="btn btn-info waves-effect waves-light margin-left-20 btn-claim"
+              onClick={ this.props.toggleKMDInterest }>
+              <i className="fa fa-dollar"></i> { translate('DASHBOARD.CLAIM') }
+            </button>
+          }
+        </div>
       </div>
     );
   }

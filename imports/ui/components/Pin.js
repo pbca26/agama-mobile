@@ -112,7 +112,7 @@ class Pin extends React.Component {
         </div>
         { this.state.qrScanError &&
           <div className="error margin-top-5 margin-bottom-15 sz350">
-            { translate('SEND.QR_SCAN_ERR') } <i className="fa fa-warning"></i>
+            <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
           </div>
         }
         <div className="edit margin-bottom-10">
