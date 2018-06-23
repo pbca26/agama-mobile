@@ -85,6 +85,7 @@ class App extends React.Component {
   }
 
   componentWillMount() {
+    const { actions } = this.props;
     const _localStorageCoins = getLocalStorageVar('coins');
 
     if (_localStorageCoins) {
@@ -92,6 +93,13 @@ class App extends React.Component {
         coins: _localStorageCoins,
       });
     }
+  
+    actions.getOverview(this.state.coins)
+    .then((res) => {
+      this.setState({
+        overview: res,
+      });
+    });
   }
 
   historyBack() {
@@ -202,7 +210,7 @@ class App extends React.Component {
       });
     }
 
-    document.getElementById('body').style.overflow = 'inherit';
+    // document.getElementById('body').style.overflowY = 'inherit';
     this.scrollToTop();
   }
 
