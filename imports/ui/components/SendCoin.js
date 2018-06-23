@@ -120,6 +120,13 @@ class SendCoin extends React.Component {
   updateInput(e) {
     this.setState({
       [e.target.name]: e.target.value,
+      spvVerificationWarning: false,
+      spvPreflightSendInProgress: false,
+      validNan: false,
+      validTooMuch: false,
+      validIncorrectAddress: false,
+      qrScanError: false,
+      wrongPin: false,
     });
   }
 
