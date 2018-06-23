@@ -85,6 +85,11 @@ class SendCoin extends React.Component {
         this.setState({
           qrScanError: true,
         });
+        setTimeout(() => {
+          this.setState({
+            qrScanError: false,
+          });
+        }, 5000);
       } else {
         convertURIToImageData(data)
         .then((imageData) => {
@@ -98,6 +103,11 @@ class SendCoin extends React.Component {
             this.setState({
               qrScanError: true,
             });
+            setTimeout(() => {
+              this.setState({
+                qrScanError: false,
+              });
+            }, 5000);
           } else {
             this.setState({
               qrScanError: false,
