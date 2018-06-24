@@ -35,7 +35,7 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
             proto: electrumServer.proto,
             address,
             raw: true,
-            maxlength: 2,
+            // maxlength: 2,
           },
         }, (error, result) => {
           result = JSON.parse(result.content);

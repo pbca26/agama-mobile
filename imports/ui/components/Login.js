@@ -310,7 +310,9 @@ class Login extends React.Component {
                   <div className="btn">Sign In</div>
                   <div className="group2">
                     <div className="rectangle8copy"></div>
-                    <img className="path6" src="/images/template/login/reset-password-path-6.png" />
+                    <img
+                      className="path6"
+                      src="/images/template/login/reset-password-path-6.png" />
                   </div>
                 </div>
               </div>

@@ -1,12 +1,18 @@
+@media only screen and (max-width : 370px) {
+  .app-main .transactions-ui {
+    padding-left: 7px;
+    padding-right: 0;
+  }
+}
+
 .transactions-ui {
   min-height: 100vh;
   padding: 0 10px;
   padding-top: 30px;
   
   .individualportfolio-inner {
-    width: 375px;
-    height: 100%;
-    position:relative;
+    width: 375px;    
+    position: relative;
     margin: auto;
     min-height: 100vh;
   }
@@ -15,16 +21,16 @@
     width: 100%;
     min-height: 100vh;
     position: relative;
-    overflow: hidden;
+    overflow-x: hidden;
     margin: 0;
   }
 
   a {
-    text-decoration: none
+    text-decoration: none;
   }
 
   div {
-    -webkit-text-size-adjust: none
+    -webkit-text-size-adjust: none;
   }
 
   .individualportfolio .lasttransactions {
@@ -34,7 +40,7 @@
     width: auto;
     position: absolute;
     margin: 0;
-    left: 0;
+    left: 3px;
     font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
     font-size: 18.0px;
     color: rgba(255, 255, 255, 1.0);
@@ -46,7 +52,7 @@
   .cryptocardbtc-block {
     border-radius: 4px;
     max-width: 345px;
-    width: calc(100vw - 20px);
+    width: calc(100vw - 12px);
     height: 145px;
     background: url('/images/template/transactions/gradient.png') no-repeat;  
   }
@@ -55,7 +61,7 @@
     background-color: rgba(255, 255, 255, 0.0);
     height: 145px;
     max-width: 347px;
-    width: calc(100vw - 20px);
+    width: calc(100vw - 12px);
     position: absolute;
     margin: 0;
     left: 0;
@@ -123,7 +129,7 @@
     background-color: rgba(255, 255, 255, 0.0);
     padding-top: 53px;
     height: 1px;
-    width: 375px;
+    width: 357px;
     position: absolute;
     margin: 0;
     left: -14px;
@@ -131,10 +137,10 @@
   }
 
   .individualportfolio .transactions-list {
-    top: 292px;
-    position: absolute;
-    left: 0;
-  
+    margin-top: 145px;
+    position: relative;
+    left: 4px;
+
     .item {
       height: 88px;
       width: 335px;
@@ -268,16 +274,16 @@
 
 .send-receive-block {
   position: absolute;
-  top: 232px;
-  width: 100%;
-  text-align: center;
+  top: 168px;
+  max-width: 345px;
+  width: calc(100vw - 12px);
   z-index: 10;
 
   .send-receive-block-inner {
+    text-align: center;
     display: inline-block;
-    text-align: left;
     margin: 0 auto;
-    width: 278px;
+    width: 345px;
 
     button {
       background-color: rgba(255, 255, 255, 0);
@@ -314,14 +320,15 @@
     }
   }
   &.three-btn {
-    padding: 0 10px;
+    width: inherit;
+    max-width: inherit;
 
     .send-receive-block-inner {
-      text-align: left;
-      width: 393px;
+      max-width: 345px;
+      width: calc(100vw - 12px);
 
       button {
-        width: 101px;
+        width: calc(345px/3 - 16px);
       }
     }
   }

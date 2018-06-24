@@ -7,20 +7,48 @@ import {
 } from '../actions/utils';
 import { translate } from '../translate/translate';
 import Spinner from './Spinner';
+import QRCode from 'qrcode.react';
 
 class Transactions extends React.Component {
   constructor() {
     super();
     this.state = {
       toggledTxDetails: null,
+      showQR: false,
     };
     this.toggleTxDetails = this.toggleTxDetails.bind(this);
     this.openExternalURL = this.openExternalURL.bind(this);
     this.isInterestDefined = this.isInterestDefined.bind(this);
+    this.toggleQR = this.toggleQR.bind(this);
+    this.showClaimButton = this.showClaimButton.bind(this);
+  }
+
+  toggleQR() {
+    this.setState({
+      showQR: !this.state.showQR,
+    });
+  }
+
+  showClaimButton() {
+    if (this.props.coin === 'kmd' &&
+        this.props.balance &&
+        this.props.balance.interest &&
+        this.props.balance.interest > 0) {
+      return true;
+    }
+  }
+
+  showSendButton() {
+    if (this.props.balance &&
+        this.props.balance.balance &&
+        this.props.balance.balance > 0) {
+      return true;
+    }
   }
 
   isInterestDefined() {
-    if (this.props.balance.interest &&
+    if (this.props.balance &&
+        this.props.balance.interest &&
         this.props.balance.interest > 0) {
       return true;
     }
@@ -103,12 +131,54 @@ class Transactions extends React.Component {
     );
   };
 
+  renderSendReceiveBtn() {
+    return (
+      <div className={ 'send-receive-block' + (this.showClaimButton() ? ' three-btn' : '') }>
+        <div className="send-receive-block-inner">
+          <button
+            disabled={ !this.showSendButton() }
+            type="button"
+            onClick={ () => this.props.changeActiveSection('send') }
+            className="btn btn-primary waves-effect waves-light margin-right-20">
+            <i className="fa fa-send"></i> { translate('DASHBOARD.SEND') }
+          </button>
+          <button
+            type="button"
+            className="btn btn-success waves-effect waves-light"
+            onClick={ this.toggleQR }>
+            <i className="fa fa-inbox"></i> { translate('DASHBOARD.RECEIVE') }
+          </button>
+          { this.state.showQR &&
+            <div className="receive-qr">
+              { this.props.address &&
+                <div>
+                  <QRCode
+                    value={ this.props.address }
+                    size={ 198 } />
+                  <div className="text-center">{ this.props.address }</div>
+                </div>
+              }
+            </div>
+          }
+          { this.showClaimButton() &&
+            <button
+              type="button"
+              className="btn btn-info waves-effect waves-light margin-left-20 btn-claim"
+              onClick={ this.props.toggleKMDInterest }>
+              <i className="fa fa-dollar"></i> { translate('DASHBOARD.CLAIM') }
+            </button>
+          }
+        </div>
+      </div>
+    );
+  }
+
   render() {
     if (this.props.activeSection === 'dashboard') {
-      if (this.props.transactions) {
-        const _transactions = this.props.transactions;
-        let _items = [];
+      const _transactions = this.props.transactions;
+      let _items = [];
 
+      if (_transactions) {
         for (let i = 0; i < _transactions.length; i++) {
           _items.push(
             <div
@@ -169,56 +239,59 @@ class Transactions extends React.Component {
             </div>
           );*/
         }
+      }
 
-        return (
-          <div className="transactions-ui">
-            <div className="individualportfolio">
-              <div className="individualportfolio-inner">
+      return (
+        <div className="transactions-ui">
+          <div className="individualportfolio">
+            <div className="individualportfolio-inner">
+              { this.props.loading &&
+                !this.props.transactions &&
+                <div className="lasttransactions">Loading transactions history...</div>                  
+              }
+              { this.props.transactions &&
                 <div className="lasttransactions">{ !_items.length ? translate('TRANSACTIONS.NO_HISTORY') : 'Last Transactions' }</div>
-                <div className="cryptocardbtc-block">
-                  <div className="cryptocardbtc">
-                    <img
-                      className="coin-icon"
-                      src={ `/images/cryptologo/${this.props.coin}.png` } />
-                    <div className="coin-title">{ translate('COINS.' + this.props.coin.toUpperCase()) }</div>
-                    <div className="coin-balance">
-                      <div className="balance">
-                      { translate('BALANCE.BALANCE') }: { formatValue(this.props.balance.balance) } { this.props.coin.toUpperCase() }
-                      </div>
-                      { this.isInterestDefined() &&
-                        <div className="interest">
-                        { translate('BALANCE.INTEREST') }: { formatValue(this.props.balance.interest) } { this.props.coin.toUpperCase() }
-                        </div>
-                      }
+              }
+              <div className="cryptocardbtc-block">
+                <div className="cryptocardbtc">
+                  <img
+                    className="coin-icon"
+                    src={ `/images/cryptologo/${this.props.coin}.png` } />
+                  <div className="coin-title">{ translate('COINS.' + this.props.coin.toUpperCase()) }</div>
+                  <div className="coin-balance">
+                    <div className="balance">
+                    { translate('BALANCE.BALANCE') }: { this.props.balance ? formatValue(this.props.balance.balance) : 0 } { this.props.coin.toUpperCase() }
                     </div>
-                    { !this.props.loading &&
-                      this.props.auth &&
+                    { this.isInterestDefined() &&
+                      <div className="interest">
+                      { translate('BALANCE.INTEREST') }: { this.props.balance ? formatValue(this.props.balance.interest) : 0 } { this.props.coin.toUpperCase() }
+                      </div>
+                    }
+                  </div>
+                  { !this.props.loading &&
+                    this.props.auth &&
+                    this.props.activeSection === 'dashboard' &&
+                    (_items && _items.length > 0) &&
+                    <i
+                      onClick={ this.props.dashboardRefresh }
+                      className="fa fa-refresh dashboard-refresh"></i>
+                    }
+                    { this.props.loading &&
                       this.props.activeSection === 'dashboard' &&
-                      (_items && _items.length > 0) &&
-                      <i
-                        onClick={ this.props.dashboardRefresh }
-                        className="fa fa-refresh dashboard-refresh"></i>
-                      }
-                      { this.props.loading &&
-                        this.props.activeSection === 'dashboard' &&
-                        <Spinner />
-                      }
-                  </div>
+                      <Spinner />
+                    }
                 </div>
-                { (_items && _items.length > 0) &&
-                  <div className="transactions-list">
-                  { _items }
-                  </div>
-                }
               </div>
+              { this.renderSendReceiveBtn() }
+              { (_items && _items.length > 0 && !this.state.showQR) &&
+                <div className="transactions-list">
+                { _items }
+                </div>
+              }
             </div>
           </div>
-        );
-      } else {
-        return null;
-      }
-    } else {
-      return null;
+        </div>
+      );
     }
   }
 }

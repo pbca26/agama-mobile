@@ -179,7 +179,6 @@ class SendCoin extends React.Component {
   }
 
   changeSendCoinStep(step, back) {
-    console.warn(step);
     if (back) {
       this.setState({
         sendCurrentStep: step,
