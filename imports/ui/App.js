@@ -749,6 +749,7 @@ class App extends React.Component {
         <div className="app-header">
           { this.state.history &&
             !this.state.displayMenu &&
+            ((this.state.auth && this.state.history !== 'login' && this.state.history !== 'create-seed') || !this.state.auth) &&
             <img
               onClick={ this.historyBack }
               className="menu-back"
