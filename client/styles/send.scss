@@ -1,8 +1,8 @@
 .form.send {
   .edit {
     font-size: 14px;
-    width: 100%;
-    max-width: 100%;
+    width: inherit;
+    max-width: inherit;
     padding: 15px 10px 10px 10px;
 
     input {
@@ -105,7 +105,8 @@
   }
   .btn-inner {
     &.pull-left {
-      margin-left: 20px;
+      margin-left: 10px;
+      padding: 0 10px;
 
       .group2 {
         float: left;
@@ -114,7 +115,7 @@
       .btn {
         float: right;
         position: relative;
-        left: 48px;
+        left: 40px;
         top: 1px;
         padding-right: 50px;
       }
@@ -124,7 +125,14 @@
       }
     }
     &.pull-right {
-      margin-right: 20px;
+      margin-right: 10px;
+      padding: 0 10px;
+
+      .btn {
+        position: relative;
+        left: 8px;
+        top: 0;
+      }
     }
   }
 }

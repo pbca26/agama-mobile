@@ -3,7 +3,7 @@
   padding: 0 10px;
   
   .home-inner {
-    width: 375px;
+    max-width: 375px;
     height: 100%;
     position:relative;
     margin: auto;
@@ -41,7 +41,7 @@
     background-color: rgba(255, 255, 255, 0.0);
     top: 34px;
     height: 220px;
-    width: 347px;
+    width: 340px;
     position: absolute;
     margin: 0;
     left: 0;
@@ -61,7 +61,7 @@
     background-color: rgba(255, 255, 255, 0.0);
     top: 0;
     height: 150px;
-    width: 345px;
+    width: 340px;
     position: absolute;
     margin: 0;
     left: 1px
@@ -71,7 +71,7 @@
     background-color: rgba(255, 255, 255, 0.0);
     top: 0;
     height: 150px;
-    width: 345px;
+    width: 340px;
     position: relative;
     margin: 0;
     left: 0;
@@ -416,14 +416,14 @@
   /* coin */
   .home {
     .overview-coins {
-      width: 347px;
+      width: 340px;
       margin: 0;
 
       .overview-coin {
         height: 80px;
 
         .div1 {
-          width: 347px;
+          width: 340px;
         }
 
         &:last-child {
@@ -465,7 +465,7 @@
     width: 10px;
     position: absolute;
     margin: 0;
-    left: 345px
+    left: 340px
   }
 
   .home .btc {

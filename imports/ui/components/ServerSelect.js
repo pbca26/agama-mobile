@@ -78,9 +78,9 @@ class ServerSelect extends React.Component {
   render() {
     return (
       <div className="margin-top-40 form server-select">
-        <span className="bold">
+        <div className="bold text-center">
           <i className="fa fa-warning error"></i> <span className="error">{ translate('DASHBOARD.CON_ERROR', this.props.coin.toUpperCase()) }</span>
-        </span>
+        </div>
         <div className="server-select-inner">
           <div>
             <select
@@ -93,22 +93,23 @@ class ServerSelect extends React.Component {
             </select>
           </div>
           { this.state.errorTestingServer &&
-            <div className="error margin-top-10 margin-bottom-10">
+            <div className="error margin-top-10 margin-bottom-10 text-center">
             { translate('DASHBOARD.ERROR_TESTING_SERVER', this.state.selectedOption) }
             </div>
           }
           { this.state.connecting &&
-            <div className="margin-top-20 margin-bottom-10">
+            <div className="margin-top-20 margin-bottom-10 text-center">
             { translate('DASHBOARD.CONNECTING_TO_NEW_SERVER') }
             </div>
           }
           <div
             onClick={ this.setElectrumServer }
             className="group3 margin-top-50">
-            <div className="rectangle10copy"></div>
-            <div className="btn">{ translate('DASHBOARD.SWITCH_SERVER') }</div>
-            <div className="group2">
-              <i className="fa fa-eye"></i>
+            <div className="btn-inner">
+              <div className="btn">{ translate('DASHBOARD.SWITCH_SERVER') }</div>
+              <div className="group2">
+                <i className="fa fa-eye"></i>
+              </div>
             </div>
           </div>
         </div>
