@@ -19,7 +19,6 @@ import Login from './components/Login';
 import Transactions from './components/Transactions';
 import ServerSelect from './components/ServerSelect';
 import CreateSeed from './components/CreateSeed';
-import SendReceive from './components/SendReceive';
 import KMDInterest from './components/KMDInterest';
 import OfflineSigning from './components/OfflineSigning';
 import Pin from './components/Pin';
@@ -794,22 +793,19 @@ class App extends React.Component {
               <i className="fa fa-warning error"></i> <span className="error">{ translate('DASHBOARD.PROXY_ERROR') }</span>
             </div>
           }
-          {  /*<Balance { ...this.state } /> */ }
-          { this.state.auth &&
-            this.state.activeSection === 'dashboard' &&
-            !this.state.proxyError &&
-            <SendReceive
-              { ...this.state }
-              changeActiveSection={ this.changeActiveSection }
-              toggleKMDInterest={ this.toggleKMDInterest } />
-          }
           <KMDInterest
             { ...this.state }
             sendtx={ this.props.actions.sendtx }
             changeActiveSection={ this.changeActiveSection } />
-          <Transactions
-            { ...this.state }
-            dashboardRefresh={ this.dashboardRefresh } />
+          { this.state.auth &&
+            this.state.activeSection === 'dashboard' &&
+            !this.state.proxyError &&
+            <Transactions
+              { ...this.state }
+              dashboardRefresh={ this.dashboardRefresh }
+              changeActiveSection={ this.changeActiveSection }
+              toggleKMDInterest={ this.toggleKMDInterest } />
+          }
           { !this.state.auth &&
             this.state.activeSection === 'offlinesig' &&
             <OfflineSigning />
