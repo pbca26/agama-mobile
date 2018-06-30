@@ -11,7 +11,7 @@ import {
   getRandomIntInclusive,
   convertURIToImageData,
 } from './actions/utils';
-import { translate } from './translate/translate';
+import translate from './translate/translate';
 
 import SendCoin from './components/SendCoin';
 import AddCoin from './components/AddCoin';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { translate } from '../translate/translate';
+import translate from '../translate/translate';
 import {
   isNumber,
   explorers,
@@ -189,7 +189,6 @@ class SendCoin extends React.Component {
         wrongPin: false,
       });
     } else {
-      console.warn(this.validate());
       if (!this.validate()) {
         switch(step) {
           case 0:
@@ -392,7 +391,7 @@ class SendCoin extends React.Component {
                     name="pin"
                     value={ this.state.pin }
                     onChange={ this.updateInput }
-                    placeholder="Enter your PIN"
+                    placeholder={ translate('SEND.ENTER_YOUR_PIN') }
                     autoComplete="off" />
                 </div>
               </div>
@@ -418,7 +417,9 @@ class SendCoin extends React.Component {
                   className="btn-inner pull-left">
                   <div className="btn">{ translate('SEND.BACK') }</div>
                   <div className="group2">
-                    <img className="path6" src="/images/template/menu/trends-combined-shape.png" />
+                    <img
+                      className="path6"
+                      src="/images/template/menu/trends-combined-shape.png" />
                   </div>
                 </div>
                 <div
@@ -426,8 +427,9 @@ class SendCoin extends React.Component {
                   className="btn-inner pull-right">
                   <div className="btn">{ translate('SEND.CONFIRM') }</div>
                   <div className="group2">
-                    <div className="rectangle8copy"></div>
-                    <img className="path6" src="/images/template/login/reset-password-path-6.png" />
+                    <img
+                      className="path6"
+                      src="/images/template/login/reset-password-path-6.png" />
                   </div>
                 </div>
               </div>
@@ -440,7 +442,7 @@ class SendCoin extends React.Component {
                 this.state.sendResult.msg === 'success' &&
                 <div className="send-result">
                   <div className="edit success">
-                    Success <i className="fa fa-check"></i>
+                  { translate('SEND.SUCCESS') } <i className="fa fa-check"></i>
                   </div>
                   <div className="edit">
                     { translate('SEND.FROM') }
@@ -455,7 +457,7 @@ class SendCoin extends React.Component {
                     <div className="shade margin-top-5">{ this.state.sendAmount } { this.props.coin.toUpperCase() }</div>
                   </div>
                   <div className="edit">
-                    Transaction ID
+                    { translate('SEND.TXID') }
                     <div className="shade margin-top-5">{ this.state.sendResult && this.state.sendResult.result && this.state.sendResult.result.txid ? this.renderTxID() : translate('SEND.PROCESSING_SM') }</div>
                   </div>
                   { (isAssetChain(this.props.coin) || this.props.coin === 'chips') &&
@@ -464,7 +466,7 @@ class SendCoin extends React.Component {
                       this.state.sendResult.result.txid &&
                     <div className="edit">
                       <span onClick={ () => this.openExternalURL(`${explorers[this.props.coin.toUpperCase()]}/tx/${this.state.sendResult.result.txid}`) }>
-                        Open in explorer<i className="fa fa-external-link margin-left-10"></i>
+                      { translate('SEND.OPEN_IN_EXPLORER') }<i className="fa fa-external-link margin-left-10"></i>
                       </span>
                     </div>
                   }
@@ -497,11 +499,13 @@ class SendCoin extends React.Component {
             <div
               onClick={ () => this.changeSendCoinStep(0) }
               className="group3 margin-top-50">
-              <div className="rectangle10copy"></div>
-              <div className="btn">{ translate('SEND.MAKE_ANOTHER_TX') }</div>
-              <div className="group2">
-                <div className="rectangle8copy"></div>
-                <img className="path6" src="/images/template/login/reset-password-path-6.png" />
+              <div class="btn-inner">
+                <div className="btn">{ translate('SEND.MAKE_ANOTHER_TX') }</div>
+                <div className="group2">
+                  <img
+                    className="path6"
+                    src="/images/template/login/reset-password-path-6.png" />
+                </div>
               </div>
             </div>
           </div>

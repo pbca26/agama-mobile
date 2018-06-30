@@ -1,6 +1,39 @@
 export const _lang = {
   'EN': {
+    'SETTINGS': {
+      'MINUTES': 'minutes',
+      'SAVE': 'Save',
+      'REQUIRE_PIN_CONFIRM': 'Require PIN to confirm transaction',
+    },
+    'RECOVERY': {
+      'PROVIDE_YOUR_PIN': 'Provide your PIN number to unlock passphrase.',
+      'SHOW': 'Show',
+    },
+    'PIN': {
+      'SAVE': 'Save',
+      'SEED_IS_ENCRYPTED': 'Seed is encrypted with provided PIN. Use the PIN to login or sign a transaction.',
+      'PROVIDE_A_PASSPHRASE': 'Provide passhprase or WIF',
+      'PROVIDE_A_SEED': 'Provide a seed and enter 6 digit PIN number in the form below.',
+    },
+    'OVERVIEW': {
+      'TOTAL_VALUE': 'Total Value',
+      'PER_COIN': 'per coin',
+      'YOUR_COINS': 'Your Coins',
+    },
+    'OFFLINE': {
+      'TX_SIG_FAIL': 'failed to sign transaction',
+      'CONFIRM': 'Confirm',
+      'TX_PIN_CONFIRM': 'To confirm transaction provide PIN and press the button below.',
+      'OFFLINE_TX_SIG': 'Offline Transaction Signing',
+      'SEND_FROM': 'Send from',
+      'SEND_TO': 'Send to',
+      'AMOUNT': 'Amount',
+    },
     'LOGIN': {
+      'OR_WIF': 'or WIF',
+      'CREATE_A_PIN': 'Create a pin to Sign In.',
+      'SIGN_IN_TO_YOUR_ACC': 'Sign In to your Agama account.',
+      'SIGN_IN': 'Sign In',
       'PIN_ACCESS': 'PIN access',
       'WRONG_PIN': 'Wrong PIN!',
       'LOGIN': 'Login',
@@ -15,6 +48,10 @@ export const _lang = {
       'CONFIRMATION_REQUIRED': 'Confirmation is required',
     },
     'SEND': {
+      'SUCCESS': 'Success',
+      'TXID': 'Transaction ID',
+      'OPEN_IN_EXPLORER': 'Open in explorer',
+      'ENTER_YOUR_PIN': 'Enter your PIN',
       'SEND': 'Send',
       'BACK': 'Back',
       'SEND_FROM': 'Send from',
@@ -75,6 +112,8 @@ export const _lang = {
       'CLAIM': 'Claim',
     },
     'TRANSACTIONS': {
+      'LAST_TX': 'Last Transactions',
+      'LOADING_HISTORY': 'Loading transactions history',
       'OUT': 'out',
       'IN': 'in',
       'MINE': 'mine',

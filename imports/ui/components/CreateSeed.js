@@ -9,7 +9,7 @@ import {
   encryptkey,
   decryptkey,
 } from '../actions/seedCrypt';
-import { translate } from '../translate/translate';
+import translate from '../translate/translate';
 import passphraseGenerator from 'agama-wallet-lib/src/crypto/passphrasegenerator';
 
 class CreateSeed extends React.Component {
@@ -164,7 +164,7 @@ class CreateSeed extends React.Component {
             onClick={ this.login }
             className="group3">
             <div className="btn-inner">
-              <div className="btn">Sign In</div>
+              <div className="btn">{ translate('LOGIN.SIGN_IN') }</div>
               <div className="group2">
                 <div className="rectangle8copy"></div>
                 <img

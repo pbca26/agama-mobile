@@ -1,7 +1,7 @@
 import React from 'react';
 import Spinner from './Spinner';
 
-import { translate } from '../translate/translate';
+import translate from '../translate/translate';
 import {
   secondsToString,
   formatValue,
@@ -97,12 +97,12 @@ class KMDInterest extends React.Component {
           <td className={ _utxo[i].amount >= 10 ? 'green bold' : '' }>{ formatValue(_utxo[i].amount) }</td>
           <td>{ formatValue(_utxo[i].interest) }</td>
           <td>
-          { _utxo[i].locktime &&
-            <i className="fa fa-check-circle green locktime-icon"></i>
-          }
-          { !_utxo[i].locktime &&
-            <i className="fa fa-exclamation-circle red locktime-icon"></i>
-          }
+            { _utxo[i].locktime &&
+              <i className="fa fa-check-circle green locktime-icon"></i>
+            }
+            { !_utxo[i].locktime &&
+              <i className="fa fa-exclamation-circle red locktime-icon"></i>
+            }
           </td>
         </tr>
       );

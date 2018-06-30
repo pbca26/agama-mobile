@@ -125,7 +125,8 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                                     _utxoItem.height,
                                     electrumServer,
                                     proxyServer
-                                  ).then((verifyMerkleRes) => {
+                                  )
+                                  .then((verifyMerkleRes) => {
                                     if (verifyMerkleRes &&
                                         verifyMerkleRes === CONNECTION_ERROR_OR_INCOMPLETE_DATA) {
                                       verifyMerkleRes = false;
@@ -156,7 +157,8 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                                     _utxoItem.height,
                                     electrumServer,
                                     proxyServer
-                                  ).then((verifyMerkleRes) => {
+                                  )
+                                  .then((verifyMerkleRes) => {
                                     if (verifyMerkleRes &&
                                         verifyMerkleRes === CONNECTION_ERROR_OR_INCOMPLETE_DATA) {
                                       verifyMerkleRes = false;

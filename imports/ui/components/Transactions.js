@@ -5,7 +5,7 @@ import {
   explorers,
   isAssetChain,
 } from '../actions/utils';
-import { translate } from '../translate/translate';
+import translate from '../translate/translate';
 import Spinner from './Spinner';
 import QRCode from 'qrcode.react';
 
@@ -247,10 +247,10 @@ class Transactions extends React.Component {
             <div className="individualportfolio-inner">
               { this.props.loading &&
                 !this.props.transactions &&
-                <div className="lasttransactions">Loading transactions history...</div>                  
+                <div className="lasttransactions">{ translate('TRANSACTIONS.LOADING_HISTORY') }...</div>                  
               }
               { this.props.transactions &&
-                <div className="lasttransactions">{ !_items.length ? translate('TRANSACTIONS.NO_HISTORY') : 'Last Transactions' }</div>
+                <div className="lasttransactions">{ !_items.length ? translate('TRANSACTIONS.NO_HISTORY') : translate('TRANSACTIONS.LAST_TX') }</div>
               }
               <div className="cryptocardbtc-block">
                 <div className="cryptocardbtc">

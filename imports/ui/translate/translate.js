@@ -1,6 +1,6 @@
 import { _lang } from './en';
 
-export function translate(langID, interpolateStr) {
+const translate = (langID, interpolateStr) => {
   let defaultLang = 'EN';
 
   if (langID &&
@@ -26,3 +26,5 @@ export function translate(langID, interpolateStr) {
     }
   }
 }
+
+export default translate;

@@ -8,7 +8,7 @@ import {
   encryptkey,
   decryptkey,
 } from '../actions/seedCrypt';
-import { translate } from '../translate/translate';
+import translate from '../translate/translate';
 
 // TODO: reset settings/purge seed and pin
 
@@ -67,9 +67,9 @@ class Settings extends React.Component {
             value={ this.state.autoLockTimeout }
             onChange={ (event) => this.updateInput(event) }
             autoFocus>
-            <option value="600000">10 minutes</option>
-            <option value="1200000">20 minutes</option>
-            <option value="1800000">30 minutes</option>
+            <option value="600000">10 { translate('SETTINGS.MINUTES') }</option>
+            <option value="1200000">20 { translate('SETTINGS.MINUTES') }</option>
+            <option value="1800000">30 { translate('SETTINGS.MINUTES') }</option>
           </select>
         </div>
         <div className="item last">
@@ -85,14 +85,14 @@ class Settings extends React.Component {
           <div
             className="toggle-label"
             onClick={ this.toggleConfirmPin }>
-            Require PIN to confirm transaction
+            { translate('SETTINGS.REQUIRE_PIN_CONFIRM') }
           </div>
         </div>
         <div
           onClick={ this.save }
           className="group3 margin-top-25">
           <div className="btn-inner">
-            <div className="btn">Save</div>
+            <div className="btn">{ translate('SETTINGS.SAVE') }</div>
             <div className="group2">
               <i className="fa fa-save"></i>
             </div>

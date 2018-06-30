@@ -1,7 +1,7 @@
 // TODO
 
 import React from 'react';
-import { translate } from '../translate/translate';
+import translate from '../translate/translate';
 import jsQR from 'jsqr';
 import QRCode from 'qrcode.react';
 import {
@@ -68,7 +68,7 @@ class OfflineSigning extends React.Component {
         });
         console.warn(_decryptedKey);
         const network = this.state.network.toLowerCase();
-        const wif = seedToWif(_decryptedKey, true, isAssetChain(network) || network === 'kmd' ? 'komodo' : network.toLowerCase()).wif;
+        const wif = seedToWif(_decryptedKey, true, isAssetChain(network) || network === 'kmd' ? 'kmd' : network.toLowerCase()).wif;
         let _rawtx;
         
         if (network === 'btg' ||
@@ -183,7 +183,7 @@ class OfflineSigning extends React.Component {
   render() {
     return (
       <div className="margin-top-20 margin-left-10">
-        <h4 className="padding-bottom-10">Offline Transaction Signing</h4>
+        <h4 className="padding-bottom-10">{ translate('OFFLINE.OFFLINE_TX_SIG') }</h4>
         <button
           className="btn btn-default btn-scan-qr margin-bottom-30"
           onClick={ this.scanQR }>
@@ -202,19 +202,19 @@ class OfflineSigning extends React.Component {
             <div className="margin-bottom-20">
               <div>
                 <div>
-                  <strong>Send from</strong>
+                  <strong>{ translate('OFFLINE.SEND_FROM') }</strong>
                 </div>
                 { this.state.sendFrom }
               </div>
               <div className="margin-top-10">
                 <div>
-                  <strong>Send to</strong>
+                  <strong>{ translate('OFFLINE.SEND_TO') }</strong>
                 </div>
                 { this.state.sendTo }
               </div>
               <div className="margin-top-10">
                 <div>
-                  <strong>Amount</strong>
+                  <strong>{ translate('OFFLINE.AMOUNT') }</strong>
                 </div>
                 { this.state.amount * 0.00000001 } { this.state.network }
               </div>
@@ -222,7 +222,7 @@ class OfflineSigning extends React.Component {
 
             <hr />
 
-            <h5 className="margin-bottom-25">To confirm transaction provide PIN and press the button below.</h5>
+            <h5 className="margin-bottom-25">{ translate('OFFLINE.TX_PIN_CONFIRM') }</h5>
             <input
               type="password"
               className="form-control margin-bottom-30"
@@ -239,13 +239,13 @@ class OfflineSigning extends React.Component {
               className="btn btn-lg btn-primary btn-block ladda-button"
               onClick={ this.sign }>
               <span className="ladda-label">
-              Confirm
+              { translate('OFFLINE.CONFIRM') }
               </span>
             </button>
 
             { this.state.failedToSign &&
               <div className="error margin-bottom-25 margin-top-20">
-                <i className="fa fa-warning"></i> failed to sign transaction
+                <i className="fa fa-warning"></i> { translate('OFFLINE.TX_SIG_FAIL') }
               </div>
             }
 

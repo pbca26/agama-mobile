@@ -10,7 +10,7 @@ import {
   encryptkey,
   decryptkey,
 } from '../actions/seedCrypt';
-import { translate } from '../translate/translate';
+import translate from '../translate/translate';
 
 class Login extends React.Component {
   constructor() {
@@ -176,7 +176,7 @@ class Login extends React.Component {
         className="btn btn-lg btn-primary"
         onClick={ () => this.triggerKey('back') }>
         <span className="ladda-label padding-fix">
-        <i className="fa fa-long-arrow-left"></i>
+          <i className="fa fa-long-arrow-left"></i>
         </span>
       </button>
     );
@@ -186,7 +186,7 @@ class Login extends React.Component {
         key={ `login-keypad-remove` }
         className="btn btn-lg btn-primary"
         onClick={ () => this.triggerKey('remove') }>
-        <span className="ladda-label padding-fix">
+          <span className="ladda-label padding-fix">
         <i className="fa fa-remove"></i>
         </span>
       </button>
@@ -206,7 +206,7 @@ class Login extends React.Component {
         <div className="form login">
           { getLocalStorageVar('seed') &&
             <div className="form-inner">
-              <div className="title">Sign In to your Agama account.</div>
+              <div className="title">{ translate('LOGIN.SIGN_IN_TO_YOUR_ACC') }</div>
               <div className="group">
                 <div className="edit">
                   <input
@@ -227,10 +227,12 @@ class Login extends React.Component {
                 onClick={ () => this.login(true) }
                 className="group3">
                 <div className="btn-inner">
-                  <div className="btn">Sign In</div>
+                  <div className="btn">{ translate('LOGIN.SIGN_IN') }</div>
                   <div className="group2">
                     <div className="rectangle8copy"></div>
-                    <img className="path6" src="/images/template/login/reset-password-path-6.png" />
+                    <img
+                      className="path6"
+                      src="/images/template/login/reset-password-path-6.png" />
                   </div>
                 </div>
               </div>
@@ -238,7 +240,7 @@ class Login extends React.Component {
           }
           { !getLocalStorageVar('seed') &&
             <div className="form-inner login-create-pin">
-              <div className="title">Create a pin to Sign In.</div>
+              <div className="title">{ translate('LOGIN.CREATE_A_PIN') }</div>
               <div>
                 <div
                   onClick={ this.scanQR }
@@ -262,7 +264,7 @@ class Login extends React.Component {
                       className="form-control"
                       name="passphrase"
                       onChange={ this.updateInput }
-                      placeholder={ translate('LOGIN.ENTER_PASSPHRASE') + ' or WIF' }
+                      placeholder={ translate('LOGIN.ENTER_PASSPHRASE') + ' ' + translate('LOGIN.OR_WIF') }
                       value={ this.state.passphrase || '' } />
                   </div>
                 </div>
@@ -307,7 +309,7 @@ class Login extends React.Component {
                 onClick={ () => this.login(false) }
                 className="group3">
                 <div className="btn-inner">
-                  <div className="btn">Sign In</div>
+                  <div className="btn">{ translate('LOGIN.SIGN_IN') }</div>
                   <div className="group2">
                     <div className="rectangle8copy"></div>
                     <img

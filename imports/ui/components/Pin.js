@@ -9,7 +9,7 @@ import {
   encryptkey,
   decryptkey,
 } from '../actions/seedCrypt';
-import { translate } from '../translate/translate';
+import translate from '../translate/translate';
 
 class Pin extends React.Component {
   constructor() {
@@ -133,12 +133,12 @@ class Pin extends React.Component {
             type="password"
             name="passphrase"
             onChange={ this.updateInput }
-            placeholder={ translate('LOGIN.ENTER_PASSPHRASE') + ' or WIF' }
+            placeholder={ translate('LOGIN.ENTER_PASSPHRASE') + ' ' + translate('LOGIN.OR_WIF') }
             value={ this.state.passphrase || '' } />
         </div>
         { this.state.passphraseTooShort &&
           <div className="error margin-top-15 sz350">
-            <i className="fa fa-warning"></i> Provide passhprase or WIF
+            <i className="fa fa-warning"></i> { translate('PIN.PROVIDE_A_PASSPHRASE') }
           </div>
         }
         <div className="margin-bottom-25 margin-top-40 edit">
@@ -155,13 +155,13 @@ class Pin extends React.Component {
           </div>
         }
         { this.state.pinSet &&
-          <div className="margin-bottom-15 margin-top-15 sz350">Seed is encrypted with provided PIN. Use the PIN to login or sign a transaction.</div>
+          <div className="margin-bottom-15 margin-top-15 sz350">{ translate('PIN.SEED_IS_ENCRYPTED') }</div>
         }
         <div
           onClick={ this.save }
           className="group3 margin-top-40">
           <div className="btn-inner">
-            <div className="btn">Save</div>
+            <div className="btn">{ translate('PIN.SAVE') }</div>
             <div className="group2">
               <i className="fa fa-save"></i>
             </div>

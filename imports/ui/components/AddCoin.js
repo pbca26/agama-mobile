@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { coinsList } from '../actions/utils';
-import { translate } from '../translate/translate';
+import translate from '../translate/translate';
 
 class AddCoin extends React.Component {
   constructor() {
@@ -68,32 +68,17 @@ class AddCoin extends React.Component {
         onClick={ () => this.addCoin('kmd') }
         key={ `overview-coins-kmd` }
         className={ 'overview-coin' + (_coins.kmd ? ' disabled' : '') }>
-          <img className="div1" src="/images/template/home/trends-rectangle-7.png" />
-          <div className="btc">
-            <img
-              className="oval4"
-              src={ `/images/cryptologo/kmd.png` } />
-          </div>
-          <div className="bitcoin">{ translate('COINS.KMD') }</div>
+        <img
+          className="div1"
+          src="/images/template/home/trends-rectangle-7.png" />
+        <div className="btc">
+          <img
+            className="oval4"
+            src={ `/images/cryptologo/kmd.png` } />
+        </div>
+        <div className="bitcoin">{ translate('COINS.KMD') }</div>
       </div>
     );
-
-    /*_items.push(
-      <span
-        className={ _coins.kmd ? 'disabled' : '' }
-        key={ `addcoin-kmd` }>
-        <img
-          onClick={ () => singleSelect ? this.addCoin('kmd') : this.toggleMultiSelectCoin('kmd') }
-          src={ `/images/cryptologo/kmd.png` } />
-        <div>
-          KMD
-          { this.state.multiSelect.kmd &&
-            !singleSelect &&
-            <i className="fa fa-check-circle-o"></i>
-          }        
-        </div>
-      </span>
-    );*/
 
     for (let i = 0; i < coinsList.length; i++) {
       const key = coinsList[i];
@@ -114,28 +99,6 @@ class AddCoin extends React.Component {
             <div className="bitcoin">{ translate('COINS.' + _coin.toUpperCase()) }</div>
           </div>
         );
-
-        /*_items.push(
-          <span
-            className={ _coins[key] ? 'disabled' : '' }
-            key={ `addcoin-${key}` }>
-            { _coins[key] &&
-              <img src={ `/images/cryptologo/${_coin}.png` } />
-            }
-            { !_coins[key] &&
-              <img
-                onClick={ () => singleSelect ? this.addCoin(_coin) : this.toggleMultiSelectCoin(_coin) }
-                src={ `/images/cryptologo/${_coin}.png` } />
-            }
-            <div>
-              { key }
-              { this.state.multiSelect[_coin] &&
-                !singleSelect &&
-                <i className="fa fa-check-circle-o"></i>
-              }
-            </div>
-          </span>
-        );*/
       }
     }
 
@@ -185,39 +148,6 @@ class AddCoin extends React.Component {
       </div>
     );
   }
-
-/*<div className="col-sm-12 addcoin">
-  <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12">
-    <div className="row">
-      <div className="margin-bottom-30">
-        <span
-          className="btn-back"
-          onClick={ () => this.props.changeActiveSection(this.props.auth ? 'dashboard' : 'login') }>
-          <i className="fa fa-arrow-left"></i> { translate('DASHBOARD.BACK') }
-        </span>
-      </div>
-      <h4>{ translate('ADD_COIN.SHORTCUTS') }</h4>
-      <div className="coins-list">
-      { this.renderCoins(true) }
-      </div>
-      { this.renderCoinShortcuts() }
-      <hr />
-      <h4>{ translate('ADD_COIN.MULTI_SELECT') }</h4>
-      <div className="coins-list">
-        { this.renderCoins() }
-      </div>
-      <div className="padding-bottom-20">
-        <button
-          className="btn btn-lg btn-primary btn-block ladda-button"
-          onClick={ () => this.addCoin('multi') }>
-          <span className="ladda-label">
-          { translate('ADD_COIN.ADD_SELECTED_COINS') }
-          </span>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>*/
 
   render() {
     if (this.props.activeSection !== 'create-seed' &&

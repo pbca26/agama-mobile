@@ -1,6 +1,6 @@
 import React from 'react';
 import { formatValue } from '../actions/utils';
-import { translate } from '../translate/translate';
+import translate from '../translate/translate';
 
 class ServerSelect extends React.Component {
   constructor() {
@@ -44,7 +44,8 @@ class ServerSelect extends React.Component {
       this.props.coin,
       _server[1],
       _server[0]
-    ).then((res) => {
+    )
+    .then((res) => {
       if (res === 'error') {
         this.setState({
           errorTestingServer: true,

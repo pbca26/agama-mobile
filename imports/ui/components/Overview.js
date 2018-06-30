@@ -2,7 +2,7 @@ import React from 'react';
 import Spinner from './Spinner';
 
 import { formatValue } from '../actions/utils';
-import { translate } from '../translate/translate';
+import translate from '../translate/translate';
 
 class Overview extends React.Component {
   constructor() {
@@ -32,7 +32,7 @@ class Overview extends React.Component {
               className="rectangle5"
               src="/images/template/home/home-rectangle-5.png" />
           </div>
-          <div className="totalvalue">Total Value</div>
+          <div className="totalvalue">{ translate('OVERVIEW.TOTAL_VALUE') }</div>
           <div className="a3467812">{ formatValue(_totalUSDBalance) }</div>
           <div className="label1">$</div>
           <div className="cryptocardgraph">
@@ -83,7 +83,7 @@ class Overview extends React.Component {
             <img
               className="div1"
               src="/images/template/home/trends-rectangle-7.png" />
-            <div className="a1241">~ $ { formatValue(_overview[i].usdPricePerItem) } per coin</div>
+            <div className="a1241">~ $ { formatValue(_overview[i].usdPricePerItem) } { translate('OVERVIEW.PER_COIN') }</div>
             { /*<img className="path5" src="/images/template/home/home-path-5.png" />*/ }
             <div className="btc">
               <img
@@ -116,7 +116,7 @@ class Overview extends React.Component {
         <div className="home">
           <div className="home-inner">
             { this.renderOverview() }
-            <div className="yourcoins">Your Coins</div>
+            <div className="yourcoins">{ translate('OVERVIEW.YOUR_COINS') }</div>
             { /*<img
               className="combinedshape2"
             src="/images/template/home/home-combined-shape 2.png" />*/ }

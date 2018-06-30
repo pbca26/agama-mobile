@@ -1,10 +1,8 @@
 import React from 'react';
 
-import {
-  getLocalStorageVar,
-} from '../actions/utils';
+import { getLocalStorageVar } from '../actions/utils';
 import { decryptkey } from '../actions/seedCrypt';
-import { translate } from '../translate/translate';
+import translate from '../translate/translate';
 import QRCode from 'qrcode.react';
 
 class Recovery extends React.Component {
@@ -55,7 +53,7 @@ class Recovery extends React.Component {
     return (
       <div className="form recovery">
         <div className="margin-top-45 padding-bottom-35 text-center">
-        Provide your PIN number to unlock passphrase.
+        { translate('RECOVERY.PROVIDE_YOUR_PIN') }
         </div>
         <div className="margin-bottom-25">
           <div className="edit">
@@ -78,7 +76,7 @@ class Recovery extends React.Component {
           onClick={ this.decodeSeed }
           className="group3 margin-top-40">
           <div className="btn-inner">
-            <div className="btn">Show</div>
+            <div className="btn">{ translate('RECOVERY.SHOW') }</div>
             <div className="group2">
               <i className="fa fa-eye"></i>
             </div>
