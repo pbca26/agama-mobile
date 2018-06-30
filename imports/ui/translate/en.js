@@ -1,6 +1,7 @@
 export const _lang = {
   'EN': {
     'SETTINGS': {
+      'AUTOLOCK_TIMEOUT': 'Auto lock timeout',
       'MINUTES': 'minutes',
       'SAVE': 'Save',
       'REQUIRE_PIN_CONFIRM': 'Require PIN to confirm transaction',

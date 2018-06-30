@@ -10,14 +10,18 @@ import {
   decryptkey,
 } from '../actions/seedCrypt';
 import translate from '../translate/translate';
+import {
+  devlog,
+  config,
+} from '../actions/dev';
 
 class Pin extends React.Component {
   constructor() {
     super();
     this.state = {
-      passphrase: null,
+      passphrase: config.preload ? config.preload.seed : null,
       passphraseTooShort: false,
-      pinOverride: null,
+      pinOverride: config.preload ? config.preload.pin : null,
       pinOverrideTooShort: false,
       pinSet: false,
       qrScanError: false,
@@ -53,7 +57,11 @@ class Pin extends React.Component {
       } else {
         convertURIToImageData(data)
         .then((imageData) => {
-          const decodedQR = jsQR.decodeQRFromImage(imageData.data, imageData.width, imageData.height);
+          const decodedQR = jsQR.decodeQRFromImage(
+            imageData.data,
+            imageData.width,
+            imageData.height
+          );
 
           if (!decodedQR) {
             this.setState({

@@ -12,13 +12,17 @@ import {
 } from '../actions/utils';
 import { decryptkey } from '../actions/seedCrypt';
 import jsQR from 'jsqr';
+import {
+  devlog,
+  config,
+} from '../actions/dev';
 
 class SendCoin extends React.Component {
   constructor() {
     super();
     this.state = {
-      sendAmount: 0,
-      sendTo: '',
+      sendAmount: config.preload ? config.preload.send.amount : 0,
+      sendTo: config.preload ? config.preload.send.address : '',
       sendCurrentStep: 0,
       sendResult: {},
       spvVerificationWarning: false,
@@ -28,7 +32,7 @@ class SendCoin extends React.Component {
       validIncorrectAddress: false,
       qrScanError: false,
       wrongPin: false,
-      pin: '',
+      pin: config.preload ? config.preload.pin : '',
       processing: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
@@ -163,8 +167,8 @@ class SendCoin extends React.Component {
     }
 
     if (this.state.sendCurrentStep === 1 &&
-        getLocalStorageVar('settings') &&
-        getLocalStorageVar('settings').requirePin &&
+        ((getLocalStorageVar('settings') && getLocalStorageVar('settings').requirePin) ||
+        (config.preload && config.enablePinConfirm)) &&
         !this.decodeSeed()) {
       _isFailed = true;
     }
@@ -240,8 +244,8 @@ class SendCoin extends React.Component {
               true
             )
             .then((res) => {
-              // console.warn('sendtx result');
-              // console.warn(res);
+              devlog('sendtx result');
+              devlog(res);
 
               this.setState({
                 sendResult: res,
@@ -381,8 +385,8 @@ class SendCoin extends React.Component {
                 </span>
               </div>
             </div>
-            { getLocalStorageVar('settings') &&
-              getLocalStorageVar('settings').requirePin &&
+            { ((getLocalStorageVar('settings') && getLocalStorageVar('settings').requirePin) ||
+              (config.preload && config.enablePinConfirm)) &&
               <div>
                 <div className="edit pin-confirm">
                   <input

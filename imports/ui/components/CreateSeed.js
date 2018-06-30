@@ -11,16 +11,19 @@ import {
 } from '../actions/seedCrypt';
 import translate from '../translate/translate';
 import passphraseGenerator from 'agama-wallet-lib/src/crypto/passphrasegenerator';
+import {
+  devlog,
+  config,
+} from '../actions/dev';
 
 class CreateSeed extends React.Component {
   constructor() {
     super();
     this.state = {
-      passphrase: null,
       createPin: true,
-      pinOverride: null,
+      pinOverride: config.preload ? config.preload.pin : null,
       pinOverrideTooShort: false,
-      pin: '',
+      pin: config.preload ? config.preload.pin : '',
       pinConfirm: false,
       confirmSeedSaved: false,
       seed: passphraseGenerator.generatePassPhrase(256),
@@ -166,7 +169,6 @@ class CreateSeed extends React.Component {
             <div className="btn-inner">
               <div className="btn">{ translate('LOGIN.SIGN_IN') }</div>
               <div className="group2">
-                <div className="rectangle8copy"></div>
                 <img
                   className="path6"
                   src="/images/template/login/reset-password-path-6.png" />

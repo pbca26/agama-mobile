@@ -58,9 +58,7 @@ class Settings extends React.Component {
     return (
       <div className="form settings">
         <div className="margin-top-10 item">
-          <div className="padding-bottom-20">
-            Auto lock timeout
-          </div>
+          <div className="padding-bottom-20">{ translate('SETTINGS.AUTOLOCK_TIMEOUT') }</div>
           <select
             className="form-control form-material"
             name="autoLockTimeout"

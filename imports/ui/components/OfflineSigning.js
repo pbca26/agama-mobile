@@ -135,7 +135,11 @@ class OfflineSigning extends React.Component {
       } else {
         convertURIToImageData(data)
         .then((imageData) => {
-          const decodedQR = jsQR.decodeQRFromImage(imageData.data, imageData.width, imageData.height);
+          const decodedQR = jsQR.decodeQRFromImage(
+            imageData.data,
+            imageData.width,
+            imageData.height
+          );
 
           if (!decodedQR ||
               (decodedQR && decodedQR.indexOf('agtx') === -1)) {

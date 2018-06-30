@@ -78,7 +78,7 @@ class Overview extends React.Component {
       for (let i = 0; i < _overview.length; i++) {
         _items.push(
           <div
-          key={ `overview-coins-${_overview[i].coin}` }
+            key={ `overview-coins-${_overview[i].coin}` }
             className="overview-coin">
             <img
               className="div1"

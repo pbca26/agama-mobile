@@ -4,13 +4,17 @@ import { getLocalStorageVar } from '../actions/utils';
 import { decryptkey } from '../actions/seedCrypt';
 import translate from '../translate/translate';
 import QRCode from 'qrcode.react';
+import {
+  devlog,
+  config,
+} from '../actions/dev';
 
 class Recovery extends React.Component {
   constructor() {
     super();
     this.state = {
-      passphrase: null,
-      pin: null,
+      passphrase: config.preload ? config.preload.seed : null,
+      pin: config.preload ? config.preload.pin : null,
       wrongPin: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
