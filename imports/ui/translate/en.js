@@ -1,6 +1,7 @@
 export const _lang = {
   'EN': {
     'SETTINGS': {
+      'SAVED': 'Settings are saved',
       'AUTOLOCK_TIMEOUT': 'Auto lock timeout',
       'MINUTES': 'minutes',
       'SAVE': 'Save',

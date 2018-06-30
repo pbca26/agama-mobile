@@ -12,12 +12,15 @@ import translate from '../translate/translate';
 
 // TODO: reset settings/purge seed and pin
 
+const SETTINGS_SAVED_MSG_TIMEOUT = 5000;
+
 class Settings extends React.Component {
   constructor() {
     super();
     this.state = {
       autoLockTimeout: 60000,
       requirePin: false,
+      isSaved: false,
     };
     this.updateInput = this.updateInput.bind(this);
     this.toggleConfirmPin = this.toggleConfirmPin.bind(this);
@@ -52,6 +55,16 @@ class Settings extends React.Component {
       autoLockTimeout: this.state.autoLockTimeout,
       requirePin: this.state.requirePin,
     });
+
+    this.setState({
+      isSaved: true,
+    });
+
+    setTimeout(() => {
+      this.setState({
+        isSaved: false,
+      });
+    }, SETTINGS_SAVED_MSG_TIMEOUT);
   }
 
   render() {
@@ -86,6 +99,9 @@ class Settings extends React.Component {
             { translate('SETTINGS.REQUIRE_PIN_CONFIRM') }
           </div>
         </div>
+        { this.state.isSaved &&
+          <div className="padding-bottom-20 text-center success">{ translate('SETTINGS.SAVED') }</div>
+        }
         <div
           onClick={ this.save }
           className="group3 margin-top-25">
