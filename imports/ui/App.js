@@ -165,7 +165,7 @@ class App extends React.Component {
       .then((res) => {
         this.setState({
           coins,
-          history: this.state.activeSection,
+          history: null,
           activeSection: 'dashboard',
           coin,
           address: res,
