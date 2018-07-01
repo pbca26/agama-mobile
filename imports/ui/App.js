@@ -1,7 +1,7 @@
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { electrumServers } from './actions/electrumServers';
+import electrumServers from './actions/electrumServers';
 
 import actions from './actions/actions';
 import {
@@ -600,7 +600,7 @@ class App extends React.Component {
                     <div className="item">
                       <div
                         className="title"
-                        onClick={ this.toggleOverview }>Overview</div>
+                        onClick={ this.toggleOverview }>{ translate('APP_TITLE.OVERVIEW') }</div>
                       <img
                         className="line"
                         src="/images/template/menu/sidemenu-rectangle-3.png" />
@@ -621,7 +621,7 @@ class App extends React.Component {
                     <div className="item">
                       <div
                         className="title"
-                        onClick={ this.toggleRecovery }>Recovery</div>
+                        onClick={ this.toggleRecovery }>{ translate('APP_TITLE.RECOVERY') }</div>
                       <img
                         className="line"
                         src="/images/template/menu/sidemenu-rectangle-3.png" />
@@ -631,7 +631,7 @@ class App extends React.Component {
                     <div className="item">
                       <div
                         className="title"
-                        onClick={ this.toggleSettings }>Settings</div>
+                        onClick={ this.toggleSettings }>{ translate('APP_TITLE.SETTINGS') }</div>
                       <img
                         className="line"
                         src="/images/template/menu/sidemenu-rectangle-3.png" />
@@ -706,7 +706,7 @@ class App extends React.Component {
                   <div className="item">
                     <div
                       className="title"
-                      onClick={ this.togglePin }>PIN override</div>
+                      onClick={ this.togglePin }>{ translate('APP_TITLE.PIN') }</div>
                     <img
                       className="line"
                       src="/images/template/menu/sidemenu-rectangle-3.png" />
@@ -724,7 +724,7 @@ class App extends React.Component {
                   <div className="item">
                     <div
                       className="title"
-                      onClick={ this.toggleLogin }>Login</div>
+                      onClick={ this.toggleLogin }>{ translate('APP_TITLE.LOGIN') }</div>
                     <img
                       className="line"
                       src="/images/template/menu/sidemenu-rectangle-3.png" />
@@ -759,7 +759,7 @@ class App extends React.Component {
             onClick={ this.toggleMenu }
             className="menu-icon"
             src="/images/template/home/home-combined-shape.png" />
-          <div className="ui-title">{ this.state.displayMenu ? 'Menu' : translate('APP_TITLE.' + this.state.activeSection.toUpperCase()) }</div>
+          <div className="ui-title">{ this.state.displayMenu ? translate('APP_TITLE.MENU') : translate('APP_TITLE.' + this.state.activeSection.toUpperCase()) }</div>
         </div>
         <div className="app-main">
           { (this.state.activeSection !== 'pin' || this.state.activeSection !== 'offlinesig') &&

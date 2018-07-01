@@ -147,6 +147,7 @@ export const _lang = {
       'CLAIM': 'Claim',
     },
     'APP_TITLE': {
+      'MENU': 'Menu',
       'PIN': 'Override PIN',
       'LOGIN': 'Sign in',
       'DASHBOARD': 'Dashboard',

@@ -12,7 +12,7 @@ import {
   wifToWif,
 } from './seedToWif';
 import { proxyServers } from './proxyServers';
-import { electrumServers } from './electrumServers';
+import electrumServers from './electrumServers';
 import { getKMDBalance } from './getKMDBalance';
 import { createtx } from './createtx';
 import { listtransactions } from './listtransactions';
