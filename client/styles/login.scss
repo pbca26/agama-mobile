@@ -1,185 +1,26 @@
 .form {
-  width: 100%;
-  position: relative;
-  margin: 0;
-
-  .form-inner {
-    height: 100%;
-    position:relative;
-    margin: auto;
-    padding: 10px 0;
-  }
-
-  a {
-    text-decoration: none
-  }
-
-  div {
-    -webkit-text-size-adjust: none
-  }
-
-  h4 {
-    text-align: center;
-  }
-
-  .title {
-    background-color: rgba(255, 255, 255, 0.0);
-    height: auto;
-    width: 100%;
-    padding-top: 30px;
-    opacity: .8;
-    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-    font-size: 16.0px;
-    color: rgba(255, 255, 255, 1.0);
-    text-align: center;
-    line-height: 24.0px
-  }
-
-  .group3 .rectangle10copy2 {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 11px;
-    height: 61px;
-    width: 209px;
-    position: absolute;
-    margin: 0;
-    left: 0
-  }
-
-  .group3 .rectangle10copy {
-    background-color: rgba(172, 174, 191, 1.0);
-    top: 0;
-    height: 42px;
-    width: 180px;
-    position: absolute;
-    margin: 0;
-    left: 14px;
-    border-radius: 2px
-  }
-
-  .group3 .btn {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 12px;
-    height: auto;
-    width: auto;
-    position: absolute;
-    margin: 0;
-    left: 30px;
-    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-    font-size: 16.0px;
-    color: rgba(255, 255, 255, 1.0);
-    text-align: left;
-    line-height: 18.0px
-  }
-
-  .group {
-    background-color: rgba(255, 255, 255, 0);
-    padding-top: 45px;
-    margin: 0;
-  }
-
-  .group .rectangle10 {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 0;
-    height: 42px;
-    width: 335px;
-    position: absolute;
-    margin: 0;
-    left: 0;
-    opacity: .2
-  }
-
-  .edit {
-    background-color: #373A4C;
-    height: auto;
-    width: 100%;
-    margin: 0 auto;
-    max-width: 310px;
-    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-    font-size: 16.0px;
-    color: #fff;
-    text-align: left;
-    line-height: 19px;
-    height: 100%;
-    padding: 10px 10px 11px 10px;
-    
-    input {
-      background: none;
-      color: #fff;
-      width: 100%;
-      border: none;
-      outline: none;
-    }
-  }
-
-  .group2 {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 15px;
-    height: 14px;
-    width: 21px;
-    position: absolute;
-    margin: 0;
-    left: 158px
-  }
-  
-  .group2 .rectangle8copy {
-    background-color: rgba(255, 255, 255, 1.0);
-    top: 6px;
-    height: 2px;
-    width: 20px;
-    position: absolute;
-    margin: 0;
-    left: 0;
-    border-radius: 1px;
-  }
-  
-  .group2 .path6 {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 0;
-    height: 14px;
-    width: 8px;
-    position: absolute;
-    margin: 0;
-    left: 13px;
-  }
-
-  .forgotpassword {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 326px;
-    height: auto;
-    width: auto;
-    position: absolute;
-    margin: 0;
-    left: 237px;
-    opacity: .5;
-    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-    font-size: 14.0px;
-    color: rgba(255, 255, 255, 1.0);
-    text-align: left;
-    line-height: 16.0px
-  }
-}
-
-.form.login {
-  .login-create-pin {
-    .scan-qr {
-      top: 0;
-    }
-    .title {
-      padding: 30px 0 0 0;
-      top: 0;
-    }
-    .group {
-      position: inherit;
-      top: 0;
-      left: 0;
-
-      input {
-        width: 100%;
+  &.login {
+    .login-create-pin {
+      .scan-qr {
+        top: 0;
       }
-    }
-    .group3:last-child {
-      top: 0;
-      margin-top: 40px;
+      .title {
+        padding: 30px 0 0 0;
+        top: 0;
+      }
+      .group {
+        position: inherit;
+        top: 0;
+        left: 0;
+
+        input {
+          width: 100%;
+        }
+      }
+      .group3:last-child {
+        top: 0;
+        margin-top: 40px;
+      }
     }
   }
 }

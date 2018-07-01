@@ -333,7 +333,9 @@ class SendCoin extends React.Component {
                 <div className="btn">{ translate('SEND.SEND') }</div>
                 <div className="group2">
                   <div className="rectangle8copy"></div>
-                  <img className="path6" src="/images/template/login/reset-password-path-6.png" />
+                  <img
+                    className="path6"
+                    src="/images/template/login/reset-password-path-6.png" />
                 </div>
               </div>
             </div>
@@ -431,6 +433,7 @@ class SendCoin extends React.Component {
                   className="btn-inner pull-right">
                   <div className="btn">{ translate('SEND.CONFIRM') }</div>
                   <div className="group2">
+                  <div className="rectangle8copy"></div>
                     <img
                       className="path6"
                       src="/images/template/login/reset-password-path-6.png" />
@@ -506,6 +509,7 @@ class SendCoin extends React.Component {
               <div class="btn-inner">
                 <div className="btn">{ translate('SEND.MAKE_ANOTHER_TX') }</div>
                 <div className="group2">
+                  <div className="rectangle8copy"></div>
                   <img
                     className="path6"
                     src="/images/template/login/reset-password-path-6.png" />

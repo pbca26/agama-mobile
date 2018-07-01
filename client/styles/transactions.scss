@@ -10,43 +10,238 @@
   padding: 0 10px;
   padding-top: 30px;
   
+  .interest {
+    margin-top: 16px;
+  }
+  
+  .tx-interest {
+    margin-top: 3px;
+    font-size: 13px;
+  }
+
   .individualportfolio-inner {
     width: 375px;    
     position: relative;
     margin: auto;
     min-height: 100vh;
-  }
 
-  .individualportfolio {
-    width: 100%;
-    min-height: 100vh;
-    position: relative;
-    overflow-x: hidden;
-    margin: 0;
-  }
+    .lasttransactions {
+      top: 245px;
+      height: auto;
+      width: auto;
+      position: absolute;
+      margin: 0;
+      left: 3px;
+      font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+      font-size: 18px;
+      color: #fff;
+      text-align: left;
+      letter-spacing: -0.56px;
+      line-height: 22px;
+    }
+  
+    .cryptocardbtc {
+      height: 145px;
+      max-width: 347px;
+      width: calc(100vw - 12px);
+      position: absolute;
+      margin: 0;
+      left: 0;
+  
+      .group8 {
+        top: 0;
+        height: 145px;
+        width: 345px;
+        position: relative;
+        margin: 0;
+        left: 0;
+      }
 
-  a {
-    text-decoration: none;
-  }
-
-  div {
-    -webkit-text-size-adjust: none;
-  }
-
-  .individualportfolio .lasttransactions {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 245px;
-    height: auto;
-    width: auto;
-    position: absolute;
-    margin: 0;
-    left: 3px;
-    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-    font-size: 18.0px;
-    color: rgba(255, 255, 255, 1.0);
-    text-align: left;
-    letter-spacing: -.56px;
-    line-height: 22.0px
+      .coin-icon {
+        position: absolute;
+        right: 13px;
+        top: 10px;
+        width: 60px;
+      }
+  
+      .coin-title {
+        top: 28px;
+        height: auto;
+        width: auto;
+        position: absolute;
+        margin: 0;
+        left: 19px;
+        font-family: 'San Francisco', Helvetica, Arial, serif;
+        font-size: 24px;
+        color: white;
+        text-align: left;
+        letter-spacing: -0.5px;
+      }
+  
+      .coin-balance {
+        top: 74px;
+        height: auto;
+        width: auto;
+        position: absolute;
+        margin: 0;
+        left: 20px;
+        font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+        font-size: 15px;
+        color: white;
+        text-align: left;
+        letter-spacing: -0.25px;
+        line-height: 14px;
+      }
+    }
+  
+    .navigation {
+      top: 83px;
+      height: 9px;
+      width: 37px;
+      position: absolute;
+      margin: 0;
+      left: 168px;
+    }
+  
+    .line {
+      background-color: rgba(255, 255, 255, 0.0);
+      padding-top: 53px;
+      height: 1px;
+      width: 357px;
+      position: absolute;
+      margin: 0;
+      left: -14px;
+      opacity: 0.1;
+    }
+  
+    .transactions-list {
+      margin-top: 145px;
+      position: relative;
+      left: 4px;
+  
+      .item {
+        height: 88px;
+        width: 335px;
+  
+        &:last-child {
+          .line {
+            display: none;
+          }
+        }
+  
+        &.received {
+          .direction,
+          .amount-native {
+            color: rgba(142, 204, 96, 1.0);
+          }
+  
+          .direction-icon {
+            background-color: rgba(142, 204, 96, 1.0);
+          }
+        }
+  
+        &.sent {
+          .direction,
+          .amount-native {
+            color: rgba(255, 117, 117, 1.0);
+          }
+  
+          .direction-icon {
+            background-color: rgba(255, 117, 117, 1.0);
+          }
+        }
+  
+        &.self {
+          .direction,
+          .amount-native {
+            color: #00bcd4;
+          }
+  
+          .direction-icon {
+            background-color: #00bcd4;
+          }
+        }
+  
+        .direction {
+          height: auto;
+          width: auto;
+          position: absolute;
+          margin: 0;
+          left: 22px;
+          font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+          font-size: 14px;
+          color: rgba(255, 255, 255, 1.0);
+          text-align: left;
+          letter-spacing: -0.58px;
+          line-height: 16px;
+          text-transform: capitalize;
+        }
+      
+        .date {
+          padding-top: 24px;
+          height: auto;
+          width: auto;
+          position: absolute;
+          margin: 0;
+          left: 22px;
+          opacity: 0.7;
+          font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+          font-size: 14px;
+          color: rgba(255, 255, 255, 1.0);
+          text-align: left;
+          letter-spacing: -0.58px;
+          line-height: 16px;
+        }
+      
+        .amount-fiat {
+          padding-top: 24px;
+          height: auto;
+          width: auto;
+          position: absolute;
+          margin: 0;
+          left: 271px;
+          font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+          font-size: 14px;
+          color: rgba(255, 255, 255, 1.0);
+          text-align: right;
+          letter-spacing: -0.58px;
+          line-height: 16px;
+        }
+      
+        .amount-native {
+          height: auto;
+          width: auto;
+          float: right;
+          margin: 0;
+          left: 251px;
+          font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+          font-size: 14px;
+          color: rgba(255, 117, 117, 1.0);
+          text-align: right;
+          letter-spacing: -0.58px;
+          line-height: 16px;
+        }
+      
+        .direction-icon {
+          top: 2px;
+          height: 12px;
+          width: 12px;
+          position: relative;
+          margin: 0;
+          left: 0;
+          border-radius: 50%;
+        }
+      }
+    }
+  
+    .combinedshape {
+      top: 44px;
+      height: 15px;
+      width: 21px;
+      position: absolute;
+      margin: 0;
+      left: 19px;
+    }
   }
 
   .cryptocardbtc-block {
@@ -55,220 +250,14 @@
     width: calc(100vw - 12px);
     height: 145px;
     background: url('/images/template/transactions/gradient.png') no-repeat;  
-  }
+  }  
 
-  .individualportfolio .cryptocardbtc {
-    background-color: rgba(255, 255, 255, 0.0);
-    height: 145px;
-    max-width: 347px;
-    width: calc(100vw - 12px);
-    position: absolute;
-    margin: 0;
-    left: 0;
-
-    .coin-icon {
-      position: absolute;
-      right: 13px;
-      top: 10px;
-      width: 60px;
-    }
-
-    .coin-title {
-      background-color: rgba(255, 255, 255, 0);
-      top: 28px;
-      height: auto;
-      width: auto;
-      position: absolute;
-      margin: 0;
-      left: 19px;
-      font-family: 'San Francisco', Helvetica, Arial, serif;
-      font-size: 24.0px;
-      color: white;
-      text-align: left;
-      letter-spacing: -.5px;
-    }
-
-    .coin-balance {
-      background-color: rgba(255, 255, 255, 0);
-      top: 74px;
-      height: auto;
-      width: auto;
-      position: absolute;
-      margin: 0;
-      left: 20px;
-      font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-      font-size: 15.0px;
-      color: white;
-      text-align: left;
-      letter-spacing: -.25px;
-      line-height: 14.0px;
-    }
-  }
-
-  .individualportfolio .cryptocardbtc .group8 {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 0;
-    height: 145px;
-    width: 345px;
+  .individualportfolio {
+    width: 100%;
+    min-height: 100vh;
     position: relative;
+    overflow-x: hidden;
     margin: 0;
-    left: 0
-  }
-
-  .individualportfolio .navigation {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 83px;
-    height: 9px;
-    width: 37px;
-    position: absolute;
-    margin: 0;
-    left: 168px
-  }
-
-  .individualportfolio .line {
-    background-color: rgba(255, 255, 255, 0.0);
-    padding-top: 53px;
-    height: 1px;
-    width: 357px;
-    position: absolute;
-    margin: 0;
-    left: -14px;
-    opacity: .1
-  }
-
-  .individualportfolio .transactions-list {
-    margin-top: 145px;
-    position: relative;
-    left: 4px;
-
-    .item {
-      height: 88px;
-      width: 335px;
-
-      &:last-child {
-        .line {
-          display: none;
-        }
-      }
-
-      &.received {
-        .direction,
-        .amount-native {
-          color: rgba(142, 204, 96, 1.0);
-        }
-
-        .direction-icon {
-          background-color: rgba(142, 204, 96, 1.0);
-        }
-      }
-
-      &.sent {
-        .direction,
-        .amount-native {
-          color: rgba(255, 117, 117, 1.0);
-        }
-
-        .direction-icon {
-          background-color: rgba(255, 117, 117, 1.0);
-        }
-      }
-
-      &.self {
-        .direction,
-        .amount-native {
-          color: #00bcd4;
-        }
-
-        .direction-icon {
-          background-color: #00bcd4;
-        }
-      }
-
-      .direction {
-        background-color: rgba(255, 255, 255, 0.0);
-        height: auto;
-        width: auto;
-        position: absolute;
-        margin: 0;
-        left: 22px;
-        font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-        font-size: 14.0px;
-        color: rgba(255, 255, 255, 1.0);
-        text-align: left;
-        letter-spacing: -.58px;
-        line-height: 16.0px;
-        text-transform: capitalize;
-      }
-    
-      .date {
-        background-color: rgba(255, 255, 255, 0.0);
-        padding-top: 24px;
-        height: auto;
-        width: auto;
-        position: absolute;
-        margin: 0;
-        left: 22px;
-        opacity: .7;
-        font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-        font-size: 14.0px;
-        color: rgba(255, 255, 255, 1.0);
-        text-align: left;
-        letter-spacing: -.58px;
-        line-height: 16.0px
-      }
-    
-      .amount-fiat {
-        background-color: rgba(255, 255, 255, 0.0);
-        padding-top: 24px;
-        height: auto;
-        width: auto;
-        position: absolute;
-        margin: 0;
-        left: 271px;
-        font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-        font-size: 14.0px;
-        color: rgba(255, 255, 255, 1.0);
-        text-align: right;
-        letter-spacing: -.58px;
-        line-height: 16.0px
-      }
-    
-      .amount-native {
-        background-color: rgba(255, 255, 255, 0.0);
-        height: auto;
-        width: auto;
-        // position: absolute;
-        float: right;
-        margin: 0;
-        left: 251px;
-        font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-        font-size: 14.0px;
-        color: rgba(255, 117, 117, 1.0);
-        text-align: right;
-        letter-spacing: -.58px;
-        line-height: 16.0px
-      }
-    
-      .direction-icon {
-        top: 2px;
-        height: 12px;
-        width: 12px;
-        position: relative;
-        margin: 0;
-        left: 0;
-        border-radius: 50%;
-      }
-    }
-  }
-
-  .individualportfolio .combinedshape {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 44px;
-    height: 15px;
-    width: 21px;
-    position: absolute;
-    margin: 0;
-    left: 19px
   }
 }
 
@@ -286,12 +275,12 @@
     width: 345px;
 
     button {
-      background-color: rgba(255, 255, 255, 0);
+      background: none;
       font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-      font-size: 14.0px;
+      font-size: 14px;
       color: white;
       text-align: left;
-      line-height: 18.0px;
+      line-height: 18px;
       height: 40px;
       width: 120px;
       margin: 0;
@@ -332,13 +321,4 @@
       }
     }
   }
-}
-
-.interest {
-  margin-top: 16px;
-}
-
-.tx-interest {
-  margin-top: 3px;
-  font-size: 13px;
 }

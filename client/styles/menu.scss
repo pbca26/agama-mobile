@@ -10,10 +10,10 @@
 
   .active-coins {
     font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-    font-size: 16.0px;
+    font-size: 16px;
     color: white;
-    letter-spacing: -.56px;
-    line-height: 22.0px;
+    letter-spacing: -0.56px;
+    line-height: 22px;
     padding-left: 45px;
     padding-top: 20px;
 
@@ -41,6 +41,7 @@
     position:relative;
     margin: auto;
     min-height: 100vh;
+    padding-bottom: 40px;
   }
 
   .sidemenu {
@@ -48,138 +49,123 @@
     min-width: 375px;
     height: 100vh;
     position: relative;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     margin: 0;
-  }
 
-  a {
-    text-decoration: none
-  }
-
-  div {
-    -webkit-text-size-adjust: none
-  }
-
-  .sidemenu .group {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 50px;
-    height: 500px;
-    width: 385px;
-    position: absolute;
-    margin: 0;
-    left: 250px
-  }
-
-  .sidemenu .group .rectangle9copy3 {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 77px;
-    height: 346px;
-    width: 305px;
-    position: absolute;
-    margin: 0;
-    left: 0;
-    opacity: .5
-  }
-
-  .sidemenu .group .rectangle9copy2 {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 23px;
-    height: 455px;
-    width: 305px;
-    position: absolute;
-    margin: 0;
-    left: 40px;
-    opacity: .5
-  }
-
-  .sidemenu .group .rectangle9copy {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 0;
-    height: 500px;
-    width: 305px;
-    position: absolute;
-    margin: 0;
-    left: 80px
-  }
-
-  .sidemenu .menu {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 14px;
-    height: auto;
-    width: auto;
-    position: absolute;
-    margin: 0;
-    left: 165px;
-    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-    font-size: 16px;
-    color: rgba(255, 255, 255, 1.0);
-    text-align: left;
-    letter-spacing: -.56px;
-    line-height: 22.0px
-  }
-
-  .sidemenu .items {
-    position: absolute;
-    top: 20px;
-  }
-
-  .sidemenu .item {
-    padding-top: 20px;
-    height: auto;
-    width: auto;
-    margin: 0;
-    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
-    font-size: 16.0px;
-    color: rgba(255, 255, 255, 1.0);
-    text-align: left;
-    letter-spacing: -.56px;
-    line-height: 22.0px;
-
-    .title {
-      padding-left: 40px;      
-    }
-    .line {
-      padding-top: 10px;
-      background-color: rgba(255, 255, 255, 0.0);
-      height: 2px;
-      width: 200px;
+    .group {
+      top: 50px;
+      height: 500px;
+      width: 385px;
+      position: absolute;
       margin: 0;
-      border-radius: 1px;
-      opacity: .1;
-      display: block;
-      position: relative;
-      left: 20px;
-    }
-    &:last-child {
-      .line {
-        display: none;
+      left: 250px;
+
+      .rectangle9copy3 {
+        top: 77px;
+        height: 346px;
+        width: 305px;
+        position: absolute;
+        margin: 0;
+        left: 0;
+        opacity: 0.5;
+      }
+    
+      .rectangle9copy2 {
+        top: 23px;
+        height: 455px;
+        width: 305px;
+        position: absolute;
+        margin: 0;
+        left: 40px;
+        opacity: 0.5;
+      }
+    
+      .rectangle9copy {
+        top: 0;
+        height: 500px;
+        width: 305px;
+        position: absolute;
+        margin: 0;
+        left: 80px;
       }
     }
-  }
-
-  .sidemenu .combinedshape1 {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 41px;
-    height: 22px;
-    width: 20px;
-    position: absolute;
-    margin: 0;
-    left: 333px
-  }
-
-  .sidemenu .oval {
-    background-color: rgba(255, 255, 255, 0.0);
-    top: 40px;
-    height: 8px;
-    width: 8px;
-    position: absolute;
-    margin: 0;
-    left: 347px
+  
+    .menu {
+      top: 14px;
+      height: auto;
+      width: auto;
+      position: absolute;
+      margin: 0;
+      left: 165px;
+      font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+      font-size: 16px;
+      color: #fff;
+      text-align: left;
+      letter-spacing: -0.56px;
+      line-height: 22px;
+    }
+  
+    .items {
+      position: absolute;
+      top: 20px;
+    }
+  
+    .item {
+      padding-top: 20px;
+      height: auto;
+      width: auto;
+      margin: 0;
+      font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+      font-size: 16.0px;
+      color: #fff;
+      text-align: left;
+      letter-spacing: -0.56px;
+      line-height: 22px;
+  
+      .title {
+        padding-left: 40px;      
+      }
+      .line {
+        padding-top: 10px;
+        background-color: rgba(255, 255, 255, 0.0);
+        height: 2px;
+        width: 200px;
+        margin: 0;
+        border-radius: 1px;
+        opacity: 0.1;
+        display: block;
+        position: relative;
+        left: 20px;
+      }
+      &:last-child {
+        .line {
+          display: none;
+        }
+      }
+    }
+  
+    .combinedshape1 {
+      top: 41px;
+      height: 22px;
+      width: 20px;
+      position: absolute;
+      margin: 0;
+      left: 333px;
+    }
+  
+    .oval {
+      top: 40px;
+      height: 8px;
+      width: 8px;
+      position: absolute;
+      margin: 0;
+      left: 347px;
+    }
   }
 }
 
 .menu-icon {
-  background-color: rgba(255, 255, 255, 0.0);
   top: 18px;
   height: 14px;
   width: 20px;
@@ -190,7 +176,6 @@
 }
 
 .menu-back {
-  background-color: rgba(255, 255, 255, 0.0);
   top: 18px;
   height: 13px;
   width: 20px;
@@ -209,15 +194,15 @@
   height: 50px;
   z-index: 110;
   border-top: solid 2px #373a4c;
-  box-shadow: 0 1px 0 rgba(0, 0, 0, .2), 0 2px 0 rgba(0, 0, 0, .06);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .2), 0 2px 0 rgba(0, 0, 0, 0.06);
   background: #45485F;
 
   .ui-title {
     font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
     font-size: 16px;
-    color: rgba(255, 255, 255, 1.0);
-    letter-spacing: -.56px;
-    line-height: 22.0px;
+    color: #fff;
+    letter-spacing: -0.56px;
+    line-height: 22px;
     width: 100%;
     text-transform: capitalize;
     text-align: center;

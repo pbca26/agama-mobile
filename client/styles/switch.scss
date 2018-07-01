@@ -18,8 +18,8 @@
   right: 0;
   bottom: 0;
   background-color: #383a4e;
-  -webkit-transition: .4s;
-  transition: .4s;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
 
   &.round {
     border-radius: 34px;
@@ -37,8 +37,8 @@
     left: 2px;
     bottom: 2px;
     background-color: #ACAEBF;
-    -webkit-transition: .4s;
-    transition: .4s;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
   }
 }
 
