@@ -1,7 +1,7 @@
 .menu-ui {
   min-height: 100vh;
-  position: fixed;
-  top: 52px;
+  // position: fixed;
+  //top: 52px;
   left: 0;
   width: 100%;
   background-color: #4c4f69;
@@ -17,6 +17,9 @@
     padding-left: 45px;
     padding-top: 20px;
 
+    &:last-child {
+      padding-bottom: 40px;
+    }
     img {
       width: 36px;
       margin-right: 10px;

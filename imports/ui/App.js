@@ -761,72 +761,78 @@ class App extends React.Component {
             src="/images/template/home/home-combined-shape.png" />
           <div className="ui-title">{ this.state.displayMenu ? translate('APP_TITLE.MENU') : translate('APP_TITLE.' + this.state.activeSection.toUpperCase()) }</div>
         </div>
-        <div className="app-main">
-          { (this.state.activeSection !== 'pin' || this.state.activeSection !== 'offlinesig') &&
-            <Login
+        { this.state.displayMenu &&
+          <div className="app-main">
+            { this.renderMenu() }
+          </div>
+        }
+        { !this.state.displayMenu &&
+          <div className="app-main">
+            { (this.state.activeSection !== 'pin' || this.state.activeSection !== 'offlinesig') &&
+              <Login
+                { ...this.state }
+                login={ this.login } />
+            }
+            { this.state.activeSection === 'create-seed' &&
+              <CreateSeed
+                { ...this.state }
+                login={ this.login }
+                changeActiveSection={ this.changeActiveSection } />
+            }
+            <SendCoin
               { ...this.state }
-              login={ this.login } />
-          }
-          { this.state.activeSection === 'create-seed' &&
-            <CreateSeed
-              { ...this.state }
-              login={ this.login }
+              sendtx={ this.props.actions.sendtx }
               changeActiveSection={ this.changeActiveSection } />
-          }
-          { this.renderMenu() }
-          <SendCoin
-            { ...this.state }
-            sendtx={ this.props.actions.sendtx }
-            changeActiveSection={ this.changeActiveSection } />
-          <AddCoin
-            { ...this.state }
-            addCoin={ this.addCoin }
-            changeActiveSection={ this.changeActiveSection } />
-          { this.state.conError &&
-            <ServerSelect
+            <AddCoin
               { ...this.state }
-              dashboardRefresh={ this.dashboardRefresh }
-              getServersList={ this.props.actions.getServersList }
-              setDefaultServer={ this.props.actions.setDefaultServer } />
-          }
-          { this.state.proxyError &&
-            <div className="con-error">
-              <i className="fa fa-warning error"></i> <span className="error">{ translate('DASHBOARD.PROXY_ERROR') }</span>
-            </div>
-          }
-          <KMDInterest
-            { ...this.state }
-            sendtx={ this.props.actions.sendtx }
-            changeActiveSection={ this.changeActiveSection } />
-          { this.state.auth &&
-            this.state.activeSection === 'dashboard' &&
-            !this.state.proxyError &&
-            <Transactions
+              addCoin={ this.addCoin }
+              changeActiveSection={ this.changeActiveSection } />
+            { this.state.conError &&
+              <ServerSelect
+                { ...this.state }
+                dashboardRefresh={ this.dashboardRefresh }
+                getServersList={ this.props.actions.getServersList }
+                setDefaultServer={ this.props.actions.setDefaultServer } />
+            }
+            { this.state.proxyError &&
+              <div className="con-error">
+                <i className="fa fa-warning error"></i> <span className="error">{ translate('DASHBOARD.PROXY_ERROR') }</span>
+              </div>
+            }
+            <KMDInterest
               { ...this.state }
-              dashboardRefresh={ this.dashboardRefresh }
-              changeActiveSection={ this.changeActiveSection }
-              toggleKMDInterest={ this.toggleKMDInterest } />
-          }
-          { !this.state.auth &&
-            this.state.activeSection === 'offlinesig' &&
-            <OfflineSigning />
-          }
-          { !this.state.auth &&
-            this.state.activeSection === 'pin' &&
-            <Pin changeActiveSection={ this.changeActiveSection } />
-          }
-          { this.state.auth &&
-            this.state.activeSection === 'recovery' &&
-            <Recovery { ...this.state } />
-          }
-          { this.state.auth &&
-            this.state.activeSection === 'overview' &&
-            <Overview { ...this.state } />
-          }
-          { this.state.activeSection === 'settings' &&
-            <Settings />
-          }
-        </div>
+              sendtx={ this.props.actions.sendtx }
+              changeActiveSection={ this.changeActiveSection } />
+            { this.state.auth &&
+              this.state.activeSection === 'dashboard' &&
+              !this.state.proxyError &&
+              <Transactions
+                { ...this.state }
+                dashboardRefresh={ this.dashboardRefresh }
+                changeActiveSection={ this.changeActiveSection }
+                toggleKMDInterest={ this.toggleKMDInterest } />
+            }
+            { !this.state.auth &&
+              this.state.activeSection === 'offlinesig' &&
+              <OfflineSigning />
+            }
+            { !this.state.auth &&
+              this.state.activeSection === 'pin' &&
+              <Pin changeActiveSection={ this.changeActiveSection } />
+            }
+            { this.state.auth &&
+              this.state.activeSection === 'recovery' &&
+              <Recovery { ...this.state } />
+            }
+            { this.state.auth &&
+              this.state.activeSection === 'overview' &&
+              <Overview { ...this.state } />
+            }
+            { this.state.activeSection === 'settings' &&
+              <Settings />
+            }
+          </div>
+        }
       </div>
     )
   }
