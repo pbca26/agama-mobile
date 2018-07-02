@@ -62,6 +62,7 @@
         right: 13px;
         top: 10px;
         width: 60px;
+        border-radius: 50%;
       }
   
       .coin-title {
@@ -154,11 +155,13 @@
         &.self {
           .direction,
           .amount-native {
-            color: #00bcd4;
+            color: #fff;
+            opacity: 0.7;
           }
   
           .direction-icon {
-            background-color: #00bcd4;
+            background-color: #fff;
+            opacity: 0.7;
           }
         }
   

@@ -1,10 +1,14 @@
 import React from 'react';
 import {
-  secondsToString,
   formatValue,
-  explorers,
-  isAssetChain,
-} from '../actions/utils';
+} from 'agama-wallet-lib/src/utils';
+import {
+  secondsToString,
+} from 'agama-wallet-lib/src/time';
+import {
+  explorerList,
+  isKomodoCoin,
+} from 'agama-wallet-lib/src/coin-helpers';
 import translate from '../translate/translate';
 import Spinner from './Spinner';
 import QRCode from 'qrcode.react';
@@ -122,7 +126,7 @@ class Transactions extends React.Component {
 
     return (
       <span>
-        { formatValue(tx.amount) * _amountNegative || translate('TRANSACTIONS.UNKNOWN') } { this.props.coin.toUpperCase() }
+        { formatValue(tx.amount) * _amountNegative || translate('TRANSACTIONS.UNKNOWN') } { Number(tx.amount) === 0 ? '' : this.props.coin.toUpperCase() }
         { tx.interest &&
           !amountOnly &&
           <div className="tx-interest">+{ formatValue(Math.abs(tx.interest)) }</div>
@@ -223,9 +227,9 @@ class Transactions extends React.Component {
                   }
                   <div>
                   { translate('TRANSACTIONS.TIME') }: { secondsToString(_transactions[i].timestamp) }
-                    { isAssetChain(this.props.coin) &&
+                    { isKomodoCoin(this.props.coin) &&
                       <button
-                        onClick={ () => this.openExternalURL(`${explorers[this.props.coin.toUpperCase()]}/tx/${_transactions[i].txid}`) }
+                        onClick={ () => this.openExternalURL(`${explorerList[this.props.coin.toUpperCase()]}/tx/${_transactions[i].txid}`) }
                         className="margin-left-20 btn btn-sm white btn-dark waves-effect waves-light ext-link">
                         <i className="fa fa-external-link"></i>Explorer
                       </button>
