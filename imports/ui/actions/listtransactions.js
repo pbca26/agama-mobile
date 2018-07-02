@@ -1,12 +1,13 @@
 import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
-import { isAssetChain } from './utils';
-import { parseTransactionAddresses } from './parseTransactionAddresses';
-import { electrumJSTxDecoder } from './txDecoder/txDecoder';
+import {
+  isKomodoCoin,
+} from 'agama-wallet-lib/src/coin-helpers';
+import parseTransactionAddresses from 'agama-wallet-lib/src/transaction-type';
+import electrumJSNetworks from 'agama-wallet-lib/src/bitcoinjs-networks';
+import electrumJSTxDecoder from 'agama-wallet-lib/src/transaction-decoder';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
-
-const electrumJSNetworks = require('./electrumNetworks.js');
 
 export const listtransactions = (proxyServer, electrumServer, address, network, full, verify) => {
   return new Promise((resolve, reject) => {
@@ -70,12 +71,12 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
                       const blockInfo = result.result;
 
                       devlog('electrum gettransaction ==>');
-                      devlog((index + ' | ' + (transaction.raw.length - 1)));
+                      devlog(`${index} | ${(transaction.raw.length - 1)}`);
                       devlog(transaction.raw);
 
                       // decode tx
-                      const _network = electrumJSNetworks[isAssetChain(network) ? 'komodo' : network];
-                      const decodedTx = electrumJSTxDecoder(transaction.raw, network, _network);
+                      const _network = electrumJSNetworks[isKomodoCoin(network) || network === 'kmd' ? 'kmd' : network];
+                      const decodedTx = electrumJSTxDecoder(transaction.raw, _network);
 
                       let txInputs = [];
 
@@ -102,7 +103,7 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
                                 result = JSON.parse(result.content);
 
                                 if (result.msg !== 'error') {
-                                  const decodedVinVout = electrumJSTxDecoder(result.result, network, _network);
+                                  const decodedVinVout = electrumJSTxDecoder(result.result, _network);
 
                                   devlog('electrum raw input tx ==>');
 
@@ -131,7 +132,7 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
                             confirmations: Number(transaction.height) === 0 ? 0 : currentHeight - transaction.height,
                           };
 
-                          const formattedTx = parseTransactionAddresses(_parsedTx, address, 'komodo');
+                          const formattedTx = parseTransactionAddresses(_parsedTx, address, network === 'kmd' ? true : false);
 
                           if (formattedTx.type) {
                             formattedTx.height = transaction.height;
@@ -173,7 +174,7 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
                           confirmations: Number(transaction.height) === 0 ? 0 : currentHeight - transaction.height,
                         };
 
-                        const formattedTx = parseTransactionAddresses(_parsedTx, address, 'komodo');
+                        const formattedTx = parseTransactionAddresses(_parsedTx, address, network === 'kmd' ? true : false);
                         _rawtx.push(formattedTx);
                         resolve(true);
                       }
@@ -187,7 +188,7 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
                         timestamp: 'cant get block info',
                         confirmations: Number(transaction.height) === 0 ? 0 : currentHeight - transaction.height,
                       };
-                      const formattedTx = parseTransactionAddresses(_parsedTx, address, 'komodo');
+                      const formattedTx = parseTransactionAddresses(_parsedTx, address, network === 'kmd' ? true : false);
                       _rawtx.push(formattedTx);
                       resolve(true);
                     }
