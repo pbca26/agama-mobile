@@ -195,6 +195,7 @@ export const _lang = {
       'BNTN': 'Blocnation',
       'PRLPAY': 'Pearl Pay',
       'OOT': 'Utrum',
+      'ZILLA': 'Chainzilla',
       // crypto
       'CRW': 'Crown',
       'STRAT': 'Stratis',
