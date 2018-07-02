@@ -4,6 +4,10 @@ import { kmdCalcInterest } from './utils';
 import { isAssetChain } from './utils';
 import { verifyMerkleByCoin } from './merkle';
 import { electrumJSTxDecoder } from './txDecoder/txDecoder';
+import {
+  fromSats,
+  toSats,
+} from 'agama-wallet-lib/src/utils';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
@@ -99,7 +103,7 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                                   network === 'kmd') {
                                 let interest = 0;
 
-                                if (Number(_utxoItem.value) * 0.00000001 >= 10 &&
+                                if (Number(fromSats(_utxoItem.value)) >= 10 &&
                                     decodedTx.format.locktime > 0) {
                                   interest = kmdCalcInterest(decodedTx.format.locktime, _utxoItem.value);
                                 }
@@ -108,10 +112,10 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                                   txid: _utxoItem['tx_hash'],
                                   vout: _utxoItem['tx_pos'],
                                   address,
-                                  amount: Number(_utxoItem.value) * 0.00000001,
+                                  amount: Number(fromSats(_utxoItem.value)),
                                   amountSats: _utxoItem.value,
                                   interest: interest,
-                                  interestSats: Math.floor(interest * 100000000),
+                                  interestSats: Math.floor(toSats(interest)),
                                   confirmations: Number(_utxoItem.height) === 0 ? 0 : currentHeight - _utxoItem.height,
                                   spendable: true,
                                   verified: false,
@@ -143,7 +147,7 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                                   txid: _utxoItem['tx_hash'],
                                   vout: _utxoItem['tx_pos'],
                                   address,
-                                  amount: Number(_utxoItem.value) * 0.00000001,
+                                  amount: Number(fromSats(_utxoItem.value)),
                                   amountSats: _utxoItem.value,
                                   confirmations: Number(_utxoItem.height) === 0 ? 0 : currentHeight - _utxoItem.height,
                                   spendable: true,

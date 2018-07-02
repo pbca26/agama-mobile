@@ -16,6 +16,10 @@ import {
   devlog,
   config,
 } from '../actions/dev';
+import {
+  fromSats,
+  toSats,
+} from 'agama-wallet-lib/src/utils';
 
 class SendCoin extends React.Component {
   constructor() {
@@ -85,7 +89,8 @@ class SendCoin extends React.Component {
 
     MeteorCamera.getPicture({ quality: 100 }, (error, data) => {
       if (error) {
-        // console.warn(error);
+        devlog(error);
+
         this.setState({
           qrScanError: true,
         });
@@ -97,11 +102,17 @@ class SendCoin extends React.Component {
       } else {
         convertURIToImageData(data)
         .then((imageData) => {
-          /*console.log(imageData.data);
-          console.log(imageData.height);
-          console.log(imageData.width);*/
-          const decodedQR = jsQR.decodeQRFromImage(imageData.data, imageData.width, imageData.height);
-          // console.warn(decodedQR);
+          devlog(imageData.data);
+          devlog(imageData.height);
+          devlog(imageData.width);
+
+          const decodedQR = jsQR.decodeQRFromImage(
+            imageData.data,
+            imageData.width,
+            imageData.height
+          );
+          
+          devlog(decodedQR);
 
           if (!decodedQR) {
             this.setState({
@@ -208,7 +219,7 @@ class SendCoin extends React.Component {
             this.props.sendtx(
               this.props.coin,
               this.state.sendTo,
-              Math.abs(this.state.sendAmount * 100000000),
+              Math.abs(toSats(this.state.sendAmount)),
               true,
               false
             )
@@ -239,7 +250,7 @@ class SendCoin extends React.Component {
             this.props.sendtx(
               this.props.coin,
               this.state.sendTo,
-              Math.abs(this.state.sendAmount * 100000000),
+              Math.abs(toSats(this.state.sendAmount)),
               null,
               true
             )

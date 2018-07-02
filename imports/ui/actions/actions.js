@@ -17,6 +17,10 @@ import { getKMDBalance } from './getKMDBalance';
 import { createtx } from './createtx';
 import { listtransactions } from './listtransactions';
 import { listunspent } from './listunspent';
+import {
+  fromSats,
+  toSats,
+} from 'agama-wallet-lib/src/utils';
 
 let electrumKeys = {};
 let proxyServer = {};
@@ -149,8 +153,8 @@ const balance = (network) => {
             const _balance = JSON.parse(result.content).result;
 
             resolve({
-              balance: Number((0.00000001 * _balance.confirmed).toFixed(8)),
-              unconfirmed: Number((0.00000001 * _balance.unconfirmed).toFixed(8)),
+              balance: Number(fromSats(_balance.confirmed).toFixed(8)),
+              unconfirmed: Number(fromSats(_balance.unconfirmed).toFixed(8)),
             });
           }
         }
@@ -258,8 +262,8 @@ const getOverview = (coins) => {
               resolve({
                 coin: pair.coin,
                 pub: pair.pub,
-                balance: Number((0.00000001 * _balance.confirmed).toFixed(8)),
-                unconfirmed: Number((0.00000001 * _balance.unconfirmed).toFixed(8)),
+                balance: Number(fromSats(_balance.confirmed).toFixed(8)),
+                unconfirmed: Number(fromSats(_balance.unconfirmed).toFixed(8)),
               });
             }
           });
@@ -307,7 +311,6 @@ const getOverview = (coins) => {
             } else if (promiseResult[i].coin === 'kmd') {
               _coinKMDPrice = 1;
             }
-
 
             if (!promiseResult[i].balance) {
               promiseResult[i].balance = 0;

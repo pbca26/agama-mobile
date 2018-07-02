@@ -2,6 +2,10 @@ import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
 import { kmdCalcInterest } from './utils';
 import { electrumJSTxDecoder } from './txDecoder/txDecoder';
+import {
+  fromSats,
+  toSats,
+} from 'agama-wallet-lib/src/utils';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
@@ -30,9 +34,9 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer) => {
           let _utxo = [];
 
           for (let i = 0; i < utxoList.length; i++) {
-            devlog(`utxo ${utxoList[i]['tx_hash']} sats ${utxoList[i].value} value ${Number(utxoList[i].value) * 0.00000001}`);
+            devlog(`utxo ${utxoList[i]['tx_hash']} sats ${utxoList[i].value} value ${Number(fromSats(utxoList[i].value))}`);
 
-            if (Number(utxoList[i].value) * 0.00000001 >= 10) {
+            if (Number(fromSats(utxoList[i].value)) >= 10) {
               _utxo.push(utxoList[i]);
             }
           }
@@ -87,20 +91,20 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer) => {
             }))
             .then(promiseResult => {
               resolve({
-                balance: Number((0.00000001 * json.confirmed).toFixed(8)),
-                unconfirmed: Number((0.00000001 * json.unconfirmed).toFixed(8)),
+                balance: Number(fromSats(json.confirmed).toFixed(8)),
+                unconfirmed: Number(fromSats(json.unconfirmed).toFixed(8)),
                 unconfirmedSats: json.unconfirmed,
                 balanceSats: json.confirmed,
                 interest: Number(interestTotal.toFixed(8)),
-                interestSats: Math.floor(interestTotal * 100000000),
-                total: interestTotal > 0 ? Number((0.00000001 * json.confirmed + interestTotal).toFixed(8)) : 0,
-                totalSats: interestTotal > 0 ?json.confirmed + Math.floor(interestTotal * 100000000) : 0,
+                interestSats: Math.floor(toSats(interestTotal)),
+                total: interestTotal > 0 ? Number((fromSats(json.confirmed) + interestTotal).toFixed(8)) : 0,
+                totalSats: interestTotal > 0 ?json.confirmed + Math.floor(toSats(interestTotal)) : 0,
               });
             });
           } else {
             resolve({
-              balance: Number((0.00000001 * json.confirmed).toFixed(8)),
-              unconfirmed: Number((0.00000001 * json.unconfirmed).toFixed(8)),
+              balance: Number(fromSats(json.confirmed).toFixed(8)),
+              unconfirmed: Number(fromSats(json.unconfirmed).toFixed(8)),
               unconfirmedSats: json.unconfirmed,
               balanceSats: json.confirmed,
               interest: 0,
@@ -111,8 +115,8 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer) => {
           }
         } else {
           resolve({
-            balance: Number((0.00000001 * json.confirmed).toFixed(8)),
-            unconfirmed: Number((0.00000001 * json.unconfirmed).toFixed(8)),
+            balance: Number(fromSats(json.confirmed).toFixed(8)),
+            unconfirmed: Number(fromSats(json.unconfirmed).toFixed(8)),
             unconfirmedSats: json.unconfirmed,
             balanceSats: json.confirmed,
             interest: 0,
