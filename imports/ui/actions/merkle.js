@@ -37,7 +37,7 @@ const getMerkleRoot = (txid, proof, pos) => {
   return hash;
 }
 
-const verifyMerkle = (txid, height, serverList, electrumServer, proxyServer) => {
+const verifyMerkle = (txid, height, serverList, electrumServer, proxyServer, cache, network) => {
   // select random server
   const getRandomIntInclusive = (min, max) => {
     min = Math.ceil(min);
@@ -80,14 +80,20 @@ const verifyMerkle = (txid, height, serverList, electrumServer, proxyServer) => 
           const _res = getMerkleRoot(txid, merkleData.merkle, merkleData.pos);
           devlog(_res, true);
 
-          HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getblockinfo`, {
-            params: {
-              ip: _randomServer[0],
-              port: _randomServer[1],
-              proto: _randomServer[2],
-              height,
-            },
-          }, (error, result) => {
+          cache.getBlockheader(
+            height,
+            network,
+            {
+              url: `http://${proxyServer.ip}:${proxyServer.port}/api/getblockinfo`,
+              params: {
+                ip: _randomServer[0],
+                port: _randomServer[1],
+                proto: _randomServer[2],
+                height,
+              },
+            }
+          )
+          .then((result) => {
             result = JSON.parse(result.content);
 
             if (result.msg === 'error') {
@@ -124,7 +130,7 @@ const verifyMerkle = (txid, height, serverList, electrumServer, proxyServer) => 
   });
 }
 
-export const verifyMerkleByCoin = (txid, height, electrumServer, proxyServer) => {
+export const verifyMerkleByCoin = (txid, height, electrumServer, proxyServer, cache, network) => {
   const _serverList = electrumServer.serverList;
 
   devlog(`verifyMerkleByCoin`);
@@ -147,7 +153,9 @@ export const verifyMerkleByCoin = (txid, height, electrumServer, proxyServer) =>
         height,
         _filteredServerList,
         electrumServer,
-        proxyServer
+        proxyServer,
+        cache,
+        network
       )
       .then((proof) => {
         resolve(proof);

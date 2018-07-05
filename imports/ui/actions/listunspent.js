@@ -1,6 +1,6 @@
 import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
-import { kmdCalcInterest } from 'agama-wallet-lib/src/komodo-interest.js';
+import kmdCalcInterest from 'agama-wallet-lib/src/komodo-interest.js';
 import {
   isKomodoCoin,
 } from 'agama-wallet-lib/src/coin-helpers';
@@ -134,7 +134,9 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                                     _utxoItem['tx_hash'],
                                     _utxoItem.height,
                                     electrumServer,
-                                    proxyServer
+                                    proxyServer,
+                                    cache,
+                                    network
                                   )
                                   .then((verifyMerkleRes) => {
                                     if (verifyMerkleRes &&
@@ -166,7 +168,9 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                                     _utxoItem['tx_hash'],
                                     _utxoItem.height,
                                     electrumServer,
-                                    proxyServer
+                                    proxyServer,
+                                    cache,
+                                    network
                                   )
                                   .then((verifyMerkleRes) => {
                                     if (verifyMerkleRes &&

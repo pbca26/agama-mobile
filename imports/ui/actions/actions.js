@@ -24,25 +24,75 @@ import {
   toSats,
 } from 'agama-wallet-lib/src/utils';
 import electrumJSNetworks from 'agama-wallet-lib/src/bitcoinjs-networks';
+import { devlog } from './dev';
 
-let cache = {};
-const getCache = (coin, type, key, data) => {
-  if (!cache[coin]) {
-    cache[coin] = {
-      blocks: {},
-      txs: {},
-    };
-  }
+let _cache = {};
 
-  if (!cache[coin][type][key]) {
-    devlog(`not cached ${coin} ${type} ${key}`);
-    cache[coin][type][key] = data;
-    return false;
-  } else {
-    devlog(`cached ${coin} ${type} ${key}`);
-    return cache[coin][type][key];
-  }
+// runtime cache wrapper functions
+const getTransaction = (txid, coin, httpParams) => {
+  return new Promise((resolve, reject) => {
+    if (!_cache[coin]) {
+      _cache[coin] = {};
+    }
+    if (!_cache[coin].tx) {
+      _cache[coin].tx = {};
+    }
+
+    if (!_cache[coin].tx[txid]) {
+      devlog(`raw input tx ${txid}`);
+
+      HTTP.call('GET', httpParams.url, {
+        params: httpParams.params,
+      }, (error, result) => {
+        const _result = JSON.parse(result.content);
+        
+        if (_result.msg !== 'error') {
+          _cache[coin].tx[txid] = result;          
+        }
+
+        resolve(result);
+      });
+    } else {
+      devlog(`cached raw input tx ${txid}`);
+      resolve(_cache[coin].tx[txid]);
+    }
+  });
 }
+
+const getBlockheader = (height, coin, httpParams) => {
+  return new Promise((resolve, reject) => {
+    if (!_cache[coin]) {
+      _cache[coin] = {};
+    }
+    if (!_cache[coin].blockheader) {
+      _cache[coin].blockheader = {};
+    }
+
+    if (!_cache[coin].blockheader[height]) {
+      devlog(`blockheader ${height}`);
+
+      HTTP.call('GET', httpParams.url, {
+        params: httpParams.params,
+      }, (error, result) => {
+        const _result = JSON.parse(result.content);
+        
+        if (_result.msg !== 'error') {
+          _cache[coin].blockheader[height] = result;          
+        }
+
+        resolve(result);
+      });
+    } else {
+      devlog(`cached blockheader ${height}`);
+      resolve(_cache[coin].blockheader[height]);
+    }
+  });
+}
+
+const cache = {
+  getTransaction,
+  getBlockheader,
+};
 
 let electrumKeys = {};
 let proxyServer = {};
@@ -136,7 +186,7 @@ const transactions = (network) => {
         electrumKeys[network].pub,
         network,
         true,
-        getCache
+        cache
       )
       .then((res) => {
         resolve(res);
@@ -200,6 +250,7 @@ const kmdUnspents = () => {
         'kmd',
         true,
         true,
+        cache
       )
       .then((res) => {
         resolve(res);

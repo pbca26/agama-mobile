@@ -9,7 +9,7 @@ import electrumJSTxDecoder from 'agama-wallet-lib/src/transaction-decoder';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
-export const listtransactions = (proxyServer, electrumServer, address, network, full, verify) => {
+export const listtransactions = (proxyServer, electrumServer, address, network, full, cache) => {
   return new Promise((resolve, reject) => {
     // get current height
     HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getcurrentblock`, {
@@ -53,15 +53,20 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
 
               Promise.all(json.map((transaction, index) => {
                 return new Promise((resolve, reject) => {
-                  HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getblockinfo`, {
-                    params: {
-                      port: electrumServer.port,
-                      ip: electrumServer.ip,
-                      proto: electrumServer.proto,
-                      address,
-                      height: transaction.height,
-                    },
-                  }, (error, result) => {
+                  cache.getBlockheader(
+                    transaction.height,
+                    network,
+                    {
+                      url: `http://${proxyServer.ip}:${proxyServer.port}/api/getblockinfo`,
+                      params: {
+                        port: electrumServer.port,
+                        ip: electrumServer.ip,
+                        proto: electrumServer.proto,
+                        height: transaction.height,
+                      },
+                    }
+                  )
+                  .then((result) => {
                     devlog('getblock =>');
                     devlog(result);
 
@@ -88,15 +93,20 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
                         Promise.all(decodedTx.inputs.map((_decodedInput, index) => {
                           return new Promise((_resolve, _reject) => {
                             if (_decodedInput.txid !== '0000000000000000000000000000000000000000000000000000000000000000') {
-                              HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction`, {
-                                params: {
-                                  port: electrumServer.port,
-                                  ip: electrumServer.ip,
-                                  proto: electrumServer.proto,
-                                  address,
-                                  txid: _decodedInput.txid,
-                                },
-                              }, (error, result) => {
+                              cache.getTransaction(
+                                _decodedInput.txid,
+                                network,
+                                {
+                                  url: `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction`,
+                                  params: {
+                                    port: electrumServer.port,
+                                    ip: electrumServer.ip,
+                                    proto: electrumServer.proto,
+                                    txid: _decodedInput.txid,
+                                  },
+                                }
+                              )
+                              .then((result) => {
                                 devlog('gettransaction =>');
                                 devlog(result);
 
