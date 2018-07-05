@@ -188,6 +188,16 @@ export const coinsList = [
   'WLC',
   'MNZ',
   'BNTN',
+  'CHAIN',
+  'GLXT',
+  'EQL',
+  'PRLPAY',
+  'ZILLA',
+  'NINJA',
+  'VOTE2018',
+  'PIZZA',
+  'BEER',
+  'BTC',
   'DOGE',
   'DGB',
   'BTG',
@@ -206,7 +216,15 @@ export const coinsList = [
   'NMC',
   'SIB',
   'XMY',
-  'ZCL'
+  'ZCL',
+  'EMC2',
+  'FJC',
+  'GAME',
+  'BCBC',
+  'BTCZ',
+  'QTUM',
+  'DNR',
+  'BTX',
 ];
 
 export const explorers = {

@@ -1,15 +1,14 @@
 import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
 import { kmdCalcInterest } from './utils';
-import { electrumJSTxDecoder } from './txDecoder/txDecoder';
 import {
   fromSats,
   toSats,
 } from 'agama-wallet-lib/src/utils';
+import electrumJSNetworks from 'agama-wallet-lib/src/bitcoinjs-networks';
+import electrumJSTxDecoder from 'agama-wallet-lib/src/transaction-decoder';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
-
-const electrumJSNetworks = require('./electrumNetworks.js');
 
 export const getKMDBalance = (address, json, proxyServer, electrumServer) => {
   return new Promise((resolve, reject) => {
@@ -68,12 +67,12 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer) => {
                     const _rawtxJSON = result.result;
 
                     devlog('electrum gettransaction ==>');
-                    devlog((index + ' | ' + (_rawtxJSON.length - 1)));
+                    devlog(`${index} | ${(_rawtxJSON.length - 1)}`);
                     devlog(_rawtxJSON);
 
                     // decode tx
-                    const _network = electrumJSNetworks.komodo;
-                    const decodedTx = electrumJSTxDecoder(_rawtxJSON, 'kmd', _network);
+                    const _network = electrumJSNetworks.kmd;
+                    const decodedTx = electrumJSTxDecoder(_rawtxJSON, _network);
 
                     if (decodedTx &&
                         decodedTx.format &&
@@ -98,7 +97,7 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer) => {
                 interest: Number(interestTotal.toFixed(8)),
                 interestSats: Math.floor(toSats(interestTotal)),
                 total: interestTotal > 0 ? Number((fromSats(json.confirmed) + interestTotal).toFixed(8)) : 0,
-                totalSats: interestTotal > 0 ?json.confirmed + Math.floor(toSats(interestTotal)) : 0,
+                totalSats: interestTotal > 0 ? json.confirmed + Math.floor(toSats(interestTotal)) : 0,
               });
             });
           } else {

@@ -12,6 +12,10 @@ import {
   convertURIToImageData,
 } from './actions/utils';
 import translate from './translate/translate';
+import {
+  devlog,
+  config,
+} from './actions/dev';
 
 import SendCoin from './components/SendCoin';
 import AddCoin from './components/AddCoin';
@@ -109,7 +113,6 @@ class App extends React.Component {
   }
 
   scrollToTop() {
-    console.warn(this.state);
     window.scrollTo(0, 0);
   }
 
@@ -119,12 +122,16 @@ class App extends React.Component {
         clearTimeout(this.globalClickTimeout);
       }
 
-      this.globalClickTimeout = setTimeout(() => {
-        // console.warn(`logout after ${DEFAULT_LOCK_INACTIVE_INTERVAL} inactivity`);
-        this.lock();
-      }, DEFAULT_LOCK_INACTIVE_INTERVAL);
+      if (config.dev &&
+          config.preload &&
+          !config.preload.disableAutoLock) {
+        this.globalClickTimeout = setTimeout(() => {
+          devlog(`logout after ${DEFAULT_LOCK_INACTIVE_INTERVAL}ms inactivity`);
+          this.lock();
+        }, DEFAULT_LOCK_INACTIVE_INTERVAL);
+      }
 
-      // console.warn('global click', 'set timer');
+      // devlog('global click', 'set timer');
     }
   }
 
@@ -548,8 +555,7 @@ class App extends React.Component {
           onClick={ () => this.state.coin !== 'kmd' ? this.switchCoin('kmd') : null }
           key={ `active-coins-kmd` }
           className="active-coins">
-          <img
-            src={ `/images/cryptologo/kmd.png` } /> <span>KMD</span>
+          <img src="/images/cryptologo/kmd.png" /> <span>KMD</span>
           { this.state.coin === 'kmd' &&
             <i className="fa fa-check"></i>
           }

@@ -13,7 +13,7 @@ import {
   isZcash,
   isPos,
 } from './txDecoder/txDecoder';
-import { electrumServers } from './electrumServers';
+import electrumServers from './electrumServers';
 
 const bitcoinJSForks = require('bitcoinforksjs-lib');
 const bitcoinZcash = require('bitcoinjs-lib-zcash');
@@ -74,7 +74,11 @@ export const buildSignedTxForks = (sendTo, changeAddress, wif, network, utxo, ch
 
 // single sig
 export const buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue) => {
-  const _network = electrumJSNetworks[isAssetChain(network) ? 'komodo' : network];
+  const _network = electrumJSNetworks[isAssetChain(network) ? 'kmd' : network];
+
+  console.log(`${wif} ${network}`); 
+  console.log(_network);
+
   let key = isZcash(network) ? bitcoinZcash.ECPair.fromWIF(wif, _network) : bitcoin.ECPair.fromWIF(wif, _network);
   let tx;
 

@@ -5,19 +5,26 @@ import translate from '../translate/translate';
 import jsQR from 'jsqr';
 import QRCode from 'qrcode.react';
 import {
-  isAssetChain,  
   getLocalStorageVar,
   convertURIToImageData,
 } from '../actions/utils';
+import {
+  isKomodoCoin,
+} from 'agama-wallet-lib/src/coin-helpers';
+import {
+  fromSats,
+  toSats,
+} from 'agama-wallet-lib/src/utils';
 import {
   encryptkey,
   decryptkey,
 } from '../actions/seedCrypt';
 import {
-  seedToWif,
   wifToWif,
-} from '../actions/seedToWif';
+  seedToWif,
+} from 'agama-wallet-lib/src/keys';
 import { devlog } from '../actions/dev';
+import electrumJSNetworks from 'agama-wallet-lib/src/bitcoinjs-networks';
 
 import {
   buildSignedTxForks,
@@ -66,9 +73,10 @@ class OfflineSigning extends React.Component {
         this.setState({
           wrongPin: false,
         });
-        console.warn(_decryptedKey);
+        devlog(_decryptedKey);
+
         const network = this.state.network.toLowerCase();
-        const wif = seedToWif(_decryptedKey, true, isAssetChain(network) || network === 'kmd' ? 'kmd' : network.toLowerCase()).wif;
+        const wif = seedToWif(_decryptedKey, isKomodoCoin(network) || network === 'kmd' ? electrumJSNetworks.kmd : electrumJSNetworks[key.toLowerCase()], true).wif;
         let _rawtx;
         
         if (network === 'btg' ||
@@ -126,7 +134,7 @@ class OfflineSigning extends React.Component {
     MeteorCamera.getPicture({
       quality: 100,
       width,
-      height
+      height,
     }, (error, data) => {
       if (error) {
         this.setState({
@@ -220,7 +228,7 @@ class OfflineSigning extends React.Component {
                 <div>
                   <strong>{ translate('OFFLINE.AMOUNT') }</strong>
                 </div>
-                { this.state.amount * 0.00000001 } { this.state.network }
+                { fromSats(this.state.amount) } { this.state.network }
               </div>
             </div>
 

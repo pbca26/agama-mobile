@@ -1,17 +1,18 @@
 import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
 import { kmdCalcInterest } from './utils';
-import { isAssetChain } from './utils';
+import {
+  isKomodoCoin,
+} from 'agama-wallet-lib/src/coin-helpers';
 import { verifyMerkleByCoin } from './merkle';
-import { electrumJSTxDecoder } from './txDecoder/txDecoder';
 import {
   fromSats,
   toSats,
 } from 'agama-wallet-lib/src/utils';
+import electrumJSNetworks from 'agama-wallet-lib/src/bitcoinjs-networks';
+import electrumJSTxDecoder from 'agama-wallet-lib/src/transaction-decoder';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
-
-const electrumJSNetworks = require('./electrumNetworks.js');
 
 export const listunspent = (proxyServer, electrumServer, address, network, full, verify) => {
   let _atLeastOneDecodeTxFailed = false;
@@ -85,12 +86,12 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                             const _rawtxJSON = result.result;
 
                             devlog('electrum gettransaction ==>');
-                            devlog(index + ' | ' + (_rawtxJSON.length - 1));
+                            devlog(`${index} | ${(_rawtxJSON.length - 1)}`);
                             devlog(_rawtxJSON);
 
                             // decode tx
-                            const _network = electrumJSNetworks[isAssetChain(network) ? 'komodo' : network];
-                            const decodedTx = electrumJSTxDecoder(_rawtxJSON, network, _network);
+                            const _network = electrumJSNetworks[isKomodoCoin(network) ? 'kmd' : network];
+                            const decodedTx = electrumJSTxDecoder(_rawtxJSON, _network);
 
                             devlog('decoded tx =>');
                             devlog(decodedTx);
@@ -99,8 +100,7 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                               _atLeastOneDecodeTxFailed = true;
                               resolve('cant decode tx');
                             } else {
-                              if (network === 'komodo' ||
-                                  network === 'kmd') {
+                              if (network === 'kmd') {
                                 let interest = 0;
 
                                 if (Number(fromSats(_utxoItem.value)) >= 10 &&

@@ -3,14 +3,16 @@ const bs58check = require('bs58check');
 import { Promise } from 'meteor/promise';
 
 import {
-  isAssetChain,
+  isKomodoCoin,
+} from 'agama-wallet-lib/src/coin-helpers';
+import {
   getRandomIntInclusive,
   getLocalStorageVar,
 } from './utils';
 import {
-  seedToWif,
   wifToWif,
-} from './seedToWif';
+  seedToWif,
+} from 'agama-wallet-lib/src/keys';
 import { proxyServers } from './proxyServers';
 import electrumServers from './electrumServers';
 import { getKMDBalance } from './getKMDBalance';
@@ -21,6 +23,26 @@ import {
   fromSats,
   toSats,
 } from 'agama-wallet-lib/src/utils';
+import electrumJSNetworks from 'agama-wallet-lib/src/bitcoinjs-networks';
+
+let cache = {};
+const getCache = (coin, type, key, data) => {
+  if (!cache[coin]) {
+    cache[coin] = {
+      blocks: {},
+      txs: {},
+    };
+  }
+
+  if (!cache[coin][type][key]) {
+    devlog(`not cached ${coin} ${type} ${key}`);
+    cache[coin][type][key] = data;
+    return false;
+  } else {
+    devlog(`cached ${coin} ${type} ${key}`);
+    return cache[coin][type][key];
+  }
+}
 
 let electrumKeys = {};
 let proxyServer = {};
@@ -81,6 +103,8 @@ const sendtx = (network, outputAddress, value, verify, push) => {
       let _electrumServer = getLocalStorageVar('coins')[network].server;
       _electrumServer.serverList = electrumServers[network].serverList;
 
+      devlog(`sendtx ${network}`);
+
       createtx(
         proxyServer,
         _electrumServer,
@@ -110,8 +134,9 @@ const transactions = (network) => {
         proxyServer,
         _electrumServer,
         electrumKeys[network].pub,
-        network === 'kmd' ? 'komodo' : network,
-        true
+        network,
+        true,
+        getCache
       )
       .then((res) => {
         resolve(res);
@@ -138,8 +163,7 @@ const balance = (network) => {
         if (!result) {
           resolve('proxy-error');
         } else {
-          if (network === 'komodo' ||
-              network === 'kmd') {
+          if (network === 'kmd') {
             getKMDBalance(
               address,
               JSON.parse(result.content).result,
@@ -173,7 +197,7 @@ const kmdUnspents = () => {
         proxyServer,
         _electrumServer,
         electrumKeys.kmd.pub,
-        'komodo',
+        'kmd',
         true,
         true,
       )
@@ -199,12 +223,12 @@ const auth = (seed, coins) => {
         } catch (e) {}
 
         if (isWif) {
-          _seedToWif = wifToWif(seed, isAssetChain(key) || key === 'komodo' ? 'komodo' : key.toLowerCase());
+          _seedToWif = wifToWif(seed, isKomodoCoin(key) || key === 'kmd' ? electrumJSNetworks.kmd : electrumJSNetworks[key.toLowerCase()]);
         } else {
-          _seedToWif = seedToWif(seed, true, isAssetChain(key) || key === 'komodo' ? 'komodo' : key.toLowerCase());
+          _seedToWif = seedToWif(seed, isKomodoCoin(key) || key === 'kmd' ? electrumJSNetworks.kmd : electrumJSNetworks[key.toLowerCase()], true);
         }
 
-          electrumKeys[key] = _seedToWif;
+        electrumKeys[key] = _seedToWif;
         _pubKeys[key] = _seedToWif.pub;
       }
 
@@ -220,7 +244,7 @@ const addKeyPair = (coin) => {
       const _wif = electrumKeys[Object.keys(electrumKeys)[0]].wif;
       let _pubKeys = {};
 
-      const _wifToWif = wifToWif(_wif, isAssetChain(coin) ? 'komodo' : coin);
+      const _wifToWif = wifToWif(_wif, isKomodoCoin(coin) ? 'kmd' : coin);
       electrumKeys[coin] = _wifToWif;
       _pubKeys[coin] = _wifToWif.pub;
 

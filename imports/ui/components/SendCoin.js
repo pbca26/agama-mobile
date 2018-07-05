@@ -3,10 +3,6 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import translate from '../translate/translate';
 import {
-  isNumber,
-  explorers,
-  isAssetChain,
-  formatValue,
   convertURIToImageData,
   getLocalStorageVar,
 } from '../actions/utils';
@@ -19,7 +15,13 @@ import {
 import {
   fromSats,
   toSats,
+  formatValue,
+  isNumber,
 } from 'agama-wallet-lib/src/utils';
+import {
+  explorerList,
+  isKomodoCoin,
+} from 'agama-wallet-lib/src/coin-helpers';
 
 class SendCoin extends React.Component {
   constructor() {
@@ -111,7 +113,7 @@ class SendCoin extends React.Component {
             imageData.width,
             imageData.height
           );
-          
+
           devlog(decodedQR);
 
           if (!decodedQR) {
@@ -478,12 +480,12 @@ class SendCoin extends React.Component {
                     { translate('SEND.TXID') }
                     <div className="shade margin-top-5">{ this.state.sendResult && this.state.sendResult.result && this.state.sendResult.result.txid ? this.renderTxID() : translate('SEND.PROCESSING_SM') }</div>
                   </div>
-                  { (isAssetChain(this.props.coin) || this.props.coin === 'chips') &&
+                  { (isKomodoCoin(this.props.coin) || this.props.coin === 'chips') &&
                       this.state.sendResult &&
                       this.state.sendResult.result &&
                       this.state.sendResult.result.txid &&
                     <div className="edit">
-                      <span onClick={ () => this.openExternalURL(`${explorers[this.props.coin.toUpperCase()]}/tx/${this.state.sendResult.result.txid}`) }>
+                      <span onClick={ () => this.openExternalURL(`${explorerList[this.props.coin.toUpperCase()]}/tx/${this.state.sendResult.result.txid}`) }>
                       { translate('SEND.OPEN_IN_EXPLORER') }<i className="fa fa-external-link margin-left-10"></i>
                       </span>
                     </div>
@@ -517,7 +519,7 @@ class SendCoin extends React.Component {
             <div
               onClick={ () => this.changeSendCoinStep(0) }
               className="group3 margin-top-50">
-              <div class="btn-inner">
+              <div className="btn-inner">
                 <div className="btn">{ translate('SEND.MAKE_ANOTHER_TX') }</div>
                 <div className="group2">
                   <div className="rectangle8copy"></div>
