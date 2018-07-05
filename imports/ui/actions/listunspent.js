@@ -1,6 +1,6 @@
 import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
-import { kmdCalcInterest } from './utils';
+import { kmdCalcInterest } from 'agama-wallet-lib/src/komodo-interest.js';
 import {
   isKomodoCoin,
 } from 'agama-wallet-lib/src/coin-helpers';
@@ -14,7 +14,7 @@ import electrumJSTxDecoder from 'agama-wallet-lib/src/transaction-decoder';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
-export const listunspent = (proxyServer, electrumServer, address, network, full, verify) => {
+export const listunspent = (proxyServer, electrumServer, address, network, full, verify, cache) => {
   let _atLeastOneDecodeTxFailed = false;
 
   if (full) {
@@ -68,15 +68,21 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                   } else {
                     Promise.all(_utxo.map((_utxoItem, index) => {
                       return new Promise((resolve, reject) => {
-                        HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction`, {
-                          params: {
-                            port: electrumServer.port,
-                            ip: electrumServer.ip,
-                            proto: electrumServer.proto,
-                            address,
-                            txid: _utxoItem['tx_hash'],
-                          },
-                        }, (error, result) => {
+                        cache.getTransaction(
+                          _utxoItem['tx_hash'],
+                          network,
+                          {
+                            url: `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction`,
+                            params: {
+                              port: electrumServer.port,
+                              ip: electrumServer.ip,
+                              proto: electrumServer.proto,
+                              address,
+                              txid: _utxoItem['tx_hash'],
+                            },
+                          }
+                        )
+                        .then((result) => {
                           result = JSON.parse(result.content);
 
                           devlog('gettransaction =>');
@@ -105,7 +111,7 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
 
                                 if (Number(fromSats(_utxoItem.value)) >= 10 &&
                                     decodedTx.format.locktime > 0) {
-                                  interest = kmdCalcInterest(decodedTx.format.locktime, _utxoItem.value);
+                                  interest = kmdCalcInterest(decodedTx.format.locktime, _utxoItem.value, _utxoItem.height);
                                 }
 
                                 let _resolveObj = {
