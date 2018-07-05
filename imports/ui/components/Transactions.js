@@ -124,11 +124,16 @@ class Transactions extends React.Component {
       _amountNegative = 1;
     }
 
+    if (Number(tx.interest) === Number(tx.amount)) {
+      _amountNegative = -1;
+    }
+
     return (
       <span>
         { formatValue(tx.amount) * _amountNegative || translate('TRANSACTIONS.UNKNOWN') } { Number(tx.amount) === 0 ? '' : this.props.coin.toUpperCase() }
         { tx.interest &&
           !amountOnly &&
+          (Number(tx.interest) !== Number(tx.amount)) &&
           <div className="tx-interest">+{ formatValue(Math.abs(tx.interest)) }</div>
         }
       </span>
@@ -181,12 +186,13 @@ class Transactions extends React.Component {
     if (this.props.activeSection === 'dashboard') {
       const _transactions = this.props.transactions;
       let _items = [];
+      console.warn(_transactions);
 
       if (_transactions) {
         for (let i = 0; i < _transactions.length; i++) {
           _items.push(
             <div
-              className={ `item ${_transactions[i].type}` }
+              className={ `item ${_transactions[i].interest && Math.abs(_transactions[i].interest) > 0 ? 'received' : _transactions[i].type}` }
               key={ `transaction-${i}` }>
               <div className="direction">{ _transactions[i].type }</div>
               <div className="date">{ secondsToString(_transactions[i].timestamp) }</div>
