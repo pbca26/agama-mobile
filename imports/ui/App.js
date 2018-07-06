@@ -7,8 +7,6 @@ import actions from './actions/actions';
 import {
   setLocalStorageVar,
   getLocalStorageVar,
-  sortBy,
-  getRandomIntInclusive,
   convertURIToImageData,
 } from './actions/utils';
 import translate from './translate/translate';
@@ -16,6 +14,10 @@ import {
   devlog,
   config,
 } from './actions/dev';
+import {
+  getRandomIntInclusive,
+  sort,
+} from 'agama-wallet-lib/src/utils';
 
 import SendCoin from './components/SendCoin';
 import AddCoin from './components/AddCoin';
@@ -159,7 +161,7 @@ class App extends React.Component {
       server,
     };
 
-    setLocalStorageVar('coins', this.state.coins);
+    // setLocalStorageVar('coins', this.state.coins);
 
     if (!this.state.auth) {
       this.setState({
@@ -319,7 +321,7 @@ class App extends React.Component {
           conError: true,
         });
       } else {
-        res = sortBy(res, 'timestamp');
+        res = sort(res, 'timestamp');
 
         this.setState({
           transactions: res,

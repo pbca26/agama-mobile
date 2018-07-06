@@ -2,6 +2,9 @@ import crypto from 'crypto';
 import reverse from 'buffer-reverse';
 import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
+import {
+  getRandomIntInclusive,
+} from 'agama-wallet-lib/src/utils';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
@@ -39,13 +42,6 @@ const getMerkleRoot = (txid, proof, pos) => {
 
 const verifyMerkle = (txid, height, serverList, electrumServer, proxyServer, cache, network) => {
   // select random server
-  const getRandomIntInclusive = (min, max) => {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-
-    return Math.floor(Math.random() * (max - min + 1)) + min; // the maximum is inclusive and the minimum is inclusive
-  }
-
   const _rnd = getRandomIntInclusive(0, serverList.length - 1);
   const randomServer = serverList[_rnd];
   const _randomServer = randomServer.split(':');

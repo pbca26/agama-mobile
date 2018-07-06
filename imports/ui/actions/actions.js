@@ -6,7 +6,6 @@ import {
   isKomodoCoin,
 } from 'agama-wallet-lib/src/coin-helpers';
 import {
-  getRandomIntInclusive,
   getLocalStorageVar,
 } from './utils';
 import {
@@ -22,6 +21,7 @@ import { listunspent } from './listunspent';
 import {
   fromSats,
   toSats,
+  getRandomIntInclusive,
 } from 'agama-wallet-lib/src/utils';
 import electrumJSNetworks from 'agama-wallet-lib/src/bitcoinjs-networks';
 import { devlog } from './dev';
@@ -274,9 +274,9 @@ const auth = (seed, coins) => {
         } catch (e) {}
 
         if (isWif) {
-          _seedToWif = wifToWif(seed, isKomodoCoin(key) || key === 'kmd' ? electrumJSNetworks.kmd : electrumJSNetworks[key.toLowerCase()]);
+          _seedToWif = wifToWif(seed, isKomodoCoin(key) ? electrumJSNetworks.kmd : electrumJSNetworks[key.toLowerCase()]);
         } else {
-          _seedToWif = seedToWif(seed, isKomodoCoin(key) || key === 'kmd' ? electrumJSNetworks.kmd : electrumJSNetworks[key.toLowerCase()], true);
+          _seedToWif = seedToWif(seed, isKomodoCoin(key) ? electrumJSNetworks.kmd : electrumJSNetworks[key.toLowerCase()], true);
         }
 
         electrumKeys[key] = _seedToWif;
@@ -292,10 +292,10 @@ const auth = (seed, coins) => {
 const addKeyPair = (coin) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
-      const _wif = electrumKeys[Object.keys(electrumKeys)[0]].wif;
+      const _wif = electrumKeys[Object.keys(electrumKeys)[0]].priv;
       let _pubKeys = {};
 
-      const _wifToWif = wifToWif(_wif, isKomodoCoin(coin) ? 'kmd' : coin);
+      const _wifToWif = wifToWif(_wif, isKomodoCoin(coin) ? electrumJSNetworks.kmd : electrumJSNetworks[coin]);
       electrumKeys[coin] = _wifToWif;
       _pubKeys[coin] = _wifToWif.pub;
 
