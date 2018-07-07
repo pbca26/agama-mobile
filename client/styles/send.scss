@@ -10,6 +10,9 @@
       margin-top: 6px;
       opacity: 0.8;
     }
+    &.success {
+      text-transform: capitalize;
+    }
   }
   .group3 {
     top: 0;
@@ -134,5 +137,10 @@
         top: 0;
       }
     }
+  }
+  .form-control {
+    font-size: 12px;
+    margin-top: 6px;
+    opacity: 0.8;
   }
 }

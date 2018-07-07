@@ -1,164 +1,160 @@
 import { Promise } from 'meteor/promise';
-import bitcoin from 'bitcoinjs-lib';
-import coinSelect from 'coinselect';
 
 import { devlog } from './dev';
-import {
-  kmdCalcInterest,
-  estimateTxSize,
-} from './utils';
 import { listunspent } from './listunspent';
 import { isAssetChain } from './utils';
-import {
-  isZcash,
-  isPos,
-} from './txDecoder/txDecoder';
 import electrumServers from './electrumServers';
-
-const bitcoinJSForks = require('bitcoinforksjs-lib');
-const bitcoinZcash = require('bitcoinjs-lib-zcash');
-const bitcoinPos = require('bitcoinjs-lib-pos');
+import electrumJSNetworks from 'agama-wallet-lib/src/bitcoinjs-networks';
+import transactionBuilder from 'agama-wallet-lib/src/transaction-builder';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
-const electrumJSNetworks = require('./electrumNetworks.js');
+export const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, value, fee, wif, network, verify, push, cache) => {
+  devlog('createrawtx =>');
 
-// btg/bch
-export const buildSignedTxForks = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue) => {
-  const _network = electrumJSNetworks[network];
-  const keyPair = bitcoinJSForks.ECPair.fromWIF(wif, _network);
-  const pk = bitcoinJSForks.crypto.hash160(keyPair.getPublicKeyBuffer());
-  const spk = bitcoinJSForks.script.pubKeyHash.output.encode(pk);
-  let tx = new bitcoinJSForks.TransactionBuilder(_network);
-
-  devlog(`buildSignedTx${network.toUpperCase()}`);
-
-  for (let i = 0; i < utxo.length; i++) {
-    tx.addInput(utxo[i].txid, utxo[i].vout, bitcoinJSForks.Transaction.DEFAULT_SEQUENCE, spk);
-  }
-
-  tx.addOutput(sendTo, Number(spendValue));
-
-  if (changeValue > 0) {
-    tx.addOutput(changeAddress, Number(changeValue));
-  }
-
-  if (network === 'btg') {
-    tx.enableBitcoinGold(true);
-  } else if (network === 'bch') {
-    tx.enableBitcoinCash(true);
-  }
-
-  tx.setVersion(2);
-
-  devlog('buildSignedTx unsigned tx data vin');
-  devlog(tx.tx.ins);
-  devlog('buildSignedTx unsigned tx data vout');
-  devlog(tx.tx.outs);
-  devlog('buildSignedTx unsigned tx data');
-  devlog(tx);
-
-  const hashType = bitcoinJSForks.Transaction.SIGHASH_ALL | bitcoinJSForks.Transaction.SIGHASH_BITCOINCASHBIP143;
-
-  for (let i = 0; i < utxo.length; i++) {
-    tx.sign(i, keyPair, null, hashType, utxo[i].value);
-  }
-
-  const rawtx = tx.build().toHex();
-
-  devlog('buildSignedTx signed tx hex');
-  devlog(rawtx);
-
-  return rawtx;
-}
-
-// single sig
-export const buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue) => {
-  const _network = electrumJSNetworks[isAssetChain(network) ? 'kmd' : network];
-
-  console.log(`${wif} ${network}`); 
-  console.log(_network);
-
-  let key = isZcash(network) ? bitcoinZcash.ECPair.fromWIF(wif, _network) : bitcoin.ECPair.fromWIF(wif, _network);
-  let tx;
-
-  if (isZcash(network)) {
-    tx = new bitcoinZcash.TransactionBuilder(_network);
-  } else if (isPos(network)) {
-    tx = new bitcoinPos.TransactionBuilder(_network);
-  } else {
-    tx = new bitcoin.TransactionBuilder(_network);
-  }
-
-  devlog('buildSignedTx');
-  // devlog(`buildSignedTx priv key ${wif}`);
-  devlog(`buildSignedTx pub key ${key.getAddress().toString()}`);
-
-  for (let i = 0; i < utxo.length; i++) {
-    tx.addInput(utxo[i].txid, utxo[i].vout);
-  }
-
-  if (isPos(network)) {
-    tx.addOutput(sendTo, Number(spendValue), _network);
-  } else {
-    tx.addOutput(sendTo, Number(spendValue));
-  }
-
-  if (changeValue > 0) {
-    if (isPos(network)) {
-      tx.addOutput(changeAddress, Number(changeValue), _network);
-    } else {
-      tx.addOutput(changeAddress, Number(changeValue));
-    }
-  }
-
-  if (network === 'komodo' ||
-      network === 'kmd') {
-    const _locktime = Math.floor(Date.now() / 1000) - 777;
-    tx.setLockTime(_locktime);
-    devlog(`kmd tx locktime set to ${_locktime}`);
-  }
-
-  devlog('buildSignedTx unsigned tx data vin');
-  devlog(tx.tx.ins);
-  devlog('buildSignedTx unsigned tx data vout');
-  devlog(tx.tx.outs);
-  devlog('buildSignedTx unsigned tx data');
-  devlog(tx);
-
-  for (let i = 0; i < utxo.length; i++) {
-    if (isPos(network)) {
-      tx.sign(_network, i, key);
-    } else {
-      tx.sign(i, key);
-    }
-  }
-
-  const rawtx = tx.build().toHex();
-
-  devlog('buildSignedTx signed tx hex');
-  devlog(rawtx);
-
-  return rawtx;
-}
-
-const maxSpendBalance = (utxoList, fee) => {
-  let maxSpendBalance = 0;
-
-  for (let i = 0; i < utxoList.length; i++) {
-    maxSpendBalance += Number(utxoList[i].value);
-  }
-
-  if (fee) {
-    return Number(maxSpendBalance) - Number(fee);
-  } else {
-    return maxSpendBalance;
-  }
-}
-
-export const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, value, defaultFee, wif, network, verify, push) => {
   return new Promise((resolve, reject) => {
-    let defaultFee = electrumServers[network].txfee;
+    listunspent(
+      proxyServer,
+      electrumServer,
+      changeAddress,
+      network,
+      true,
+      verify,
+      cache
+    )
+    .then((utxoList) => {
+      if (utxoList &&
+          utxoList.length) {
+        const _network = electrumJSNetworks[isAssetChain(network) ? 'kmd' : network];    
+        let _data = transactionBuilder.data(
+          _network,
+          value,
+          fee,
+          outputAddress,
+          changeAddress,
+          utxoList
+        );
+
+        devlog('send data', _data);
+
+        if (_data.balance) {
+          if (!push) {
+            resolve ({
+              msg: 'success',
+              result: _data,
+            });
+          }
+        } else {
+          resolve({
+            msg: 'error',
+            result: _data,
+          });
+        }
+
+        const _tx = transactionBuilder.transaction(
+          outputAddress,
+          changeAddress,
+          wif,
+          _network,
+          _data.inputs,
+          _data.change,
+          _data.value
+        );
+
+        // push to network
+        if (push) {
+          HTTP.call('POST', `http://${proxyServer.ip}:${proxyServer.port}/api/pushtx`, {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            data: {
+              rawtx: _tx,
+              port: electrumServer.port,
+              ip: electrumServer.ip,
+              proto: electrumServer.proto,
+            },
+          }, (error, result) => {
+            result = JSON.parse(result.content);
+
+            if (result.msg === 'error') {
+              resolve({
+                msg: 'error',
+                result: 'Connection error. Please retry.',
+              });
+            } else {
+              const txid = result.result;
+              _data.raw = _tx;
+              _data.txid = txid; 
+              _data.utxoSet = utxoList;           
+
+              if (txid &&
+                  txid.indexOf('bad-txns-inputs-spent') > -1) {
+                const successObj = {
+                  msg: 'error',
+                  result: 'Bad transaction inputs spent',
+                  raw: _data,
+                };
+
+                resolve(successObj);
+              } else {
+                if (txid &&
+                    txid.length === 64) {
+                  if (txid.indexOf('bad-txns-in-belowout') > -1) {
+                    const successObj = {
+                      msg: 'error',
+                      result: 'Bad transaction inputs spent',
+                      raw: _data,
+                    };
+
+                    resolve(successObj);
+                  } else {
+                    const successObj = {
+                      msg: 'success',
+                      result: _data,
+                    };
+
+                    resolve(successObj);
+                  }
+                } else {
+                  if (txid &&
+                      txid.indexOf('bad-txns-in-belowout') > -1) {
+                    const successObj = {
+                      msg: 'error',
+                      result: 'Bad transaction inputs spent',
+                      raw: _data,
+                    };
+
+                    resolve(successObj);
+                  } else {
+                    const successObj = {
+                      msg: 'error',
+                      result: 'Can\'t broadcast transaction',
+                      raw: _data,
+                    };
+
+                    resolve(successObj);
+                  }
+                }
+              }
+            }
+          });
+        }
+      } else {
+        resolve ({
+          msg: 'error',
+          result: 'No available UTXO(s) or connection error',
+        });
+      }
+    });
+  });
+}
+
+/*
+export const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, value, defaultFee, wif, network, verify, push, cache) => {
+  return new Promise((resolve, reject) => {
+    if (network !== 'btc') {
+      defaultFee = electrumServers[network].txfee;
+    }
 
     devlog('createrawtx =>');
 
@@ -168,7 +164,8 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
       changeAddress,
       network,
       true,
-      verify
+      verify,
+      cache
     )
     .then((utxoList) => {
       if (utxoList &&
@@ -180,8 +177,7 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
         let utxoVerified = true;
 
         for (let i = 0; i < utxoList.length; i++) {
-          if (network === 'komodo' ||
-              network === 'kmd') {
+          if (network === 'kmd') {
             utxoListFormatted.push({
               txid: utxoList[i].txid,
               vout: utxoList[i].vout,
@@ -543,4 +539,4 @@ export const createtx = (proxyServer, electrumServer, outputAddress, changeAddre
       }
     });
   });
-}
+}*/

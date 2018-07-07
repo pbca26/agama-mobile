@@ -50,6 +50,13 @@ export const _lang = {
       'CONFIRMATION_REQUIRED': 'Confirmation is required',
     },
     'SEND': {
+      'TOTAL': 'Total',
+      'FEE': 'Fee',
+      'BTC_FEE_SLOW': 'Slow (60 min)',
+      'BTC_FEE_AVG': 'Average (30 min)',
+      'BTC_FEE_FAST': 'Fast (< 30 min)',
+      'BTC_FEES_FETCHING': 'Fetching btc fees data...',
+      'BTC_FEES_FETCHING_FAILED': 'Failed to retrieve btc fees data. Retrying in 5s...',
       'SUCCESS': 'Success',
       'TXID': 'Transaction ID',
       'OPEN_IN_EXPLORER': 'Open in explorer',

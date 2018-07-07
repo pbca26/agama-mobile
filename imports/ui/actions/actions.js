@@ -146,7 +146,7 @@ const clearKeys = () => {
   }
 }
 
-const sendtx = (network, outputAddress, value, verify, push) => {
+const sendtx = (network, outputAddress, value, verify, push, btcFee) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
       const changeAddress = electrumKeys[network].pub;
@@ -161,11 +161,12 @@ const sendtx = (network, outputAddress, value, verify, push) => {
         outputAddress,
         changeAddress,
         value,
-        10000,
-        electrumKeys[network].wif,
+        btcFee ? { perbyte: true, value: btcFee } : (isKomodoCoin(network) ? electrumServers.kmd.txfee : electrumServers[network].txfee),
+        electrumKeys[network].priv,
         network,
         verify,
-        push
+        push,
+        cache
       )
       .then((res) => {
         resolve(res);
@@ -408,6 +409,34 @@ const getOverview = (coins) => {
   }
 }
 
+const getBtcFees = () => {
+  return async (dispatch) => {
+    return new Promise((resolve, reject) => {    
+      HTTP.call('GET', `https://www.atomicexplorer.com/api/btc/fees`, {
+        params: {},
+      }, (error, result) => {
+        if (!result) {
+          resolve('error');
+        } else {
+          const _btcFees = JSON.parse(result.content).result;
+
+          devlog('btc fees');
+          devlog(_btcFees);
+
+          if (_btcFees.recommended &&
+              _btcFees.recommended.fastestFee,
+              _btcFees.recommended.halfHourFee,
+              _btcFees.recommended.hourFee) {
+            resolve(_btcFees.recommended);
+          } else {
+            resolve('error');
+          }
+        }
+      });
+    });
+  }
+}
+
 export default {
   auth,
   getOverview,
@@ -419,4 +448,5 @@ export default {
   setDefaultServer,
   addKeyPair,
   kmdUnspents,
+  getBtcFees,
 }

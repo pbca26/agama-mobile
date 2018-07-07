@@ -553,10 +553,9 @@ class SendCoin extends React.Component {
                     { translate('SEND.TXID') }
                     <div className="shade margin-top-5">{ this.state.sendResult && this.state.sendResult.result && this.state.sendResult.result.txid ? this.renderTxID() : translate('SEND.PROCESSING_SM') }</div>
                   </div>
-                  { (isKomodoCoin(this.props.coin) || this.props.coin === 'chips') &&
-                      this.state.sendResult &&
-                      this.state.sendResult.result &&
-                      this.state.sendResult.result.txid &&
+                  { this.state.sendResult &&
+                    this.state.sendResult.result &&
+                    this.state.sendResult.result.txid &&
                     <div className="edit">
                       <span onClick={ () => this.openExternalURL(`${explorerList[this.props.coin.toUpperCase()]}/tx/${this.state.sendResult.result.txid}`) }>
                       { translate('SEND.OPEN_IN_EXPLORER') }<i className="fa fa-external-link margin-left-10"></i>
@@ -579,7 +578,7 @@ class SendCoin extends React.Component {
                   <div className="edit error">
                   { translate('SEND.ERROR') } <i className="fa fa-close"></i>
                   </div>
-                  <div className="edit">
+                  <div className="edit padding-bottom-15">
                     <div className="shade">{ this.state.sendResult.result }</div>
                     { this.state.sendResult.raw &&
                       this.state.sendResult.raw.txid &&
