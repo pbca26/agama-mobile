@@ -57,6 +57,7 @@ class App extends React.Component {
       proxyError: false,
       overview: null,
       history: null,
+      btcFees: null,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.login = this.login.bind(this);
@@ -66,7 +67,6 @@ class App extends React.Component {
     this.getBalance = this.getBalance.bind(this);
     this.getTransactions = this.getTransactions.bind(this);
     this.toggleMenu = this.toggleMenu.bind(this);
-    this.toggleSend = this.toggleSend.bind(this);
     this.toggleCreateSeed = this.toggleCreateSeed.bind(this);
     this.toggleAddCoin = this.toggleAddCoin.bind(this);
     this.dashboardRefresh = this.dashboardRefresh.bind(this);
@@ -87,6 +87,7 @@ class App extends React.Component {
     this.overviewInterval = null;
     this.historyBack = this.historyBack.bind(this);
     this.scrollToTop = this.scrollToTop.bind(this);
+    this.getBtcFees = this.getBtcFees.bind(this);
   }
 
   componentWillMount() {
@@ -104,6 +105,27 @@ class App extends React.Component {
       this.setState({
         overview: res,
       });
+    });
+  }
+
+  getBtcFees() {
+    const { actions } = this.props;
+  
+    this.setState({
+      btcFees: null,
+    });
+
+    actions.getBtcFees()
+    .then((res) => {
+      this.setState({
+        btcFees: res,
+      });
+
+      if (res === 'error') {
+        setTimeout(() => {
+          this.getBtcFees();
+        }, 5000);
+      }
     });
   }
 
@@ -161,7 +183,7 @@ class App extends React.Component {
       server,
     };
 
-    // setLocalStorageVar('coins', this.state.coins);
+    setLocalStorageVar('coins', this.state.coins);
 
     if (!this.state.auth) {
       this.setState({
@@ -218,6 +240,11 @@ class App extends React.Component {
       });
     }
 
+    if (this.state.coin === 'btc' &&
+        section === 'send') {
+      this.getBtcFees();
+    }
+
     // document.getElementById('body').style.overflowY = 'inherit';
     this.scrollToTop();
   }
@@ -228,6 +255,8 @@ class App extends React.Component {
       address: this.state.pubKeys[coin],
       history: this.state.activeSection,
       activeSection: this.state.activeSection !== 'send' ? 'dashboard' : 'send',
+      transactions: this.state.coins[coin] ? this.state.coins[coin].transactions: null,
+      balance: this.state.coins[coin] ? this.state.coins[coin].balance: null,
     });
 
     // toggle refresh and update in-mem coins cache obj
@@ -321,7 +350,7 @@ class App extends React.Component {
           conError: true,
         });
       } else {
-        res = sort(res, 'timestamp');
+        res = sort(res, 'timestamp', true);
 
         this.setState({
           transactions: res,
@@ -386,6 +415,12 @@ class App extends React.Component {
         address = res.kmd;
       } else {
         coin = Object.keys(this.state.coins)[0];
+        address = res[coin];
+      }
+
+      if (config.preload &&
+          config.preload.activeCoin) {
+        coin = config.preload.activeCoin;
         address = res[coin];
       }
 
@@ -495,18 +530,6 @@ class App extends React.Component {
     this.setState({
       history: this.state.activeSection,
       activeSection: this.state.activeSection === 'offlinesig' ? 'dashboard' : 'offlinesig',
-    });
-    this.scrollToTop();
-  }
-
-  toggleSend() {
-    setTimeout(() => {
-      this.toggleMenu();
-    }, 10);
-
-    this.setState({
-      history: this.state.activeSection,
-      activeSection: this.state.activeSection === 'send' ? 'dashboard' : 'send',
     });
     this.scrollToTop();
   }
@@ -790,7 +813,8 @@ class App extends React.Component {
             <SendCoin
               { ...this.state }
               sendtx={ this.props.actions.sendtx }
-              changeActiveSection={ this.changeActiveSection } />
+              changeActiveSection={ this.changeActiveSection }
+              getBtcFees={ this.getBtcFees } />
             <AddCoin
               { ...this.state }
               addCoin={ this.addCoin }
