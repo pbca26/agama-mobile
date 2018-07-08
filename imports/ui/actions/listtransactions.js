@@ -2,10 +2,10 @@ import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
 import {
   isKomodoCoin,
-} from 'agama-wallet-lib/src/coin-helpers';
-import parseTransactionAddresses from 'agama-wallet-lib/src/transaction-type';
-import electrumJSNetworks from 'agama-wallet-lib/src/bitcoinjs-networks';
-import electrumJSTxDecoder from 'agama-wallet-lib/src/transaction-decoder';
+} from 'agama-wallet-lib/build/coin-helpers';
+import parseTransactionAddresses from 'agama-wallet-lib/build/transaction-type';
+import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
+//import electrumJSTxDecoder from 'agama-wallet-lib/build/transaction-decoder';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 

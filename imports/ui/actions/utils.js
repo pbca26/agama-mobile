@@ -1,4 +1,4 @@
-import { isKomodoCoin } from 'agama-wallet-lib/src/coin-helpers';
+import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
 
 export const maskPubAddress = (pub) => {
   // keep 3 first and 3 last chars unmasked

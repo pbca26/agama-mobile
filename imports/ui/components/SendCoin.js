@@ -18,16 +18,16 @@ import {
   toSats,
   formatValue,
   isNumber,
-} from 'agama-wallet-lib/src/utils';
+} from 'agama-wallet-lib/build/utils';
 import {
   explorerList,
   isKomodoCoin,
-} from 'agama-wallet-lib/src/coin-helpers';
+} from 'agama-wallet-lib/build/coin-helpers';
 import {
   addressVersionCheck,
-} from 'agama-wallet-lib/src/keys';
+} from 'agama-wallet-lib/build/keys';
 import electrumServers from '../actions/electrumServers';
-import electrumJSNetworks from 'agama-wallet-lib/src/bitcoinjs-networks';
+import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 
 class SendCoin extends React.Component {
   constructor() {

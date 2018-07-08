@@ -4,14 +4,14 @@ import { Promise } from 'meteor/promise';
 
 import {
   isKomodoCoin,
-} from 'agama-wallet-lib/src/coin-helpers';
+} from 'agama-wallet-lib/build/coin-helpers';
 import {
   getLocalStorageVar,
 } from './utils';
 import {
   wifToWif,
   seedToWif,
-} from 'agama-wallet-lib/src/keys';
+} from 'agama-wallet-lib/build/keys';
 import { proxyServers } from './proxyServers';
 import electrumServers from './electrumServers';
 import { getKMDBalance } from './getKMDBalance';
@@ -22,8 +22,8 @@ import {
   fromSats,
   toSats,
   getRandomIntInclusive,
-} from 'agama-wallet-lib/src/utils';
-import electrumJSNetworks from 'agama-wallet-lib/src/bitcoinjs-networks';
+} from 'agama-wallet-lib/build/utils';
+import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 import { devlog } from './dev';
 
 let _cache = {};

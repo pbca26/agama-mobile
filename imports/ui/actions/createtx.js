@@ -4,8 +4,8 @@ import { devlog } from './dev';
 import { listunspent } from './listunspent';
 import { isAssetChain } from './utils';
 import electrumServers from './electrumServers';
-import electrumJSNetworks from 'agama-wallet-lib/src/bitcoinjs-networks';
-import transactionBuilder from 'agama-wallet-lib/src/transaction-builder';
+import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
+import transactionBuilder from 'agama-wallet-lib/build/transaction-builder';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 

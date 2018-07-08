@@ -4,9 +4,9 @@ import { kmdCalcInterest } from './utils';
 import {
   fromSats,
   toSats,
-} from 'agama-wallet-lib/src/utils';
-import electrumJSNetworks from 'agama-wallet-lib/src/bitcoinjs-networks';
-import electrumJSTxDecoder from 'agama-wallet-lib/src/transaction-decoder';
+} from 'agama-wallet-lib/build/utils';
+import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
+//import electrumJSTxDecoder from 'agama-wallet-lib/build/transaction-decoder';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import Spinner from './Spinner';
 
-import { formatValue } from 'agama-wallet-lib/src/utils';
+import { formatValue } from 'agama-wallet-lib/build/utils';
 import translate from '../translate/translate';
 
 class Overview extends React.Component {

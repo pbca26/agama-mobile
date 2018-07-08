@@ -10,11 +10,11 @@ import {
 } from '../actions/utils';
 import {
   isKomodoCoin,
-} from 'agama-wallet-lib/src/coin-helpers';
+} from 'agama-wallet-lib/build/coin-helpers';
 import {
   fromSats,
   toSats,
-} from 'agama-wallet-lib/src/utils';
+} from 'agama-wallet-lib/build/utils';
 import {
   encryptkey,
   decryptkey,
@@ -22,9 +22,9 @@ import {
 import {
   wifToWif,
   seedToWif,
-} from 'agama-wallet-lib/src/keys';
+} from 'agama-wallet-lib/build/keys';
 import { devlog } from '../actions/dev';
-import electrumJSNetworks from 'agama-wallet-lib/src/bitcoinjs-networks';
+import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 
 import {
   buildSignedTxForks,

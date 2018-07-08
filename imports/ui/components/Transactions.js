@@ -1,14 +1,14 @@
 import React from 'react';
 import {
   formatValue,
-} from 'agama-wallet-lib/src/utils';
+} from 'agama-wallet-lib/build/utils';
 import {
   secondsToString,
-} from 'agama-wallet-lib/src/time';
+} from 'agama-wallet-lib/build/time';
 import {
   explorerList,
   isKomodoCoin,
-} from 'agama-wallet-lib/src/coin-helpers';
+} from 'agama-wallet-lib/build/coin-helpers';
 import translate from '../translate/translate';
 import Spinner from './Spinner';
 import QRCode from 'qrcode.react';

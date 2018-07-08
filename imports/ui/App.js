@@ -17,7 +17,7 @@ import {
 import {
   getRandomIntInclusive,
   sort,
-} from 'agama-wallet-lib/src/utils';
+} from 'agama-wallet-lib/build/utils';
 
 import SendCoin from './components/SendCoin';
 import AddCoin from './components/AddCoin';

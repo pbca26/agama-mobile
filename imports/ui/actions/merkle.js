@@ -4,7 +4,7 @@ import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
 import {
   getRandomIntInclusive,
-} from 'agama-wallet-lib/src/utils';
+} from 'agama-wallet-lib/build/utils';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 

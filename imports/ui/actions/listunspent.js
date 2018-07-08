@@ -1,16 +1,16 @@
 import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
-import kmdCalcInterest from 'agama-wallet-lib/src/komodo-interest.js';
+import kmdCalcInterest from 'agama-wallet-lib/build/komodo-interest.js';
 import {
   isKomodoCoin,
-} from 'agama-wallet-lib/src/coin-helpers';
+} from 'agama-wallet-lib/build/coin-helpers';
 import { verifyMerkleByCoin } from './merkle';
 import {
   fromSats,
   toSats,
-} from 'agama-wallet-lib/src/utils';
-import electrumJSNetworks from 'agama-wallet-lib/src/bitcoinjs-networks';
-import electrumJSTxDecoder from 'agama-wallet-lib/src/transaction-decoder';
+} from 'agama-wallet-lib/build/utils';
+import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
+//import electrumJSTxDecoder from 'agama-wallet-lib/build/transaction-decoder';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 

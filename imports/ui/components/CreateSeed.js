@@ -10,7 +10,7 @@ import {
   decryptkey,
 } from '../actions/seedCrypt';
 import translate from '../translate/translate';
-import passphraseGenerator from 'agama-wallet-lib/src/crypto/passphrasegenerator';
+import passphraseGenerator from 'agama-wallet-lib/build/crypto/passphrasegenerator';
 import {
   devlog,
   config,
