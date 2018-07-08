@@ -102,7 +102,7 @@ App.accessRule('https://prohashing.com');
 App.accessRule('https://chain.fair.to');
 App.accessRule('https://explorer.feathercoin.com');
 App.accessRule('https://chainz.cryptoid.info');
-App.accessRule('http://explorer.gobyte.network:5001');
+App.accessRule('http://explorer.gobyte.network');
 App.accessRule('http://explorer.fujicoin.org');
 App.accessRule('http://zilla.explorer.dexstats.info');
 App.accessRule('https://explorer.zcoin.io');

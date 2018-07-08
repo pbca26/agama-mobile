@@ -188,6 +188,8 @@ class App extends React.Component {
     if (!this.state.auth) {
       this.setState({
         coins,
+        history: null,
+        activeSection: 'login',
       });
     } else {
       const { actions } = this.props;
@@ -455,7 +457,7 @@ class App extends React.Component {
 
     this.setState({
       history: this.state.activeSection,
-      activeSection: this.state.activeSection === 'settings' ? 'dashboard' : 'settings',
+      activeSection: this.state.activeSection === 'settings' ? (this.state.auth ? 'dashboard' : 'login') : 'settings',
     });
     this.scrollToTop();
   }
@@ -493,7 +495,7 @@ class App extends React.Component {
 
     this.setState({
       history: this.state.activeSection,
-      activeSection: this.state.activeSection === 'overview' ? 'dashboard' : 'overview',
+      activeSection: this.state.activeSection === 'overview' ? (this.state.auth ? 'dashboard' : 'login') : 'overview',
     });
     this.scrollToTop();
   }
@@ -505,7 +507,7 @@ class App extends React.Component {
 
     this.setState({
       history: this.state.activeSection,
-      activeSection: this.state.activeSection === 'recovery' ? 'dashboard' : 'recovery',
+      activeSection: this.state.activeSection === 'recovery' ? (this.state.auth ? 'dashboard' : 'login') : 'recovery',
     });
     this.scrollToTop();
   }
@@ -517,7 +519,7 @@ class App extends React.Component {
 
     this.setState({
       history: this.state.activeSection,
-      activeSection: this.state.activeSection === 'pin' ? 'dashboard' : 'pin',
+      activeSection: this.state.activeSection === 'pin' ? (this.state.auth ? 'dashboard' : 'login') : 'pin',
     });
     this.scrollToTop();
   }
@@ -529,7 +531,7 @@ class App extends React.Component {
 
     this.setState({
       history: this.state.activeSection,
-      activeSection: this.state.activeSection === 'offlinesig' ? 'dashboard' : 'offlinesig',
+      activeSection: this.state.activeSection === 'offlinesig' ? (this.state.auth ? 'dashboard' : 'login') : 'offlinesig',
     });
     this.scrollToTop();
   }
@@ -541,7 +543,7 @@ class App extends React.Component {
 
     this.setState({
       history: this.state.activeSection,
-      activeSection: this.state.activeSection === 'addcoin' ? 'dashboard' : 'addcoin',
+      activeSection: this.state.activeSection === 'addcoin' ? (this.state.auth ? 'dashboard' : 'login') : 'addcoin',
     });
     this.scrollToTop();
   }
@@ -553,7 +555,7 @@ class App extends React.Component {
 
     this.setState({
       history: this.state.activeSection,
-      activeSection: this.state.activeSection === 'create-seed' ? 'dashboard' : 'create-seed',
+      activeSection: this.state.activeSection === 'create-seed' ? (this.state.auth ? 'dashboard' : 'login') : 'create-seed',
     });
     this.scrollToTop();
   }
@@ -565,7 +567,7 @@ class App extends React.Component {
 
     this.setState({
       history: this.state.activeSection,
-      activeSection: this.state.activeSection === 'login' ? 'dashboard' : 'login',
+      activeSection: this.state.activeSection === 'login' ? (this.state.auth ? 'dashboard' : 'login') : 'login',
     });
     this.scrollToTop();
   }
@@ -700,69 +702,69 @@ class App extends React.Component {
                   </div>
                 </div>
               }
-            { !this.state.auth &&
-              <div className="items">
-                { (this.state.activeSection === 'addcoin' || this.state.activeSection === 'create-seed') &&
-                  <div className="item">
-                    <div
-                      className="title"
-                      onClick={ this.toggleLogin }>{ translate('DASHBOARD.LOGIN') }</div>
-                    <img
-                      className="line"
-                      src="/images/template/menu/sidemenu-rectangle-3.png" />
-                  </div>
-                }
-                { this.state.activeSection !== 'addcoin' &&
-                  <div className="item">
-                    <div
-                      className="title"
-                      onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.ADD_COIN') }</div>
-                    <img
-                      className="line"
-                      src="/images/template/menu/sidemenu-rectangle-3.png" />
-                  </div>
-                }
-                { this.state.activeSection !== 'create-seed' &&
-                  <div className="item">
-                    <div
-                      className="title"
-                      onClick={ this.toggleCreateSeed }>{ translate('DASHBOARD.CREATE_SEED') }</div>
-                    <img
-                      className="line"
-                      src="/images/template/menu/sidemenu-rectangle-3.png" />
-                  </div>
-                }
-                { this.state.activeSection !== 'pin' &&
-                  getLocalStorageVar('seed') &&
-                  <div className="item">
-                    <div
-                      className="title"
-                      onClick={ this.togglePin }>{ translate('APP_TITLE.PIN') }</div>
-                    <img
-                      className="line"
-                      src="/images/template/menu/sidemenu-rectangle-3.png" />
-                  </div>
-                }
-                { /*this.state.activeSection !== 'offlinesig' &&
-                  <div className="item">
-                    <div
-                      className="title"
-                      onClick={ this.toggleOffileSig }>Offline Signing</div>
-                    <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
-                  </div>*/
-                }
-                { (this.state.activeSection === 'offlinesig' || this.state.activeSection === 'pin') &&
-                  <div className="item">
-                    <div
-                      className="title"
-                      onClick={ this.toggleLogin }>{ translate('APP_TITLE.LOGIN') }</div>
-                    <img
-                      className="line"
-                      src="/images/template/menu/sidemenu-rectangle-3.png" />
-                  </div>
-                }
-              </div>
-            }
+              { !this.state.auth &&
+                <div className="items">
+                  { (this.state.activeSection === 'addcoin' || this.state.activeSection === 'create-seed') &&
+                    <div className="item">
+                      <div
+                        className="title"
+                        onClick={ this.toggleLogin }>{ translate('DASHBOARD.LOGIN') }</div>
+                      <img
+                        className="line"
+                        src="/images/template/menu/sidemenu-rectangle-3.png" />
+                    </div>
+                  }
+                  { this.state.activeSection !== 'addcoin' &&
+                    <div className="item">
+                      <div
+                        className="title"
+                        onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.ADD_COIN') }</div>
+                      <img
+                        className="line"
+                        src="/images/template/menu/sidemenu-rectangle-3.png" />
+                    </div>
+                  }
+                  { this.state.activeSection !== 'create-seed' &&
+                    <div className="item">
+                      <div
+                        className="title"
+                        onClick={ this.toggleCreateSeed }>{ translate('DASHBOARD.CREATE_SEED') }</div>
+                      <img
+                        className="line"
+                        src="/images/template/menu/sidemenu-rectangle-3.png" />
+                    </div>
+                  }
+                  { this.state.activeSection !== 'pin' &&
+                    getLocalStorageVar('seed') &&
+                    <div className="item">
+                      <div
+                        className="title"
+                        onClick={ this.togglePin }>{ translate('APP_TITLE.PIN') }</div>
+                      <img
+                        className="line"
+                        src="/images/template/menu/sidemenu-rectangle-3.png" />
+                    </div>
+                  }
+                  { /*this.state.activeSection !== 'offlinesig' &&
+                    <div className="item">
+                      <div
+                        className="title"
+                        onClick={ this.toggleOffileSig }>Offline Signing</div>
+                      <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                    </div>*/
+                  }
+                  { (this.state.activeSection === 'offlinesig' || this.state.activeSection === 'pin') &&
+                    <div className="item">
+                      <div
+                        className="title"
+                        onClick={ this.toggleLogin }>{ translate('APP_TITLE.LOGIN') }</div>
+                      <img
+                        className="line"
+                        src="/images/template/menu/sidemenu-rectangle-3.png" />
+                    </div>
+                  }
+                </div>
+              }
             </div>
           </div>
         </div>
@@ -781,6 +783,7 @@ class App extends React.Component {
           { this.state.history &&
             !this.state.displayMenu &&
             ((this.state.auth && this.state.history !== 'login' && this.state.history !== 'create-seed') || !this.state.auth) &&
+            this.state.history !== this.state.activeSection &&
             <img
               onClick={ this.historyBack }
               className="menu-back"

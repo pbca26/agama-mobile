@@ -49,9 +49,9 @@ class AddCoin extends React.Component {
     }
 
     if (Object.keys(this.props.coins).length) {
-      this.props.changeActiveSection('dashboard');
+      this.props.changeActiveSection(this.props.auth ? 'dashboard' : 'login');
     } else {
-      this.props.changeActiveSection('login');
+      this.props.changeActiveSection(this.props.auth ? 'dashboard' : 'login');
     }
 
     this.setState({
@@ -66,7 +66,7 @@ class AddCoin extends React.Component {
     _items.push(
       <div
         onClick={ () => this.addCoin('kmd') }
-        key={ `overview-coins-kmd` }
+        key="overview-coins-kmd"
         className={ 'overview-coin' + (_coins.kmd ? ' disabled' : '') }>
         <img
           className="div1"

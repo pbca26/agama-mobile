@@ -5,7 +5,7 @@ import {
 } from 'agama-wallet-lib/build/coin-helpers';
 import parseTransactionAddresses from 'agama-wallet-lib/build/transaction-type';
 import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
-//import electrumJSTxDecoder from 'agama-wallet-lib/build/transaction-decoder';
+import electrumJSTxDecoder from 'agama-wallet-lib/build/transaction-decoder';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
