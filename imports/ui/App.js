@@ -429,7 +429,7 @@ class App extends React.Component {
         pubKeys: res,
         coin,
         address,
-        history: this.state.activeSection,
+        history: null,
         activeSection: 'dashboard',
       });
 
