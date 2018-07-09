@@ -43,6 +43,8 @@ App.launchScreens({
 // proxies
 App.accessRule('http://94.130.225.86');
 App.accessRule('http://94.130.98.74');
+App.accessRule('http://94.130.225.86:80');
+App.accessRule('http://94.130.98.74:80');
 // atomic
 App.accessRule('https://www.atomicexplorer.com');
 // coin explorers
