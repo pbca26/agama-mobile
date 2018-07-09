@@ -589,6 +589,10 @@ class SendCoin extends React.Component {
               }
             </div>
             <div
+              disabled={
+                !this.state.sendResult ||
+                this.state.processing
+              }
               onClick={ () => this.changeSendCoinStep(0) }
               className="group3 margin-top-50">
               <div className="btn-inner">
