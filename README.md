@@ -41,3 +41,8 @@ refer to meteor docs https://guide.meteor.com
 
 ## How to verify jar/apk signature
 jarsigner -verify -certs -verbose filename.apk
+
+## How to sign apk
+create signing key
+
+jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 release-unsigned.apk agama-app

@@ -784,23 +784,36 @@ class App extends React.Component {
             !this.state.displayMenu &&
             ((this.state.auth && this.state.history !== 'login' && this.state.history !== 'create-seed') || !this.state.auth) &&
             this.state.history !== this.state.activeSection &&
+            !this.state.proxyError &&
             <img
               onClick={ this.historyBack }
               className="menu-back"
               src="/images/template/menu/trends-combined-shape.png" />
           }
-          <img
-            onClick={ this.toggleMenu }
-            className="menu-icon"
-            src="/images/template/home/home-combined-shape.png" />
+          { !this.state.proxyError &&
+            <img
+              onClick={ this.toggleMenu }
+              className="menu-icon"
+              src="/images/template/home/home-combined-shape.png" />
+          }
           <div className="ui-title">{ this.state.displayMenu ? translate('APP_TITLE.MENU') : translate('APP_TITLE.' + this.state.activeSection.toUpperCase()) }</div>
         </div>
         { this.state.displayMenu &&
+          !this.state.proxyError &&
           <div className="app-main">
             { this.renderMenu() }
           </div>
         }
-        { !this.state.displayMenu &&
+        { this.state.proxyError &&
+          !this.state.displayMenu &&
+          <div className="app-main">
+            <div className="con-error">
+              <i className="fa fa-warning error"></i> <span className="error">{ translate('DASHBOARD.PROXY_ERROR') }</span>
+            </div>
+          </div>
+        }
+        { !this.state.proxyError &&
+          !this.state.displayMenu &&
           <div className="app-main">
             { (this.state.activeSection !== 'pin' || this.state.activeSection !== 'offlinesig') &&
               <Login
@@ -828,11 +841,6 @@ class App extends React.Component {
                 dashboardRefresh={ this.dashboardRefresh }
                 getServersList={ this.props.actions.getServersList }
                 setDefaultServer={ this.props.actions.setDefaultServer } />
-            }
-            { this.state.proxyError &&
-              <div className="con-error">
-                <i className="fa fa-warning error"></i> <span className="error">{ translate('DASHBOARD.PROXY_ERROR') }</span>
-              </div>
             }
             <KMDInterest
               { ...this.state }
