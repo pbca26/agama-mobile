@@ -76,42 +76,6 @@ class Transactions extends React.Component {
     window.open(url, '_system');
   }
 
-  renderTxType(category) {
-    if (category === 'send' ||
-        category === 'sent') {
-      return (
-        <span className="label label-danger">
-          <i className="fa fa-arrow-circle-left"></i> <span>{ translate('TRANSACTIONS.OUT') }</span>
-        </span>
-      );
-    } else if (category === 'receive' ||
-        category === 'received') {
-      return (
-        <span className="label label-success">
-          <i className="fa fa-arrow-circle-right"></i> <span>{ translate('TRANSACTIONS.IN') } &nbsp; &nbsp;</span>
-        </span>
-      );
-    } else if (category === 'generate') {
-      return (
-        <span>
-          <i className="fa fa-cogs"></i> <span>{ translate('TRANSACTIONS.MINE') }</span>
-        </span>
-      );
-    } else if (category === 'immature') {
-      return (
-        <span>
-          <i className="fa fa-clock-o"></i> <span>{ translate('TRANSACTIONS.IMMATURE') }</span>
-        </span>
-      );
-    } else if (category === 'unknown') {
-      return (
-        <span>
-          <i className="fa fa-meh-o"></i> <span>{ translate('TRANSACTIONS.UNKNOWN') }</span>
-        </span>
-      );
-    }
-  };
-
   renderTxAmount(tx, amountOnly) {
     let _amountNegative;
 
@@ -130,6 +94,9 @@ class Transactions extends React.Component {
 
     return (
       <span>
+        { Number(tx.interest) === Number(tx.amount) &&
+          <span>+</span>
+        }
         { formatValue(tx.amount) * _amountNegative || translate('TRANSACTIONS.UNKNOWN') } { Number(tx.amount) === 0 ? '' : this.props.coin.toUpperCase() }
         { tx.interest &&
           !amountOnly &&
@@ -186,7 +153,6 @@ class Transactions extends React.Component {
     if (this.props.activeSection === 'dashboard') {
       const _transactions = this.props.transactions;
       let _items = [];
-      console.warn(_transactions);
 
       if (_transactions) {
         for (let i = 0; i < _transactions.length; i++) {
