@@ -97,7 +97,7 @@ class KMDInterest extends React.Component {
       _items.push(
         <tr key={ `kmd-interest-utxo-${i}` }>
           <td className={ _utxo[i].amount >= 10 ? 'green bold' : '' }>{ formatValue(_utxo[i].amount) }</td>
-          <td>{ formatValue(_utxo[i].interest) }</td>
+          <td className={ _utxo[i].interest > 0 ? 'green bold' : '' }>{ formatValue(_utxo[i].interest) }</td>
           <td>
             { _utxo[i].locktime &&
               <i className="fa fa-check-circle green locktime-icon"></i>

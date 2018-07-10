@@ -1,10 +1,10 @@
 import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
-import kmdCalcInterest from 'agama-wallet-lib/build/komodo-interest.js';
+import kmdCalcInterest from 'agama-wallet-lib/build/komodo-interest';
 import {
   isKomodoCoin,
 } from 'agama-wallet-lib/build/coin-helpers';
-import { verifyMerkleByCoin } from './merkle';
+import verifyMerkleByCoin from './merkle';
 import {
   fromSats,
   toSats,
@@ -14,7 +14,7 @@ import electrumJSTxDecoder from 'agama-wallet-lib/build/transaction-decoder';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
-export const listunspent = (proxyServer, electrumServer, address, network, full, verify, cache) => {
+const listunspent = (proxyServer, electrumServer, address, network, full, verify, cache) => {
   let _atLeastOneDecodeTxFailed = false;
 
   if (full) {
@@ -77,7 +77,6 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                               port: electrumServer.port,
                               ip: electrumServer.ip,
                               proto: electrumServer.proto,
-                              address,
                               txid: _utxoItem['tx_hash'],
                             },
                           }
@@ -227,4 +226,6 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
       });
     });
   }
-}
+};
+
+export default listunspent;
