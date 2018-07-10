@@ -67,21 +67,14 @@ class App extends React.Component {
     this.getBalance = this.getBalance.bind(this);
     this.getTransactions = this.getTransactions.bind(this);
     this.toggleMenu = this.toggleMenu.bind(this);
-    this.toggleCreateSeed = this.toggleCreateSeed.bind(this);
-    this.toggleAddCoin = this.toggleAddCoin.bind(this);
     this.dashboardRefresh = this.dashboardRefresh.bind(this);
     this.switchCoin = this.switchCoin.bind(this);
     this.addCoin = this.addCoin.bind(this);
     this.changeActiveSection = this.changeActiveSection.bind(this);
     this.toggleAutoRefresh = this.toggleAutoRefresh.bind(this);
-    this.toggleLogin = this.toggleLogin.bind(this);
     this.toggleKMDInterest = this.toggleKMDInterest.bind(this);
-    this.toggleOffileSig = this.toggleOffileSig.bind(this);
-    this.togglePin = this.togglePin.bind(this);
-    this.toggleSettings = this.toggleSettings.bind(this);
-    this.toggleRecovery = this.toggleRecovery.bind(this);
     this.toggleOverview = this.toggleOverview.bind(this);
-    this.toggle = this.toggleOverview.bind(this);
+    this.toggleMenuOption = this.toggleMenuOption.bind(this);
     this.globalClick = this.globalClick.bind(this);
     this.globalClickTimeout = null;
     this.overviewInterval = null;
@@ -450,18 +443,6 @@ class App extends React.Component {
     });
   }
 
-  toggleSettings() {
-    setTimeout(() => {
-      this.toggleMenu();
-    }, 10);
-
-    this.setState({
-      history: this.state.activeSection,
-      activeSection: this.state.activeSection === 'settings' ? (this.state.auth ? 'dashboard' : 'login') : 'settings',
-    });
-    this.scrollToTop();
-  }
-
   toggleOverview() {
     const { actions } = this.props;
     
@@ -489,85 +470,17 @@ class App extends React.Component {
       });
     }
 
-    setTimeout(() => {
-      this.toggleMenu();
-    }, 10);
-
-    this.setState({
-      history: this.state.activeSection,
-      activeSection: this.state.activeSection === 'overview' ? (this.state.auth ? 'dashboard' : 'login') : 'overview',
-    });
-    this.scrollToTop();
+    this.toggleMenuOption('overview');
   }
 
-  toggleRecovery() {
+  toggleMenuOption(optionName) {
     setTimeout(() => {
       this.toggleMenu();
     }, 10);
 
     this.setState({
       history: this.state.activeSection,
-      activeSection: this.state.activeSection === 'recovery' ? (this.state.auth ? 'dashboard' : 'login') : 'recovery',
-    });
-    this.scrollToTop();
-  }
-
-  togglePin() {
-    setTimeout(() => {
-      this.toggleMenu();
-    }, 10);
-
-    this.setState({
-      history: this.state.activeSection,
-      activeSection: this.state.activeSection === 'pin' ? (this.state.auth ? 'dashboard' : 'login') : 'pin',
-    });
-    this.scrollToTop();
-  }
-
-  toggleOffileSig() {
-    setTimeout(() => {
-      this.toggleMenu();
-    }, 10);
-
-    this.setState({
-      history: this.state.activeSection,
-      activeSection: this.state.activeSection === 'offlinesig' ? (this.state.auth ? 'dashboard' : 'login') : 'offlinesig',
-    });
-    this.scrollToTop();
-  }
-
-  toggleAddCoin() {
-    setTimeout(() => {
-      this.toggleMenu();
-    }, 10);
-
-    this.setState({
-      history: this.state.activeSection,
-      activeSection: this.state.activeSection === 'addcoin' ? (this.state.auth ? 'dashboard' : 'login') : 'addcoin',
-    });
-    this.scrollToTop();
-  }
-
-  toggleCreateSeed() {
-    setTimeout(() => {
-      this.toggleMenu();
-    }, 10);
-
-    this.setState({
-      history: this.state.activeSection,
-      activeSection: this.state.activeSection === 'create-seed' ? (this.state.auth ? 'dashboard' : 'login') : 'create-seed',
-    });
-    this.scrollToTop();
-  }
-
-  toggleLogin() {
-    setTimeout(() => {
-      this.toggleMenu();
-    }, 10);
-
-    this.setState({
-      history: this.state.activeSection,
-      activeSection: this.state.activeSection === 'login' ? (this.state.auth ? 'dashboard' : 'login') : 'login',
+      activeSection: this.state.activeSection === optionName ? (this.state.auth ? 'dashboard' : 'login') : optionName,
     });
     this.scrollToTop();
   }
@@ -654,7 +567,7 @@ class App extends React.Component {
                     <div className="item">
                       <div
                         className="title"
-                        onClick={ this.toggleRecovery }>{ translate('APP_TITLE.RECOVERY') }</div>
+                        onClick={ () => this.toggleMenuOption('recovery') }>{ translate('APP_TITLE.RECOVERY') }</div>
                       <img
                         className="line"
                         src="/images/template/menu/sidemenu-rectangle-3.png" />
@@ -664,7 +577,7 @@ class App extends React.Component {
                     <div className="item">
                       <div
                         className="title"
-                        onClick={ this.toggleSettings }>{ translate('APP_TITLE.SETTINGS') }</div>
+                        onClick={ () => this.toggleMenuOption('settings') }>{ translate('APP_TITLE.SETTINGS') }</div>
                       <img
                         className="line"
                         src="/images/template/menu/sidemenu-rectangle-3.png" />
@@ -691,7 +604,7 @@ class App extends React.Component {
                     <div className="item">
                       <div
                         className="title"
-                        onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.ADD_COIN') }</div>
+                        onClick={ () => this.toggleMenuOption('addcoin') }>{ translate('DASHBOARD.ADD_COIN') }</div>
                       <img
                         className="line"
                         src="/images/template/menu/sidemenu-rectangle-3.png" />
@@ -708,7 +621,7 @@ class App extends React.Component {
                     <div className="item">
                       <div
                         className="title"
-                        onClick={ this.toggleLogin }>{ translate('DASHBOARD.LOGIN') }</div>
+                        onClick={ () => this.toggleMenuOption('login') }>{ translate('DASHBOARD.LOGIN') }</div>
                       <img
                         className="line"
                         src="/images/template/menu/sidemenu-rectangle-3.png" />
@@ -718,7 +631,7 @@ class App extends React.Component {
                     <div className="item">
                       <div
                         className="title"
-                        onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.ADD_COIN') }</div>
+                        onClick={ () => this.toggleMenuOption('addcoin') }>{ translate('DASHBOARD.ADD_COIN') }</div>
                       <img
                         className="line"
                         src="/images/template/menu/sidemenu-rectangle-3.png" />
@@ -728,7 +641,7 @@ class App extends React.Component {
                     <div className="item">
                       <div
                         className="title"
-                        onClick={ this.toggleCreateSeed }>{ translate('DASHBOARD.CREATE_SEED') }</div>
+                        onClick={ () => this.toggleMenuOption('create-seed') }>{ translate('DASHBOARD.CREATE_SEED') }</div>
                       <img
                         className="line"
                         src="/images/template/menu/sidemenu-rectangle-3.png" />
@@ -739,7 +652,7 @@ class App extends React.Component {
                     <div className="item">
                       <div
                         className="title"
-                        onClick={ this.togglePin }>{ translate('APP_TITLE.PIN') }</div>
+                        onClick={ () => this.toggleMenuOption('pin') }>{ translate('APP_TITLE.PIN') }</div>
                       <img
                         className="line"
                         src="/images/template/menu/sidemenu-rectangle-3.png" />
@@ -749,7 +662,7 @@ class App extends React.Component {
                     <div className="item">
                       <div
                         className="title"
-                        onClick={ this.toggleOffileSig }>Offline Signing</div>
+                        onClick={ () => this.toggleMenuOption('offline-sig') }>Offline Signing</div>
                       <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
                     </div>*/
                   }
@@ -757,7 +670,7 @@ class App extends React.Component {
                     <div className="item">
                       <div
                         className="title"
-                        onClick={ this.toggleLogin }>{ translate('APP_TITLE.LOGIN') }</div>
+                        onClick={ () => this.toggleMenuOption('login') }>{ translate('APP_TITLE.LOGIN') }</div>
                       <img
                         className="line"
                         src="/images/template/menu/sidemenu-rectangle-3.png" />
