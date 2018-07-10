@@ -1,6 +1,6 @@
 import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
-import { kmdCalcInterest } from './utils';
+import kmdCalcInterest from 'agama-wallet-lib/build/komodo-interest';
 import {
   fromSats,
   toSats,
@@ -10,7 +10,7 @@ import electrumJSTxDecoder from 'agama-wallet-lib/build/transaction-decoder';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
-export const getKMDBalance = (address, json, proxyServer, electrumServer) => {
+export const getKMDBalance = (address, json, proxyServer, electrumServer, cache) => {
   return new Promise((resolve, reject) => {
     HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent`, {
       params: {
@@ -49,17 +49,22 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer) => {
 
             Promise.all(_utxo.map((_utxoItem, index) => {
               return new Promise((resolve, reject) => {
-                HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction`, {
-                  params: {
-                    port: electrumServer.port,
-                    ip: electrumServer.ip,
-                    proto: electrumServer.proto,
-                    address,
-                    txid: _utxoItem['tx_hash'],
-                  },
-                }, (error, result) => {
-                  // devlog('gettransaction =>');
-                  // devlog(result);
+                cache.getTransaction(
+                  _utxoItem['tx_hash'],
+                  'kmd',
+                  {
+                    url: `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction`,
+                    params: {
+                      port: electrumServer.port,
+                      ip: electrumServer.ip,
+                      proto: electrumServer.proto,
+                      txid: _utxoItem['tx_hash'],
+                    },
+                  }
+                )
+                .then((result) => {
+                  devlog('gettransaction =>');
+                  devlog(result);
 
                   result = JSON.parse(result.content);
 
@@ -77,7 +82,7 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer) => {
                     if (decodedTx &&
                         decodedTx.format &&
                         decodedTx.format.locktime > 0) {
-                      interestTotal += kmdCalcInterest(decodedTx.format.locktime, _utxoItem.value);
+                      interestTotal += Number(kmdCalcInterest(decodedTx.format.locktime, _utxoItem.value, _utxoItem.height));
                     }
 
                     devlog('decoded tx =>');
@@ -128,3 +133,5 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer) => {
     });
   });
 }
+
+export default getKMDBalance;

@@ -5,10 +5,9 @@ import { devlog } from './dev';
 import {
   getRandomIntInclusive,
 } from 'agama-wallet-lib/build/utils';
+import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
-
-const electrumJSNetworks = require('./electrumNetworks.js');
 
 // get merkle root
 const getMerkleRoot = (txid, proof, pos) => {
@@ -126,7 +125,7 @@ const verifyMerkle = (txid, height, serverList, electrumServer, proxyServer, cac
   });
 }
 
-export const verifyMerkleByCoin = (txid, height, electrumServer, proxyServer, cache, network) => {
+const verifyMerkleByCoin = (txid, height, electrumServer, proxyServer, cache, network) => {
   const _serverList = electrumServer.serverList;
 
   devlog(`verifyMerkleByCoin`);
@@ -161,3 +160,5 @@ export const verifyMerkleByCoin = (txid, height, electrumServer, proxyServer, ca
     }
   });
 }
+
+export default verifyMerkleByCoin;

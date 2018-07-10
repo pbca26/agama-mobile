@@ -12,12 +12,12 @@ import {
   wifToWif,
   seedToWif,
 } from 'agama-wallet-lib/build/keys';
-import { proxyServers } from './proxyServers';
+import proxyServers from './proxyServers';
 import electrumServers from './electrumServers';
-import { getKMDBalance } from './getKMDBalance';
-import { createtx } from './createtx';
-import { listtransactions } from './listtransactions';
-import { listunspent } from './listunspent';
+import getKMDBalance from './getKMDBalance';
+import createtx from './createtx';
+import listtransactions from './listtransactions';
+import listunspent from './listunspent';
 import {
   fromSats,
   toSats,
@@ -219,7 +219,8 @@ const balance = (network) => {
               address,
               JSON.parse(result.content).result,
               proxyServer,
-              _electrumServer
+              _electrumServer,
+              cache
             )
             .then((res) => {
               resolve(res);

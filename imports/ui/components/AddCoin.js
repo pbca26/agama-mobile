@@ -74,7 +74,7 @@ class AddCoin extends React.Component {
         <div className="btc">
           <img
             className="oval4"
-            src={ `/images/cryptologo/kmd.png` } />
+            src="/images/cryptologo/kmd.png" />
         </div>
         <div className="bitcoin">{ translate('COINS.KMD') }</div>
       </div>

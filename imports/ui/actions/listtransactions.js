@@ -9,7 +9,7 @@ import electrumJSTxDecoder from 'agama-wallet-lib/build/transaction-decoder';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
-export const listtransactions = (proxyServer, electrumServer, address, network, full, cache) => {
+const listtransactions = (proxyServer, electrumServer, address, network, full, cache) => {
   return new Promise((resolve, reject) => {
     // get current height
     HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getcurrentblock`, {
@@ -221,4 +221,6 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
       }
     });
   });
-}
+};
+
+export default listtransactions;
