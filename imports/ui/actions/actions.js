@@ -97,11 +97,24 @@ const cache = {
 let electrumKeys = {};
 let proxyServer = {};
 // pick a random proxy server
-const _randomServer = proxyServers[getRandomIntInclusive(0, proxyServers.length - 1)];
-proxyServer = {
-  ip: _randomServer.ip,
-  port: _randomServer.port,
+
+const _getAnotherProxy = () => {
+  const _randomServer = proxyServers[getRandomIntInclusive(0, proxyServers.length - 1)];
+  proxyServer = {
+    ip: _randomServer.ip,
+    port: _randomServer.port,
+  };
+
+  devlog(`proxy ${proxyServer.ip}:${proxyServer.port}`);
 };
+
+const getAnotherProxy = () => {
+  return async (dispatch) => {
+    _getAnotherProxy();
+  };
+}
+
+_getAnotherProxy();
 
 const getServersList = () => {
   return async (dispatch) => {
@@ -450,4 +463,5 @@ export default {
   addKeyPair,
   kmdUnspents,
   getBtcFees,
+  getAnotherProxy,
 }

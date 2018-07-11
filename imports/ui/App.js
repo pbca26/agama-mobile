@@ -81,6 +81,7 @@ class App extends React.Component {
     this.historyBack = this.historyBack.bind(this);
     this.scrollToTop = this.scrollToTop.bind(this);
     this.getBtcFees = this.getBtcFees.bind(this);
+    this.retryProxy = this.retryProxy.bind(this);
   }
 
   componentWillMount() {
@@ -99,6 +100,13 @@ class App extends React.Component {
         overview: res,
       });
     });
+  }
+
+  retryProxy() {
+    const { actions } = this.props;
+    
+    actions.getAnotherProxy();
+    this.dashboardRefresh();
   }
 
   getBtcFees() {
@@ -718,10 +726,21 @@ class App extends React.Component {
           </div>
         }
         { this.state.proxyError &&
-          !this.state.displayMenu &&
           <div className="app-main">
             <div className="con-error">
               <i className="fa fa-warning error"></i> <span className="error">{ translate('DASHBOARD.PROXY_ERROR') }</span>
+            </div>
+            <div className="form proxy">
+              <div
+                onClick={ this.retryProxy }
+                className="group3">
+                <div className="btn-inner">
+                  <div className="btn">{ translate('DASHBOARD.RETRY') }</div>
+                  <div className="group2">
+                    <i className="fa fa-refresh"></i>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         }

@@ -119,6 +119,7 @@ export const _lang = {
       'CONNECTING_TO_NEW_SERVER': 'Connecting to a new server...',
       'PROXY_ERROR': 'Proxy service is unreachable!',
       'CLAIM': 'Claim',
+      'RETRY': 'Retry',
     },
     'TRANSACTIONS': {
       'LAST_TX': 'Last Transactions',
