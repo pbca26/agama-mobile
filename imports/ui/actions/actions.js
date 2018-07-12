@@ -379,44 +379,48 @@ const getOverview = (coins) => {
           });
         }))
         .then(pricesResult => {
-          let _kmdRates = {
-            BTC: 0,
-            USD: 0,
-          };
+          if (pricesResult[0] === 'prices-error') {
+            resolve('error');
+          } else {
+            let _kmdRates = {
+              BTC: 0,
+              USD: 0,
+            };
 
-          if (pricesResult[0].BTC &&
-              pricesResult[0].USD) {
-            _kmdRates.BTC = pricesResult[0].BTC;
-            _kmdRates.USD = pricesResult[0].USD;
-          }
-
-          let _overviewItems = [];
-
-          for (let i = 0; i < promiseResult.length; i++) {
-            let _coinKMDPrice = 0;
-            let _usdPricePerItem = 0;
-
-            if (pricesResult[1][`${promiseResult[i].coin.toUpperCase()}/KMD`]) {
-              _coinKMDPrice = pricesResult[1][`${promiseResult[i].coin.toUpperCase()}/KMD`].low;
-            } else if (promiseResult[i].coin === 'kmd') {
-              _coinKMDPrice = 1;
+            if (pricesResult[0].BTC &&
+                pricesResult[0].USD) {
+              _kmdRates.BTC = pricesResult[0].BTC;
+              _kmdRates.USD = pricesResult[0].USD;
             }
 
-            if (!promiseResult[i].balance) {
-              promiseResult[i].balance = 0;
+            let _overviewItems = [];
+
+            for (let i = 0; i < promiseResult.length; i++) {
+              let _coinKMDPrice = 0;
+              let _usdPricePerItem = 0;
+
+              if (pricesResult[1][`${promiseResult[i].coin.toUpperCase()}/KMD`]) {
+                _coinKMDPrice = pricesResult[1][`${promiseResult[i].coin.toUpperCase()}/KMD`].low;
+              } else if (promiseResult[i].coin === 'kmd') {
+                _coinKMDPrice = 1;
+              }
+
+              if (!promiseResult[i].balance) {
+                promiseResult[i].balance = 0;
+              }
+
+              _overviewItems.push({
+                coin: promiseResult[i].coin,
+                balanceNative: promiseResult[i].balance,
+                balanceKMD: promiseResult[i].balance * _coinKMDPrice,
+                balanceBTC: promiseResult[i].balance * _kmdRates.BTC,
+                balanceUSD: promiseResult[i].balance * _coinKMDPrice * _kmdRates.USD,
+                usdPricePerItem: _coinKMDPrice * _kmdRates.USD,
+              });
             }
 
-            _overviewItems.push({
-              coin: promiseResult[i].coin,
-              balanceNative: promiseResult[i].balance,
-              balanceKMD: promiseResult[i].balance * _coinKMDPrice,
-              balanceBTC: promiseResult[i].balance * _kmdRates.BTC,
-              balanceUSD: promiseResult[i].balance * _coinKMDPrice * _kmdRates.USD,
-              usdPricePerItem: _coinKMDPrice * _kmdRates.USD,
-            });
+            resolve(_overviewItems);
           }
-
-          resolve(_overviewItems);
         });
       });
     });

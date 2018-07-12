@@ -114,13 +114,20 @@ class Overview extends React.Component {
     return (
       <div className="overview-ui">
         <div className="home">
-          <div className="home-inner">
-            { this.renderOverview() }
-            <div className="yourcoins">{ translate('OVERVIEW.YOUR_COINS') }</div>
-            { /*<img
-              className="combinedshape2"
-            src="/images/template/home/home-combined-shape 2.png" />*/ }
-          </div>
+          { this.props.overview === 'error' &&
+            <div className="con-error">
+              <i className="fa fa-warning error"></i> <span className="error">{ translate('OVERVIEW.PRICES_ERROR') }</span>
+            </div>
+          }
+          { this.props.overview !== 'error' &&
+            <div className="home-inner">
+              { this.renderOverview() }
+              <div className="yourcoins">{ translate('OVERVIEW.YOUR_COINS') }</div>
+              { /*<img
+                className="combinedshape2"
+              src="/images/template/home/home-combined-shape 2.png" />*/ }
+            </div>
+          }
         </div>
       </div>
     );

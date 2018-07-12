@@ -18,6 +18,7 @@ export const _lang = {
       'PROVIDE_A_SEED': 'Provide a seed and enter 6 digit PIN number in the form below.',
     },
     'OVERVIEW': {
+      'PRICES_ERROR': 'Atomicexplorer.com is unreachable!',
       'TOTAL_VALUE': 'Total Value',
       'PER_COIN': 'per coin',
       'YOUR_COINS': 'Your Coins',
