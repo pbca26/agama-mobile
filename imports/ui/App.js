@@ -204,6 +204,8 @@ class App extends React.Component {
           coin,
           address: res,
           loading: true,
+          transactions: this.state.coins[coin] ? this.state.coins[coin].transactions: null,
+          balance: this.state.coins[coin] ? this.state.coins[coin].balance: null,
         });
         this.scrollToTop();
         this.dashboardRefresh();
