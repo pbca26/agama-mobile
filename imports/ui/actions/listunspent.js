@@ -1,9 +1,7 @@
 import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
 import kmdCalcInterest from 'agama-wallet-lib/build/komodo-interest';
-import {
-  isKomodoCoin,
-} from 'agama-wallet-lib/build/coin-helpers';
+import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
 import verifyMerkleByCoin from './merkle';
 import {
   fromSats,

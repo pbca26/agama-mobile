@@ -1,8 +1,6 @@
 import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
-import {
-  isKomodoCoin,
-} from 'agama-wallet-lib/build/coin-helpers';
+import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
 import parseTransactionAddresses from 'agama-wallet-lib/build/transaction-type';
 import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 import electrumJSTxDecoder from 'agama-wallet-lib/build/transaction-decoder';

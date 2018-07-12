@@ -2,9 +2,7 @@ import crypto from 'crypto';
 import reverse from 'buffer-reverse';
 import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
-import {
-  getRandomIntInclusive,
-} from 'agama-wallet-lib/build/utils';
+import { getRandomIntInclusive } from 'agama-wallet-lib/build/utils';
 import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';

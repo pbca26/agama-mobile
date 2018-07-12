@@ -1,7 +1,7 @@
 import { Promise } from 'meteor/promise';
 
 import { devlog } from './dev';
-import { listunspent } from './listunspent';
+import listunspent from './listunspent';
 import { isAssetChain } from './utils';
 import electrumServers from './electrumServers';
 import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
