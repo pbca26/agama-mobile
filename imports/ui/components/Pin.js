@@ -119,7 +119,7 @@ class Pin extends React.Component {
     return (
       <div className="form pin-override">
         <div className="margin-top-40 padding-bottom-30 text-center fs14 sz350">
-        Provide a seed and enter 6 digit PIN number in the form below.
+        { translate('PIN.PROVIDE_A_SEED') }
         </div>
         <div
           onClick={ this.scanQR }
@@ -141,7 +141,7 @@ class Pin extends React.Component {
             type="password"
             name="passphrase"
             onChange={ this.updateInput }
-            placeholder={ translate('LOGIN.ENTER_PASSPHRASE') + ' ' + translate('LOGIN.OR_WIF') }
+            placeholder={ `${translate('LOGIN.ENTER_PASSPHRASE')} ${translate('LOGIN.OR_WIF')}` }
             value={ this.state.passphrase || '' } />
         </div>
         { this.state.passphraseTooShort &&

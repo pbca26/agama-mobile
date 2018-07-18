@@ -1,5 +1,4 @@
 import React from 'react';
-import { formatValue } from '../actions/utils';
 import translate from '../translate/translate';
 
 class ServerSelect extends React.Component {

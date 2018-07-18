@@ -5,8 +5,8 @@ import translate from '../translate/translate';
 import {
   convertURIToImageData,
   getLocalStorageVar,
-  isAssetChain,  
 } from '../actions/utils';
+import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
 import { decryptkey } from '../actions/seedCrypt';
 import jsQR from 'jsqr';
 import {
@@ -23,9 +23,7 @@ import {
   explorerList,
   isKomodoCoin,
 } from 'agama-wallet-lib/build/coin-helpers';
-import {
-  addressVersionCheck,
-} from 'agama-wallet-lib/build/keys';
+import { addressVersionCheck } from 'agama-wallet-lib/build/keys';
 import electrumServers from '../actions/electrumServers';
 import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 
@@ -179,8 +177,8 @@ class SendCoin extends React.Component {
       _isFailed = true;
     }
 
-    if (!addressVersionCheck(electrumJSNetworks[isAssetChain(this.props.coin) ? 'kmd' : this.props.coin], this.state.sendTo) ||
-        addressVersionCheck(electrumJSNetworks[isAssetChain(this.props.coin) ? 'kmd' : this.props.coin], this.state.sendTo) === 'Invalid pub address') {
+    if (!addressVersionCheck(electrumJSNetworks[isKomodoCoin(this.props.coin) ? 'kmd' : this.props.coin], this.state.sendTo) ||
+        addressVersionCheck(electrumJSNetworks[isKomodoCoin(this.props.coin) ? 'kmd' : this.props.coin], this.state.sendTo) === 'Invalid pub address') {
       validIncorrectAddress = true;
       _isFailed = true;
     }
@@ -247,8 +245,6 @@ class SendCoin extends React.Component {
               this.props.coin === 'btc' ? this.props.btcFees[this.state.btcFee] : null
             )
             .then((sendPreflight) => {
-              console.warn('sendPreflight', sendPreflight);
-
               if (sendPreflight &&
                   sendPreflight.msg === 'success') {
                 this.setState({

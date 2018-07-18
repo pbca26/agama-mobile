@@ -1,10 +1,6 @@
 import React from 'react';
-import {
-  formatValue,
-} from 'agama-wallet-lib/build/utils';
-import {
-  secondsToString,
-} from 'agama-wallet-lib/build/time';
+import { formatValue } from 'agama-wallet-lib/build/utils';
+import { secondsToString } from 'agama-wallet-lib/build/time';
 import {
   explorerList,
   isKomodoCoin,

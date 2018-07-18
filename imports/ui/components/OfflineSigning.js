@@ -8,9 +8,7 @@ import {
   getLocalStorageVar,
   convertURIToImageData,
 } from '../actions/utils';
-import {
-  isKomodoCoin,
-} from 'agama-wallet-lib/build/coin-helpers';
+import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
 import {
   fromSats,
   toSats,
@@ -106,7 +104,7 @@ class OfflineSigning extends React.Component {
 
         if (_rawtx) {
           this.setState({
-            signedTx: network + ':' + _rawtx,
+            signedTx: `${network}:${_rawtx}`,
           });
         } else {
           this.setState({

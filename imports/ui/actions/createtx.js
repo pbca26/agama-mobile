@@ -2,10 +2,11 @@ import { Promise } from 'meteor/promise';
 
 import { devlog } from './dev';
 import listunspent from './listunspent';
-import { isAssetChain } from './utils';
-import electrumServers from './electrumServers';
+import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
+import electrumServers from 'agama-wallet-lib/build/electrum-servers';
 import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 import transactionBuilder from 'agama-wallet-lib/build/transaction-builder';
+import translate from '../translate/translate';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
@@ -25,7 +26,7 @@ const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, val
     .then((utxoList) => {
       if (utxoList &&
           utxoList.length) {
-        const _network = electrumJSNetworks[isAssetChain(network) ? 'kmd' : network];    
+        const _network = electrumJSNetworks[isKomodoCoin(network) ? 'kmd' : network];    
         let _data = transactionBuilder.data(
           _network,
           value,
@@ -79,7 +80,7 @@ const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, val
             if (result.msg === 'error') {
               resolve({
                 msg: 'error',
-                result: 'Connection error. Please retry.',
+                result: translate('API.CON_ERROR'),
               });
             } else {
               const txid = result.result;
@@ -91,7 +92,7 @@ const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, val
                   txid.indexOf('bad-txns-inputs-spent') > -1) {
                 const successObj = {
                   msg: 'error',
-                  result: 'Bad transaction inputs spent',
+                  result: translate('API.BAD_TX_INPUTS_SPENT_ERR'),
                   raw: _data,
                 };
 
@@ -102,7 +103,7 @@ const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, val
                   if (txid.indexOf('bad-txns-in-belowout') > -1) {
                     const successObj = {
                       msg: 'error',
-                      result: 'Bad transaction inputs spent',
+                      result: translate('API.BAD_TX_INPUTS_SPENT_ERR'),
                       raw: _data,
                     };
 
@@ -120,7 +121,7 @@ const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, val
                       txid.indexOf('bad-txns-in-belowout') > -1) {
                     const successObj = {
                       msg: 'error',
-                      result: 'Bad transaction inputs spent',
+                      result: translate('API.BAD_TX_INPUTS_SPENT_ERR'),
                       raw: _data,
                     };
 
@@ -128,7 +129,7 @@ const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, val
                   } else {
                     const successObj = {
                       msg: 'error',
-                      result: 'Can\'t broadcast transaction',
+                      result: translate('API.CANT_BROADCAST_TX_ERR'),
                       raw: _data,
                     };
 
@@ -142,7 +143,7 @@ const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, val
       } else {
         resolve ({
           msg: 'error',
-          result: 'No available UTXO(s) or connection error',
+          result: translate('API.NO_UTXO_ERR'),
         });
       }
     });

@@ -184,7 +184,7 @@ class Login extends React.Component {
         className="btn btn-lg btn-primary"
         onClick={ () => this.triggerKey('back') }>
         <span className="ladda-label padding-fix">
-          <i className="fa fa-long-arrow-left"></i>
+        <i className="fa fa-long-arrow-left"></i>
         </span>
       </button>
     );
@@ -194,7 +194,7 @@ class Login extends React.Component {
         key={ `login-keypad-remove` }
         className="btn btn-lg btn-primary"
         onClick={ () => this.triggerKey('remove') }>
-          <span className="ladda-label padding-fix">
+        <span className="ladda-label padding-fix">
         <i className="fa fa-remove"></i>
         </span>
       </button>
@@ -272,7 +272,7 @@ class Login extends React.Component {
                       className="form-control"
                       name="passphrase"
                       onChange={ this.updateInput }
-                      placeholder={ translate('LOGIN.ENTER_PASSPHRASE') + ' ' + translate('LOGIN.OR_WIF') }
+                      placeholder={ `${translate('LOGIN.ENTER_PASSPHRASE')} ${translate('LOGIN.OR_WIF')}` }
                       value={ this.state.passphrase || '' } />
                   </div>
                 </div>

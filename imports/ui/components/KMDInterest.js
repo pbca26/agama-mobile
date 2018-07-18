@@ -2,12 +2,8 @@ import React from 'react';
 import Spinner from './Spinner';
 
 import translate from '../translate/translate';
-import {
-  secondsToString,
-} from 'agama-wallet-lib/build/time';
-import {
-  formatValue,
-} from 'agama-wallet-lib/build/utils';
+import { secondsToString } from 'agama-wallet-lib/build/time';
+import { formatValue } from 'agama-wallet-lib/build/utils';
 
 class KMDInterest extends React.Component {
   constructor() {

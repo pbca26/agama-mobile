@@ -1,5 +1,3 @@
-import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
-
 export const maskPubAddress = (pub) => {
   // keep 3 first and 3 last chars unmasked
   let masked = '';
@@ -10,8 +8,6 @@ export const maskPubAddress = (pub) => {
 
   return pub[0] + pub[1] + pub[2] + masked + pub[pub.length - 3] + pub[pub.length - 2] + pub[pub.length - 1];
 }
-
-export const isAssetChain = isKomodoCoin;
 
 export const setLocalStorageVar = (name, json) => {
   const _json = JSON.stringify(json);

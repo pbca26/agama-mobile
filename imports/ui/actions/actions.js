@@ -9,7 +9,7 @@ import {
   seedToWif,
 } from 'agama-wallet-lib/build/keys';
 import proxyServers from './proxyServers';
-import electrumServers from './electrumServers';
+import electrumServers from 'agama-wallet-lib/build/electrum-servers';
 import getKMDBalance from './getKMDBalance';
 import createtx from './createtx';
 import listtransactions from './listtransactions';
