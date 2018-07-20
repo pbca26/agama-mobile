@@ -1,11 +1,11 @@
-export const lang = {
-  'API': {
-    'NO_UTXO_ERR': 'No available UTXO(s) or connection error',
-    'CANT_BROADCAST_TX_ERR': 'Can\'t broadcast transaction',
-    'BAD_TX_INPUTS_SPENT_ERR': 'Bad transaction inputs spent',
-    'CON_ERROR': 'Connection error. Please retry.',
-  },
+const lang = {
   'EN': {
+    'API': {
+      'NO_UTXO_ERR': 'No available UTXO(s) or connection error',
+      'CANT_BROADCAST_TX_ERR': 'Can\'t broadcast transaction',
+      'BAD_TX_INPUTS_SPENT_ERR': 'Bad transaction inputs spent',
+      'CON_ERROR': 'Connection error. Please retry.',
+    },
     'SETTINGS': {
       'SAVED': 'Settings are saved',
       'AUTOLOCK_TIMEOUT': 'Auto lock timeout',
@@ -341,3 +341,5 @@ export const lang = {
     },
   },
 };
+
+export default lang;
