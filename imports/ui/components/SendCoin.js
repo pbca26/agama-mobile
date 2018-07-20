@@ -6,7 +6,6 @@ import {
   convertURIToImageData,
   getLocalStorageVar,
 } from '../actions/utils';
-import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
 import { decryptkey } from '../actions/seedCrypt';
 import jsQR from 'jsqr';
 import {
@@ -24,7 +23,7 @@ import {
   isKomodoCoin,
 } from 'agama-wallet-lib/build/coin-helpers';
 import { addressVersionCheck } from 'agama-wallet-lib/build/keys';
-import electrumServers from '../actions/electrumServers';
+import electrumServers from 'agama-wallet-lib/build/electrum-servers';
 import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 
 class SendCoin extends React.Component {

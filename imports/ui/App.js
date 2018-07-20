@@ -1,7 +1,7 @@
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import electrumServers from './actions/electrumServers';
+import electrumServers from 'agama-wallet-lib/build/electrum-servers';
 
 import actions from './actions/actions';
 import {
