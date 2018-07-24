@@ -31,9 +31,12 @@ import Pin from './components/Pin';
 import Recovery from './components/Recovery';
 import Overview  from './components/Overview';
 import Settings  from './components/Settings';
+import { setTimeout } from 'timers';
 
 const DASHBOARD_UPDATE_INTERVAL = 120000; // 2m
 const DEFAULT_LOCK_INACTIVE_INTERVAL = getLocalStorageVar('settings') && getLocalStorageVar('settings').autoLockTimeout ? getLocalStorageVar('settings').autoLockTimeout : 600000; // 10m
+const PROXY_RETRY_COUNT = 2;
+const PROXY_RETRY_TIMEOUT = 5000;
 
 class App extends React.Component {
   constructor() {
@@ -61,6 +64,8 @@ class App extends React.Component {
       history: null,
       btcFees: null,
     };
+    this.globalClickTimeout = null;
+    this.overviewInterval = null;
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
@@ -78,8 +83,6 @@ class App extends React.Component {
     this.toggleOverview = this.toggleOverview.bind(this);
     this.toggleMenuOption = this.toggleMenuOption.bind(this);
     this.globalClick = this.globalClick.bind(this);
-    this.globalClickTimeout = null;
-    this.overviewInterval = null;
     this.historyBack = this.historyBack.bind(this);
     this.scrollToTop = this.scrollToTop.bind(this);
     this.getBtcFees = this.getBtcFees.bind(this);
@@ -104,18 +107,21 @@ class App extends React.Component {
     });
   }
 
-  retryProxy() {
+  retryProxy(disableAnimation) {
     const { actions } = this.props;
 
-    this.setState({
-      proxyRetryInProgress: true,
-    });
-
-    setTimeout(() => {
+    if (!disableAnimation ||
+       typeof disableAnimation === 'object') {
       this.setState({
-        proxyRetryInProgress: false,
+        proxyRetryInProgress: true,
       });
-    }, 1000);
+
+      setTimeout(() => {
+        this.setState({
+          proxyRetryInProgress: false,
+        });
+      }, 1000);
+    }
     
     actions.getAnotherProxy();
     this.dashboardRefresh();
@@ -326,10 +332,26 @@ class App extends React.Component {
     .then((res) => {
       if (res &&
           res === 'proxy-error') {
-        this.setState({
+        let _newState = {
           proxyError: true,
           proxyErrorCount: this.state.proxyErrorCount + 1,
-        });
+        };
+
+        if (this.state.proxyErrorCount + 1 <= PROXY_RETRY_COUNT &&
+            this.state.proxyErrorCount >= 0) {
+          setTimeout(() => {
+            devlog(`proxy retry attempt #${this.state.proxyErrorCount}`);
+            this.retryProxy(true);
+          }, PROXY_RETRY_TIMEOUT);
+        } else {
+          _newState = {
+            proxyError: true,
+            proxyErrorCount: -777,
+          }
+          devlog(`${PROXY_RETRY_COUNT} consecutive proxy retry attempts have failed, go manual`);
+        }
+
+        this.setState(_newState);
       } else {
         if (res &&
             !res.hasOwnProperty('balance') &&
@@ -535,8 +557,7 @@ class App extends React.Component {
             onClick={ () => key !== this.state.coin ? this.switchCoin(key) : null }
             key={ `active-coins-${key}` }
             className="active-coins">
-            <img
-              src={ `/images/cryptologo/${key}.png` } /> <span>{ key.toUpperCase() }</span>
+            <img src={ `/images/cryptologo/${key}.png` } /> <span>{ key.toUpperCase() }</span>
             { key === this.state.coin &&
               <i className="fa fa-check"></i>
             }
@@ -722,13 +743,13 @@ class App extends React.Component {
             !this.state.displayMenu &&
             ((this.state.auth && this.state.history !== 'login' && this.state.history !== 'create-seed') || !this.state.auth) &&
             this.state.history !== this.state.activeSection &&
-            !this.state.proxyError &&
+            (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
             <img
               onClick={ this.historyBack }
               className="menu-back"
               src="/images/template/menu/trends-combined-shape.png" />
           }
-          { !this.state.proxyError &&
+          { (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
             <img
               onClick={ this.toggleMenu }
               className="menu-icon"
@@ -737,12 +758,13 @@ class App extends React.Component {
           <div className="ui-title">{ this.state.displayMenu ? translate('APP_TITLE.MENU') : translate('APP_TITLE.' + this.state.activeSection.toUpperCase()) }</div>
         </div>
         { this.state.displayMenu &&
-          !this.state.proxyError &&
+          (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
           <div className="app-main">
             { this.renderMenu() }
           </div>
         }
         { this.state.proxyError &&
+          this.state.proxyErrorCount === -777 &&
           <div className="app-main">
             <div className="con-error">
               <i className="fa fa-warning error"></i> <span className="error">{ translate('DASHBOARD.PROXY_ERROR') }</span>
@@ -750,6 +772,10 @@ class App extends React.Component {
             <div className="form proxy">
               <div
                 onClick={ this.retryProxy }
+                disabled={
+                  this.state.proxyRetryInProgress &&
+                  this.state.proxyErrorCount !== -777
+                }
                 className={ 'group3' + (this.state.proxyRetryInProgress ? ' retrying' : '') }>
                 <div className="btn-inner">
                   <div className="btn">{ translate('DASHBOARD.RETRY') }</div>
@@ -761,7 +787,7 @@ class App extends React.Component {
             </div>
           </div>
         }
-        { !this.state.proxyError &&
+        { (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
           !this.state.displayMenu &&
           <div className="app-main">
             { (this.state.activeSection !== 'pin' || this.state.activeSection !== 'offlinesig') &&
@@ -797,7 +823,7 @@ class App extends React.Component {
               changeActiveSection={ this.changeActiveSection } />
             { this.state.auth &&
               this.state.activeSection === 'dashboard' &&
-              !this.state.proxyError &&
+              (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
               <Transactions
                 { ...this.state }
                 dashboardRefresh={ this.dashboardRefresh }
