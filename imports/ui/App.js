@@ -55,6 +55,8 @@ class App extends React.Component {
       updateInterval: null,
       conError: false,
       proxyError: false,
+      proxyErrorCount: 0,
+      proxyRetryInProgress: false,
       overview: null,
       history: null,
       btcFees: null,
@@ -104,6 +106,16 @@ class App extends React.Component {
 
   retryProxy() {
     const { actions } = this.props;
+
+    this.setState({
+      proxyRetryInProgress: true,
+    });
+
+    setTimeout(() => {
+      this.setState({
+        proxyRetryInProgress: false,
+      });
+    }, 1000);
     
     actions.getAnotherProxy();
     this.dashboardRefresh();
@@ -316,6 +328,7 @@ class App extends React.Component {
           res === 'proxy-error') {
         this.setState({
           proxyError: true,
+          proxyErrorCount: this.state.proxyErrorCount + 1,
         });
       } else {
         if (res &&
@@ -331,6 +344,7 @@ class App extends React.Component {
             balance: res,
             conError: false,
             proxyError: false,
+            proxyErrorCount: 0,
           });
         }
       }
@@ -362,6 +376,7 @@ class App extends React.Component {
           loading: false,
           conError: false,
           proxyError: false,
+          proxyErrorCount: 0,          
         });
       }
     });
@@ -735,7 +750,7 @@ class App extends React.Component {
             <div className="form proxy">
               <div
                 onClick={ this.retryProxy }
-                className="group3">
+                className={ 'group3' + (this.state.proxyRetryInProgress ? ' retrying' : '') }>
                 <div className="btn-inner">
                   <div className="btn">{ translate('DASHBOARD.RETRY') }</div>
                   <div className="group2">

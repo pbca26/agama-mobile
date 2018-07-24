@@ -95,11 +95,30 @@ let proxyServer = {};
 // pick a random proxy server
 
 const _getAnotherProxy = () => {
-  const _randomServer = proxyServers[getRandomIntInclusive(0, proxyServers.length - 1)];
-  proxyServer = {
-    ip: _randomServer.ip,
-    port: _randomServer.port,
-  };
+  if (proxyServer &&
+      proxyServer.ip &&
+      proxyServer.port) {
+    for (let i = 0; i < proxyServers.length; i++) {
+      devlog('_getanotherproxy proxies', proxyServers[i]);
+      devlog('_getanotherproxy active proxy', proxyServer);
+      
+      if (proxyServer.ip !== proxyServers[i].ip ||
+          proxyServer.port !== proxyServers[i].port) {
+        devlog('new proxy', proxyServers[i]);
+        proxyServer = {
+          ip: proxyServers[i].ip,
+          port: proxyServers[i].port,
+        };
+        break;
+      }
+    }
+  } else {
+    const _randomServer = proxyServers[getRandomIntInclusive(0, proxyServers.length - 1)];
+    proxyServer = {
+      ip: _randomServer.ip,
+      port: _randomServer.port,
+    };
+  }
 
   devlog(`proxy ${proxyServer.ip}:${proxyServer.port}`);
 };
