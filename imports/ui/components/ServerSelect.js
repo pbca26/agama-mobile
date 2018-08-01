@@ -19,11 +19,14 @@ class ServerSelect extends React.Component {
     this.props.getServersList()
     .then((res) => {
       const _coin = this.props.coin;
+      const _server = this.props.coins[this.props.coin].server;
 
       this.setState({
-        selectedOption: res[_coin].ip + ':' + res[_coin].port + ':' + res[_coin].proto,
-        electrumServer: res[_coin].ip + ':' + res[_coin].port + ':' + res[_coin].proto,
+        selectedOption: _server.ip + ':' + _server.port + ':' + _server.proto,
+        electrumServer: _server.ip + ':' + _server.port + ':' + _server.proto,
         serverList: res[_coin].serverList,
+        errorTestingServer: false,
+        connecting: false,
       });
     });
   }
@@ -38,11 +41,14 @@ class ServerSelect extends React.Component {
 
   setElectrumServer() {
     const _server = this.state.selectedOption.split(':');
+    console.warn(this.state.selectedOption);
+    console.warn(_server);
 
     this.props.setDefaultServer(
       this.props.coin,
       _server[1],
-      _server[0]
+      _server[0],
+      _server[2],
     )
     .then((res) => {
       if (res === 'error') {
@@ -55,6 +61,14 @@ class ServerSelect extends React.Component {
           errorTestingServer: false,
           connecting: true,
         });
+        this.props.updateDefaultCoinServer(
+          this.props.coin,
+          { 
+            ip: _server[0],
+            port: _server[1],
+            proto: _server[2],
+          } 
+        );
         this.props.dashboardRefresh();
       }
     });
@@ -77,7 +91,7 @@ class ServerSelect extends React.Component {
 
   render() {
     return (
-      <div className="margin-top-40 form server-select">
+      <div className="form server-select">
         <div className="bold text-center">
           <i className="fa fa-warning error"></i> <span className="error">{ translate('DASHBOARD.CON_ERROR', this.props.coin.toUpperCase()) }</span>
         </div>
@@ -93,12 +107,12 @@ class ServerSelect extends React.Component {
             </select>
           </div>
           { this.state.errorTestingServer &&
-            <div className="error margin-top-10 margin-bottom-10 text-center">
+            <div className="error margin-top-30 margin-bottom-10 text-center">
             { translate('DASHBOARD.ERROR_TESTING_SERVER', this.state.selectedOption) }
             </div>
           }
           { this.state.connecting &&
-            <div className="margin-top-20 margin-bottom-10 text-center">
+            <div className="margin-top-30 margin-bottom-10 text-center">
             { translate('DASHBOARD.CONNECTING_TO_NEW_SERVER') }
             </div>
           }
@@ -108,7 +122,7 @@ class ServerSelect extends React.Component {
             <div className="btn-inner">
               <div className="btn">{ translate('DASHBOARD.SWITCH_SERVER') }</div>
               <div className="group2">
-                <i className="fa fa-eye"></i>
+                <i className="fa fa-refresh"></i>
               </div>
             </div>
           </div>

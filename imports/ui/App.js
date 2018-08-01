@@ -87,6 +87,7 @@ class App extends React.Component {
     this.scrollToTop = this.scrollToTop.bind(this);
     this.getBtcFees = this.getBtcFees.bind(this);
     this.retryProxy = this.retryProxy.bind(this);
+    this.updateDefaultCoinServer = this.updateDefaultCoinServer.bind(this);
   }
 
   componentWillMount() {
@@ -104,6 +105,16 @@ class App extends React.Component {
       this.setState({
         overview: res,
       });
+    });
+  }
+
+  updateDefaultCoinServer(coin, server) {
+    let _newState = JSON.parse(JSON.stringify(this.state.coins));
+    _newState[coin].server = server;
+    
+    setLocalStorageVar('coins', _newState);
+    this.setState({
+      coins: _newState,
     });
   }
 
@@ -383,7 +394,7 @@ class App extends React.Component {
     actions.transactions(this.state.coin)
     .then((res) => {
       if (res &&
-          res.indexOf('error') > -1) {
+          (res.indexOf('error') > -1 || res.indexOf('proxy-error') > -1)) {
         this.setState({
           balance: null,
           transactions: null,
@@ -789,6 +800,17 @@ class App extends React.Component {
         }
         { (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
           !this.state.displayMenu &&
+          this.state.conError &&
+          <ServerSelect
+            { ...this.state }
+            dashboardRefresh={ this.dashboardRefresh }
+            getServersList={ this.props.actions.getServersList }
+            setDefaultServer={ this.props.actions.setDefaultServer }
+            updateDefaultCoinServer={ this.updateDefaultCoinServer } />
+        }
+        { (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
+          !this.state.displayMenu &&
+          !this.state.conError &&
           <div className="app-main">
             { (this.state.activeSection !== 'pin' || this.state.activeSection !== 'offlinesig') &&
               <Login
@@ -810,13 +832,6 @@ class App extends React.Component {
               { ...this.state }
               addCoin={ this.addCoin }
               changeActiveSection={ this.changeActiveSection } />
-            { this.state.conError &&
-              <ServerSelect
-                { ...this.state }
-                dashboardRefresh={ this.dashboardRefresh }
-                getServersList={ this.props.actions.getServersList }
-                setDefaultServer={ this.props.actions.setDefaultServer } />
-            }
             <KMDInterest
               { ...this.state }
               sendtx={ this.props.actions.sendtx }
