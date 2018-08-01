@@ -242,24 +242,32 @@ const balance = (network) => {
         if (!result) {
           resolve('proxy-error');
         } else {
+          const _balance = JSON.parse(result.content).result;
+          
           if (network === 'kmd') {
-            getKMDBalance(
-              address,
-              JSON.parse(result.content).result,
-              proxyServer,
-              _electrumServer,
-              cache
-            )
-            .then((res) => {
-              resolve(res);
-            });
+            if (!_balance.hasOwnProperty('confirmed')) {
+              resolve('error');
+            } else {
+              getKMDBalance(
+                address,
+                JSON.parse(result.content).result,
+                proxyServer,
+                _electrumServer,
+                cache
+              )
+              .then((res) => {
+                resolve(res);
+              });
+            }
           } else {
-            const _balance = JSON.parse(result.content).result;
-
-            resolve({
-              balance: Number(fromSats(_balance.confirmed).toFixed(8)),
-              unconfirmed: Number(fromSats(_balance.unconfirmed).toFixed(8)),
-            });
+            if (!_balance.hasOwnProperty('confirmed')) {
+              resolve('error');
+            } else {
+              resolve({
+                balance: Number(fromSats(_balance.confirmed).toFixed(8)),
+                unconfirmed: Number(fromSats(_balance.unconfirmed).toFixed(8)),
+              });
+            }
           }
         }
       });
