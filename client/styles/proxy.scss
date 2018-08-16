@@ -10,11 +10,5 @@
       position: relative;
       top: -4px;
     }
-
-    &.retrying {
-      .fa {
-        animation: rotate 1s linear infinite;        
-      }
-    }
   }
 }

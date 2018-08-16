@@ -1,5 +1,6 @@
 import React from 'react';
 import translate from '../translate/translate';
+import { fail } from 'assert';
 
 class ServerSelect extends React.Component {
   constructor() {
@@ -10,6 +11,7 @@ class ServerSelect extends React.Component {
       selectedOption: '',
       errorTestingServer: false,
       connecting: false,
+      spvServerRetryInProgress: false,
     };
     this.updateInput = this.updateInput.bind(this);
     this.setElectrumServer = this.setElectrumServer.bind(this);
@@ -27,6 +29,7 @@ class ServerSelect extends React.Component {
         serverList: res[_coin].serverList,
         errorTestingServer: false,
         connecting: false,
+        spvServerRetryInProgress: false,
       });
     });
   }
@@ -36,6 +39,7 @@ class ServerSelect extends React.Component {
       [e.target.name]: e.target.value,
       errorTestingServer: false,
       connecting: false,
+      spvServerRetryInProgress: false,
     });
   }
 
@@ -43,6 +47,10 @@ class ServerSelect extends React.Component {
     const _server = this.state.selectedOption.split(':');
     console.warn(this.state.selectedOption);
     console.warn(_server);
+
+    this.setState({
+      spvServerRetryInProgress: true,
+    });
 
     this.props.setDefaultServer(
       this.props.coin,
@@ -55,11 +63,13 @@ class ServerSelect extends React.Component {
         this.setState({
           errorTestingServer: true,
           connecting: false,
+          spvServerRetryInProgress: false,
         });
       } else {
         this.setState({
           errorTestingServer: false,
           connecting: true,
+          spvServerRetryInProgress: false,
         });
         this.props.updateDefaultCoinServer(
           this.props.coin,
@@ -82,7 +92,7 @@ class ServerSelect extends React.Component {
       _items.push(
         <option
           key={ `spv-server-list-${i}` }
-          value={ `${_spvServers[i]}` }>{ `${_spvServers[i]}` }</option>
+          value={ _spvServers[i] }>{ `${_spvServers[i]}` }</option>
       );
     }
 
@@ -93,11 +103,13 @@ class ServerSelect extends React.Component {
     return (
       <div className="form server-select">
         <div className="bold text-center">
-          <i className="fa fa-warning error"></i> <span className="error">{ translate('DASHBOARD.CON_ERROR', this.props.coin.toUpperCase()) }</span>
+          <i className="fa fa-warning error padding-right-5"></i>
+          <span className="error">{ translate('DASHBOARD.CON_ERROR', this.props.coin.toUpperCase()) }</span>
         </div>
         <div className="server-select-inner">
           <div>
             <select
+              disabled={ this.state.spvServerRetryInProgress }            
               className="form-control form-material"
               name="selectedOption"
               value={ this.state.selectedOption }
@@ -117,8 +129,9 @@ class ServerSelect extends React.Component {
             </div>
           }
           <div
+            disabled={ this.state.spvServerRetryInProgress }
             onClick={ this.setElectrumServer }
-            className="group3 margin-top-50">
+            className={ 'group3 margin-top-50' + (this.state.spvServerRetryInProgress ? ' retrying' : '')}>
             <div className="btn-inner">
               <div className="btn">{ translate('DASHBOARD.SWITCH_SERVER') }</div>
               <div className="group2">

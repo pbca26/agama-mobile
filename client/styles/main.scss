@@ -119,3 +119,11 @@ a {
 div {
   -webkit-text-size-adjust: none
 }
+
+.group3 {
+  &.retrying {
+    .fa {
+      animation: rotate 1s linear infinite;        
+    }
+  }
+}

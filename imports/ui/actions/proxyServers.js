@@ -1,5 +1,3 @@
-// TODO: random
-
 const proxyServers = [{
   ip: '94.130.225.86',
   port: 80,
