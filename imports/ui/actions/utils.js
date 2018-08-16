@@ -1,3 +1,18 @@
+import translate from '../translate/translate';
+
+export const assetsPath = {
+  coinLogo: '/images/cryptologo',
+  login: '/images/template/login',
+  menu: '/images/template/menu',
+  home: '/images/template/home',
+  txs: '/images/template/transactions',
+};
+
+// https://stackoverflow.com/questions/5467129/sort-javascript-object-by-key
+export const sortObject = (o) => {
+  return Object.keys(o).sort().reduce((r, k) => (r[k] = o[k], r), {});
+}
+
 export const maskPubAddress = (pub) => {
   // keep 3 first and 3 last chars unmasked
   let masked = '';
@@ -48,7 +63,7 @@ export const convertURIToImageData = (URI) => {
   });
 };
 
-export const coinsList = [
+export const _coinsList = [
   'CHIPS',
   'SUPERNET',
   'REVS',
@@ -60,15 +75,11 @@ export const coinsList = [
   'COQUI',
   'OOT',
   'HODL',
-  'SHARK',
   'MSHARK',
   'BOTS',
   'MGW',
   'BTCH',
-  //'MVP',
-  //'CEAL',
   'KV',
-  'MESH',
   'WLC',
   'MNZ',
   'BNTN',
@@ -77,15 +88,12 @@ export const coinsList = [
   'EQL',
   'PRLPAY',
   'ZILLA',
-  'NINJA',
-  'VOTE2018',
   'PIZZA',
   'BEER',
   'BTC',
   'DOGE',
   'DGB',
   'BTG',
-  //'BLK',
   'BCH',
   'FAIR',
   'VIA',
@@ -108,8 +116,29 @@ export const coinsList = [
   'BTCZ',
   'QTUM',
   'DNR',
-  'BTX',
   'XZC',
   'FTC',
-  'GBX'
+  'GBX',
+  //'NINJA',  
+  //'SHARK',
+  //'MVP',
+  //'CEAL',
+  //'MESH',
+  //'VOTE2018',
+  //'BLK',
+  //'BTX', (?) needs a fix
 ];
+
+// sorting needs to be done
+export let coinsList = []; // sorted
+let _coins = {};
+
+for (let i = 0; i < _coinsList.length; i++) {
+  _coins[translate('COINS.' + _coinsList[i].toUpperCase())] = _coinsList[i];
+}
+
+_coins = sortObject(_coins);
+
+for (let key in _coins) {
+  coinsList.push(_coins[key]);
+}
