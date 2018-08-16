@@ -3,7 +3,10 @@ const bs58check = require('bs58check');
 import { Promise } from 'meteor/promise';
 
 import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
-import { getLocalStorageVar } from './utils';
+import {
+  getLocalStorageVar,
+  sortObject,
+} from './utils';
 import {
   wifToWif,
   seedToWif,
@@ -21,6 +24,7 @@ import {
 } from 'agama-wallet-lib/build/utils';
 import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 import { devlog } from './dev';
+import translate from '../translate/translate';
 
 let _cache = {};
 
@@ -346,12 +350,22 @@ const addKeyPair = (coin) => {
 const getOverview = (coins) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
+      // sort coins
+      const _coinObjKeys = Object.keys(coins);
+      let _coins = {};
+      
+      for (let i = 0; i < _coinObjKeys.length; i++) {
+        _coins[translate('COINS.' + _coinObjKeys[i].toUpperCase())] = _coinObjKeys[i];
+      }
+
+      _coins = sortObject(_coins);
+
       let _keys = [];
 
-      for (let key in coins) {
+      for (let key in _coins) {
         _keys.push({
-          pub: electrumKeys[key].pub,
-          coin: key,
+          pub: electrumKeys[_coins[key]].pub,
+          coin: _coins[key],
         });
       }
 

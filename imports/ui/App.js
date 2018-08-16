@@ -8,6 +8,8 @@ import {
   setLocalStorageVar,
   getLocalStorageVar,
   convertURIToImageData,
+  assetsPath,
+  sortObject,
 } from './actions/utils';
 import translate from './translate/translate';
 import {
@@ -33,8 +35,9 @@ import Overview  from './components/Overview';
 import Settings  from './components/Settings';
 import { setTimeout } from 'timers';
 
+const _storageSettings = getLocalStorageVar('settings');
 const DASHBOARD_UPDATE_INTERVAL = 120000; // 2m
-const DEFAULT_LOCK_INACTIVE_INTERVAL = getLocalStorageVar('settings') && getLocalStorageVar('settings').autoLockTimeout ? getLocalStorageVar('settings').autoLockTimeout : 600000; // 10m
+const DEFAULT_LOCK_INACTIVE_INTERVAL = _storageSettings && _storageSettings.autoLockTimeout ? _storageSettings.autoLockTimeout : 600000; // 10m
 const PROXY_RETRY_COUNT = 2;
 const PROXY_RETRY_TIMEOUT = 5000;
 
@@ -279,7 +282,6 @@ class App extends React.Component {
       this.getBtcFees();
     }
 
-    // document.getElementById('body').style.overflowY = 'inherit';
     this.scrollToTop();
   }
 
@@ -494,8 +496,6 @@ class App extends React.Component {
   }
 
   toggleMenu() {
-    // document.getElementById('body').style.overflow = !this.state.displayMenu ? 'hidden' : 'inherit';
-
     this.setState({
       displayMenu: !this.state.displayMenu,
     });
@@ -544,37 +544,22 @@ class App extends React.Component {
   }
 
   renderActiveCoins() {
+    let _coins = JSON.parse(JSON.stringify(this.state.coins));
     let _items = [];
+    _coins = sortObject(_coins);
 
-    if (this.state.coins &&
-        this.state.coins.kmd) {
+    for (let key in _coins) {
       _items.push(
         <div
-          onClick={ () => this.state.coin !== 'kmd' ? this.switchCoin('kmd') : null }
-          key={ `active-coins-kmd` }
+          onClick={ () => key !== this.state.coin ? this.switchCoin(key) : null }
+          key={ `active-coins-${key}` }
           className="active-coins">
-          <img src="/images/cryptologo/kmd.png" /> <span>KMD</span>
-          { this.state.coin === 'kmd' &&
+          <img src={ `${assetsPath.coinLogo}/${key}.png` } /> <span>{ key.toUpperCase() }</span>
+          { key === this.state.coin &&
             <i className="fa fa-check"></i>
           }
         </div>
       );
-    }
-
-    for (let key in this.state.coins) {
-      if (key !== 'kmd') {
-        _items.push(
-          <div
-            onClick={ () => key !== this.state.coin ? this.switchCoin(key) : null }
-            key={ `active-coins-${key}` }
-            className="active-coins">
-            <img src={ `/images/cryptologo/${key}.png` } /> <span>{ key.toUpperCase() }</span>
-            { key === this.state.coin &&
-              <i className="fa fa-check"></i>
-            }
-          </div>
-        );
-      }
     }
 
     return _items;
@@ -589,13 +574,13 @@ class App extends React.Component {
               <div className="group">
                 <img
                   className="rectangle9copy3"
-                  src="/images/template/menu/sidemenu-rectangle-9-copy-3.png" />
+                  src={ `${assetsPath.menu}/sidemenu-rectangle-9-copy-3.png` } />
                 <img
                   className="rectangle9copy2"
-                  src="/images/template/menu/sidemenu-rectangle-9-copy-2.png" />
+                  src={ `${assetsPath.menu}/sidemenu-rectangle-9-copy-2.png` } />
                 <img
                   className="rectangle9copy"
-                  src="/images/template/menu/sidemenu-rectangle-9-copy.png" />
+                  src={ `${assetsPath.menu}/sidemenu-rectangle-9-copy.png` } />
               </div>
               { this.state.auth &&
                 <div className="items">
@@ -603,20 +588,24 @@ class App extends React.Component {
                     <div className="item">
                       <div
                         className="title"
-                        onClick={ this.toggleOverview }>{ translate('APP_TITLE.OVERVIEW') }</div>
+                        onClick={ this.toggleOverview }>
+                        { translate('APP_TITLE.OVERVIEW') }
+                      </div>
                       <img
                         className="line"
-                        src="/images/template/menu/sidemenu-rectangle-3.png" />
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                     </div>
                   }
                   { this.state.activeSection !== 'dashboard' &&
                     <div className="item">
                       <div
                         className="title"
-                        onClick={ () => this.changeActiveSection('dashboard', true) }>{ translate('DASHBOARD.DASHBOARD') }</div>
+                        onClick={ () => this.changeActiveSection('dashboard', true) }>
+                        { translate('DASHBOARD.DASHBOARD') }
+                      </div>
                       <img
                         className="line"
-                        src="/images/template/menu/sidemenu-rectangle-3.png" />
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                     </div>
                   }
                   { this.state.activeSection !== 'recovery' &&
@@ -624,47 +613,57 @@ class App extends React.Component {
                     <div className="item">
                       <div
                         className="title"
-                        onClick={ () => this.toggleMenuOption('recovery') }>{ translate('APP_TITLE.RECOVERY') }</div>
+                        onClick={ () => this.toggleMenuOption('recovery') }>
+                        { translate('APP_TITLE.RECOVERY') }
+                      </div>
                       <img
                         className="line"
-                        src="/images/template/menu/sidemenu-rectangle-3.png" />
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                     </div>
                   }
                   { this.state.activeSection !== 'settings' &&
                     <div className="item">
                       <div
                         className="title"
-                        onClick={ () => this.toggleMenuOption('settings') }>{ translate('APP_TITLE.SETTINGS') }</div>
+                        onClick={ () => this.toggleMenuOption('settings') }>
+                        { translate('APP_TITLE.SETTINGS') }
+                      </div>
                       <img
                         className="line"
-                        src="/images/template/menu/sidemenu-rectangle-3.png" />
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                     </div>
                   }
                   <div className="item">
                     <div
                       className="title"
-                      onClick={ this.logout }>{ translate('DASHBOARD.LOGOUT') }</div>
+                      onClick={ this.logout }>
+                      { translate('DASHBOARD.LOGOUT') }
+                    </div>
                     <img
                       className="line"
-                      src="/images/template/menu/sidemenu-rectangle-3.png" />
+                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                   </div>
                   <div className="item">
                     <div
                       className="title"
-                      onClick={ this.lock }>{ translate('DASHBOARD.LOCK') }</div>
+                      onClick={ this.lock }>
+                      { translate('DASHBOARD.LOCK') }
+                    </div>
                     <img
                       className="line"
-                      src="/images/template/menu/sidemenu-rectangle-3.png" />
+                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                   </div>
                   { this.state.activeSection !== 'addcoin' &&
                     Object.keys(this.state.coins).length !== Object.keys(electrumServers).length &&
                     <div className="item">
                       <div
                         className="title"
-                        onClick={ () => this.toggleMenuOption('addcoin') }>{ translate('DASHBOARD.ADD_COIN') }</div>
+                        onClick={ () => this.toggleMenuOption('addcoin') }>
+                        { translate('DASHBOARD.ADD_COIN') }
+                      </div>
                       <img
                         className="line"
-                        src="/images/template/menu/sidemenu-rectangle-3.png" />
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                     </div>
                   }
                   <div>
@@ -678,30 +677,36 @@ class App extends React.Component {
                     <div className="item">
                       <div
                         className="title"
-                        onClick={ () => this.toggleMenuOption('login') }>{ translate('DASHBOARD.LOGIN') }</div>
+                        onClick={ () => this.toggleMenuOption('login') }>
+                        { translate('DASHBOARD.LOGIN') }
+                      </div>
                       <img
                         className="line"
-                        src="/images/template/menu/sidemenu-rectangle-3.png" />
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                     </div>
                   }
                   { this.state.activeSection !== 'addcoin' &&
                     <div className="item">
                       <div
                         className="title"
-                        onClick={ () => this.toggleMenuOption('addcoin') }>{ translate('DASHBOARD.ADD_COIN') }</div>
+                        onClick={ () => this.toggleMenuOption('addcoin') }>
+                        { translate('DASHBOARD.ADD_COIN') }
+                      </div>
                       <img
                         className="line"
-                        src="/images/template/menu/sidemenu-rectangle-3.png" />
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                     </div>
                   }
                   { this.state.activeSection !== 'create-seed' &&
                     <div className="item">
                       <div
                         className="title"
-                        onClick={ () => this.toggleMenuOption('create-seed') }>{ translate('DASHBOARD.CREATE_SEED') }</div>
+                        onClick={ () => this.toggleMenuOption('create-seed') }>
+                        { translate('DASHBOARD.CREATE_SEED') }
+                      </div>
                       <img
                         className="line"
-                        src="/images/template/menu/sidemenu-rectangle-3.png" />
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                     </div>
                   }
                   { this.state.activeSection !== 'pin' &&
@@ -709,10 +714,12 @@ class App extends React.Component {
                     <div className="item">
                       <div
                         className="title"
-                        onClick={ () => this.toggleMenuOption('pin') }>{ translate('APP_TITLE.PIN') }</div>
+                        onClick={ () => this.toggleMenuOption('pin') }>
+                        { translate('APP_TITLE.PIN') }
+                      </div>
                       <img
                         className="line"
-                        src="/images/template/menu/sidemenu-rectangle-3.png" />
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                     </div>
                   }
                   { /*this.state.activeSection !== 'offlinesig' &&
@@ -720,17 +727,21 @@ class App extends React.Component {
                       <div
                         className="title"
                         onClick={ () => this.toggleMenuOption('offline-sig') }>Offline Signing</div>
-                      <img className="line" src="/images/template/menu/sidemenu-rectangle-3.png" />
+                      <img
+                        className="line"
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                     </div>*/
                   }
                   { (this.state.activeSection === 'offlinesig' || this.state.activeSection === 'pin') &&
                     <div className="item">
                       <div
                         className="title"
-                        onClick={ () => this.toggleMenuOption('login') }>{ translate('APP_TITLE.LOGIN') }</div>
+                        onClick={ () => this.toggleMenuOption('login') }>
+                        { translate('APP_TITLE.LOGIN') }
+                      </div>
                       <img
                         className="line"
-                        src="/images/template/menu/sidemenu-rectangle-3.png" />
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                     </div>
                   }
                 </div>
@@ -758,15 +769,17 @@ class App extends React.Component {
             <img
               onClick={ this.historyBack }
               className="menu-back"
-              src="/images/template/menu/trends-combined-shape.png" />
+              src={ `${assetsPath.menu}/trends-combined-shape.png` } />
           }
           { (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
             <img
               onClick={ this.toggleMenu }
               className="menu-icon"
-              src="/images/template/home/home-combined-shape.png" />
+              src={ `${assetsPath.home}/home-combined-shape.png` } />
           }
-          <div className="ui-title">{ this.state.displayMenu ? translate('APP_TITLE.MENU') : translate('APP_TITLE.' + this.state.activeSection.toUpperCase()) }</div>
+          <div className="ui-title">
+            {  translate('APP_TITLE.' + (this.state.displayMenu ? 'MENU' : this.state.activeSection.toUpperCase())) }
+          </div>
         </div>
         { this.state.displayMenu &&
           (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
