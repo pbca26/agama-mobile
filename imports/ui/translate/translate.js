@@ -1,7 +1,7 @@
 import lang from './en';
 
 const translate = (langID, interpolateStr) => {
-  let defaultLang = 'EN';
+  const defaultLang = 'EN';
 
   if (langID &&
       langID.indexOf('.') > -1) {

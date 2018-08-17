@@ -8,6 +8,7 @@ import {
 import translate from '../translate/translate';
 import Spinner from './Spinner';
 import QRCode from 'qrcode.react';
+import { assetsPath } from '../actions/utils';
 
 class Transactions extends React.Component {
   constructor() {
@@ -30,26 +31,32 @@ class Transactions extends React.Component {
   }
 
   showClaimButton() {
-    if (this.props.coin === 'kmd' &&
-        this.props.balance &&
-        this.props.balance.interest &&
-        this.props.balance.interest > 0) {
+    const _props = this.props;
+
+    if (_props.coin === 'kmd' &&
+        _props.balance &&
+        _props.balance.interest &&
+        _props.balance.interest > 0) {
       return true;
     }
   }
 
   showSendButton() {
-    if (this.props.balance &&
-        this.props.balance.balance &&
-        this.props.balance.balance > 0) {
+    const _props = this.props;
+
+    if (_props.balance &&
+        _props.balance.balance &&
+        _props.balance.balance > 0) {
       return true;
     }
   }
 
   isInterestDefined() {
-    if (this.props.balance &&
-        this.props.balance.interest &&
-        this.props.balance.interest > 0) {
+    const _props = this.props;
+
+    if (_props.balance &&
+        _props.balance.interest &&
+        _props.balance.interest > 0) {
       return true;
     }
   }
@@ -93,7 +100,10 @@ class Transactions extends React.Component {
         { Number(tx.interest) === Number(tx.amount) &&
           <span>+</span>
         }
-        { formatValue(tx.amount) * _amountNegative || translate('TRANSACTIONS.UNKNOWN') } { Number(tx.amount) === 0 ? '' : this.props.coin.toUpperCase() }
+        { formatValue(tx.amount) * _amountNegative || translate('TRANSACTIONS.UNKNOWN') }
+        { Number(tx.amount) !== 0 &&
+          <span className="padding-left-5">{ this.props.coin.toUpperCase() }</span>
+        }
         { tx.interest &&
           !amountOnly &&
           (Number(tx.interest) !== Number(tx.amount)) &&
@@ -161,57 +171,16 @@ class Transactions extends React.Component {
               { /*<div className="amount-fiat">$0</div> */ }
               <div className="amount-native">{ this.renderTxAmount(_transactions[i]) }</div>
               <div className="direction-icon"></div>
-              <img className="line" src="/images/template/transactions/trends-rectangle-7.png" />
+              <img
+                className="line"
+                src={ `${assetsPath.txs}/trends-rectangle-7.png` } />
             </div>
           );
-          /*_items.push(
-            <div
-              className="txlist-transaction"
-              key={ `transaction-${i}` }>
-              <div>
-                { this.renderTxType(_transactions[i].type) }
-                <span className="margin-left-20">{ this.renderTxAmount(_transactions[i]) }</span>
-                <span className="margin-left-20">{ secondsToString(_transactions[i].timestamp) }</span>
-                <span
-                  onClick={ () => this.toggleTxDetails(i) }
-                  className={ 'details-toggle fa ' + (this.state.toggledTxDetails === i ? 'fa-caret-up' : 'fa-caret-down') }></span>
-              </div>
-              { this.state.toggledTxDetails !== i &&
-                <div className="margin-top-10 padding-bottom-10 txid-hash">
-                { _transactions[i].txid }
-                </div>
-              }
-              { this.state.toggledTxDetails === i &&
-                <div className="margin-top-10 padding-bottom-10 tx-details">
-                  <div>{ translate('TRANSACTIONS.DIRECTION') }: { _transactions[i].type }</div>
-                  <div>{ translate('TRANSACTIONS.AMOUNT') }: { this.renderTxAmount(_transactions[i], true) } { this.props.coin.toUpperCase() }</div>
-                  { _transactions[i].interest &&
-                    Math.abs(_transactions[i].interest) > 0 &&
-                    <div>{ translate('TRANSACTIONS.INTEREST') }: { formatValue(Math.abs(_transactions[i].interest)) } KMD</div>
-                  }
-                  <div>{ translate('TRANSACTIONS.CONFIRMATIONS') }: { _transactions[i].confirmations }</div>
-                  { this.props.coin === 'kmd' &&
-                    <div>Locktime: { _transactions[i].locktime }</div>
-                  }
-                  <div>
-                  { translate('TRANSACTIONS.TIME') }: { secondsToString(_transactions[i].timestamp) }
-                    { isKomodoCoin(this.props.coin) &&
-                      <button
-                        onClick={ () => this.openExternalURL(`${explorerList[this.props.coin.toUpperCase()]}/tx/${_transactions[i].txid}`) }
-                        className="margin-left-20 btn btn-sm white btn-dark waves-effect waves-light ext-link">
-                        <i className="fa fa-external-link"></i>Explorer
-                      </button>
-                    }
-                  </div>
-                  <div>
-                  { translate('TRANSACTIONS.TX_HASH') } <div className="txid-hash">{ _transactions[i].txid }</div>
-                  </div>
-                </div>
-              }
-            </div>
-          );*/
         }
       }
+
+      const _coin = this.props.coin;
+      const _balance = this.props.balance;
 
       return (
         <div className="transactions-ui">
@@ -222,21 +191,23 @@ class Transactions extends React.Component {
                 <div className="lasttransactions">{ translate('TRANSACTIONS.LOADING_HISTORY') }...</div>                  
               }
               { this.props.transactions &&
-                <div className="lasttransactions">{ !_items.length ? translate('TRANSACTIONS.NO_HISTORY') : translate('TRANSACTIONS.LAST_TX') }</div>
+                <div className="lasttransactions">
+                  { translate('TRANSACTIONS.' + (!_items.length ? 'NO_HISTORY' : 'LAST_TX')) }
+                </div>
               }
               <div className="cryptocardbtc-block">
                 <div className="cryptocardbtc">
                   <img
                     className="coin-icon"
-                    src={ `/images/cryptologo/${this.props.coin}.png` } />
-                  <div className="coin-title">{ translate('COINS.' + this.props.coin.toUpperCase()) }</div>
+                    src={ `${assetsPath.coinLogo}/${_coin}.png` } />
+                  <div className="coin-title">{ translate('COINS.' + _coin.toUpperCase()) }</div>
                   <div className="coin-balance">
                     <div className="balance">
-                    { translate('BALANCE.BALANCE') }: { this.props.balance ? formatValue(this.props.balance.balance) : 0 } { this.props.coin.toUpperCase() }
+                    { translate('BALANCE.BALANCE') }: { _balance ? formatValue(_balance.balance) : 0 } { _coin.toUpperCase() }
                     </div>
                     { this.isInterestDefined() &&
                       <div className="interest">
-                      { translate('BALANCE.INTEREST') }: { this.props.balance ? formatValue(this.props.balance.interest) : 0 } { this.props.coin.toUpperCase() }
+                      { translate('BALANCE.INTEREST') }: { _balance ? formatValue(_balance.interest) : 0 } { _coin.toUpperCase() }
                       </div>
                     }
                   </div>

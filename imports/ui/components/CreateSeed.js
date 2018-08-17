@@ -15,6 +15,7 @@ import {
   devlog,
   config,
 } from '../actions/dev';
+import { assetsPath } from '../actions/utils';
 
 class CreateSeed extends React.Component {
   constructor() {
@@ -171,7 +172,7 @@ class CreateSeed extends React.Component {
               <div className="group2">
                 <img
                   className="path6"
-                  src="/images/template/login/reset-password-path-6.png" />
+                  src={ `${assetsPath.login}/reset-password-path-6.png` } />
               </div>
             </div>
           </div>

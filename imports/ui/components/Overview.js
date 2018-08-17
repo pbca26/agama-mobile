@@ -3,6 +3,7 @@ import Spinner from './Spinner';
 
 import { formatValue } from 'agama-wallet-lib/build/utils';
 import translate from '../translate/translate';
+import { assetsPath } from '../actions/utils';
 
 class Overview extends React.Component {
   constructor() {
@@ -26,11 +27,11 @@ class Overview extends React.Component {
       _items.push(
         <div
           className="group7"
-          key={ `overview-coins-usd-balance` }>
+          key="overview-coins-usd-balance">
           <div className="cryptocardbg">
             <img
               className="rectangle5"
-              src="/images/template/home/home-rectangle-5.png" />
+              src={ `${assetsPath.home}/home-rectangle-5.png` } />
           </div>
           <div className="totalvalue">{ translate('OVERVIEW.TOTAL_VALUE') }</div>
           <div className="a3467812">{ formatValue(_totalUSDBalance) }</div>
@@ -59,16 +60,16 @@ class Overview extends React.Component {
               <div className="group3">
                 <img
                   className="path4"
-                  src="/images/template/home/home-path-4.png" />
+                  src={ `${assetsPath.home}/home-path-4.png` } />
                 <img
                   className="oval3"
-                  src="/images/template/home/home-oval-3.png" />
+                  src={ `${assetsPath.home}/home-oval-3.png` } />
                 <img
                   className="oval3copy"
-                  src="/images/template/home/home-oval-3.png" />
+                  src={ `${assetsPath.home}/home-oval-3.png` } />
                 <img
                   className="oval3copy2"
-                  src="/images/template/home/home-oval-3.png" />
+                  src={ `${assetsPath.home}/home-oval-3.png` } />
               </div>
             </div>
           </div>
@@ -82,13 +83,15 @@ class Overview extends React.Component {
             className="overview-coin">
             <img
               className="div1"
-              src="/images/template/home/trends-rectangle-7.png" />
-            <div className="a1241">~ $ { formatValue(_overview[i].usdPricePerItem) } { translate('OVERVIEW.PER_COIN') }</div>
-            { /*<img className="path5" src="/images/template/home/home-path-5.png" />*/ }
+              src={ `${assetsPath.home}/trends-rectangle-7.png` } />
+            <div className="a1241">
+              ~ $ { formatValue(_overview[i].usdPricePerItem) } { translate('OVERVIEW.PER_COIN') }
+            </div>
+            { /*<img className="path5" src={ `${assetsPath.home}/home-path-5.png` } />*/ }
             <div className="btc">
               <img
                 className="oval4"
-                src={ `/images/cryptologo/${_overview[i].coin}.png` } />
+                src={ `${assetsPath.coinLogo}/${_overview[i].coin}.png` } />
             </div>
             <div className="bitcoin">{ translate('COINS.' + _overview[i].coin.toUpperCase()) }</div>
             <div className="a0000041">{ formatValue(_overview[i].balanceNative) }</div>
@@ -115,7 +118,7 @@ class Overview extends React.Component {
       <div className="overview-ui">
         <div className="home">
           { this.props.overview === 'error' &&
-            <div className="con-error">
+            <div className="con-error width-limit">
               <i className="fa fa-warning error"></i> <span className="error">{ translate('OVERVIEW.PRICES_ERROR') }</span>
             </div>
           }
@@ -125,7 +128,7 @@ class Overview extends React.Component {
               <div className="yourcoins">{ translate('OVERVIEW.YOUR_COINS') }</div>
               { /*<img
                 className="combinedshape2"
-              src="/images/template/home/home-combined-shape 2.png" />*/ }
+                src={ `${assetsPath.home}/home-combined-shape 2.png` } />*/ }
             </div>
           }
         </div>

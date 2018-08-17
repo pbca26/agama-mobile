@@ -68,7 +68,7 @@ button:disabled {
 }
 
 .fs14 {
-  font-size: 14px;
+  font-size: 14px !important;
 }
 .lh25 {
   line-height: 25px;
@@ -126,4 +126,9 @@ div {
       animation: rotate 1s linear infinite;        
     }
   }
+}
+
+.width-limit {
+  width: 90%;
+  margin: 0 auto;
 }

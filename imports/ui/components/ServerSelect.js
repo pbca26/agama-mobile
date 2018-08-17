@@ -104,7 +104,7 @@ class ServerSelect extends React.Component {
       <div className="form server-select">
         <div className="bold text-center">
           <i className="fa fa-warning error padding-right-5"></i>
-          <span className="error">{ translate('DASHBOARD.CON_ERROR', this.props.coin.toUpperCase()) }</span>
+          <span className="error width-limit">{ translate('DASHBOARD.CON_ERROR', this.props.coin.toUpperCase()) }</span>
         </div>
         <div className="server-select-inner">
           <div>
@@ -119,7 +119,7 @@ class ServerSelect extends React.Component {
             </select>
           </div>
           { this.state.errorTestingServer &&
-            <div className="error margin-top-30 margin-bottom-10 text-center">
+            <div className="error margin-top-30 margin-bottom-10 text-center width-limit">
             { translate('DASHBOARD.ERROR_TESTING_SERVER', this.state.selectedOption) }
             </div>
           }

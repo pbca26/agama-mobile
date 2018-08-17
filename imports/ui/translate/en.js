@@ -39,6 +39,7 @@ const lang = {
       AMOUNT: 'Amount',
     },
     LOGIN: {
+      EMPTY_SEED: 'Please provide your seed/WIF and a 6 digit pin number below.',
       OR_WIF: 'or WIF',
       CREATE_A_PIN: 'Create a pin to Sign In.',
       SIGN_IN_TO_YOUR_ACC: 'Sign In to your Agama account.',

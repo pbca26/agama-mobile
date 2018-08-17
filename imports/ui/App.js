@@ -790,7 +790,7 @@ class App extends React.Component {
         { this.state.proxyError &&
           this.state.proxyErrorCount === -777 &&
           <div className="app-main">
-            <div className="con-error">
+            <div className="con-error width-limit">
               <i className="fa fa-warning error"></i> <span className="error">{ translate('DASHBOARD.PROXY_ERROR') }</span>
             </div>
             <div className="form proxy">

@@ -5,6 +5,7 @@ import translate from '../translate/translate';
 import {
   convertURIToImageData,
   getLocalStorageVar,
+  assetsPath,
 } from '../actions/utils';
 import { decryptkey } from '../actions/seedCrypt';
 import jsQR from 'jsqr';
@@ -87,7 +88,8 @@ class SendCoin extends React.Component {
     }
   }
 
-  openExternalURL(url) {
+  openExternalURL() {
+    const url = `${explorerList[this.props.coin.toUpperCase()]}/tx/${this.state.sendResult.result.txid}`;
     window.open(url, '_system');
   }
 
@@ -170,14 +172,16 @@ class SendCoin extends React.Component {
     let validTooMuch = false;
     let validIncorrectAddress = false;
     let validNan = false;
+    const _network = electrumJSNetworks[isKomodoCoin(this.props.coin) ? 'kmd' : this.props.coin];
+    const storageSettings = getLocalStorageVar('settings');
 
     if (this.state.sendAmount > this.props.balance.balance) {
       validTooMuch = true;
       _isFailed = true;
     }
 
-    if (!addressVersionCheck(electrumJSNetworks[isKomodoCoin(this.props.coin) ? 'kmd' : this.props.coin], this.state.sendTo) ||
-        addressVersionCheck(electrumJSNetworks[isKomodoCoin(this.props.coin) ? 'kmd' : this.props.coin], this.state.sendTo) === 'Invalid pub address') {
+    if (!addressVersionCheck(_network, this.state.sendTo) ||
+        addressVersionCheck(_network, this.state.sendTo) === 'Invalid pub address') {
       validIncorrectAddress = true;
       _isFailed = true;
     }
@@ -188,7 +192,7 @@ class SendCoin extends React.Component {
     }
 
     if (this.state.sendCurrentStep === 1 &&
-        ((getLocalStorageVar('settings') && getLocalStorageVar('settings').requirePin) ||
+        ((storageSettings && storageSettings.requirePin) ||
         (config.preload && config.enablePinConfirm)) &&
         !this.decodeSeed()) {
       _isFailed = true;
@@ -299,7 +303,12 @@ class SendCoin extends React.Component {
         autoComplete="off">
         <div className="edit">
           <label className="control-label padding-bottom-10">
-            { translate('SEND.FROM') } <strong>[ <span className="success">{ formatValue(this.props.balance.balance) } { this.props.coin.toUpperCase() }</span> ]</strong>
+            { translate('SEND.FROM') }
+            <strong className="padding-left-5">
+              [ <span className="success">
+                { formatValue(this.props.balance.balance) } { this.props.coin.toUpperCase() }
+                </span> ]
+            </strong>
           </label>
           <div className="shade">{ this.props.address }</div>
         </div>
@@ -346,7 +355,8 @@ class SendCoin extends React.Component {
             }
             { this.state.validTooMuch &&
               <div className="error margin-top-15">
-                <i className="fa fa-warning"></i> { translate('SEND.TOO_MUCH', `${this.props.balance.balance} ${this.props.coin.toUpperCase()}`) }
+                <i className="fa fa-warning padding-right-5"></i>
+                { translate('SEND.TOO_MUCH', `${this.props.balance.balance} ${this.props.coin.toUpperCase()}`) }
               </div>
             }
           </div>
@@ -395,7 +405,7 @@ class SendCoin extends React.Component {
                   <div className="rectangle8copy"></div>
                   <img
                     className="path6"
-                    src="/images/template/login/reset-password-path-6.png" />
+                    src={ `${assetsPath.login}/reset-password-path-6.png` } />
                 </div>
               </div>
             </div>
@@ -493,8 +503,8 @@ class SendCoin extends React.Component {
             }
             { this.state.spvVerificationWarning &&
               <div className="padding-top-20 fs14 lh25">
-                <i className="fa fa-warning warning"></i> <strong className="warning">{ translate('SEND.WARNING') }:</strong> { translate('SEND.WARNING_SPV_P1') }<br />
-                { translate('SEND.WARNING_SPV_P2') }
+                <i className="fa fa-warning warning"></i> <strong className="warning">{ translate('SEND.WARNING') }:</strong> { translate('SEND.WARNING_SPV_P1') }
+                <div>{ translate('SEND.WARNING_SPV_P2') }</div>
               </div>
             }
             <div className="widget-body-footer">
@@ -506,7 +516,7 @@ class SendCoin extends React.Component {
                   <div className="group2">
                     <img
                       className="path6"
-                      src="/images/template/menu/trends-combined-shape.png" />
+                      src={ `${assetsPath.menu}/trends-combined-shape.png` } />
                   </div>
                 </div>
                 <div
@@ -517,7 +527,7 @@ class SendCoin extends React.Component {
                   <div className="rectangle8copy"></div>
                     <img
                       className="path6"
-                      src="/images/template/login/reset-password-path-6.png" />
+                      src={ `${assetsPath.login}/reset-password-path-6.png` } />
                   </div>
                 </div>
               </div>
@@ -546,13 +556,19 @@ class SendCoin extends React.Component {
                   </div>
                   <div className="edit">
                     { translate('SEND.TXID') }
-                    <div className="shade margin-top-5">{ this.state.sendResult && this.state.sendResult.result && this.state.sendResult.result.txid ? this.renderTxID() : translate('SEND.PROCESSING_SM') }</div>
+                    <div className="shade margin-top-5">
+                    {
+                      this.state.sendResult &&
+                      this.state.sendResult.result &&
+                      this.state.sendResult.result.txid ? this.renderTxID() : translate('SEND.PROCESSING_SM')
+                    }
+                    </div>
                   </div>
                   { this.state.sendResult &&
                     this.state.sendResult.result &&
                     this.state.sendResult.result.txid &&
                     <div className="edit">
-                      <span onClick={ () => this.openExternalURL(`${explorerList[this.props.coin.toUpperCase()]}/tx/${this.state.sendResult.result.txid}`) }>
+                      <span onClick={ this.openExternalURL }>
                       { translate('SEND.OPEN_IN_EXPLORER') }<i className="fa fa-external-link margin-left-10"></i>
                       </span>
                     </div>
@@ -596,7 +612,7 @@ class SendCoin extends React.Component {
                   <div className="rectangle8copy"></div>
                   <img
                     className="path6"
-                    src="/images/template/login/reset-password-path-6.png" />
+                    src={ `${assetsPath.login}/reset-password-path-6.png` } />
                 </div>
               </div>
             </div>

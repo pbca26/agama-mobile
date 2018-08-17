@@ -92,8 +92,12 @@ class KMDInterest extends React.Component {
     for (let i = 0; i < _utxo.length; i++) {
       _items.push(
         <tr key={ `kmd-interest-utxo-${i}` }>
-          <td className={ _utxo[i].amount >= 10 ? 'green bold' : '' }>{ formatValue(_utxo[i].amount) }</td>
-          <td className={ _utxo[i].interest > 0 ? 'green bold' : '' }>{ formatValue(_utxo[i].interest) }</td>
+          <td className={ _utxo[i].amount >= 10 ? 'green bold' : '' }>
+            { formatValue(_utxo[i].amount) }
+          </td>
+          <td className={ _utxo[i].interest > 0 ? 'green bold' : '' }>
+            { formatValue(_utxo[i].interest) }
+          </td>
           <td>
             { _utxo[i].locktime &&
               <i className="fa fa-check-circle green locktime-icon"></i>
@@ -124,7 +128,9 @@ class KMDInterest extends React.Component {
                 onClick={ this.preflightClaim }
                 className="btn-inner">
                 <div className="btn">
-                  <span>{ translate('CLAIM.CLAIM') } { formatValue(this.props.balance.interest) } KMD { translate('CLAIM.INTEREST_SM') }</span>
+                  <span>
+                    { translate('CLAIM.CLAIM') } { formatValue(this.props.balance.interest) } KMD { translate('CLAIM.INTEREST_SM') }
+                  </span>
                 </div>
                 <div className="group2">
                   <i className="fa fa-dollar"></i>
@@ -155,10 +161,14 @@ class KMDInterest extends React.Component {
             </div>
           }
           { this.state.failed &&
-            <div className="padding-bottom-10 text-center red bold">{ translate('CLAIM.FAILED_TO_CLAIM_INTEREST') }</div>
+            <div className="padding-bottom-10 text-center red bold">
+              { translate('CLAIM.FAILED_TO_CLAIM_INTEREST') }
+            </div>
           }
           { this.state.success &&
-            <div className="padding-bottom-10 text-center green bold">{ translate('CLAIM.YOU_SUCCESFULLY_CLAIMED') } { formatValue(this.props.balance.interest) } KMD</div>
+            <div className="padding-bottom-10 text-center green bold">
+              { translate('CLAIM.YOU_SUCCESFULLY_CLAIMED') } { formatValue(this.props.balance.interest) } KMD
+            </div>
           }
           { !this.props.utxo &&
             <Spinner />
