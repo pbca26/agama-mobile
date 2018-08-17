@@ -5,6 +5,7 @@ import {
   setLocalStorageVar,
   getLocalStorageVar,
   convertURIToImageData,
+  assetsPath,
 } from '../actions/utils';
 import {
   encryptkey,
@@ -21,7 +22,7 @@ class Login extends React.Component {
     super();
     this.state = {
       passphrase: config.preload ? config.preload.seed : null,
-      createPin: false,
+      createPin: !getLocalStorageVar('seed') ? true : false,
       pinOverride: config.preload ? config.preload.pin : null,
       pinOverrideTooShort: false,
       pin: config.preload ? config.preload.pin : '',
@@ -162,47 +163,6 @@ class Login extends React.Component {
     }
   }
 
-  renderKeyPad() {
-    let _items = [];
-
-    for (let i = 0; i < 10; i++) {
-      _items.push(
-        <button
-          key={ `login-keypad-${i}` }
-          className="btn btn-lg btn-primary"
-          onClick={ () => this.triggerKey(i) }>
-          <span className="ladda-label">
-          { i }
-          </span>
-        </button>
-      );
-    }
-
-    _items.push(
-      <button
-        key={ `login-keypad-back` }
-        className="btn btn-lg btn-primary"
-        onClick={ () => this.triggerKey('back') }>
-        <span className="ladda-label padding-fix">
-        <i className="fa fa-long-arrow-left"></i>
-        </span>
-      </button>
-    );
-
-    _items.push(
-      <button
-        key={ `login-keypad-remove` }
-        className="btn btn-lg btn-primary"
-        onClick={ () => this.triggerKey('remove') }>
-        <span className="ladda-label padding-fix">
-        <i className="fa fa-remove"></i>
-        </span>
-      </button>
-    );
-
-    return _items;
-  }
-
   render() {
     if ((this.props.activeSection === 'login' || (!this.props.auth && this.props.activeSection !== 'addcoin')) &&
         this.props.coins &&
@@ -240,7 +200,7 @@ class Login extends React.Component {
                     <div className="rectangle8copy"></div>
                     <img
                       className="path6"
-                      src="/images/template/login/reset-password-path-6.png" />
+                      src={ `${assetsPath.login}/reset-password-path-6.png` } />
                   </div>
                 </div>
               </div>
@@ -249,6 +209,7 @@ class Login extends React.Component {
           { !getLocalStorageVar('seed') &&
             <div className="form-inner login-create-pin">
               <div className="title">{ translate('LOGIN.CREATE_A_PIN') }</div>
+              <div className="title fs14 text-center width-limit">{ translate('LOGIN.EMPTY_SEED') }</div>
               <div>
                 <div
                   onClick={ this.scanQR }
@@ -322,7 +283,7 @@ class Login extends React.Component {
                     <div className="rectangle8copy"></div>
                     <img
                       className="path6"
-                      src="/images/template/login/reset-password-path-6.png" />
+                      src={ `${assetsPath.login}/reset-password-path-6.png` } />
                   </div>
                 </div>
               </div>
