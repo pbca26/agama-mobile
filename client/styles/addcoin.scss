@@ -30,7 +30,8 @@
           border-bottom: none;
         }
         &.disabled {
-          display: none;
+          opacity: 0.5;
+          pointer-events: none;
         }
       }
   

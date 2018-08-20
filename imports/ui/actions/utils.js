@@ -64,6 +64,7 @@ export const convertURIToImageData = (URI) => {
 };
 
 export const _coinsList = [
+  'KMD',
   'CHIPS',
   'SUPERNET',
   'REVS',
