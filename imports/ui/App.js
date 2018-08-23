@@ -179,16 +179,16 @@ class App extends React.Component {
         clearTimeout(this.globalClickTimeout);
       }
 
-      if (config.dev &&
-          config.preload &&
-          !config.preload.disableAutoLock) {
+      if (!config.dev ||
+          (config.dev && config.preload && !config.preload.disableAutoLock) ||
+          (config.dev && !config.preload)) {
         this.globalClickTimeout = setTimeout(() => {
           devlog(`logout after ${DEFAULT_LOCK_INACTIVE_INTERVAL}ms inactivity`);
           this.lock();
         }, DEFAULT_LOCK_INACTIVE_INTERVAL);
       }
 
-      // devlog('global click', 'set timer');
+      devlog('global click', 'set timer');
     }
   }
 
