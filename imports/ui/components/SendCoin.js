@@ -97,12 +97,12 @@ class SendCoin extends React.Component {
     const width = 480;
     const height = 640;
 
-    MeteorCamera.getPicture({ quality: 100 }, (error, data) => {
+    MeteorCamera.getPicture({ quality: 100 }, (error, data) => {      
       if (error) {
-        devlog(error);
+        devlog('qrcam err', error);
 
         this.setState({
-          qrScanError: true,
+          qrScanError: error.errorClass && error.errorClass.error && error.errorClass.error !== 'cancel' ? true : false,
         });
         setTimeout(() => {
           this.setState({
@@ -116,11 +116,21 @@ class SendCoin extends React.Component {
           devlog(imageData.height);
           devlog(imageData.width);
 
-          const decodedQR = jsQR.decodeQRFromImage(
-            imageData.data,
-            imageData.width,
-            imageData.height
-          );
+          let decodedQR;
+          
+          if (!jsQR.decodeQRFromImage) {
+            decodedQR = jsQR(
+              imageData.data,
+              imageData.width,
+              imageData.height
+            );
+          } else {
+            decodedQR = jsQR.decodeQRFromImage(
+              imageData.data,
+              imageData.width,
+              imageData.height
+            );
+          }
 
           devlog(decodedQR);
 
@@ -327,11 +337,11 @@ class SendCoin extends React.Component {
               placeholder={ translate('SEND.ENTER_AN_ADDRESS') }
               autoComplete="off"
               required />
-          { this.state.validIncorrectAddress &&
-            <div className="error margin-top-15">
-              <i className="fa fa-warning"></i> { translate('SEND.ADDRESS_IS_INCORECT') }
-            </div>
-          }
+            { this.state.validIncorrectAddress &&
+              <div className="error margin-top-15">
+                <i className="fa fa-warning"></i> { translate('SEND.ADDRESS_IS_INCORECT') }
+              </div>
+            }
           </div>
           <div className="edit">
             <label
