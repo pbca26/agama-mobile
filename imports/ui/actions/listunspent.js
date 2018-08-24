@@ -67,7 +67,7 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
                     Promise.all(_utxo.map((_utxoItem, index) => {
                       return new Promise((resolve, reject) => {
                         cache.getTransaction(
-                          _utxoItem['tx_hash'],
+                          _utxoItem.tx_hash,
                           network,
                           {
                             url: `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction`,
@@ -75,7 +75,7 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
                               port: electrumServer.port,
                               ip: electrumServer.ip,
                               proto: electrumServer.proto,
-                              txid: _utxoItem['tx_hash'],
+                              txid: _utxoItem.tx_hash,
                             },
                           }
                         )
@@ -94,7 +94,14 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
 
                             // decode tx
                             const _network = electrumJSNetworks[isKomodoCoin(network) ? 'kmd' : network];
-                            const decodedTx = electrumJSTxDecoder(_rawtxJSON, _network);
+                            let decodedTx;
+                            
+                            if (cache.getDecodedTransaction(_utxoItem.tx_hash, network)) {
+                              decodedTx = cache.getDecodedTransaction(_utxoItem.tx_hash, network);
+                            } else {
+                              decodedTx = electrumJSTxDecoder(_rawtxJSON, _network);
+                              cache.getDecodedTransaction(_utxoItem.tx_hash, network, decodedTx);
+                            }
 
                             devlog('decoded tx =>');
                             devlog(decodedTx);
@@ -112,8 +119,8 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
                                 }
 
                                 let _resolveObj = {
-                                  txid: _utxoItem['tx_hash'],
-                                  vout: _utxoItem['tx_pos'],
+                                  txid: _utxoItem.tx_hash,
+                                  vout: _utxoItem.tx_pos,
                                   address,
                                   amount: Number(fromSats(_utxoItem.value)),
                                   amountSats: _utxoItem.value,
@@ -128,7 +135,7 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
                                 // merkle root verification agains another electrum server
                                 if (verify) {
                                   verifyMerkleByCoin(
-                                    _utxoItem['tx_hash'],
+                                    _utxoItem.tx_hash,
                                     _utxoItem.height,
                                     electrumServer,
                                     proxyServer,
@@ -149,8 +156,8 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
                                 }
                               } else {
                                 let _resolveObj = {
-                                  txid: _utxoItem['tx_hash'],
-                                  vout: _utxoItem['tx_pos'],
+                                  txid: _utxoItem.tx_hash,
+                                  vout: _utxoItem.tx_pos,
                                   address,
                                   amount: Number(fromSats(_utxoItem.value)),
                                   amountSats: _utxoItem.value,
@@ -162,7 +169,7 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
                                 // merkle root verification agains another electrum server
                                 if (verify) {
                                   verifyMerkleByCoin(
-                                    _utxoItem['tx_hash'],
+                                    _utxoItem.tx_hash,
                                     _utxoItem.height,
                                     electrumServer,
                                     proxyServer,

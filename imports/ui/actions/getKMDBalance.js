@@ -50,7 +50,7 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer, cache)
             Promise.all(_utxo.map((_utxoItem, index) => {
               return new Promise((resolve, reject) => {
                 cache.getTransaction(
-                  _utxoItem['tx_hash'],
+                  _utxoItem.tx_hash,
                   'kmd',
                   {
                     url: `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction`,
@@ -58,7 +58,7 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer, cache)
                       port: electrumServer.port,
                       ip: electrumServer.ip,
                       proto: electrumServer.proto,
-                      txid: _utxoItem['tx_hash'],
+                      txid: _utxoItem.tx_hash,
                     },
                   }
                 )
@@ -77,7 +77,14 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer, cache)
 
                     // decode tx
                     const _network = electrumJSNetworks.kmd;
-                    const decodedTx = electrumJSTxDecoder(_rawtxJSON, _network);
+                    let decodedTx;
+
+                    if (cache.getDecodedTransaction(_utxoItem.tx_hash, 'kmd')) {
+                      decodedTx = cache.getDecodedTransaction(_utxoItem.tx_hash, 'kmd');
+                    } else {
+                      decodedTx = electrumJSTxDecoder(_rawtxJSON, _network);
+                      cache.getDecodedTransaction(_utxoItem.tx_hash, 'kmd', decodedTx);
+                    }
 
                     if (decodedTx &&
                         decodedTx.format &&

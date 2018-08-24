@@ -29,6 +29,23 @@ import translate from '../translate/translate';
 let _cache = {};
 
 // runtime cache wrapper functions
+const getDecodedTransaction = (txid, coin, data) => {
+  if (!_cache[coin].txDecoded) {
+    _cache[coin].txDecoded = {};
+  }
+
+  if (_cache[coin].txDecoded[txid]) {
+    devlog(`raw input tx decoded ${txid}`);
+    return _cache[coin].txDecoded[txid];
+  } else {
+    if (data) {
+      _cache[coin].txDecoded[txid] = data;
+    } else {
+      return false;
+    }
+  }
+}
+
 const getTransaction = (txid, coin, httpParams) => {
   return new Promise((resolve, reject) => {
     if (!_cache[coin]) {
@@ -47,7 +64,7 @@ const getTransaction = (txid, coin, httpParams) => {
         const _result = JSON.parse(result.content);
         
         if (_result.msg !== 'error') {
-          _cache[coin].tx[txid] = result;          
+          _cache[coin].tx[txid] = result;
         }
 
         resolve(result);
@@ -92,6 +109,7 @@ const getBlockheader = (height, coin, httpParams) => {
 const cache = {
   getTransaction,
   getBlockheader,
+  getDecodedTransaction,
 };
 
 let electrumKeys = {};

@@ -111,7 +111,14 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
                                 result = JSON.parse(result.content);
 
                                 if (result.msg !== 'error') {
-                                  const decodedVinVout = electrumJSTxDecoder(result.result, _network);
+                                  let decodedVinVout;
+
+                                  if (cache.getDecodedTransaction(_decodedInput.txid, network)) {
+                                    decodedVinVout = cache.getDecodedTransaction(_decodedInput.txid, network);
+                                  } else {
+                                    decodedVinVout = electrumJSTxDecoder(result.result, _network);
+                                    cache.getDecodedTransaction(_decodedInput.txid, network, decodedVinVout);
+                                  }
 
                                   devlog('electrum raw input tx ==>');
 

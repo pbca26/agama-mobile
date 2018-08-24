@@ -45,8 +45,6 @@ class ServerSelect extends React.Component {
 
   setElectrumServer() {
     const _server = this.state.selectedOption.split(':');
-    console.warn(this.state.selectedOption);
-    console.warn(_server);
 
     this.setState({
       spvServerRetryInProgress: true,
