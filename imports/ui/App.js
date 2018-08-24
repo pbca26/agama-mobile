@@ -290,7 +290,7 @@ class App extends React.Component {
       coin: coin,
       address: this.state.pubKeys[coin],
       history: this.state.activeSection,
-      activeSection: this.state.activeSection !== 'send' ? 'dashboard' : 'send',
+      activeSection: 'dashboard',
       transactions: this.state.coins[coin] ? this.state.coins[coin].transactions: null,
       balance: this.state.coins[coin] ? this.state.coins[coin].balance: null,
     });
