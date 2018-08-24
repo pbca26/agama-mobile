@@ -46,3 +46,6 @@ jarsigner -verify -certs -verbose filename.apk
 create signing key
 
 jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 release-unsigned.apk agama-app
+
+## Notes
+jsqr v1.1.1 breaks the code, needs thorough debugging

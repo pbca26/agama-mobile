@@ -135,8 +135,10 @@ class OfflineSigning extends React.Component {
       height,
     }, (error, data) => {
       if (error) {
+        devlog('qrcam err', error);
+        
         this.setState({
-          qrScanError: true,
+          qrScanError: error.errorClass && error.errorClass.error && error.errorClass.error !== 'cancel' ? true : false,          
         });
       } else {
         convertURIToImageData(data)

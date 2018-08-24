@@ -46,8 +46,10 @@ class Pin extends React.Component {
       quality: 100,
     }, (error, data) => {
       if (error) {
+        devlog('qrcam err', error);
+        
         this.setState({
-          qrScanError: true,
+          qrScanError: error.errorClass && error.errorClass.error && error.errorClass.error !== 'cancel' ? true : false,
         });
         setTimeout(() => {
           this.setState({

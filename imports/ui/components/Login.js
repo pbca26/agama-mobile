@@ -64,22 +64,12 @@ class Login extends React.Component {
         }, 5000);
       } else {
         convertURIToImageData(data)
-        .then((imageData) => {
-          let decodedQR;
-          
-          if (!jsQR.decodeQRFromImage) {
-            decodedQR = jsQR(
-              imageData.data,
-              imageData.width,
-              imageData.height
-            );
-          } else {
-            decodedQR = jsQR.decodeQRFromImage(
-              imageData.data,
-              imageData.width,
-              imageData.height
-            );
-          }
+        .then((imageData) => {        
+          const decodedQR = jsQR.decodeQRFromImage(
+            imageData.data,
+            imageData.width,
+            imageData.height
+          );
 
           if (!decodedQR) {
             this.setState({
