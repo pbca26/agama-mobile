@@ -56,7 +56,7 @@ class Recovery extends React.Component {
   render() {
     return (
       <div className="form recovery">
-        <div className="margin-top-45 padding-bottom-35 text-center">
+        <div className="title margin-top-45 padding-bottom-35 text-center fs14">
         { translate('RECOVERY.PROVIDE_YOUR_PIN') }
         </div>
         <div className="margin-bottom-25">
@@ -92,7 +92,7 @@ class Recovery extends React.Component {
             <div className="text-center">
               <QRCode
                 value={ this.state.passphrase }
-                size={ 360 } />
+                size={ 320 } />
             </div>
           </div>
         }

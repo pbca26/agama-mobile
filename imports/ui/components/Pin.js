@@ -120,7 +120,7 @@ class Pin extends React.Component {
   render() {
     return (
       <div className="form pin-override">
-        <div className="margin-top-40 padding-bottom-30 text-center fs14 sz350">
+        <div className="title padding-bottom-30 text-center fs14 sz350">
         { translate('PIN.PROVIDE_A_SEED') }
         </div>
         <div

@@ -99,7 +99,7 @@ class CreateSeed extends React.Component {
     if (this.props.activeSection === 'create-seed') {
       return (
         <div className="form create-seed">
-          <h4>{ translate('LOGIN.THIS_IS_YOUR_NEW_SEED') }</h4>
+          <div className="title margin-bottom-25">{ translate('LOGIN.THIS_IS_YOUR_NEW_SEED') }</div>
           <div className="seed-gen-box">{ this.state.seed }</div>
           <div className="text-center margin-top-30">
             <QRCode

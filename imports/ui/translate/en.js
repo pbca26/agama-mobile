@@ -21,7 +21,7 @@ const lang = {
       SAVE: 'Save',
       SEED_IS_ENCRYPTED: 'Seed is encrypted with provided PIN. Use the PIN to login or sign a transaction.',
       PROVIDE_A_PASSPHRASE: 'Provide seed or WIF',
-      PROVIDE_A_SEED: 'Provide a seed and enter 6 digit PIN number in the form below.',
+      PROVIDE_A_SEED: 'Provide a seed and enter 6 digit PIN number in the form below',
     },
     OVERVIEW: {
       PRICES_ERROR: 'Atomicexplorer.com is unreachable!',
