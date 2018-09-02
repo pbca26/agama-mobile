@@ -14,13 +14,13 @@ const lang = {
       REQUIRE_PIN_CONFIRM: 'Require PIN to confirm transaction',
     },
     RECOVERY: {
-      PROVIDE_YOUR_PIN: 'Provide your PIN number to unlock passphrase.',
+      PROVIDE_YOUR_PIN: 'Provide your PIN number to unlock seed/WIF.',
       SHOW: 'Show',
     },
     PIN: {
       SAVE: 'Save',
       SEED_IS_ENCRYPTED: 'Seed is encrypted with provided PIN. Use the PIN to login or sign a transaction.',
-      PROVIDE_A_PASSPHRASE: 'Provide passhprase or WIF',
+      PROVIDE_A_PASSPHRASE: 'Provide seed or WIF',
       PROVIDE_A_SEED: 'Provide a seed and enter 6 digit PIN number in the form below.',
     },
     OVERVIEW: {
@@ -47,8 +47,8 @@ const lang = {
       PIN_ACCESS: 'PIN access',
       WRONG_PIN: 'Wrong PIN!',
       LOGIN: 'Login',
-      PASSPHRASE_ACCESS: 'Passphrase access',
-      ENTER_PASSPHRASE: 'Enter a passphrase',
+      PASSPHRASE_ACCESS: 'Seed access',
+      ENTER_PASSPHRASE: 'Enter a seed',
       OVERRIDE_PIN: 'Create / Override PIN',
       ENTER_6_DIGIT_PIN: 'Enter a PIN (min. 6 digits)',
       PIN_TOO_SHORT: 'PIN is too short!',
