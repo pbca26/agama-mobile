@@ -14,6 +14,7 @@ import {
   devlog,
   config,
 } from '../actions/dev';
+import { Meteor } from 'meteor/meteor';
 
 class Pin extends React.Component {
   constructor() {
@@ -51,7 +52,7 @@ class Pin extends React.Component {
         this.setState({
           qrScanError: error.errorClass && error.errorClass.error && error.errorClass.error !== 'cancel' ? true : false,
         });
-        setTimeout(() => {
+        Meteor.setTimeout(() => {
           this.setState({
             qrScanError: false,
           });
@@ -69,7 +70,7 @@ class Pin extends React.Component {
             this.setState({
               qrScanError: true,
             });
-            setTimeout(() => {
+            Meteor.setTimeout(() => {
               this.setState({
                 qrScanError: false,
               });
@@ -103,7 +104,7 @@ class Pin extends React.Component {
           passphraseTooShort: false,
         });
 
-        setTimeout(() => {
+        Meteor.setTimeout(() => {
           this.setState(this.defaultState);
           this.props.changeActiveSection('login');
         }, 500);

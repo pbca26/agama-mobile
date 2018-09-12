@@ -9,6 +9,7 @@ import {
   decryptkey,
 } from '../actions/seedCrypt';
 import translate from '../translate/translate';
+import { Meteor } from 'meteor/meteor';
 
 // TODO: reset settings/purge seed and pin
 
@@ -60,7 +61,7 @@ class Settings extends React.Component {
       isSaved: true,
     });
 
-    setTimeout(() => {
+    Meteor.setTimeout(() => {
       this.setState({
         isSaved: false,
       });

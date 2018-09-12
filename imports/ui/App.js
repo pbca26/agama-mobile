@@ -2,7 +2,7 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import electrumServers from 'agama-wallet-lib/build/electrum-servers';
-
+import { Meteor } from 'meteor/meteor';
 import actions from './actions/actions';
 import {
   setLocalStorageVar,
@@ -33,7 +33,6 @@ import Pin from './components/Pin';
 import Recovery from './components/Recovery';
 import Overview  from './components/Overview';
 import Settings  from './components/Settings';
-import { setTimeout } from 'timers';
 
 const _storageSettings = getLocalStorageVar('settings');
 const DASHBOARD_UPDATE_INTERVAL = 120000; // 2m
@@ -130,7 +129,7 @@ class App extends React.Component {
         proxyRetryInProgress: true,
       });
 
-      setTimeout(() => {
+      Meteor.setTimeout(() => {
         this.setState({
           proxyRetryInProgress: false,
         });
@@ -155,7 +154,7 @@ class App extends React.Component {
       });
 
       if (res === 'error') {
-        setTimeout(() => {
+        Meteor.setTimeout(() => {
           this.getBtcFees();
         }, 5000);
       }
@@ -176,13 +175,13 @@ class App extends React.Component {
   globalClick() {
     if (this.state.auth) {
       if (this.globalClickTimeout) {
-        clearTimeout(this.globalClickTimeout);
+        Meteor.clearTimeout(this.globalClickTimeout);
       }
 
       if (!config.dev ||
           (config.dev && config.preload && !config.preload.disableAutoLock) ||
           (config.dev && !config.preload)) {
-        this.globalClickTimeout = setTimeout(() => {
+        this.globalClickTimeout = Meteor.setTimeout(() => {
           devlog(`logout after ${DEFAULT_LOCK_INACTIVE_INTERVAL}ms inactivity`);
           this.lock();
         }, DEFAULT_LOCK_INACTIVE_INTERVAL);
@@ -296,7 +295,7 @@ class App extends React.Component {
     });
 
     // toggle refresh and update in-mem coins cache obj
-    setTimeout(() => {
+    Meteor.setTimeout(() => {
       this.toggleMenu();
       this.dashboardRefresh();
       this.scrollToTop();
@@ -305,14 +304,14 @@ class App extends React.Component {
 
   toggleAutoRefresh(disable) {
     if (disable) {
-      clearInterval(this.state.updateInterval);
-      clearInterval(this.state.overviewInterval);
+      Meteor.clearInterval(this.state.updateInterval);
+      Meteor.clearInterval(this.state.overviewInterval);
 
       this.setState({
         updateInterval: null,
       });
     } else {
-      const _updateInterval = setInterval(() => {
+      const _updateInterval = Meteor.setInterval(() => {
         if (this.state.activeSection === 'dashboard') {
           this.dashboardRefresh();
         }
@@ -352,7 +351,7 @@ class App extends React.Component {
 
         if (this.state.proxyErrorCount + 1 <= PROXY_RETRY_COUNT &&
             this.state.proxyErrorCount >= 0) {
-          setTimeout(() => {
+          Meteor.setTimeout(() => {
             devlog(`proxy retry attempt #${this.state.proxyErrorCount}`);
             this.retryProxy(true);
           }, PROXY_RETRY_TIMEOUT);
@@ -426,10 +425,10 @@ class App extends React.Component {
       this.toggleAutoRefresh(true);
       setLocalStorageVar('coins', {});
 
-      setTimeout(() => {
+      Meteor.setTimeout(() => {
         this.toggleMenu();
       }, 10);
-      setTimeout(() => {
+      Meteor.setTimeout(() => {
         this.setState(this.defaultState);
       }, 20);
       this.scrollToTop();
@@ -440,16 +439,20 @@ class App extends React.Component {
   lock() {
     const { actions } = this.props;
 
+    if (this.globalClickTimeout) {
+      Meteor.clearTimeout(this.globalClickTimeout);
+    }
+
     actions.clearKeys()
     .then((res) => {
       const lockState = Object.assign({}, this.defaultState);
       lockState.coins = this.state.coins;
 
       this.toggleAutoRefresh(true);
-      setTimeout(() => {
+      Meteor.setTimeout(() => {
         this.toggleMenu();
       }, 10);
-      setTimeout(() => {
+      Meteor.setTimeout(() => {
         this.setState(lockState);
       }, 20);
       this.scrollToTop();
@@ -512,7 +515,7 @@ class App extends React.Component {
     });
 
     if (!this.state.overviewInterval) {
-      const _updateInterval = setInterval(() => {
+      const _updateInterval = Meteor.setInterval(() => {
         if (this.state.activeSection === 'overview') {
           actions.getOverview(this.state.coins)
           .then((res) => {
@@ -532,7 +535,7 @@ class App extends React.Component {
   }
 
   toggleMenuOption(optionName) {
-    setTimeout(() => {
+    Meteor.setTimeout(() => {
       this.toggleMenu();
     }, 10);
 

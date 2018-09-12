@@ -26,6 +26,7 @@ import {
 import { addressVersionCheck } from 'agama-wallet-lib/build/keys';
 import electrumServers from 'agama-wallet-lib/build/electrum-servers';
 import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
+import { Meteor } from 'meteor/meteor';
 
 class SendCoin extends React.Component {
   constructor() {
@@ -104,7 +105,7 @@ class SendCoin extends React.Component {
         this.setState({
           qrScanError: error.errorClass && error.errorClass.error && error.errorClass.error !== 'cancel' ? true : false,
         });
-        setTimeout(() => {
+        Meteor.setTimeout(() => {
           this.setState({
             qrScanError: false,
           });
@@ -128,7 +129,7 @@ class SendCoin extends React.Component {
             this.setState({
               qrScanError: true,
             });
-            setTimeout(() => {
+            Meteor.setTimeout(() => {
               this.setState({
                 qrScanError: false,
               });

@@ -16,6 +16,7 @@ import {
   devlog,
   config,
 } from '../actions/dev';
+import { Meteor } from 'meteor/meteor';
 
 class Login extends React.Component {
   constructor() {
@@ -57,7 +58,7 @@ class Login extends React.Component {
           qrScanError: error.errorClass && error.errorClass.error && error.errorClass.error !== 'cancel' ? true : false,
         });
       
-        setTimeout(() => {
+        Meteor.setTimeout(() => {
           this.setState({
             qrScanError: false,
           });
@@ -76,7 +77,7 @@ class Login extends React.Component {
               qrScanError: true,
             });
 
-            setTimeout(() => {
+            Meteor.setTimeout(() => {
               this.setState({
                 qrScanError: false,
               });
