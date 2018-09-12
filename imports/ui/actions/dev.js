@@ -1,9 +1,11 @@
 export const config = {
   dev: false,
+  debug: true,
 };
 
 export const devlog = (msg, data) => {
-  if (config.dev) {
+  if (config.dev ||
+      config.debug) {
     if (data) {
       console.warn(msg, data);
     } else {
