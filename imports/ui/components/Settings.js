@@ -18,7 +18,7 @@ class Settings extends React.Component {
   constructor() {
     super();
     this.state = {
-      autoLockTimeout: 60000,
+      autoLockTimeout: 600000,
       requirePin: false,
       isSaved: false,
     };
