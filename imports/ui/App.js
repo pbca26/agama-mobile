@@ -607,33 +607,34 @@ class App extends React.Component {
               </div>
               { this.state.auth &&
                 <div className="items">
-                  { this.state.activeSection !== 'overview' &&
-                    <div className="item">
-                      <div
-                        className="title"
-                        onClick={ this.toggleOverview }>
-                        { translate('APP_TITLE.OVERVIEW') }
-                      </div>
-                      <img
-                        className="line"
-                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                  <div
+                    className="item"
+                    disabled={ this.state.activeSection === 'overview' }>
+                    <div
+                      className="title"
+                      onClick={ this.toggleOverview }>
+                      { translate('APP_TITLE.OVERVIEW') }
                     </div>
-                  }
-                  { this.state.activeSection !== 'dashboard' &&
-                    <div className="item">
-                      <div
-                        className="title"
-                        onClick={ () => this.changeActiveSection('dashboard', true) }>
-                        { translate('DASHBOARD.DASHBOARD') }
-                      </div>
-                      <img
-                        className="line"
-                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                    <img
+                      className="line"
+                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                  </div>
+                  <div
+                    className="item"
+                    disabled={ this.state.activeSection === 'dashboard' }>
+                    <div
+                      className="title"
+                      onClick={ () => this.changeActiveSection('dashboard', true) }>
+                      { translate('DASHBOARD.DASHBOARD') }
                     </div>
-                  }
-                  { this.state.activeSection !== 'recovery' &&
-                    getLocalStorageVar('seed') &&
-                    <div className="item">
+                    <img
+                      className="line"
+                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                  </div>
+                  { getLocalStorageVar('seed') &&
+                    <div
+                      className="item"
+                      disabled={ this.state.activeSection === 'recovery' }>
                       <div
                         className="title"
                         onClick={ () => this.toggleMenuOption('recovery') }>
@@ -644,18 +645,18 @@ class App extends React.Component {
                         src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                     </div>
                   }
-                  { this.state.activeSection !== 'settings' &&
-                    <div className="item">
-                      <div
-                        className="title"
-                        onClick={ () => this.toggleMenuOption('settings') }>
-                        { translate('APP_TITLE.SETTINGS') }
-                      </div>
-                      <img
-                        className="line"
-                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                  <div
+                    className="item"
+                    disabled={ this.state.activeSection === 'settings' }>
+                    <div
+                      className="title"
+                      onClick={ () => this.toggleMenuOption('settings') }>
+                      { translate('APP_TITLE.SETTINGS') }
                     </div>
-                  }
+                    <img
+                      className="line"
+                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                  </div>
                   <div className="item">
                     <div
                       className="title"
@@ -676,9 +677,10 @@ class App extends React.Component {
                       className="line"
                       src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                   </div>
-                  { this.state.activeSection !== 'addcoin' &&
-                    Object.keys(this.state.coins).length !== Object.keys(electrumServers).length &&
-                    <div className="item">
+                  { Object.keys(this.state.coins).length !== Object.keys(electrumServers).length &&
+                    <div
+                      className="item"
+                      disabled={ this.state.activeSection === 'addcoin' }>
                       <div
                         className="title"
                         onClick={ () => this.toggleMenuOption('addcoin') }>
@@ -708,33 +710,34 @@ class App extends React.Component {
                         src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                     </div>
                   }
-                  { this.state.activeSection !== 'addcoin' &&
-                    <div className="item">
-                      <div
-                        className="title"
-                        onClick={ () => this.toggleMenuOption('addcoin') }>
-                        { translate('DASHBOARD.ADD_COIN') }
-                      </div>
-                      <img
-                        className="line"
-                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                  <div
+                    className="item"
+                    disabled={ this.state.activeSection === 'addcoin' }>
+                    <div
+                      className="title"
+                      onClick={ () => this.toggleMenuOption('addcoin') }>
+                      { translate('DASHBOARD.ADD_COIN') }
                     </div>
-                  }
-                  { this.state.activeSection !== 'create-seed' &&
-                    <div className="item">
-                      <div
-                        className="title"
-                        onClick={ () => this.toggleMenuOption('create-seed') }>
-                        { translate('DASHBOARD.CREATE_SEED') }
-                      </div>
-                      <img
-                        className="line"
-                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                    <img
+                      className="line"
+                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                  </div>
+                  <div
+                    className="item"
+                    disabled={ this.state.activeSection === 'create-seed' }>
+                    <div
+                      className="title"
+                      onClick={ () => this.toggleMenuOption('create-seed') }>
+                      { translate('DASHBOARD.CREATE_SEED') }
                     </div>
-                  }
-                  { this.state.activeSection !== 'pin' &&
-                    getLocalStorageVar('seed') &&
-                    <div className="item">
+                    <img
+                      className="line"
+                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                  </div>
+                  { getLocalStorageVar('seed') &&
+                    <div
+                      className="item"
+                      disabled={ this.state.activeSection === 'pin' }>
                       <div
                         className="title"
                         onClick={ () => this.toggleMenuOption('pin') }>
@@ -801,7 +804,7 @@ class App extends React.Component {
               src={ `${assetsPath.home}/home-combined-shape.png` } />
           }
           <div className="ui-title">
-            {  translate('APP_TITLE.' + (this.state.displayMenu ? 'MENU' : this.state.activeSection.toUpperCase())) }
+            { translate('APP_TITLE.' + (this.state.displayMenu ? 'MENU' : this.state.activeSection.toUpperCase())) }
           </div>
         </div>
         { this.state.displayMenu &&
