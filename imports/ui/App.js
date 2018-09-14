@@ -34,9 +34,7 @@ import Recovery from './components/Recovery';
 import Overview  from './components/Overview';
 import Settings  from './components/Settings';
 
-const _storageSettings = getLocalStorageVar('settings');
 const DASHBOARD_UPDATE_INTERVAL = 120000; // 2m
-const DEFAULT_LOCK_INACTIVE_INTERVAL = _storageSettings && _storageSettings.autoLockTimeout ? _storageSettings.autoLockTimeout : 600000; // 10m
 const PROXY_RETRY_COUNT = 2;
 const PROXY_RETRY_TIMEOUT = 5000;
 
@@ -172,7 +170,29 @@ class App extends React.Component {
     window.scrollTo(0, 0);
   }
 
+  /*globalClick() {
+    if (this.state.auth) {
+      if (this.globalClickTimeout) {
+        Meteor.clearTimeout(this.globalClickTimeout);
+      }
+
+      if (!config.dev ||
+          (config.dev && config.preload && !config.preload.disableAutoLock) ||
+          (config.dev && !config.preload)) {
+        this.globalClickTimeout = Meteor.setTimeout(() => {
+          devlog(`logout after ${DEFAULT_LOCK_INACTIVE_INTERVAL}ms inactivity`);
+          this.lock();
+        }, DEFAULT_LOCK_INACTIVE_INTERVAL);
+      }
+
+      devlog('global click', 'set timer');
+    }
+  }*/
+
   globalClick() {
+    const _storageSettings = getLocalStorageVar('settings');    
+    const DEFAULT_LOCK_INACTIVE_INTERVAL = _storageSettings && _storageSettings.autoLockTimeout ? _storageSettings.autoLockTimeout : 600000; // 10m
+    
     if (this.state.auth) {
       if (this.globalClickTimeout) {
         Meteor.clearTimeout(this.globalClickTimeout);
@@ -878,7 +898,7 @@ class App extends React.Component {
               <Overview { ...this.state } />
             }
             { this.state.activeSection === 'settings' &&
-              <Settings />
+              <Settings globalClick={ this.globalClick } />
             }
           </div>
         }
