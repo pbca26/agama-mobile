@@ -66,6 +66,8 @@ class Settings extends React.Component {
         isSaved: false,
       });
     }, SETTINGS_SAVED_MSG_TIMEOUT);
+
+    this.props.globalClick();
   }
 
   render() {
