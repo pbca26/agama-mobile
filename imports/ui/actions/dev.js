@@ -1,6 +1,6 @@
 export const config = {
   dev: false,
-  debug: true,
+  debug: false,
 };
 
 export const devlog = (msg, data) => {
