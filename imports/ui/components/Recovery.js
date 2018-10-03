@@ -1,18 +1,20 @@
 import React from 'react';
 
-import {
-  getLocalStorageVar,
-} from '../actions/utils';
+import { getLocalStorageVar } from '../actions/utils';
 import { decryptkey } from '../actions/seedCrypt';
-import { translate } from '../translate/translate';
+import translate from '../translate/translate';
 import QRCode from 'qrcode.react';
+import {
+  devlog,
+  config,
+} from '../actions/dev';
 
 class Recovery extends React.Component {
   constructor() {
     super();
     this.state = {
-      passphrase: null,
-      pin: null,
+      passphrase: config.preload ? config.preload.seed : null,
+      pin: config.preload ? config.preload.pin : null,
       wrongPin: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
@@ -30,6 +32,7 @@ class Recovery extends React.Component {
   updateInput(e) {
     this.setState({
       [e.target.name]: e.target.value,
+      wrongPin: false,
     });
   }
 
@@ -52,45 +55,47 @@ class Recovery extends React.Component {
 
   render() {
     return (
-      <div className="col-sm-12">
-        <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12">
-          <div className="row">
-            <h4 className="padding-bottom-15">Recovery passphrase</h4>
-            <div className="padding-bottom-10">
-            Provide your PIN number to unlock passphrase.
+      <div className="form recovery">
+        <div className="title margin-top-45 padding-bottom-35 text-center fs14">
+        { translate('RECOVERY.PROVIDE_YOUR_PIN') }
+        </div>
+        <div className="margin-bottom-25">
+          <div className="edit">
+            <input
+              type="password"
+              className="form-control"
+              name="pin"
+              onChange={ this.updateInput }
+              placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
+              value={ this.state.pin || '' } />
+          </div>
+          { this.state.wrongPin &&
+            <div className="error margin-top-15 sz350">
+              <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
             </div>
-            <div className="margin-bottom-25">
-              <input
-                type="password"
-                className="form-control margin-top-20"
-                name="pin"
-                onChange={ this.updateInput }
-                placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
-                value={ this.state.pin || '' } />
-              { this.state.wrongPin &&
-                <div className="error margin-top-15">
-                  <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
-                </div>
-              }
+          }
+        </div>
+        <div
+          disabled={ !this.state.pin }
+          onClick={ this.decodeSeed }
+          className="group3 margin-top-40">
+          <div className="btn-inner">
+            <div className="btn">{ translate('RECOVERY.SHOW') }</div>
+            <div className="group2">
+              <i className="fa fa-eye"></i>
             </div>
-            <button
-              disabled={ !this.state.pin }
-              className="btn btn-lg btn-primary btn-block ladda-button"
-              onClick={ this.decodeSeed }>
-              <span className="ladda-label">
-              Show
-              </span>
-            </button>
-            { this.state.passphrase &&
-              <div className="margin-bottom-25 margin-top-70 decoded-seed">
-                <div className="margin-bottom-40 fs-16 seed-string">{ this.state.passphrase }</div>
-                <QRCode
-                  value={ this.state.passphrase }
-                  size={ 240 } />
-              </div>
-            }
           </div>
         </div>
+        { this.state.passphrase &&
+          <div className="margin-bottom-25 margin-top-50 decoded-seed">
+            <div className="seed-gen-box margin-bottom-30">{ this.state.passphrase }</div>
+            <div className="text-center">
+              <QRCode
+                value={ this.state.passphrase }
+                size={ 320 } />
+            </div>
+          </div>
+        }
       </div>
     );
   }

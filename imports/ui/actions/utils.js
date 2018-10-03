@@ -1,105 +1,16 @@
-export const kmdCalcInterest = (locktime, value) => { // value in sats
-  const timestampDiff = Math.floor(Date.now() / 1000) - locktime - 777;
-  let timestampDiffMinutes = timestampDiff / 60;
-  let interest = 0;
+import translate from '../translate/translate';
 
-  // calc interest
-  if (timestampDiffMinutes >= 60) {
-    if (timestampDiffMinutes > 365 * 24 * 60) {
-      timestampDiffMinutes = 365 * 24 * 60;
-    }
-    timestampDiffMinutes -= 59;
+export const assetsPath = {
+  coinLogo: '/images/cryptologo',
+  login: '/images/template/login',
+  menu: '/images/template/menu',
+  home: '/images/template/home',
+  txs: '/images/template/transactions',
+};
 
-    interest = ((Number(value) * 0.00000001) / 10512000) * timestampDiffMinutes;
-  }
-
-  return interest;
-}
-
-export const secondsToString = (seconds, skipMultiply, showSeconds) => {
-  const a = new Date(seconds * (skipMultiply ? 1 : 1000));
-  const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec'
-  ];
-  const year = a.getFullYear();
-  const month = months[a.getMonth()];
-  const date = a.getDate();
-  const hour = a.getHours() < 10 ? `0${a.getHours()}` : a.getHours();
-  const min = a.getMinutes() < 10 ? `0${a.getMinutes()}` : a.getMinutes();
-  const sec = a.getSeconds();
-  const time = `${date} ${month} ${year} ${hour}:${min}${(showSeconds ? ':' + sec : '')}`;
-
-  return time;
-}
-
-export const estimateTxSize = (numVins, numOuts) => {
-  // in x 180 + out x 34 + 10 plus or minus in
-  return numVins * 180 + numOuts * 34 + 11;
-}
-
-export const sortBy = (data, sortKey) => {
-  return data.sort((b, a) => {
-    if (a[sortKey] < b[sortKey]) {
-      return -1;
-    }
-
-    if (a[sortKey] > b[sortKey]) {
-      return 1;
-    }
-
-    return 0;
-  });
-}
-
-export const isNumber = (value) => {
-  return !isNaN(parseFloat(value)) && isFinite(value);
-}
-
-export const isPositiveNumber = (value) => {
-  return isNumber(value) && (+value) > 0;
-}
-
-export const getRandomIntInclusive = (min, max) => {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-// display rounding
-export const formatValue = (formatValue) => {
-  const _valueToStr = formatValue.toString();
-
-  if (_valueToStr.indexOf('.') === -1) {
-    return formatValue;
-  } else {
-    if (_valueToStr) {
-      const _decimal = _valueToStr.substr(_valueToStr.indexOf('.') + 1, _valueToStr.length);
-      let newVal = _valueToStr.substr(0, _valueToStr.indexOf('.') + 1);
-
-      for (let i = 0; i < _decimal.length; i++) {
-        if (_decimal[i] === '0') {
-          newVal = newVal + _decimal[i];
-        } else {
-          newVal = newVal + _decimal[i];
-          break;
-        }
-      }
-
-      return newVal;
-    }
-  }
+// https://stackoverflow.com/questions/5467129/sort-javascript-object-by-key
+export const sortObject = (o) => {
+  return Object.keys(o).sort().reduce((r, k) => (r[k] = o[k], r), {});
 }
 
 export const maskPubAddress = (pub) => {
@@ -111,39 +22,6 @@ export const maskPubAddress = (pub) => {
   }
 
   return pub[0] + pub[1] + pub[2] + masked + pub[pub.length - 3] + pub[pub.length - 2] + pub[pub.length - 1];
-}
-
-export const isAssetChain = (coin) => {
-  coin = coin.toUpperCase();
-
-  if (coin === 'SUPERNET' ||
-      coin === 'REVS' ||
-      coin === 'PANGEA' ||
-      coin === 'DEX' ||
-      coin === 'JUMBLR' ||
-      coin === 'BET' ||
-      coin === 'CRYPTO' ||
-      coin === 'COQUI' ||
-      coin === 'OOT' ||
-      coin === 'HODL' ||
-      coin === 'SHARK' ||
-      coin === 'MSHARK' ||
-      coin === 'BOTS' ||
-      coin === 'MGW' ||
-      coin === 'MVP' ||
-      coin === 'KV' ||
-      coin === 'CEAL' ||
-      coin === 'MESH' ||
-      coin === 'WLC' ||
-      coin === 'MNZ' ||
-      coin === 'BTCH' ||
-      coin === 'BNTN' ||
-      coin === 'komodo' ||
-      coin === 'KMD') {
-    return true;
-  }
-
-  return false;
 }
 
 export const setLocalStorageVar = (name, json) => {
@@ -163,72 +41,6 @@ export function getLocalStorageVar(name) {
     return null;
   }
 }
-
-export const coinsList = [
-  'CHIPS',
-  'SUPERNET',
-  'REVS',
-  'PANGEA',
-  'DEX',
-  'JUMBLR',
-  'BET',
-  'CRYPTO',
-  'COQUI',
-  'OOT',
-  'HODL',
-  'SHARK',
-  'MSHARK',
-  'BOTS',
-  'MGW',
-  'BTCH',
-  //'MVP',
-  'KV',
-  //'CEAL',
-  'MESH',
-  'WLC',
-  'MNZ',
-  'BNTN',
-  'DOGE',
-  'DGB',
-  'BTG',
-  'BLK',
-  'BCH',
-  'FAIR',
-  'VIA',
-  'MONA',
-  'ZEC',
-  'HUSH',
-  'ARG',
-  'DASH',
-  'CRW',
-  'VTC',
-  'LTC',
-  'NMC',
-  'SIB',
-  'XMY',
-  'ZCL'
-];
-
-export const explorers = {
-  KMD: 'http://kmd.komodochainz.info',
-  MSHARK: 'http://MSHARK.explorer.supernet.org',
-  REVS: 'http://revs.explorer.supernet.org',
-  SUPERNET: 'http://SUPERNET.explorer.supernet.org',
-  DEX: 'http://DEX.explorer.supernet.org',
-  PANGEA: 'http://PANGEA.explorer.supernet.org',
-  JUMBLR: 'http://JUMBLR.explorer.supernet.org',
-  BET: 'http://BET.explorer.supernet.org',
-  CRYPTO: 'http://CRYPTO.explorer.supernet.org',
-  HODL: 'http://HODL.explorer.supernet.org',
-  SHARK: 'http://SHARK.explorer.supernet.org',
-  BOTS: 'http://BOTS.explorer.supernet.org',
-  MGW: 'http://MGW.explorer.supernet.org',
-  WLC: 'http://WIRELESS.explorer.supernet.org',
-  CHIPS: 'http://chips1.explorer.supernet.org',
-  COQUI: 'https://explorer.coqui.cash',
-  OOT: 'https://explorer.utrum.io',
-  MNZ: 'https://www.mnzexplorer.com',
-};
 
 export const convertURIToImageData = (URI) => {
   return new Promise((resolve, reject) => {
@@ -250,3 +62,87 @@ export const convertURIToImageData = (URI) => {
     image.src = URI;
   });
 };
+
+export const _coinsList = [
+  'KMD',
+  'CHIPS',
+  'SUPERNET',
+  'REVS',
+  'PANGEA',
+  'DEX',
+  'JUMBLR',
+  'BET',
+  'CRYPTO',
+  'COQUI',
+  'OOT',
+  'HODL',
+  'MSHARK',
+  'BOTS',
+  'MGW',
+  'BTCH',
+  'KV',
+  'WLC',
+  'MNZ',
+  'BNTN',
+  'CHAIN',
+  'GLXT',
+  'EQL',
+  'PRLPAY',
+  'ZILLA',
+  'PIZZA',
+  'BEER',
+  'CCL',
+  'VRSC',
+  'CALL',
+  'BTC',
+  'DOGE',
+  'DGB',
+  'BTG',
+  'BCH',
+  'FAIR',
+  'VIA',
+  'MONA',
+  'ZEC',
+  'HUSH',
+  'ARG',
+  'DASH',
+  'CRW',
+  'VTC',
+  'LTC',
+  'NMC',
+  'SIB',
+  'XMY',
+  'ZCL',
+  'EMC2',
+  'FJC',
+  'GAME',
+  'BCBC',
+  'BTCZ',
+  'QTUM',
+  'DNR',
+  'XZC',
+  'FTC',
+  'GBX',
+  //'NINJA',  
+  //'SHARK',
+  //'MVP',
+  //'CEAL',
+  //'MESH',
+  //'VOTE2018',
+  //'BLK',
+  //'BTX', (?) needs a fix
+];
+
+// sorting needs to be done
+export let coinsList = []; // sorted
+let _coins = {};
+
+for (let i = 0; i < _coinsList.length; i++) {
+  _coins[translate('COINS.' + _coinsList[i].toUpperCase())] = _coinsList[i];
+}
+
+_coins = sortObject(_coins);
+
+for (let key in _coins) {
+  coinsList.push(_coins[key]);
+}

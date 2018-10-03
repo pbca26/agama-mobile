@@ -1,59 +1,222 @@
-.nav-menu {
-  position: fixed;
+.menu-ui {
+  min-height: 100vh;
+  // position: fixed;
+  //top: 52px;
+  left: 0;
+  width: 100%;
+  background-color: #4c4f69;
+  z-index: 100;
+  overflow: hidden;
+
+  .active-coins {
+    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+    font-size: 16px;
+    color: white;
+    letter-spacing: -0.56px;
+    line-height: 22px;
+    padding-left: 45px;
+    padding-top: 20px;
+
+    &:last-child {
+      padding-bottom: 40px;
+    }
+    img {
+      width: 36px;
+      margin-right: 10px;
+      border-radius: 50%;
+      border: solid 1px #fff;
+      background: #fff;
+    }
+    span,
+    i {
+      position: relative;
+      top: -13px;
+    }
+    i {
+      padding-left: 7px;
+      font-size: 14px;
+    }
+  }
+  
+  .sidemenu-inner {
+    width: 375px;
+    height: 100%;
+    position:relative;
+    margin: auto;
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  .sidemenu {
+    width: 100%;
+    min-width: 375px;
+    height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+    margin: 0;
+
+    .group {
+      top: 50px;
+      height: 500px;
+      width: 385px;
+      position: absolute;
+      margin: 0;
+      left: 250px;
+
+      .rectangle9copy3 {
+        top: 77px;
+        height: 346px;
+        width: 305px;
+        position: absolute;
+        margin: 0;
+        left: 0;
+        opacity: 0.5;
+      }
+    
+      .rectangle9copy2 {
+        top: 23px;
+        height: 455px;
+        width: 305px;
+        position: absolute;
+        margin: 0;
+        left: 40px;
+        opacity: 0.5;
+      }
+    
+      .rectangle9copy {
+        top: 0;
+        height: 500px;
+        width: 305px;
+        position: absolute;
+        margin: 0;
+        left: 80px;
+      }
+    }
+  
+    .menu {
+      top: 14px;
+      height: auto;
+      width: auto;
+      position: absolute;
+      margin: 0;
+      left: 165px;
+      font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+      font-size: 16px;
+      color: #fff;
+      text-align: left;
+      letter-spacing: -0.56px;
+      line-height: 22px;
+    }
+  
+    .items {
+      position: absolute;
+      top: 20px;
+    }
+  
+    .item {
+      padding-top: 20px;
+      height: auto;
+      width: auto;
+      margin: 0;
+      font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+      font-size: 16.0px;
+      color: #fff;
+      text-align: left;
+      letter-spacing: -0.56px;
+      line-height: 22px;
+  
+      .title {
+        padding-left: 40px;      
+      }
+      .line {
+        padding-top: 10px;
+        background-color: rgba(255, 255, 255, 0.0);
+        height: 2px;
+        width: 200px;
+        margin: 0;
+        border-radius: 1px;
+        opacity: 0.1;
+        display: block;
+        position: relative;
+        left: 20px;
+      }
+      &:last-child {
+        .line {
+          display: none;
+        }
+      }
+    }
+  
+    .combinedshape1 {
+      top: 41px;
+      height: 22px;
+      width: 20px;
+      position: absolute;
+      margin: 0;
+      left: 333px;
+    }
+  
+    .oval {
+      top: 40px;
+      height: 8px;
+      width: 8px;
+      position: absolute;
+      margin: 0;
+      left: 347px;
+    }
+  }
+}
+
+.menu-icon {
+  top: 18px;
+  height: 14px;
+  width: 20px;
+  position: absolute;
+  margin: 0;
+  right: 14px;
+  z-index: 10;
+}
+
+.menu-back {
+  top: 18px;
+  height: 13px;
+  width: 20px;
+  position: absolute;
+  margin: 0;
+  left: 10px;
+  z-index: 10;
+}
+
+.app-header {
   top: 0;
-  right: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  z-index: 200;
-  background: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  height: 50px;
+  z-index: 110;
+  border-top: solid 2px #373a4c;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .2), 0 2px 0 rgba(0, 0, 0, 0.06);
+  background: #45485F;
 
-  .nav-menu-overlay {
-    position: absolute;
+  .ui-title {
+    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+    font-size: 16px;
+    color: #fff;
+    letter-spacing: -0.56px;
+    line-height: 22px;
     width: 100%;
-    height: 100%;
-    z-index: 100;
+    text-transform: capitalize;
+    text-align: center;
+    position: absolute;
+    top: 14px;
   }
-  &-inner {
-    width: 200px;
-    background: #fff;
-    height: 100%;
-    float: right;
-    position: relative;
-    z-index: 120;
-    overflow-y: auto;
-
-    .fa {
-      float: right;
-      font-size: 34px;
-      margin-right: 20px;
-      margin-top: 7px;
-    }
-    .nav-menu-items {
-      margin-top: 70px;
-
-      div {
-        margin-bottom: 25px;
-        font-size: 16px;
-        margin-left: 20px;
-      }
-      .active-coins {
-        margin-left: 0;
-
-        span {
-          position: relative;
-          top: 2px;
-          left: 10px;
-        }
-        img {
-          height: 42px;
-        }
-        .fa {
-          font-size: 20px;
-          margin-right: 10px;
-          margin-top: 10px;
-          color: #46be8a;
-        }
-      }
-    }
+  .combinedshape {
+    position: absolute;
   }
+}
+
+.app-main {
+  padding-top: 52px;
 }

@@ -1,0 +1,584 @@
+.overview-ui {
+  min-height: 100vh;
+  padding: 0 10px;
+  height: 100%;
+  
+  .home-inner {
+    max-width: 375px;
+    height: 100%;
+    position:relative;
+    margin: auto;
+    min-height: 100vh;
+  }
+
+  .home {
+    width: 100%;
+    height: inherit;
+    min-height: 100vh;
+    position: relative;
+    overflow: visible;
+    margin: 0;
+
+    .overview-coins {
+      margin: 0;
+      top: 240px;
+      height: 100%;
+      width: 347px;
+      position: relative;
+      margin: 0;
+      left: 0;
+
+      .overview-coin {
+        height: 80px;
+
+        .div1 {
+          width: 340px;
+        }
+
+        &:last-child {
+          .div1 {
+            display: none;
+          }
+        }
+      }
+    }
+
+    .rectangle9 {
+      top: 0;
+      height: 100%;
+      width: 375px;
+      position: absolute;
+      margin: 0;
+      left: 0;
+    }
+  
+    .group7 {
+      top: 34px;
+      height: 220px;
+      width: 340px;
+      position: absolute;
+      margin: 0;
+      left: 0;
+
+      .rectangle5copy {
+        top: 81px;
+        height: 139px;
+        width: 347px;
+        position: absolute;
+        margin: 0;
+        left: 0;
+      }
+    
+      .cryptocardbg {
+        top: 0;
+        height: 150px;
+        width: 340px;
+        position: absolute;
+        margin: 0;
+        left: 1px;
+
+        .rectangle5 {
+          top: 0;
+          height: 150px;
+          width: 340px;
+          position: relative;
+          margin: 0;
+          left: 0;
+          border-radius: 4px;
+        }
+      }
+    
+      .cryptocardcurrency {
+        top: 9px;
+        height: 82px;
+        width: 82px;
+        position: absolute;
+        margin: 0;
+        left: 5px;
+
+        .oval {
+          top: 0;
+          height: 82px;
+          width: 82px;
+          position: relative;
+          margin: 0;
+          left: 0;
+        }
+      }
+    
+      .totalvalue {
+        top: 107px;
+        height: auto;
+        width: auto;
+        position: absolute;
+        margin: 0;
+        left: 21px;
+        opacity: 0.9;
+        font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+        font-size: 11px;
+        color: white;
+        text-align: left;
+        letter-spacing: -0.2px;
+        line-height: 12px;
+      }
+    
+      .a3467812 {
+        top: 77px;
+        height: auto;
+        width: auto;
+        position: absolute;
+        margin: 0;
+        left: 26px;
+        font-family: 'San Francisco', Helvetica, Arial, serif;
+        font-size: 24px;
+        color: #fff;
+        text-align: left;
+        letter-spacing: -0.5px;
+      }
+    
+      .label1 {
+        top: 78px;
+        height: auto;
+        width: auto;
+        position: absolute;
+        margin: 0;
+        left: 13px;
+        font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+        font-size: 12px;
+        color: #fff;
+        text-align: left;
+        letter-spacing: -0.25px;
+        line-height: 14px;
+      }
+    
+      .cryptocardgraph {
+        top: 16px;
+        height: 120px;
+        width: 135px;
+        position: absolute;
+        margin: 0;
+        left: 193px;
+
+        .group4 {
+          top: 0;
+          height: 120px;
+          width: 135px;
+          position: relative;
+          margin: 0;
+          left: 0;
+
+          .group2 {
+            top: 0;
+            height: 120px;
+            width: 132px;
+            position: absolute;
+            margin: 0;
+            left: 2px;
+
+            .rectangle6 {
+              top: 0;
+              height: 120px;
+              width: 2px;
+              position: absolute;
+              margin: 0;
+              left: 0;
+              opacity: 0.25;
+              background: #fff;
+            }
+          
+            .rectangle6copy {
+              top: 0;
+              height: 120px;
+              width: 3px;
+              position: absolute;
+              margin: 0;
+              left: 16px;
+              opacity: 0.1;
+              background: #fff;
+            }
+          
+            .rectangle6copy9 {
+              top: 0;
+              height: 120px;
+              width: 3px;
+              position: absolute;
+              margin: 0;
+              left: 7px;
+              opacity: 0.1;
+              background: #fff;
+            }
+          
+            .rectangle6copy10 {
+              top: 0;
+              height: 120px;
+              width: 3px;
+              position: absolute;
+              margin: 0;
+              left: 23px;
+              opacity: 0.1;
+              background: #fff;
+            }
+          
+            .rectangle6copy11 {
+              top: 0;
+              height: 120px;
+              width: 3px;
+              position: absolute;
+              margin: 0;
+              left: 41px;
+              opacity: 0.1;
+              background: #fff;
+            }
+          
+            .rectangle6copy12 {
+              top: 0;
+              height: 120px;
+              width: 3px;
+              position: absolute;
+              margin: 0;
+              left: 48px;
+              opacity: 0.1;
+              background: #fff;
+            }
+          
+            .rectangle6copy13 {
+              top: 0;
+              height: 120px;
+              width: 2px;
+              position: absolute;
+              margin: 0;
+              left: 75px;
+              opacity: 0.1;
+              background: #fff;
+            }
+          
+            .rectangle6copy14 {
+              top: 0;
+              height: 120px;
+              width: 3px;
+              position: absolute;
+              margin: 0;
+              left: 91px;
+              opacity: 0.1;
+              background: #fff;
+            }
+          
+            .rectangle6copy15 {
+              top: 0;
+              height: 120px;
+              width: 3px;
+              position: absolute;
+              margin: 0;
+              left: 107px;
+              opacity: 0.1;
+              background: #fff;
+            }
+          
+            .rectangle6copy16 {
+              top: 0;
+              height: 120px;
+              width: 2px;
+              position: absolute;
+              margin: 0;
+              left: 123px;
+              opacity: 0.1;
+              background: #fff;
+            }
+          
+            .rectangle6copy2 {
+              top: 0;
+              height: 120px;
+              width: 3px;
+              position: absolute;
+              margin: 0;
+              left: 33px;
+              opacity: 0.1;
+              background: #fff;
+            }
+          
+            .rectangle6copy5 {
+              top: 0;
+              height: 120px;
+              width: 3px;
+              position: absolute;
+              margin: 0;
+              left: 57px;
+              opacity: 0.25;
+              background: #fff;
+            }
+          
+            .rectangle6copy4 {
+              top: 0;
+              height: 120px;
+              width: 2px;
+              position: absolute;
+              margin: 0;
+              left: 67px;
+              opacity: 0.1;
+              background: #fff;
+            }
+          
+            .rectangle6copy3 {
+              top: 0;
+              height: 120px;
+              width: 3px;
+              position: absolute;
+              margin: 0;
+              left: 83px;
+              opacity: 0.1;
+              background: #fff;
+            }
+          
+            .rectangle6copy8 {
+              top: 0;
+              height: 120px;
+              width: 3px;
+              position: absolute;
+              margin: 0;
+              left: 100px;
+              opacity: 0.1;
+              background: #fff;
+            }
+          
+            .rectangle6copy7 {
+              top: 0;
+              height: 120px;
+              width: 3px;
+              position: absolute;
+              margin: 0;
+              left: 115px;
+              opacity: 0.25;
+              background: #fff;
+            }
+          
+            .rectangle6copy6 {
+              top: 0;
+              height: 120px;
+              width: 3px;
+              position: absolute;
+              margin: 0;
+              left: 130px;
+              opacity: 0.1;
+              background: #fff;
+            }
+          }
+        
+          .group3 {
+            top: 16px;
+            height: 81px;
+            width: 131px;
+            position: absolute;
+            margin: 0;
+            left: 0;
+
+            .path4 {
+              top: 6px;
+              height: 78px;
+              width: 121px;
+              position: absolute;
+              margin: 0;
+              left: 2px;
+            }
+          
+            .oval3 {
+              top: 65px;
+              height: 16px;
+              width: 16px;
+              position: absolute;
+              margin: 0;
+              left: -1px;
+            }
+          
+            .oval3copy {
+              top: 40px;
+              height: 16px;
+              width: 16px;
+              position: absolute;
+              margin: 0;
+              left: 57px;
+            }
+          
+            .oval3copy2 {
+              top: 0;
+              height: 16px;
+              width: 16px;
+              position: absolute;
+              margin: 0;
+              left: 114px;
+            }            
+          }
+        }
+      }
+    }
+  
+    .div1 {
+      opacity: 0.1;
+      position: absolute;
+      margin-top: 80px;
+    }
+  
+    .a1241 {
+      padding-top: 45px;
+      height: auto;
+      width: auto;
+      float: right;
+      padding-right: 14px;
+      margin: 0;
+      font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+      font-size: 13px;
+      color: rgba(126, 210, 33, 1.0);
+      text-align: right;
+      letter-spacing: -0.58px;
+      line-height: 16px;
+    }
+  
+    .path5 {
+      padding-top: 50px;
+      height: 6px;
+      width: 10px;
+      position: absolute;
+      margin: 0;
+      left: 340px;
+    }
+  
+    .btc {
+      padding-top: 22px;
+      height: 40px;
+      width: 40px;
+      position: absolute;
+      margin: 0;
+      left: 5px;
+
+      .oval4 {
+        height: 40px;
+        width: 40px;
+        margin: 0;
+        border-radius: 50%;
+        border: solid 2px #fff;
+        background: #fff;
+      }
+    
+      .shape {
+        top: 11px;
+        height: 18px;
+        width: 13px;
+        position: absolute;
+        margin: 0;
+        left: 13px;
+      }
+    }
+  
+    .bitcoin {
+      padding-top: 23px;
+      height: auto;
+      width: auto;
+      position: absolute;
+      margin: 0;
+      left: 61px;
+      font-family: 'Helvetica', Helvetica, Arial, serif;
+      font-size: 14px;
+      color: #fff;
+      text-align: left;
+      letter-spacing: -0.58px;
+      line-height: 17px;
+    }
+  
+    .a0000041 {
+      padding-top: 45px;
+      height: auto;
+      width: auto;
+      position: absolute;
+      margin: 0;
+      left: 61px;
+      opacity: 0.65;
+      font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+      font-size: 14px;
+      color: #fff;
+      text-align: left;
+      letter-spacing: -0.1px;
+      line-height: 16px;
+      font-weight: 300;
+    }
+  
+    .a123345 {
+      padding-top: 23px;
+      height: auto;
+      width: auto;
+      position: absolute;
+      margin: 0;
+      left: 262px;
+      font-family: 'Helvetica', Helvetica, Arial, serif;
+      font-size: 14px;
+      color: #fff;
+      text-align: right;
+      letter-spacing: -0.58px;
+      line-height: 17px;
+    }
+  
+    .combinedshape {
+      top: 45px;
+      height: 14px;
+      width: 20px;
+      position: absolute;
+      margin: 0;
+      left: 20px;
+    }
+  
+    .home .portfolio {
+      top: 42px;
+      height: auto;
+      width: auto;
+      position: absolute;
+      margin: 0;
+      left: 153px;
+      font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+      font-size: 18px;
+      color: #fff;
+      text-align: left;
+      letter-spacing: -0.56px;
+      line-height: 22px;
+    }
+  
+    .combinedshape1 {
+      top: 41px;
+      height: 22px;
+      width: 20px;
+      position: absolute;
+      margin: 0;
+      left: 333px;
+    }
+  
+    .oval1 {
+      top: 40px;
+      height: 8px;
+      width: 8px;
+      position: absolute;
+      margin: 0;
+      left: 347px;
+    }
+  
+    .yourcoins {
+      top: 220px;
+      height: auto;
+      width: auto;
+      position: absolute;
+      margin: 0;
+      left: 5px;
+      font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+      font-size: 18px;
+      color: #fff;
+      text-align: left;
+      letter-spacing: -0.56px;
+      line-height: 22px;
+    }
+  
+    .combinedshape2 {
+      top: 312px;
+      height: 26px;
+      width: 26px;
+      position: absolute;
+      margin: 0;
+      left: 331px;
+    }
+  }
+}

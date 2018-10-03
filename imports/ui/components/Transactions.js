@@ -1,20 +1,64 @@
 import React from 'react';
+import { formatValue } from 'agama-wallet-lib/build/utils';
+import { secondsToString } from 'agama-wallet-lib/build/time';
 import {
-  secondsToString,
-  formatValue,
-  explorers,
-  isAssetChain,
-} from '../actions/utils';
-import { translate } from '../translate/translate';
+  explorerList,
+  isKomodoCoin,
+} from 'agama-wallet-lib/build/coin-helpers';
+import translate from '../translate/translate';
+import Spinner from './Spinner';
+import QRCode from 'qrcode.react';
+import { assetsPath } from '../actions/utils';
 
 class Transactions extends React.Component {
   constructor() {
     super();
     this.state = {
       toggledTxDetails: null,
+      showQR: false,
     };
     this.toggleTxDetails = this.toggleTxDetails.bind(this);
     this.openExternalURL = this.openExternalURL.bind(this);
+    this.isInterestDefined = this.isInterestDefined.bind(this);
+    this.toggleQR = this.toggleQR.bind(this);
+    this.showClaimButton = this.showClaimButton.bind(this);
+  }
+
+  toggleQR() {
+    this.setState({
+      showQR: !this.state.showQR,
+    });
+  }
+
+  showClaimButton() {
+    const _props = this.props;
+
+    if (_props.coin === 'kmd' &&
+        _props.balance &&
+        _props.balance.interest &&
+        _props.balance.interest > 0) {
+      return true;
+    }
+  }
+
+  showSendButton() {
+    const _props = this.props;
+
+    if (_props.balance &&
+        _props.balance.balance &&
+        _props.balance.balance > 0) {
+      return true;
+    }
+  }
+
+  isInterestDefined() {
+    const _props = this.props;
+
+    if (_props.balance &&
+        _props.balance.interest &&
+        _props.balance.interest > 0) {
+      return true;
+    }
   }
 
   componentWillReceiveProps(props) {
@@ -35,42 +79,6 @@ class Transactions extends React.Component {
     window.open(url, '_system');
   }
 
-  renderTxType(category) {
-    if (category === 'send' ||
-        category === 'sent') {
-      return (
-        <span className="label label-danger">
-          <i className="fa fa-arrow-circle-left"></i> <span>{ translate('TRANSACTIONS.OUT') }</span>
-        </span>
-      );
-    } else if (category === 'receive' ||
-        category === 'received') {
-      return (
-        <span className="label label-success">
-          <i className="fa fa-arrow-circle-right"></i> <span>{ translate('TRANSACTIONS.IN') } &nbsp; &nbsp;</span>
-        </span>
-      );
-    } else if (category === 'generate') {
-      return (
-        <span>
-          <i className="fa fa-cogs"></i> <span>{ translate('TRANSACTIONS.MINE') }</span>
-        </span>
-      );
-    } else if (category === 'immature') {
-      return (
-        <span>
-          <i className="fa fa-clock-o"></i> <span>{ translate('TRANSACTIONS.IMMATURE') }</span>
-        </span>
-      );
-    } else if (category === 'unknown') {
-      return (
-        <span>
-          <i className="fa fa-meh-o"></i> <span>{ translate('TRANSACTIONS.UNKNOWN') }</span>
-        </span>
-      );
-    }
-  };
-
   renderTxAmount(tx, amountOnly) {
     let _amountNegative;
 
@@ -83,91 +91,150 @@ class Transactions extends React.Component {
       _amountNegative = 1;
     }
 
+    if (Number(tx.interest) === Number(tx.amount)) {
+      _amountNegative = -1;
+    }
+
     return (
       <span>
+        { Number(tx.interest) === Number(tx.amount) &&
+          <span>+</span>
+        }
         { formatValue(tx.amount) * _amountNegative || translate('TRANSACTIONS.UNKNOWN') }
+        { Number(tx.amount) !== 0 &&
+          <span className="padding-left-5">{ this.props.coin.toUpperCase() }</span>
+        }
         { tx.interest &&
           !amountOnly &&
-          <span className="tx-interest margin-left-15">(+{ formatValue(Math.abs(tx.interest)) })</span>
+          (Number(tx.interest) !== Number(tx.amount)) &&
+          <div className="tx-interest">+{ formatValue(Math.abs(tx.interest)) }</div>
         }
       </span>
     );
   };
 
+  renderSendReceiveBtn() {
+    return (
+      <div className={ 'send-receive-block' + (this.showClaimButton() ? ' three-btn' : '') }>
+        <div className="send-receive-block-inner">
+          <button
+            disabled={ !this.showSendButton() }
+            type="button"
+            onClick={ () => this.props.changeActiveSection('send') }
+            className="btn btn-primary waves-effect waves-light margin-right-20">
+            <i className="fa fa-send"></i> { translate('DASHBOARD.SEND') }
+          </button>
+          <button
+            type="button"
+            className="btn btn-success waves-effect waves-light"
+            onClick={ this.toggleQR }>
+            <i className="fa fa-inbox"></i> { translate('DASHBOARD.RECEIVE') }
+          </button>
+          { this.state.showQR &&
+            <div className="receive-qr">
+              { this.props.address &&
+                <div>
+                  <QRCode
+                    value={ this.props.address }
+                    size={ 198 } />
+                  <div className="text-center">{ this.props.address }</div>
+                </div>
+              }
+            </div>
+          }
+          { this.showClaimButton() &&
+            <button
+              type="button"
+              className="btn btn-info waves-effect waves-light margin-left-20 btn-claim"
+              onClick={ this.props.toggleKMDInterest }>
+              <i className="fa fa-dollar"></i> { translate('DASHBOARD.CLAIM') }
+            </button>
+          }
+        </div>
+      </div>
+    );
+  }
+
   render() {
     if (this.props.activeSection === 'dashboard') {
-      if (this.props.transactions) {
-        const _transactions = this.props.transactions;
-        let _items = [];
+      const _transactions = this.props.transactions;
+      let _items = [];
 
+      if (_transactions) {
         for (let i = 0; i < _transactions.length; i++) {
           _items.push(
             <div
-              className="txlist-transaction"
+              className={ `item ${_transactions[i].interest && Math.abs(_transactions[i].interest) > 0 ? 'received' : _transactions[i].type}` }
               key={ `transaction-${i}` }>
-              <div>
-                { this.renderTxType(_transactions[i].type) }
-                <span className="margin-left-20">{ this.renderTxAmount(_transactions[i]) }</span>
-                <span className="margin-left-20">{ secondsToString(_transactions[i].timestamp) }</span>
-                <span
-                  onClick={ () => this.toggleTxDetails(i) }
-                  className={ 'details-toggle fa ' + (this.state.toggledTxDetails === i ? 'fa-caret-up' : 'fa-caret-down') }></span>
-              </div>
-              { this.state.toggledTxDetails !== i &&
-                <div className="margin-top-10 padding-bottom-10 txid-hash">
-                { _transactions[i].txid }
+              <div className="direction">{ _transactions[i].type }</div>
+              <div className="date">{ secondsToString(_transactions[i].timestamp) }</div>
+              { /*<div className="amount-fiat">$0</div> */ }
+              <div className="amount-native">{ this.renderTxAmount(_transactions[i]) }</div>
+              <div className="direction-icon"></div>
+              <img
+                className="line"
+                src={ `${assetsPath.txs}/trends-rectangle-7.png` } />
+            </div>
+          );
+        }
+      }
+
+      const _coin = this.props.coin;
+      const _balance = this.props.balance;
+
+      return (
+        <div className="transactions-ui">
+          <div className="individualportfolio">
+            <div className="individualportfolio-inner">
+              { this.props.loading &&
+                !this.props.transactions &&
+                <div className="lasttransactions">{ translate('TRANSACTIONS.LOADING_HISTORY') }...</div>                  
+              }
+              { this.props.transactions &&
+                <div className="lasttransactions">
+                  { translate('TRANSACTIONS.' + (!_items.length ? 'NO_HISTORY' : 'LAST_TX')) }
                 </div>
               }
-              { this.state.toggledTxDetails === i &&
-                <div className="margin-top-10 padding-bottom-10 tx-details">
-                  <div>{ translate('TRANSACTIONS.DIRECTION') }: { _transactions[i].type }</div>
-                  <div>{ translate('TRANSACTIONS.AMOUNT') }: { this.renderTxAmount(_transactions[i], true) } { this.props.coin.toUpperCase() }</div>
-                  { _transactions[i].interest &&
-                    Math.abs(_transactions[i].interest) > 0 &&
-                    <div>{ translate('TRANSACTIONS.INTEREST') }: { formatValue(Math.abs(_transactions[i].interest)) } KMD</div>
-                  }
-                  <div>{ translate('TRANSACTIONS.CONFIRMATIONS') }: { _transactions[i].confirmations }</div>
-                  { this.props.coin === 'kmd' &&
-                    <div>Locktime: { _transactions[i].locktime }</div>
-                  }
-                  <div>
-                  { translate('TRANSACTIONS.TIME') }: { secondsToString(_transactions[i].timestamp) }
-                    { isAssetChain(this.props.coin) &&
-                      <button
-                        onClick={ () => this.openExternalURL(`${explorers[this.props.coin.toUpperCase()]}/tx/${_transactions[i].txid}`) }
-                        className="margin-left-20 btn btn-sm white btn-dark waves-effect waves-light ext-link">
-                        <i className="fa fa-external-link"></i>Explorer
-                      </button>
+              <div className="cryptocardbtc-block">
+                <div className="cryptocardbtc">
+                  <img
+                    className="coin-icon"
+                    src={ `${assetsPath.coinLogo}/${_coin}.png` } />
+                  <div className="coin-title">{ translate('COINS.' + _coin.toUpperCase()) }</div>
+                  <div className="coin-balance">
+                    <div className="balance">
+                    { translate('BALANCE.BALANCE') }: { _balance ? formatValue(_balance.balance) : 0 } { _coin.toUpperCase() }
+                    </div>
+                    { this.isInterestDefined() &&
+                      <div className="interest">
+                      { translate('BALANCE.INTEREST') }: { _balance ? formatValue(_balance.interest) : 0 } { _coin.toUpperCase() }
+                      </div>
                     }
                   </div>
-                  <div>
-                  { translate('TRANSACTIONS.TX_HASH') } <div className="txid-hash">{ _transactions[i].txid }</div>
-                  </div>
+                  { !this.props.loading &&
+                    this.props.auth &&
+                    this.props.activeSection === 'dashboard' &&
+                    (_items && _items.length > 0) &&
+                    <i
+                      onClick={ this.props.dashboardRefresh }
+                      className="fa fa-refresh dashboard-refresh"></i>
+                    }
+                    { this.props.loading &&
+                      this.props.activeSection === 'dashboard' &&
+                      <Spinner />
+                    }
+                </div>
+              </div>
+              { this.renderSendReceiveBtn() }
+              { (_items && _items.length > 0 && !this.state.showQR) &&
+                <div className="transactions-list">
+                { _items }
                 </div>
               }
             </div>
-          );
-        }
-
-        if (!_items.length) {
-          return (
-            <div className="txhistory">{ translate('TRANSACTIONS.NO_HISTORY') }</div>
-          );
-        } else {
-          return (
-            <div className="txhistory">
-              <div className="dashboard-title">
-                <strong>{ translate('DASHBOARD.TRANSACTIONS') }</strong>
-              </div>
-              { _items }
-            </div>
-          );
-        }
-      } else {
-        return null;
-      }
-    } else {
-      return null;
+          </div>
+        </div>
+      );
     }
   }
 }

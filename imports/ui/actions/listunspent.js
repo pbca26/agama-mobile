@@ -1,15 +1,18 @@
 import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
-import { kmdCalcInterest } from './utils';
-import { isAssetChain } from './utils';
-import { verifyMerkleByCoin } from './merkle';
-import { electrumJSTxDecoder } from './txDecoder/txDecoder';
+import kmdCalcInterest from 'agama-wallet-lib/build/komodo-interest';
+import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
+import verifyMerkleByCoin from './merkle';
+import {
+  fromSats,
+  toSats,
+} from 'agama-wallet-lib/build/utils';
+import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
+import electrumJSTxDecoder from 'agama-wallet-lib/build/transaction-decoder';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
-const electrumJSNetworks = require('./electrumNetworks.js');
-
-export const listunspent = (proxyServer, electrumServer, address, network, full, verify) => {
+const listunspent = (proxyServer, electrumServer, address, network, full, verify, cache) => {
   let _atLeastOneDecodeTxFailed = false;
 
   if (full) {
@@ -63,15 +66,20 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                   } else {
                     Promise.all(_utxo.map((_utxoItem, index) => {
                       return new Promise((resolve, reject) => {
-                        HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction`, {
-                          params: {
-                            port: electrumServer.port,
-                            ip: electrumServer.ip,
-                            proto: electrumServer.proto,
-                            address,
-                            txid: _utxoItem['tx_hash'],
-                          },
-                        }, (error, result) => {
+                        cache.getTransaction(
+                          _utxoItem.tx_hash,
+                          network,
+                          {
+                            url: `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction`,
+                            params: {
+                              port: electrumServer.port,
+                              ip: electrumServer.ip,
+                              proto: electrumServer.proto,
+                              txid: _utxoItem.tx_hash,
+                            },
+                          }
+                        )
+                        .then((result) => {
                           result = JSON.parse(result.content);
 
                           devlog('gettransaction =>');
@@ -81,12 +89,19 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                             const _rawtxJSON = result.result;
 
                             devlog('electrum gettransaction ==>');
-                            devlog(index + ' | ' + (_rawtxJSON.length - 1));
+                            devlog(`${index} | ${(_rawtxJSON.length - 1)}`);
                             devlog(_rawtxJSON);
 
                             // decode tx
-                            const _network = electrumJSNetworks[isAssetChain(network) ? 'komodo' : network];
-                            const decodedTx = electrumJSTxDecoder(_rawtxJSON, network, _network);
+                            const _network = electrumJSNetworks[isKomodoCoin(network) ? 'kmd' : network];
+                            let decodedTx;
+                            
+                            if (cache.getDecodedTransaction(_utxoItem.tx_hash, network)) {
+                              decodedTx = cache.getDecodedTransaction(_utxoItem.tx_hash, network);
+                            } else {
+                              decodedTx = electrumJSTxDecoder(_rawtxJSON, _network);
+                              cache.getDecodedTransaction(_utxoItem.tx_hash, network, decodedTx);
+                            }
 
                             devlog('decoded tx =>');
                             devlog(decodedTx);
@@ -95,23 +110,22 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                               _atLeastOneDecodeTxFailed = true;
                               resolve('cant decode tx');
                             } else {
-                              if (network === 'komodo' ||
-                                  network === 'kmd') {
+                              if (network === 'kmd') {
                                 let interest = 0;
 
-                                if (Number(_utxoItem.value) * 0.00000001 >= 10 &&
+                                if (Number(fromSats(_utxoItem.value)) >= 10 &&
                                     decodedTx.format.locktime > 0) {
-                                  interest = kmdCalcInterest(decodedTx.format.locktime, _utxoItem.value);
+                                  interest = kmdCalcInterest(decodedTx.format.locktime, _utxoItem.value, _utxoItem.height);
                                 }
 
                                 let _resolveObj = {
-                                  txid: _utxoItem['tx_hash'],
-                                  vout: _utxoItem['tx_pos'],
+                                  txid: _utxoItem.tx_hash,
+                                  vout: _utxoItem.tx_pos,
                                   address,
-                                  amount: Number(_utxoItem.value) * 0.00000001,
+                                  amount: Number(fromSats(_utxoItem.value)),
                                   amountSats: _utxoItem.value,
                                   interest: interest,
-                                  interestSats: Math.floor(interest * 100000000),
+                                  interestSats: Math.floor(toSats(interest)),
                                   confirmations: Number(_utxoItem.height) === 0 ? 0 : currentHeight - _utxoItem.height,
                                   spendable: true,
                                   verified: false,
@@ -121,11 +135,14 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                                 // merkle root verification agains another electrum server
                                 if (verify) {
                                   verifyMerkleByCoin(
-                                    _utxoItem['tx_hash'],
+                                    _utxoItem.tx_hash,
                                     _utxoItem.height,
                                     electrumServer,
-                                    proxyServer
-                                  ).then((verifyMerkleRes) => {
+                                    proxyServer,
+                                    cache,
+                                    network
+                                  )
+                                  .then((verifyMerkleRes) => {
                                     if (verifyMerkleRes &&
                                         verifyMerkleRes === CONNECTION_ERROR_OR_INCOMPLETE_DATA) {
                                       verifyMerkleRes = false;
@@ -139,10 +156,10 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                                 }
                               } else {
                                 let _resolveObj = {
-                                  txid: _utxoItem['tx_hash'],
-                                  vout: _utxoItem['tx_pos'],
+                                  txid: _utxoItem.tx_hash,
+                                  vout: _utxoItem.tx_pos,
                                   address,
-                                  amount: Number(_utxoItem.value) * 0.00000001,
+                                  amount: Number(fromSats(_utxoItem.value)),
                                   amountSats: _utxoItem.value,
                                   confirmations: Number(_utxoItem.height) === 0 ? 0 : currentHeight - _utxoItem.height,
                                   spendable: true,
@@ -152,11 +169,14 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
                                 // merkle root verification agains another electrum server
                                 if (verify) {
                                   verifyMerkleByCoin(
-                                    _utxoItem['tx_hash'],
+                                    _utxoItem.tx_hash,
                                     _utxoItem.height,
                                     electrumServer,
-                                    proxyServer
-                                  ).then((verifyMerkleRes) => {
+                                    proxyServer,
+                                    cache,
+                                    network
+                                  )
+                                  .then((verifyMerkleRes) => {
                                     if (verifyMerkleRes &&
                                         verifyMerkleRes === CONNECTION_ERROR_OR_INCOMPLETE_DATA) {
                                       verifyMerkleRes = false;
@@ -211,4 +231,6 @@ export const listunspent = (proxyServer, electrumServer, address, network, full,
       });
     });
   }
-}
+};
+
+export default listunspent;

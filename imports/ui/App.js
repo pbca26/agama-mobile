@@ -1,28 +1,32 @@
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { electrumServers } from './actions/electrumServers';
-
+import electrumServers from 'agama-wallet-lib/build/electrum-servers';
+import { Meteor } from 'meteor/meteor';
 import actions from './actions/actions';
 import {
   setLocalStorageVar,
   getLocalStorageVar,
-  sortBy,
-  getRandomIntInclusive,
   convertURIToImageData,
+  assetsPath,
+  sortObject,
 } from './actions/utils';
-import { translate } from './translate/translate';
+import translate from './translate/translate';
+import {
+  devlog,
+  config,
+} from './actions/dev';
+import {
+  getRandomIntInclusive,
+  sort,
+} from 'agama-wallet-lib/build/utils';
 
 import SendCoin from './components/SendCoin';
-import MyAddress from './components/MyAddress';
 import AddCoin from './components/AddCoin';
 import Login from './components/Login';
 import Transactions from './components/Transactions';
-import Balance from './components/Balance';
-import Spinner from './components/Spinner';
 import ServerSelect from './components/ServerSelect';
 import CreateSeed from './components/CreateSeed';
-import SendReceive from './components/SendReceive';
 import KMDInterest from './components/KMDInterest';
 import OfflineSigning from './components/OfflineSigning';
 import Pin from './components/Pin';
@@ -31,7 +35,8 @@ import Overview  from './components/Overview';
 import Settings  from './components/Settings';
 
 const DASHBOARD_UPDATE_INTERVAL = 120000; // 2m
-const DEFAULT_LOCK_INACTIVE_INTERVAL = getLocalStorageVar('settings') && getLocalStorageVar('settings').autoLockTimeout ? getLocalStorageVar('settings').autoLockTimeout : 600000; // 10m
+const PROXY_RETRY_COUNT = 2;
+const PROXY_RETRY_TIMEOUT = 5000;
 
 class App extends React.Component {
   constructor() {
@@ -47,14 +52,20 @@ class App extends React.Component {
       coin: null,
       coins: {},
       pubKeys: {},
-      activeSection: null,
+      activeSection: 'login',
       saveSeed: null,
       auth: false,
       updateInterval: null,
       conError: false,
       proxyError: false,
+      proxyErrorCount: 0,
+      proxyRetryInProgress: false,
       overview: null,
+      history: null,
+      btcFees: null,
     };
+    this.globalClickTimeout = null;
+    this.overviewInterval = null;
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
@@ -63,28 +74,24 @@ class App extends React.Component {
     this.getBalance = this.getBalance.bind(this);
     this.getTransactions = this.getTransactions.bind(this);
     this.toggleMenu = this.toggleMenu.bind(this);
-    this.toggleSend = this.toggleSend.bind(this);
-    this.toggleCreateSeed = this.toggleCreateSeed.bind(this);
-    this.toggleAddCoin = this.toggleAddCoin.bind(this);
     this.dashboardRefresh = this.dashboardRefresh.bind(this);
     this.switchCoin = this.switchCoin.bind(this);
     this.addCoin = this.addCoin.bind(this);
     this.changeActiveSection = this.changeActiveSection.bind(this);
     this.toggleAutoRefresh = this.toggleAutoRefresh.bind(this);
-    this.toggleLogin = this.toggleLogin.bind(this);
     this.toggleKMDInterest = this.toggleKMDInterest.bind(this);
-    this.toggleOffileSig = this.toggleOffileSig.bind(this);
-    this.togglePin = this.togglePin.bind(this);
-    this.toggleSettings = this.toggleSettings.bind(this);
-    this.toggleRecovery = this.toggleRecovery.bind(this);
     this.toggleOverview = this.toggleOverview.bind(this);
-    this.toggle = this.toggleOverview.bind(this);
+    this.toggleMenuOption = this.toggleMenuOption.bind(this);
     this.globalClick = this.globalClick.bind(this);
-    this.globalClickTimeout = null;
-    this.overviewInterval = null;
+    this.historyBack = this.historyBack.bind(this);
+    this.scrollToTop = this.scrollToTop.bind(this);
+    this.getBtcFees = this.getBtcFees.bind(this);
+    this.retryProxy = this.retryProxy.bind(this);
+    this.updateDefaultCoinServer = this.updateDefaultCoinServer.bind(this);
   }
 
   componentWillMount() {
+    const { actions } = this.props;
     const _localStorageCoins = getLocalStorageVar('coins');
 
     if (_localStorageCoins) {
@@ -92,29 +99,120 @@ class App extends React.Component {
         coins: _localStorageCoins,
       });
     }
+  
+    actions.getOverview(this.state.coins)
+    .then((res) => {
+      this.setState({
+        overview: res,
+      });
+    });
+  }
+
+  updateDefaultCoinServer(coin, server) {
+    let _newState = JSON.parse(JSON.stringify(this.state.coins));
+    _newState[coin].server = server;
+    
+    setLocalStorageVar('coins', _newState);
+    this.setState({
+      coins: _newState,
+    });
+  }
+
+  retryProxy(disableAnimation) {
+    const { actions } = this.props;
+
+    if (!disableAnimation ||
+       typeof disableAnimation === 'object') {
+      this.setState({
+        proxyRetryInProgress: true,
+      });
+
+      Meteor.setTimeout(() => {
+        this.setState({
+          proxyRetryInProgress: false,
+        });
+      }, 1000);
+    }
+    
+    actions.getAnotherProxy();
+    this.dashboardRefresh();
+  }
+
+  getBtcFees() {
+    const { actions } = this.props;
+  
+    this.setState({
+      btcFees: null,
+    });
+
+    actions.getBtcFees()
+    .then((res) => {
+      this.setState({
+        btcFees: res,
+      });
+
+      if (res === 'error') {
+        Meteor.setTimeout(() => {
+          this.getBtcFees();
+        }, 5000);
+      }
+    });
+  }
+
+  historyBack() {
+    this.setState({
+      activeSection: this.state.history,
+      history: null,
+    });
   }
 
   scrollToTop() {
     window.scrollTo(0, 0);
   }
 
-  globalClick() {
+  /*globalClick() {
     if (this.state.auth) {
       if (this.globalClickTimeout) {
-        clearTimeout(this.globalClickTimeout);
+        Meteor.clearTimeout(this.globalClickTimeout);
       }
 
-      this.globalClickTimeout = setTimeout(() => {
-        // console.warn(`logout after ${DEFAULT_LOCK_INACTIVE_INTERVAL} inactivity`);
-        this.lock();
-      }, DEFAULT_LOCK_INACTIVE_INTERVAL);
+      if (!config.dev ||
+          (config.dev && config.preload && !config.preload.disableAutoLock) ||
+          (config.dev && !config.preload)) {
+        this.globalClickTimeout = Meteor.setTimeout(() => {
+          devlog(`logout after ${DEFAULT_LOCK_INACTIVE_INTERVAL}ms inactivity`);
+          this.lock();
+        }, DEFAULT_LOCK_INACTIVE_INTERVAL);
+      }
 
-      // console.warn('global click', 'set timer');
+      devlog('global click', 'set timer');
+    }
+  }*/
+
+  globalClick() {
+    const _storageSettings = getLocalStorageVar('settings');    
+    const DEFAULT_LOCK_INACTIVE_INTERVAL = _storageSettings && _storageSettings.autoLockTimeout ? _storageSettings.autoLockTimeout : 600000; // 10m
+    
+    if (this.state.auth) {
+      if (this.globalClickTimeout) {
+        Meteor.clearTimeout(this.globalClickTimeout);
+      }
+
+      if (!config.dev ||
+          (config.dev && config.preload && !config.preload.disableAutoLock) ||
+          (config.dev && !config.preload)) {
+        this.globalClickTimeout = Meteor.setTimeout(() => {
+          devlog(`logout after ${DEFAULT_LOCK_INACTIVE_INTERVAL}ms inactivity`);
+          this.lock();
+        }, DEFAULT_LOCK_INACTIVE_INTERVAL);
+      }
+
+      devlog('global click', 'set timer');
     }
   }
 
   addCoin(coin) {
-    const server = electrumServers[coin === 'kmd' ? 'komodo' : coin];
+    const server = electrumServers[coin];
     let coins = this.state.coins;
 
     // pick a random server to communicate with
@@ -124,9 +222,12 @@ class App extends React.Component {
       const randomServer = server.serverList[randomServerId];
       const serverDetails = randomServer.split(':');
 
-      if (serverDetails.length === 2) {
-        server.ip = serverDetails[0];
-        server.port = serverDetails[1];
+      if (serverDetails.length === 3) {
+        server = {
+          ip: serverDetails[0],
+          port: serverDetails[1],
+          proto: serverDetails[2],
+        };
       }
     }
 
@@ -139,6 +240,8 @@ class App extends React.Component {
     if (!this.state.auth) {
       this.setState({
         coins,
+        history: null,
+        activeSection: 'login',
       });
     } else {
       const { actions } = this.props;
@@ -147,10 +250,13 @@ class App extends React.Component {
       .then((res) => {
         this.setState({
           coins,
+          history: null,
           activeSection: 'dashboard',
           coin,
           address: res,
           loading: true,
+          transactions: this.state.coins[coin] ? this.state.coins[coin].transactions: null,
+          balance: this.state.coins[coin] ? this.state.coins[coin].balance: null,
         });
         this.scrollToTop();
         this.dashboardRefresh();
@@ -163,6 +269,7 @@ class App extends React.Component {
 
     this.setState({
       utxo: null,
+      history: this.state.activeSection,
       activeSection: 'claim',
     });
 
@@ -179,15 +286,21 @@ class App extends React.Component {
     if (toggleMenu) {
       this.setState({
         displayMenu: false,
+        history: this.state.activeSection,
         activeSection: section,
       });
     } else {
       this.setState({
+        history: this.state.activeSection,        
         activeSection: section,
       });
     }
 
-    document.getElementById('body').style.overflow = 'inherit';
+    if (this.state.coin === 'btc' &&
+        section === 'send') {
+      this.getBtcFees();
+    }
+
     this.scrollToTop();
   }
 
@@ -195,11 +308,14 @@ class App extends React.Component {
     this.setState({
       coin: coin,
       address: this.state.pubKeys[coin],
-      activeSection: this.state.activeSection !== 'send' ? 'dashboard' : 'send',
+      history: this.state.activeSection,
+      activeSection: 'dashboard',
+      transactions: this.state.coins[coin] ? this.state.coins[coin].transactions: null,
+      balance: this.state.coins[coin] ? this.state.coins[coin].balance: null,
     });
 
     // toggle refresh and update in-mem coins cache obj
-    setTimeout(() => {
+    Meteor.setTimeout(() => {
       this.toggleMenu();
       this.dashboardRefresh();
       this.scrollToTop();
@@ -208,14 +324,14 @@ class App extends React.Component {
 
   toggleAutoRefresh(disable) {
     if (disable) {
-      clearInterval(this.state.updateInterval);
-      clearInterval(this.state.overviewInterval);
+      Meteor.clearInterval(this.state.updateInterval);
+      Meteor.clearInterval(this.state.overviewInterval);
 
       this.setState({
         updateInterval: null,
       });
     } else {
-      const _updateInterval = setInterval(() => {
+      const _updateInterval = Meteor.setInterval(() => {
         if (this.state.activeSection === 'dashboard') {
           this.dashboardRefresh();
         }
@@ -248,9 +364,26 @@ class App extends React.Component {
     .then((res) => {
       if (res &&
           res === 'proxy-error') {
-        this.setState({
+        let _newState = {
           proxyError: true,
-        });
+          proxyErrorCount: this.state.proxyErrorCount + 1,
+        };
+
+        if (this.state.proxyErrorCount + 1 <= PROXY_RETRY_COUNT &&
+            this.state.proxyErrorCount >= 0) {
+          Meteor.setTimeout(() => {
+            devlog(`proxy retry attempt #${this.state.proxyErrorCount}`);
+            this.retryProxy(true);
+          }, PROXY_RETRY_TIMEOUT);
+        } else {
+          _newState = {
+            proxyError: true,
+            proxyErrorCount: -777,
+          }
+          devlog(`${PROXY_RETRY_COUNT} consecutive proxy retry attempts have failed, go manual`);
+        }
+
+        this.setState(_newState);
       } else {
         if (res &&
             !res.hasOwnProperty('balance') &&
@@ -265,6 +398,7 @@ class App extends React.Component {
             balance: res,
             conError: false,
             proxyError: false,
+            proxyErrorCount: 0,
           });
         }
       }
@@ -281,7 +415,7 @@ class App extends React.Component {
     actions.transactions(this.state.coin)
     .then((res) => {
       if (res &&
-          res.indexOf('error') > -1) {
+          (res.indexOf('error') > -1 || res.indexOf('proxy-error') > -1)) {
         this.setState({
           balance: null,
           transactions: null,
@@ -289,13 +423,14 @@ class App extends React.Component {
           conError: true,
         });
       } else {
-        res = sortBy(res, 'timestamp');
+        res = sort(res, 'timestamp', true);
 
         this.setState({
           transactions: res,
           loading: false,
           conError: false,
           proxyError: false,
+          proxyErrorCount: 0,          
         });
       }
     });
@@ -310,10 +445,10 @@ class App extends React.Component {
       this.toggleAutoRefresh(true);
       setLocalStorageVar('coins', {});
 
-      setTimeout(() => {
+      Meteor.setTimeout(() => {
         this.toggleMenu();
       }, 10);
-      setTimeout(() => {
+      Meteor.setTimeout(() => {
         this.setState(this.defaultState);
       }, 20);
       this.scrollToTop();
@@ -324,16 +459,20 @@ class App extends React.Component {
   lock() {
     const { actions } = this.props;
 
+    if (this.globalClickTimeout) {
+      Meteor.clearTimeout(this.globalClickTimeout);
+    }
+
     actions.clearKeys()
     .then((res) => {
       const lockState = Object.assign({}, this.defaultState);
       lockState.coins = this.state.coins;
 
       this.toggleAutoRefresh(true);
-      setTimeout(() => {
+      Meteor.setTimeout(() => {
         this.toggleMenu();
       }, 10);
-      setTimeout(() => {
+      Meteor.setTimeout(() => {
         this.setState(lockState);
       }, 20);
       this.scrollToTop();
@@ -357,11 +496,18 @@ class App extends React.Component {
         address = res[coin];
       }
 
+      if (config.preload &&
+          config.preload.activeCoin) {
+        coin = config.preload.activeCoin;
+        address = res[coin];
+      }
+
       this.setState({
         auth: true,
         pubKeys: res,
         coin,
         address,
+        history: null,
         activeSection: 'dashboard',
       });
 
@@ -373,22 +519,9 @@ class App extends React.Component {
   }
 
   toggleMenu() {
-    document.getElementById('body').style.overflow = !this.state.displayMenu ? 'hidden' : 'inherit';
-
     this.setState({
       displayMenu: !this.state.displayMenu,
     });
-  }
-
-  toggleSettings() {
-    setTimeout(() => {
-      this.toggleMenu();
-    }, 10);
-
-    this.setState({
-      activeSection: this.state.activeSection === 'settings' ? 'dashboard' : 'settings',
-    });
-    this.scrollToTop();
   }
 
   toggleOverview() {
@@ -402,7 +535,7 @@ class App extends React.Component {
     });
 
     if (!this.state.overviewInterval) {
-      const _updateInterval = setInterval(() => {
+      const _updateInterval = Meteor.setInterval(() => {
         if (this.state.activeSection === 'overview') {
           actions.getOverview(this.state.coins)
           .then((res) => {
@@ -418,127 +551,38 @@ class App extends React.Component {
       });
     }
 
-    setTimeout(() => {
-      this.toggleMenu();
-    }, 10);
-
-    this.setState({
-      activeSection: this.state.activeSection === 'overview' ? 'dashboard' : 'overview',
-    });
-    this.scrollToTop();
+    this.toggleMenuOption('overview');
   }
 
-  toggleRecovery() {
-    setTimeout(() => {
+  toggleMenuOption(optionName) {
+    Meteor.setTimeout(() => {
       this.toggleMenu();
     }, 10);
 
     this.setState({
-      activeSection: this.state.activeSection === 'recovery' ? 'dashboard' : 'recovery',
-    });
-    this.scrollToTop();
-  }
-
-  togglePin() {
-    setTimeout(() => {
-      this.toggleMenu();
-    }, 10);
-
-    this.setState({
-      activeSection: this.state.activeSection === 'pin' ? 'dashboard' : 'pin',
-    });
-    this.scrollToTop();
-  }
-
-  toggleOffileSig() {
-    setTimeout(() => {
-      this.toggleMenu();
-    }, 10);
-
-    this.setState({
-      activeSection: this.state.activeSection === 'offlinesig' ? 'dashboard' : 'offlinesig',
-    });
-    this.scrollToTop();
-  }
-
-  toggleSend() {
-    setTimeout(() => {
-      this.toggleMenu();
-    }, 10);
-
-    this.setState({
-      activeSection: this.state.activeSection === 'send' ? 'dashboard' : 'send',
-    });
-    this.scrollToTop();
-  }
-
-  toggleAddCoin() {
-    setTimeout(() => {
-      this.toggleMenu();
-    }, 10);
-
-    this.setState({
-      activeSection: this.state.activeSection === 'addcoin' ? 'dashboard' : 'addcoin',
-    });
-    this.scrollToTop();
-  }
-
-  toggleCreateSeed() {
-    setTimeout(() => {
-      this.toggleMenu();
-    }, 10);
-
-    this.setState({
-      activeSection: this.state.activeSection === 'create-seed' ? 'dashboard' : 'create-seed',
-    });
-    this.scrollToTop();
-  }
-
-  toggleLogin() {
-    setTimeout(() => {
-      this.toggleMenu();
-    }, 10);
-
-    this.setState({
-      activeSection: this.state.activeSection === 'login' ? 'dashboard' : 'login',
+      history: this.state.activeSection,
+      activeSection: this.state.activeSection === optionName ? (this.state.auth ? 'dashboard' : 'login') : optionName,
     });
     this.scrollToTop();
   }
 
   renderActiveCoins() {
+    let _coins = JSON.parse(JSON.stringify(this.state.coins));
     let _items = [];
+    _coins = sortObject(_coins);
 
-    if (this.state.coins &&
-        this.state.coins.kmd) {
+    for (let key in _coins) {
       _items.push(
         <div
-          onClick={ () => this.state.coin !== 'kmd' ? this.switchCoin('kmd') : null }
-          key={ `active-coins-kmd` }
+          onClick={ () => key !== this.state.coin ? this.switchCoin(key) : null }
+          key={ `active-coins-${key}` }
           className="active-coins">
-          <img
-            src={ `/images/cryptologo/kmd.png` } /> <span>KMD</span>
-          { this.state.coin === 'kmd' &&
+          <img src={ `${assetsPath.coinLogo}/${key}.png` } /> <span>{ key.toUpperCase() }</span>
+          { key === this.state.coin &&
             <i className="fa fa-check"></i>
           }
         </div>
       );
-    }
-
-    for (let key in this.state.coins) {
-      if (key !== 'kmd') {
-        _items.push(
-          <div
-            onClick={ () => key !== this.state.coin ? this.switchCoin(key) : null }
-            key={ `active-coins-${key}` }
-            className="active-coins">
-            <img
-              src={ `/images/cryptologo/${key}.png` } /> <span>{ key.toUpperCase() }</span>
-            { key === this.state.coin &&
-              <i className="fa fa-check"></i>
-            }
-          </div>
-        );
-      }
     }
 
     return _items;
@@ -547,63 +591,188 @@ class App extends React.Component {
   renderMenu() {
     if (this.state.displayMenu) {
       return (
-        <div className="nav-menu">
-          <div
-            onClick={ this.toggleMenu }
-            className="nav-menu-overlay"></div>
-          <div
-            id="nav-menu-inner"
-            className="nav-menu-inner">
-            <i
-              onClick={ this.toggleMenu }
-              className="fa fa-bars"></i>
-            { this.state.auth &&
-              <div className="nav-menu-items">
-                { this.state.activeSection !== 'overview' &&
-                  <div onClick={ this.toggleOverview }>Overview</div>
-                }
-                { this.state.activeSection !== 'dashboard' &&
-                  <div onClick={ () => this.changeActiveSection('dashboard', true) }>{ translate('DASHBOARD.DASHBOARD') }</div>
-                }
-                { this.state.activeSection !== 'recovery' &&
-                  <div onClick={ this.toggleRecovery }>Recovery</div>
-                }
-                { this.state.activeSection !== 'settings' &&
-                  <div onClick={ this.toggleSettings }>Settings</div>
-                }
-                <div onClick={ this.logout }>{ translate('DASHBOARD.LOGOUT') }</div>
-                <div onClick={ this.lock }>{ translate('DASHBOARD.LOCK') }</div>
-                { this.state.activeSection !== 'addcoin' &&
-                  Object.keys(this.state.coins).length !== Object.keys(electrumServers).length &&
-                  <div onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.ADD_COIN') }</div>
-                }
-                <div>
-                { this.renderActiveCoins() }
+        <div className="menu-ui">
+          <div className="sidemenu">
+            <div className="sidemenu-inner">
+              <div className="group">
+                <img
+                  className="rectangle9copy3"
+                  src={ `${assetsPath.menu}/sidemenu-rectangle-9-copy-3.png` } />
+                <img
+                  className="rectangle9copy2"
+                  src={ `${assetsPath.menu}/sidemenu-rectangle-9-copy-2.png` } />
+                <img
+                  className="rectangle9copy"
+                  src={ `${assetsPath.menu}/sidemenu-rectangle-9-copy.png` } />
+              </div>
+              { this.state.auth &&
+                <div className="items">
+                  <div
+                    className="item"
+                    disabled={ this.state.activeSection === 'overview' }>
+                    <div
+                      className="title"
+                      onClick={ this.toggleOverview }>
+                      { translate('APP_TITLE.OVERVIEW') }
+                    </div>
+                    <img
+                      className="line"
+                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                  </div>
+                  <div
+                    className="item"
+                    disabled={ this.state.activeSection === 'dashboard' }>
+                    <div
+                      className="title"
+                      onClick={ () => this.changeActiveSection('dashboard', true) }>
+                      { translate('DASHBOARD.DASHBOARD') }
+                    </div>
+                    <img
+                      className="line"
+                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                  </div>
+                  { getLocalStorageVar('seed') &&
+                    <div
+                      className="item"
+                      disabled={ this.state.activeSection === 'recovery' }>
+                      <div
+                        className="title"
+                        onClick={ () => this.toggleMenuOption('recovery') }>
+                        { translate('APP_TITLE.RECOVERY') }
+                      </div>
+                      <img
+                        className="line"
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                    </div>
+                  }
+                  <div
+                    className="item"
+                    disabled={ this.state.activeSection === 'settings' }>
+                    <div
+                      className="title"
+                      onClick={ () => this.toggleMenuOption('settings') }>
+                      { translate('APP_TITLE.SETTINGS') }
+                    </div>
+                    <img
+                      className="line"
+                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                  </div>
+                  <div className="item">
+                    <div
+                      className="title"
+                      onClick={ this.logout }>
+                      { translate('DASHBOARD.LOGOUT') }
+                    </div>
+                    <img
+                      className="line"
+                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                  </div>
+                  <div className="item">
+                    <div
+                      className="title"
+                      onClick={ this.lock }>
+                      { translate('DASHBOARD.LOCK') }
+                    </div>
+                    <img
+                      className="line"
+                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                  </div>
+                  { Object.keys(this.state.coins).length !== Object.keys(electrumServers).length &&
+                    <div
+                      className="item"
+                      disabled={ this.state.activeSection === 'addcoin' }>
+                      <div
+                        className="title"
+                        onClick={ () => this.toggleMenuOption('addcoin') }>
+                        { translate('DASHBOARD.ADD_COIN') }
+                      </div>
+                      <img
+                        className="line"
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                    </div>
+                  }
+                  <div>
+                  { this.renderActiveCoins() }
+                  </div>
                 </div>
-              </div>
-            }
-            { !this.state.auth &&
-              <div className="nav-menu-items">
-                { (this.state.activeSection === 'addcoin' || this.state.activeSection === 'create-seed') &&
-                  <div onClick={ this.toggleLogin }>{ translate('DASHBOARD.LOGIN') }</div>
-                }
-                { this.state.activeSection !== 'addcoin' &&
-                  <div onClick={ this.toggleAddCoin }>{ translate('DASHBOARD.ADD_COIN') }</div>
-                }
-                { this.state.activeSection !== 'create-seed' &&
-                  <div onClick={ this.toggleCreateSeed }>{ translate('DASHBOARD.CREATE_SEED') }</div>
-                }
-                { this.state.activeSection !== 'pin' &&
-                  <div onClick={ this.togglePin }>PIN override</div>
-                }
-                { this.state.activeSection !== 'offlinesig' &&
-                  <div onClick={ this.toggleOffileSig }>Offline Signing</div>
-                }
-                { (this.state.activeSection === 'offlinesig' || this.state.activeSection === 'pin') &&
-                  <div onClick={ this.toggleLogin }>Login</div>
-                }
-              </div>
-            }
+              }
+              { !this.state.auth &&
+                <div className="items">
+                  { (this.state.activeSection === 'addcoin' || this.state.activeSection === 'create-seed') &&
+                    <div className="item">
+                      <div
+                        className="title"
+                        onClick={ () => this.toggleMenuOption('login') }>
+                        { translate('DASHBOARD.LOGIN') }
+                      </div>
+                      <img
+                        className="line"
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                    </div>
+                  }
+                  <div
+                    className="item"
+                    disabled={ this.state.activeSection === 'addcoin' }>
+                    <div
+                      className="title"
+                      onClick={ () => this.toggleMenuOption('addcoin') }>
+                      { translate('DASHBOARD.ADD_COIN') }
+                    </div>
+                    <img
+                      className="line"
+                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                  </div>
+                  <div
+                    className="item"
+                    disabled={ this.state.activeSection === 'create-seed' }>
+                    <div
+                      className="title"
+                      onClick={ () => this.toggleMenuOption('create-seed') }>
+                      { translate('DASHBOARD.CREATE_SEED') }
+                    </div>
+                    <img
+                      className="line"
+                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                  </div>
+                  { getLocalStorageVar('seed') &&
+                    <div
+                      className="item"
+                      disabled={ this.state.activeSection === 'pin' }>
+                      <div
+                        className="title"
+                        onClick={ () => this.toggleMenuOption('pin') }>
+                        { translate('APP_TITLE.PIN') }
+                      </div>
+                      <img
+                        className="line"
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                    </div>
+                  }
+                  { /*this.state.activeSection !== 'offlinesig' &&
+                    <div className="item">
+                      <div
+                        className="title"
+                        onClick={ () => this.toggleMenuOption('offline-sig') }>Offline Signing</div>
+                      <img
+                        className="line"
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                    </div>*/
+                  }
+                  { (this.state.activeSection === 'offlinesig' || this.state.activeSection === 'pin') &&
+                    <div className="item">
+                      <div
+                        className="title"
+                        onClick={ () => this.toggleMenuOption('login') }>
+                        { translate('APP_TITLE.LOGIN') }
+                      </div>
+                      <img
+                        className="line"
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                    </div>
+                  }
+                </div>
+              }
+            </div>
           </div>
         </div>
       );
@@ -618,97 +787,124 @@ class App extends React.Component {
         className="app-container"
         onClick={ this.globalClick }>
         <div className="app-header">
-          <img src="/images/agama-logo-side.svg" />
-          { this.state.auth &&
+          { this.state.history &&
+            !this.state.displayMenu &&
+            ((this.state.auth && this.state.history !== 'login' && this.state.history !== 'create-seed') || !this.state.auth) &&
+            this.state.history !== this.state.activeSection &&
+            (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
             <img
-              className="margin-left-20"
-              src={ `/images/cryptologo/${this.state.coin}.png` } />
+              onClick={ this.historyBack }
+              className="menu-back"
+              src={ `${assetsPath.menu}/trends-combined-shape.png` } />
           }
-          <i
-            onClick={ this.toggleMenu }
-            className="fa fa-bars"></i>
+          { (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
+            <img
+              onClick={ this.toggleMenu }
+              className="menu-icon"
+              src={ `${assetsPath.home}/home-combined-shape.png` } />
+          }
+          <div className="ui-title">
+            { translate('APP_TITLE.' + (this.state.displayMenu ? 'MENU' : this.state.activeSection.toUpperCase())) }
+          </div>
         </div>
-        <div className="app-main">
-          { (this.state.activeSection !== 'pin' || this.state.activeSection !== 'offlinesig') &&
-            <Login
-              { ...this.state }
-              login={ this.login } />
-          }
-          { this.state.activeSection === 'create-seed' &&
-            <CreateSeed
-              { ...this.state }
-              login={ this.login }
-              changeActiveSection={ this.changeActiveSection } />
-          }
-          { this.state.auth &&
-            this.state.activeSection === 'dashboard' &&
-            <MyAddress { ...this.state } />
-          }
-          { this.renderMenu() }
-          <SendCoin
-            { ...this.state }
-            sendtx={ this.props.actions.sendtx }
-            changeActiveSection={ this.changeActiveSection } />
-          <AddCoin
-            { ...this.state }
-            addCoin={ this.addCoin }
-            changeActiveSection={ this.changeActiveSection } />
-          { !this.state.loading &&
-            this.state.auth &&
-            this.state.activeSection === 'dashboard' &&
-            <i
-              onClick={ this.dashboardRefresh }
-              className="fa fa-refresh dashboard-refresh"></i>
-          }
-          { this.state.loading &&
-            this.state.activeSection === 'dashboard' &&
-            <Spinner />
-          }
-          { this.state.conError &&
-            <ServerSelect
-              { ...this.state }
-              dashboardRefresh={ this.dashboardRefresh }
-              getServersList={ this.props.actions.getServersList }
-              setDefaultServer={ this.props.actions.setDefaultServer } />
-          }
-          { this.state.proxyError &&
-            <div className="con-error">
+        { this.state.displayMenu &&
+          (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
+          <div className="app-main">
+            { this.renderMenu() }
+          </div>
+        }
+        { this.state.proxyError &&
+          this.state.proxyErrorCount === -777 &&
+          <div className="app-main">
+            <div className="con-error width-limit">
               <i className="fa fa-warning error"></i> <span className="error">{ translate('DASHBOARD.PROXY_ERROR') }</span>
             </div>
-          }
-          <Balance { ...this.state } />
-          { this.state.auth &&
-            this.state.activeSection === 'dashboard' &&
-            <SendReceive
-              { ...this.state }
-              changeActiveSection={ this.changeActiveSection }
-              toggleKMDInterest={ this.toggleKMDInterest } />
-          }
-          <KMDInterest
+            <div className="form proxy">
+              <div
+                onClick={ this.retryProxy }
+                disabled={
+                  this.state.proxyRetryInProgress &&
+                  this.state.proxyErrorCount !== -777
+                }
+                className={ 'group3' + (this.state.proxyRetryInProgress ? ' retrying' : '') }>
+                <div className="btn-inner">
+                  <div className="btn">{ translate('DASHBOARD.RETRY') }</div>
+                  <div className="group2">
+                    <i className="fa fa-refresh"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+        { (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
+          !this.state.displayMenu &&
+          this.state.conError &&
+          <ServerSelect
             { ...this.state }
-            sendtx={ this.props.actions.sendtx }
-            changeActiveSection={ this.changeActiveSection } />
-          <Transactions { ...this.state } />
-          { !this.state.auth &&
-            this.state.activeSection === 'offlinesig' &&
-            <OfflineSigning />
-          }
-          { !this.state.auth &&
-            this.state.activeSection === 'pin' &&
-            <Pin changeActiveSection={ this.changeActiveSection } />
-          }
-          { this.state.auth &&
-            this.state.activeSection === 'recovery' &&
-            <Recovery { ...this.state } />
-          }
-          { this.state.auth &&
-            this.state.activeSection === 'overview' &&
-            <Overview { ...this.state } />
-          }
-          { this.state.activeSection === 'settings' &&
-            <Settings />
-          }
-        </div>
+            dashboardRefresh={ this.dashboardRefresh }
+            getServersList={ this.props.actions.getServersList }
+            setDefaultServer={ this.props.actions.setDefaultServer }
+            updateDefaultCoinServer={ this.updateDefaultCoinServer } />
+        }
+        { (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
+          !this.state.displayMenu &&
+          !this.state.conError &&
+          <div className="app-main">
+            { (this.state.activeSection !== 'pin' || this.state.activeSection !== 'offlinesig') &&
+              <Login
+                { ...this.state }
+                login={ this.login } />
+            }
+            { this.state.activeSection === 'create-seed' &&
+              <CreateSeed
+                { ...this.state }
+                login={ this.login }
+                changeActiveSection={ this.changeActiveSection } />
+            }
+            <SendCoin
+              { ...this.state }
+              sendtx={ this.props.actions.sendtx }
+              changeActiveSection={ this.changeActiveSection }
+              getBtcFees={ this.getBtcFees } />
+            <AddCoin
+              { ...this.state }
+              addCoin={ this.addCoin }
+              changeActiveSection={ this.changeActiveSection } />
+            <KMDInterest
+              { ...this.state }
+              sendtx={ this.props.actions.sendtx }
+              changeActiveSection={ this.changeActiveSection } />
+            { this.state.auth &&
+              this.state.activeSection === 'dashboard' &&
+              (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
+              <Transactions
+                { ...this.state }
+                dashboardRefresh={ this.dashboardRefresh }
+                changeActiveSection={ this.changeActiveSection }
+                toggleKMDInterest={ this.toggleKMDInterest } />
+            }
+            { !this.state.auth &&
+              this.state.activeSection === 'offlinesig' &&
+              <OfflineSigning />
+            }
+            { !this.state.auth &&
+              this.state.activeSection === 'pin' &&
+              <Pin changeActiveSection={ this.changeActiveSection } />
+            }
+            { this.state.auth &&
+              this.state.activeSection === 'recovery' &&
+              <Recovery { ...this.state } />
+            }
+            { this.state.auth &&
+              this.state.activeSection === 'overview' &&
+              <Overview { ...this.state } />
+            }
+            { this.state.activeSection === 'settings' &&
+              <Settings globalClick={ this.globalClick } />
+            }
+          </div>
+        }
       </div>
     )
   }

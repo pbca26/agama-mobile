@@ -2,9 +2,10 @@
   float: right;
   width: 18px;
   height: 18px;
-  position: relative;
-  top: -15px;
-  left: -70px;
+  position: absolute;
+  top: 97px;
+  right: 33px;
+  transform: scale(0.5);
 
   .circle {
     animation: rotate 2s linear infinite;
