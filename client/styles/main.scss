@@ -1,214 +1,134 @@
 body {
-  padding-top: 50px;
+  background-color: #4c4f69;
+  color: #fff;
+  font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+  color: white;
+  margin: 0;
+  overflow-x: hidden;
 }
 
-.app-header {
-  height: 50px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background: #fff;
-  box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.2);
+.nav-menu {
+  position: absolute;
+  top: 5px;
+  background: #ccc;
   z-index: 100;
-
-  img {
-    height: 80%;
-    margin-top: 5px;
-    margin-left: 5px;
-  }
-
-  .fa {
-    float: right;
-    font-size: 34px;
-    margin-right: 20px;
-    margin-top: 7px;
-  }
-}
-
-.app-main {
-  margin-top: 20px;
-}
-
-.no-padding-left {
-  padding-left: 0;
 }
 
 .dashboard-refresh {
-  font-size: 24px;
-  float: right;
-  margin-right: 26px;
-  margin-top: 22px;
+  position: absolute;
+  top: 115px;
+  right: 13px;
+  z-index: 10;
+  font-size: 20px;
+  display: none;
 }
 
-.block {
-  display: block;
-}
-
-.center {
+.text-center {
   text-align: center;
 }
 
-h4 {
-  font-size: 16px;
-}
-
 .error {
-  color: #f96868;
+  color: rgba(255, 117, 117, 1.0) !important;
+  font-size: 14px;
+
+  .fa {
+    margin-right: 5px;
+  }
 }
 .warning {
   color: #f2a654;
+  font-size: 14px;
+}
+.success {
+  color: rgba(142, 204, 96, 1.0) !important;
+  font-size: 14px;
+
+  .fa {
+    margin-right: 5px;
+  }
+}
+.hide {
+  display: none;
 }
 
-.balance {
-  font-size: 16px;
-  margin: 20px;
-  margin-left: 10px;
+div[disabled],
+button:disabled {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .con-error {
-  float: left;
-  width: calc(100% - 64px);
-  margin-top: 22px;
-  margin-left: 10px;
-}
-
-.bold {
-  font-weight: bold;
-}
-
-.seed-gen-box {
-  border: solid 1px #ccc;
-  padding: 15px;
-}
-
-.margin-right-20 {
-  margin-right: 20px;
-}
-
-.margin-left-20 {
-  margin-left: 20px;
-}
-
-.send-receive-block {
-  margin-bottom: 35px;
-
-  .btn {
-    i {
-      margin-right: 5px;
-    }
-  }
-}
-
-.dashboard-title {
   font-size: 16px;
-  margin-bottom: 15px;
-}
+  text-align: center;
+  margin-top: 40px;
 
-.receive-qr {
-  position: absolute;
-  background: #fff;
-  height: 100%;
-  width: 100%;
-  top: 54px;
-  left: 0;
-  z-index: 100; 
-
-  canvas {
-    margin: 0 auto;
-    display: block;
-    margin-top: 40px;
-    margin-bottom: 30px;
-  }
-}
-
-.btn-back {
-  position: relative;
-  top: 14px;
-  left: 10px;
-
-  i {
-    margin-right: 5px; 
-  }
-}
-
-.btn-scan-qr {
-  i {
+  .fa {
     margin-right: 5px;
   }
 }
 
-.addcoin,
-.create-seed {
-  .btn-back {
-    left: 0;
-    top: 0;
-  }
+.fs14 {
+  font-size: 14px !important;
+}
+.lh25 {
+  line-height: 25px;
 }
 
-.login-keypad {
-  width: 220px;
-  margin: 0 auto;
-
-  .padding-fix {
-    padding: 5px;
-  }
-  .fa {
-    &.fa-remove {
-      position: absolute;
-      margin-left: -7px;
-      margin-top: 3px;
-    }
-    &.fa-long-arrow-left {
-      position: absolute;
-      margin-top: 3px;
-      margin-left: -8px;
-    }
-  }
-  .btn,
-  .btn:active,
-  .btn:focus {
-    width: 48px;
-    font-weight: bold;
-    background: rgb(153, 153, 153);
-    border: solid 1px rgb(153, 153, 153);
-    outline: none;
-    margin-right: 25px;
-    margin-bottom: 25px;
-  }
-}
-
-.decoded-seed {
-  text-align: center;
-
-  .fs-16 {
-    font-size: 16px;
-  }
-
-  .seed-string {
-    word-wrap: break-word;
-  }
-}
-
-.overview {
-  .overview-row {
-    margin-top: 30px;
-
-    .overview-row-icon-title {
-      position: relative;
-      top: 3px;
-      left: 8px;
-    }
-    .overview-row-icon {
-      display: inline-block;
-    }
-    .overview-row-balance {
-      float: right;
-      text-align: right;
-    }
-  }
-  .overview-usd-balance {
+.form {
+  .group3 {
+    position: inherit;
+    height: 60px;
+    width: 100%;
     text-align: center;
-    margin-top: 30px;
+    margin-top: 55px;
+    
+    .btn-inner {
+      background-color: #acaebf;
+      height: 42px;
+      display: inline-block;
+      padding: 0 20px;
+
+      .group2 {
+        float: right;
+        margin-top: 12px;
+        top: 2px;
+        left: 0;
+        position: relative;
+      }
+      .btn {
+        position: inherit;
+        float: left;
+        margin-top: 12px;
+        font-size: 16px;
+        padding-right: 38px;
+      }
+    }
   }
+}
+
+.sz350 {
+  width: 100%;
+  margin: 0 auto;
+  max-width: 320px;
+}
+
+a {
+  text-decoration: none
+}
+
+div {
+  -webkit-text-size-adjust: none
+}
+
+.group3 {
+  &.retrying {
+    .fa {
+      animation: rotate 1s linear infinite;        
+    }
+  }
+}
+
+.width-limit {
+  width: 90%;
+  margin: 0 auto;
 }

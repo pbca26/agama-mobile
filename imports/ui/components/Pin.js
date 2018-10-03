@@ -9,14 +9,20 @@ import {
   encryptkey,
   decryptkey,
 } from '../actions/seedCrypt';
-import { translate } from '../translate/translate';
+import translate from '../translate/translate';
+import {
+  devlog,
+  config,
+} from '../actions/dev';
+import { Meteor } from 'meteor/meteor';
 
 class Pin extends React.Component {
   constructor() {
     super();
     this.state = {
-      passphrase: null,
-      pinOverride: null,
+      passphrase: config.preload ? config.preload.seed : null,
+      passphraseTooShort: false,
+      pinOverride: config.preload ? config.preload.pin : null,
       pinOverrideTooShort: false,
       pinSet: false,
       qrScanError: false,
@@ -30,6 +36,9 @@ class Pin extends React.Component {
   updateInput(e) {
     this.setState({
       [e.target.name]: e.target.value,
+      passphraseTooShort: false,
+      pinOverrideTooShort: false,
+      qrScanError: false,
     });
   }
 
@@ -38,18 +47,34 @@ class Pin extends React.Component {
       quality: 100,
     }, (error, data) => {
       if (error) {
+        devlog('qrcam err', error);
+        
         this.setState({
-          qrScanError: true,
+          qrScanError: error.errorClass && error.errorClass.error && error.errorClass.error !== 'cancel' ? true : false,
         });
+        Meteor.setTimeout(() => {
+          this.setState({
+            qrScanError: false,
+          });
+        }, 5000);
       } else {
         convertURIToImageData(data)
         .then((imageData) => {
-          const decodedQR = jsQR.decodeQRFromImage(imageData.data, imageData.width, imageData.height);
+          const decodedQR = jsQR.decodeQRFromImage(
+            imageData.data,
+            imageData.width,
+            imageData.height
+          );
 
           if (!decodedQR) {
             this.setState({
               qrScanError: true,
             });
+            Meteor.setTimeout(() => {
+              this.setState({
+                qrScanError: false,
+              });
+            }, 5000);
           } else {
             this.setState({
               qrScanError: false,
@@ -62,81 +87,95 @@ class Pin extends React.Component {
   }
 
   save() {
-    if (this.state.pinOverride.length >= 6) {
-      const _encryptedKey = encryptkey(this.state.pinOverride, this.state.passphrase);
-
-      setLocalStorageVar('seed', { encryptedKey: _encryptedKey });
+    if (!this.state.passphrase) {
       this.setState({
-        pinSet: true,
-        pinOverrideTooShort: false,
-        qrScanError: false,
+        passphraseTooShort: true,
       });
-
-      setTimeout(() => {
-        this.setState(this.defaultState);
-        this.props.changeActiveSection('login');
-      }, 500);
     } else {
-      this.setState({
-        pinOverrideTooShort: true,
-        qrScanError: false,
-      });
+      if (this.state.pinOverride &&
+          this.state.pinOverride.length >= 6) {
+        const _encryptedKey = encryptkey(this.state.pinOverride, this.state.passphrase);
+
+        setLocalStorageVar('seed', { encryptedKey: _encryptedKey });
+        this.setState({
+          pinSet: true,
+          pinOverrideTooShort: false,
+          qrScanError: false,
+          passphraseTooShort: false,
+        });
+
+        Meteor.setTimeout(() => {
+          this.setState(this.defaultState);
+          this.props.changeActiveSection('login');
+        }, 500);
+      } else {
+        this.setState({
+          pinOverrideTooShort: true,
+          qrScanError: false,
+          passphraseTooShort: false,
+        });
+      }
     }
   }
 
   render() {
     return (
-      <div className="col-sm-12">
-        <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12">
-          <div className="row">
-            <h4 className="padding-bottom-15">Override PIN</h4>
-            <div className="padding-bottom-20">
-            Provide a seed and enter 6 digit PIN number in the form below.
-            </div>
-            <button
-              className="btn btn-default btn-scan-qr margin-bottom-30"
-              onClick={ this.scanQR }>
+      <div className="form pin-override">
+        <div className="title padding-bottom-30 text-center fs14 sz350">
+        { translate('PIN.PROVIDE_A_SEED') }
+        </div>
+        <div
+          onClick={ this.scanQR }
+          className="group3 margin-bottom-20">
+          <div className="btn-inner">
+            <div className="btn">{ translate('SEND.SCAN_QR') }</div>
+            <div className="group2">
               <i className="fa fa-qrcode"></i>
-              { translate('SEND.SCAN_QR') }
-            </button>
-            { this.state.qrScanError &&
-              <div className="col-lg-12">
-                <div className="error margin-top-15">
-                  <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
-                </div>
-              </div>
-            }
-            <input
-              type="password"
-              className="form-control margin-bottom-10"
-              name="passphrase"
-              onChange={ this.updateInput }
-              placeholder={ translate('LOGIN.ENTER_PASSPHRASE') + ' or WIF' }
-              value={ this.state.passphrase || '' } />
-            <div className="margin-bottom-25 margin-top-30">
-              <input
-                type="password"
-                className="form-control margin-top-20"
-                name="pinOverride"
-                onChange={ this.updateInput }
-                placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
-                value={ this.state.pinOverride || '' } />
-              { this.state.pinOverrideTooShort &&
-                <div className="error margin-top-15">
-                  <i className="fa fa-warning"></i> { translate('LOGIN.PIN_TOO_SHORT') }
-                </div>
-              }
             </div>
-            { this.state.pinSet &&
-              <div className="margin-bottom-15 margin-top-15">Seed is encrypted with provided PIN. Use the PIN to login or sign a transaction.</div>
-            }
-            <button
-              className="btn btn-lg btn-primary btn-block ladda-button"
-              onClick={ this.save }>
-              <span className="ladda-label">
-              Save
-              </span>
-            </button>
+          </div>
+        </div>
+        { this.state.qrScanError &&
+          <div className="error margin-top-5 margin-bottom-15 sz350">
+            <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
+          </div>
+        }
+        <div className="edit margin-bottom-10">
+          <input
+            type="password"
+            name="passphrase"
+            onChange={ this.updateInput }
+            placeholder={ `${translate('LOGIN.ENTER_PASSPHRASE')} ${translate('LOGIN.OR_WIF')}` }
+            value={ this.state.passphrase || '' } />
+        </div>
+        { this.state.passphraseTooShort &&
+          <div className="error margin-top-15 sz350">
+            <i className="fa fa-warning"></i> { translate('PIN.PROVIDE_A_PASSPHRASE') }
+          </div>
+        }
+        <div className="margin-bottom-25 margin-top-40 edit">
+          <input
+            type="password"
+            name="pinOverride"
+            onChange={ this.updateInput }
+            placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
+            value={ this.state.pinOverride || '' } />
+        </div>
+        { this.state.pinOverrideTooShort &&
+          <div className="error margin-top-15 sz350">
+            <i className="fa fa-warning"></i> { translate('LOGIN.PIN_TOO_SHORT') }
+          </div>
+        }
+        { this.state.pinSet &&
+          <div className="margin-bottom-15 margin-top-15 sz350">{ translate('PIN.SEED_IS_ENCRYPTED') }</div>
+        }
+        <div
+          onClick={ this.save }
+          className="group3 margin-top-40">
+          <div className="btn-inner">
+            <div className="btn">{ translate('PIN.SAVE') }</div>
+            <div className="group2">
+              <i className="fa fa-save"></i>
+            </div>
           </div>
         </div>
       </div>

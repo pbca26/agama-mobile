@@ -1,0 +1,146 @@
+.form {
+  width: 100%;
+  position: relative;
+  margin: 0;
+
+  .form-inner {
+    height: 100%;
+    position:relative;
+    margin: auto;
+    padding: 10px 0;
+  }
+
+  h4 {
+    text-align: center;
+  }
+
+  .title {
+    height: auto;
+    width: 100%;
+    padding-top: 30px;
+    opacity: 0.8;
+    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+    font-size: 16px;
+    color: #fff;
+    text-align: center;
+    line-height: 24px;
+  }
+
+  .group3 {
+    .rectangle10copy2 {
+      top: 11px;
+      height: 61px;
+      width: 209px;
+      position: absolute;
+      margin: 0;
+      left: 0;
+    }
+
+    .rectangle10copy {
+      background-color: rgba(172, 174, 191, 1.0);
+      top: 0;
+      height: 42px;
+      width: 180px;
+      position: absolute;
+      margin: 0;
+      left: 14px;
+      border-radius: 2px;
+    }
+  
+    .btn {
+      top: 12px;
+      height: auto;
+      width: auto;
+      position: absolute;
+      margin: 0;
+      left: 30px;
+      font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+      font-size: 16px;
+      color: #fff;
+      text-align: left;
+      line-height: 18px;
+    }
+  }
+
+  .group {
+    padding-top: 45px;
+    margin: 0;
+
+    .rectangle10 {
+      top: 0;
+      height: 42px;
+      width: 335px;
+      position: absolute;
+      margin: 0;
+      left: 0;
+      opacity: 0.2;
+    }
+  }
+
+  .edit {
+    background-color: #373A4C;
+    height: auto;
+    width: 100%;
+    margin: 0 auto;
+    max-width: 310px;
+    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+    font-size: 16px;
+    color: #fff;
+    text-align: left;
+    line-height: 19px;
+    height: 100%;
+    padding: 10px 10px 11px 10px;
+    
+    input {
+      background: none;
+      color: #fff;
+      width: 100%;
+      border: none;
+      outline: none;
+    }
+  }
+
+  .group2 {
+    top: 15px;
+    height: 14px;
+    width: 21px;
+    position: absolute;
+    margin: 0;
+    left: 158px;
+
+    .rectangle8copy {
+      top: 6px;
+      height: 2px;
+      width: 20px;
+      position: absolute;
+      margin: 0;
+      left: 0;
+      border-radius: 1px;
+      background: #fff;
+    }
+    
+    .path6 {
+      top: 0;
+      height: 14px;
+      width: 8px;
+      position: absolute;
+      margin: 0;
+      left: 13px;
+    }
+  }
+
+  .forgotpassword {
+    top: 326px;
+    height: auto;
+    width: auto;
+    position: absolute;
+    margin: 0;
+    left: 237px;
+    opacity: 0.5;
+    font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+    font-size: 14px;
+    color: #fff;
+    text-align: left;
+    line-height: 16px;
+  }
+}

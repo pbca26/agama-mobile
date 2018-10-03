@@ -9,21 +9,25 @@ import {
   encryptkey,
   decryptkey,
 } from '../actions/seedCrypt';
-import { translate } from '../translate/translate';
-import { PassPhraseGenerator } from './seedGen/passphrasegenerator';
+import translate from '../translate/translate';
+import passphraseGenerator from 'agama-wallet-lib/build/crypto/passphrasegenerator';
+import {
+  devlog,
+  config,
+} from '../actions/dev';
+import { assetsPath } from '../actions/utils';
 
 class CreateSeed extends React.Component {
   constructor() {
     super();
     this.state = {
-      passphrase: null,
       createPin: true,
-      pinOverride: null,
+      pinOverride: config.preload ? config.preload.pin : null,
       pinOverrideTooShort: false,
-      pin: '',
+      pin: config.preload ? config.preload.pin : '',
       pinConfirm: false,
       confirmSeedSaved: false,
-      seed: PassPhraseGenerator.generatePassPhrase(256),
+      seed: passphraseGenerator.generatePassPhrase(256),
       pristine: true,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
@@ -35,7 +39,7 @@ class CreateSeed extends React.Component {
 
   componentWillMount() {
     this.setState({
-      seed: PassPhraseGenerator.generatePassPhrase(256),
+      seed: passphraseGenerator.generatePassPhrase(256),
     });
   }
 
@@ -46,6 +50,7 @@ class CreateSeed extends React.Component {
   updateInput(e) {
     this.setState({
       [e.target.name]: e.target.value,
+      pinOverrideTooShort: false,
     });
   }
 
@@ -93,85 +98,82 @@ class CreateSeed extends React.Component {
   render() {
     if (this.props.activeSection === 'create-seed') {
       return (
-        <div className="col-sm-12">
-          <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12 create-seed margin-bottom-40">
-            <div className="row">
-              <div className="margin-bottom-30">
-                <span
-                  className="btn-back"
-                  onClick={ () => this.props.changeActiveSection('login') }>
-                  <i className="fa fa-arrow-left"></i> { translate('DASHBOARD.BACK') }
-                </span>
-              </div>
-              <h4>{ translate('LOGIN.THIS_IS_YOUR_NEW_SEED') }</h4>
-              <div className="seed-gen-box">{ this.state.seed }</div>
-              <div className="text-center margin-top-30">
-                <QRCode
-                  value={ this.state.seed }
-                  size={ 320 } />
-              </div>
-              <div className="margin-top-25 margin-bottom-25 warning">
-                <strong>{ translate('LOGIN.PLEASE_MAKE_SURE_TO') }</strong>
-              </div>
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  value="on"
-                  checked={ this.state.confirmSeedSaved } />
-                <div
-                  className="slider"
-                  onClick={ this.toggleConfirmSeed }></div>
-              </label>
+        <div className="form create-seed">
+          <div className="title margin-bottom-25">{ translate('LOGIN.THIS_IS_YOUR_NEW_SEED') }</div>
+          <div className="seed-gen-box">{ this.state.seed }</div>
+          <div className="text-center margin-top-30">
+            <QRCode
+              value={ this.state.seed }
+              size={ 320 } />
+          </div>
+          <div className="margin-top-25 margin-bottom-25 text-center warning">
+            <strong>{ translate('LOGIN.PLEASE_MAKE_SURE_TO') }</strong>
+          </div>
+          <div className="margin-top-35 margin-bottom-35 sz350">
+            <label className="switch">
+              <input
+                type="checkbox"
+                value="on"
+                checked={ this.state.confirmSeedSaved } />
               <div
-                className="toggle-label pointer"
-                onClick={ this.toggleConfirmSeed }>
-                { translate('LOGIN.I_CONFIRM_I_SAVED_SEED') }
+                className="slider"
+                onClick={ this.toggleConfirmSeed }></div>
+            </label>
+            <div
+              className="toggle-label pointer"
+              onClick={ this.toggleConfirmSeed }>
+              { translate('LOGIN.I_CONFIRM_I_SAVED_SEED') }
+            </div>
+            { !this.state.confirmSeedSaved &&
+              !this.state.pristine &&
+              <div className="error margin-top-15">
+                <i className="fa fa-warning"></i> { translate('LOGIN.CONFIRMATION_REQUIRED') }
               </div>
-              { !this.state.confirmSeedSaved &&
-                !this.state.pristine &&
-                <div className="error margin-top-15">
-                  <i className="fa fa-warning"></i> { translate('LOGIN.CONFIRMATION_REQUIRED') }
-                </div>
-              }
-              <div className="margin-bottom-25 margin-top-30">
-                <label className="switch hide">
-                  <input
-                    type="checkbox"
-                    value="on"
-                    checked={ this.state.createPin } />
-                  <div
-                    className="slider"
-                    onClick={ this.toggleCreatePin }></div>
-                </label>
-                <div
-                  className="toggle-label pointer hide"
-                  onClick={ this.toggleCreatePin }>
-                  { translate('LOGIN.OVERRIDE_PIN') }
-                </div>
-                { this.state.createPin &&
-                  <input
-                    type="password"
-                    className="form-control margin-top-20"
-                    name="pinOverride"
-                    onChange={ this.updateInput }
-                    placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
-                    value={ this.state.pinOverride || '' } />
-                }
-                { this.state.createPin &&
-                  this.state.pinOverrideTooShort &&
-                  <div className="error margin-top-15">
-                    <i className="fa fa-warning"></i> { translate('LOGIN.PIN_TOO_SHORT') }
-                  </div>
-                }
+            }
+          </div>
+          <div className="margin-bottom-25 margin-top-30">
+            <label className="switch hide">
+              <input
+                type="checkbox"
+                value="on"
+                checked={ this.state.createPin } />
+              <div
+                className="slider"
+                onClick={ this.toggleCreatePin }></div>
+            </label>
+            <div
+              className="toggle-label pointer hide"
+              onClick={ this.toggleCreatePin }>
+              { translate('LOGIN.OVERRIDE_PIN') }
+            </div>
+            { this.state.createPin &&
+              <div className="edit">
+                <input
+                  type="password"
+                  className="form-control"
+                  name="pinOverride"
+                  onChange={ this.updateInput }
+                  placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
+                  value={ this.state.pinOverride || '' } />
               </div>
-
-              <button
-                className="btn btn-lg btn-primary btn-block ladda-button"
-                onClick={ this.login }>
-                <span className="ladda-label">
-                { translate('LOGIN.LOGIN') }
-                </span>
-              </button>
+            }
+            { this.state.createPin &&
+              this.state.pinOverrideTooShort &&
+              <div className="error margin-top-15 sz350">
+                <i className="fa fa-warning"></i> { translate('LOGIN.PIN_TOO_SHORT') }
+              </div>
+            }
+          </div>
+          <div
+            onClick={ this.login }
+            className="group3">
+            <div className="btn-inner">
+              <div className="btn">{ translate('LOGIN.SIGN_IN') }</div>
+              <div className="group2">
+                <img
+                  className="path6"
+                  src={ `${assetsPath.login}/reset-password-path-6.png` } />
+              </div>
             </div>
           </div>
         </div>

@@ -1,0 +1,26 @@
+.form {
+  &.login {
+    .login-create-pin {
+      .scan-qr {
+        top: 0;
+      }
+      .title {
+        padding: 30px 0 0 0;
+        top: 0;
+      }
+      .group {
+        position: inherit;
+        top: 0;
+        left: 0;
+
+        input {
+          width: 100%;
+        }
+      }
+      .group3:last-child {
+        top: 0;
+        margin-top: 40px;
+      }
+    }
+  }
+}

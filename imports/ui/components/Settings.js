@@ -8,16 +8,20 @@ import {
   encryptkey,
   decryptkey,
 } from '../actions/seedCrypt';
-import { translate } from '../translate/translate';
+import translate from '../translate/translate';
+import { Meteor } from 'meteor/meteor';
 
 // TODO: reset settings/purge seed and pin
+
+const SETTINGS_SAVED_MSG_TIMEOUT = 5000;
 
 class Settings extends React.Component {
   constructor() {
     super();
     this.state = {
-      autoLockTimeout: 60000,
+      autoLockTimeout: 600000,
       requirePin: false,
+      isSaved: false,
     };
     this.updateInput = this.updateInput.bind(this);
     this.toggleConfirmPin = this.toggleConfirmPin.bind(this);
@@ -52,52 +56,63 @@ class Settings extends React.Component {
       autoLockTimeout: this.state.autoLockTimeout,
       requirePin: this.state.requirePin,
     });
+
+    this.setState({
+      isSaved: true,
+    });
+
+    Meteor.setTimeout(() => {
+      this.setState({
+        isSaved: false,
+      });
+    }, SETTINGS_SAVED_MSG_TIMEOUT);
+
+    this.props.globalClick();
   }
 
   render() {
     return (
-      <div className="col-sm-12">
-        <div className="col-xlg-12 col-md-12 col-sm-12 col-xs-12">
-          <div className="row">
-            <h4 className="padding-bottom-15">Settings</h4>
-            <div className="padding-bottom-10">
-              Auto lock timeout
+      <div className="form settings">
+        <div className="margin-top-10 item">
+          <div className="padding-bottom-20">{ translate('SETTINGS.AUTOLOCK_TIMEOUT') }</div>
+          <select
+            className="form-control form-material"
+            name="autoLockTimeout"
+            value={ this.state.autoLockTimeout }
+            onChange={ (event) => this.updateInput(event) }
+            autoFocus>
+            <option value="600000">10 { translate('SETTINGS.MINUTES') }</option>
+            <option value="1200000">20 { translate('SETTINGS.MINUTES') }</option>
+            <option value="1800000">30 { translate('SETTINGS.MINUTES') }</option>
+          </select>
+        </div>
+        <div className="item last">
+          <label className="switch">
+            <input
+              type="checkbox"
+              value="on"
+              checked={ this.state.requirePin } />
+            <div
+              className="slider"
+              onClick={ this.toggleConfirmPin }></div>
+          </label>
+          <div
+            className="toggle-label"
+            onClick={ this.toggleConfirmPin }>
+            { translate('SETTINGS.REQUIRE_PIN_CONFIRM') }
+          </div>
+        </div>
+        { this.state.isSaved &&
+          <div className="padding-bottom-20 text-center success">{ translate('SETTINGS.SAVED') }</div>
+        }
+        <div
+          onClick={ this.save }
+          className="group3 margin-top-25">
+          <div className="btn-inner">
+            <div className="btn">{ translate('SETTINGS.SAVE') }</div>
+            <div className="group2">
+              <i className="fa fa-save"></i>
             </div>
-            <div className="margin-bottom-20">
-              <select
-                className="form-control form-material"
-                name="autoLockTimeout"
-                value={ this.state.autoLockTimeout }
-                onChange={ (event) => this.updateInput(event) }
-                autoFocus>
-                <option value="600000">10 minutes</option>
-                <option value="1200000">20 minutes</option>
-                <option value="1800000">30 minutes</option>
-              </select>
-            </div>
-            <div className="margin-bottom-40 margin-top-45">
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  value="on"
-                  checked={ this.state.requirePin } />
-                <div
-                  className="slider"
-                  onClick={ this.toggleConfirmPin }></div>
-              </label>
-              <div
-                className="toggle-label"
-                onClick={ this.toggleConfirmPin }>
-                Require PIN to confirm transaction
-              </div>
-            </div>
-            <button
-              className="btn btn-lg btn-primary btn-block ladda-button"
-              onClick={ this.save }>
-              <span className="ladda-label">
-              Save
-              </span>
-            </button>
           </div>
         </div>
       </div>

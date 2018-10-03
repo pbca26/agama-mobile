@@ -2,10 +2,10 @@ import crypto from 'crypto';
 import reverse from 'buffer-reverse';
 import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
+import { getRandomIntInclusive } from 'agama-wallet-lib/build/utils';
+import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
-
-const electrumJSNetworks = require('./electrumNetworks.js');
 
 // get merkle root
 const getMerkleRoot = (txid, proof, pos) => {
@@ -37,15 +37,8 @@ const getMerkleRoot = (txid, proof, pos) => {
   return hash;
 }
 
-const verifyMerkle = (txid, height, serverList, electrumServer, proxyServer) => {
+const verifyMerkle = (txid, height, serverList, electrumServer, proxyServer, cache, network) => {
   // select random server
-  const getRandomIntInclusive = (min, max) => {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-
-    return Math.floor(Math.random() * (max - min + 1)) + min; // the maximum is inclusive and the minimum is inclusive
-  }
-
   const _rnd = getRandomIntInclusive(0, serverList.length - 1);
   const randomServer = serverList[_rnd];
   const _randomServer = randomServer.split(':');
@@ -80,14 +73,20 @@ const verifyMerkle = (txid, height, serverList, electrumServer, proxyServer) => 
           const _res = getMerkleRoot(txid, merkleData.merkle, merkleData.pos);
           devlog(_res, true);
 
-          HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getblockinfo`, {
-            params: {
-              port: _randomServer[1],
-              ip: _randomServer[0],
-              proto: electrumServer.proto,
-              height,
-            },
-          }, (error, result) => {
+          cache.getBlockheader(
+            height,
+            network,
+            {
+              url: `http://${proxyServer.ip}:${proxyServer.port}/api/getblockinfo`,
+              params: {
+                ip: _randomServer[0],
+                port: _randomServer[1],
+                proto: _randomServer[2],
+                height,
+              },
+            }
+          )
+          .then((result) => {
             result = JSON.parse(result.content);
 
             if (result.msg === 'error') {
@@ -124,7 +123,7 @@ const verifyMerkle = (txid, height, serverList, electrumServer, proxyServer) => 
   });
 }
 
-export const verifyMerkleByCoin = (txid, height, electrumServer, proxyServer) => {
+const verifyMerkleByCoin = (txid, height, electrumServer, proxyServer, cache, network) => {
   const _serverList = electrumServer.serverList;
 
   devlog(`verifyMerkleByCoin`);
@@ -137,7 +136,7 @@ export const verifyMerkleByCoin = (txid, height, electrumServer, proxyServer) =>
       let _filteredServerList = [];
 
       for (let i = 0; i < _serverList.length; i++) {
-        if (_serverList[i] !== electrumServer.ip + ':' + electrumServer.port) {
+        if (_serverList[i] !== electrumServer.ip + ':' + electrumServer.port + ':' + electrumServer.proto) {
           _filteredServerList.push(_serverList[i]);
         }
       }
@@ -147,8 +146,11 @@ export const verifyMerkleByCoin = (txid, height, electrumServer, proxyServer) =>
         height,
         _filteredServerList,
         electrumServer,
-        proxyServer
-      ).then((proof) => {
+        proxyServer,
+        cache,
+        network
+      )
+      .then((proof) => {
         resolve(proof);
       });
     } else {
@@ -156,3 +158,5 @@ export const verifyMerkleByCoin = (txid, height, electrumServer, proxyServer) =>
     }
   });
 }
+
+export default verifyMerkleByCoin;

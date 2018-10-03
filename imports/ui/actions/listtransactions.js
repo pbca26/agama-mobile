@@ -1,14 +1,13 @@
 import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
-import { isAssetChain } from './utils';
-import { parseTransactionAddresses } from './parseTransactionAddresses';
-import { electrumJSTxDecoder } from './txDecoder/txDecoder';
+import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
+import parseTransactionAddresses from 'agama-wallet-lib/build/transaction-type';
+import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
+import electrumJSTxDecoder from 'agama-wallet-lib/build/transaction-decoder';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
-const electrumJSNetworks = require('./electrumNetworks.js');
-
-export const listtransactions = (proxyServer, electrumServer, address, network, full, verify) => {
+const listtransactions = (proxyServer, electrumServer, address, network, full, cache) => {
   return new Promise((resolve, reject) => {
     // get current height
     HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getcurrentblock`, {
@@ -35,6 +34,7 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
             proto: electrumServer.proto,
             address,
             raw: true,
+            // maxlength: 2,
           },
         }, (error, result) => {
           result = JSON.parse(result.content);
@@ -51,15 +51,20 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
 
               Promise.all(json.map((transaction, index) => {
                 return new Promise((resolve, reject) => {
-                  HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getblockinfo`, {
-                    params: {
-                      port: electrumServer.port,
-                      ip: electrumServer.ip,
-                      proto: electrumServer.proto,
-                      address,
-                      height: transaction.height,
-                    },
-                  }, (error, result) => {
+                  cache.getBlockheader(
+                    transaction.height,
+                    network,
+                    {
+                      url: `http://${proxyServer.ip}:${proxyServer.port}/api/getblockinfo`,
+                      params: {
+                        port: electrumServer.port,
+                        ip: electrumServer.ip,
+                        proto: electrumServer.proto,
+                        height: transaction.height,
+                      },
+                    }
+                  )
+                  .then((result) => {
                     devlog('getblock =>');
                     devlog(result);
 
@@ -69,12 +74,12 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
                       const blockInfo = result.result;
 
                       devlog('electrum gettransaction ==>');
-                      devlog((index + ' | ' + (transaction.raw.length - 1)));
+                      devlog(`${index} | ${(transaction.raw.length - 1)}`);
                       devlog(transaction.raw);
 
                       // decode tx
-                      const _network = electrumJSNetworks[isAssetChain(network) ? 'komodo' : network];
-                      const decodedTx = electrumJSTxDecoder(transaction.raw, network, _network);
+                      const _network = electrumJSNetworks[isKomodoCoin(network) || network === 'kmd' ? 'kmd' : network];
+                      const decodedTx = electrumJSTxDecoder(transaction.raw, _network);
 
                       let txInputs = [];
 
@@ -86,22 +91,34 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
                         Promise.all(decodedTx.inputs.map((_decodedInput, index) => {
                           return new Promise((_resolve, _reject) => {
                             if (_decodedInput.txid !== '0000000000000000000000000000000000000000000000000000000000000000') {
-                              HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction`, {
-                                params: {
-                                  port: electrumServer.port,
-                                  ip: electrumServer.ip,
-                                  proto: electrumServer.proto,
-                                  address,
-                                  txid: _decodedInput.txid,
-                                },
-                              }, (error, result) => {
+                              cache.getTransaction(
+                                _decodedInput.txid,
+                                network,
+                                {
+                                  url: `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction`,
+                                  params: {
+                                    port: electrumServer.port,
+                                    ip: electrumServer.ip,
+                                    proto: electrumServer.proto,
+                                    txid: _decodedInput.txid,
+                                  },
+                                }
+                              )
+                              .then((result) => {
                                 devlog('gettransaction =>');
                                 devlog(result);
 
                                 result = JSON.parse(result.content);
 
                                 if (result.msg !== 'error') {
-                                  const decodedVinVout = electrumJSTxDecoder(result.result, network, _network);
+                                  let decodedVinVout;
+
+                                  if (cache.getDecodedTransaction(_decodedInput.txid, network)) {
+                                    decodedVinVout = cache.getDecodedTransaction(_decodedInput.txid, network);
+                                  } else {
+                                    decodedVinVout = electrumJSTxDecoder(result.result, _network);
+                                    cache.getDecodedTransaction(_decodedInput.txid, network, decodedVinVout);
+                                  }
 
                                   devlog('electrum raw input tx ==>');
 
@@ -130,7 +147,7 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
                             confirmations: Number(transaction.height) === 0 ? 0 : currentHeight - transaction.height,
                           };
 
-                          const formattedTx = parseTransactionAddresses(_parsedTx, address, 'komodo');
+                          const formattedTx = parseTransactionAddresses(_parsedTx, address, network === 'kmd' ? true : false);
 
                           if (formattedTx.type) {
                             formattedTx.height = transaction.height;
@@ -172,7 +189,7 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
                           confirmations: Number(transaction.height) === 0 ? 0 : currentHeight - transaction.height,
                         };
 
-                        const formattedTx = parseTransactionAddresses(_parsedTx, address, 'komodo');
+                        const formattedTx = parseTransactionAddresses(_parsedTx, address, network === 'kmd' ? true : false);
                         _rawtx.push(formattedTx);
                         resolve(true);
                       }
@@ -186,7 +203,7 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
                         timestamp: 'cant get block info',
                         confirmations: Number(transaction.height) === 0 ? 0 : currentHeight - transaction.height,
                       };
-                      const formattedTx = parseTransactionAddresses(_parsedTx, address, 'komodo');
+                      const formattedTx = parseTransactionAddresses(_parsedTx, address, network === 'kmd' ? true : false);
                       _rawtx.push(formattedTx);
                       resolve(true);
                     }
@@ -209,4 +226,6 @@ export const listtransactions = (proxyServer, electrumServer, address, network, 
       }
     });
   });
-}
+};
+
+export default listtransactions;

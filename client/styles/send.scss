@@ -1,70 +1,146 @@
-.send {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  
-  .btn-back-block {
-    margin-bottom: 20px;
-    
-    .btn-back {
-      position: relative;
-      top: 0;
-      left: -6px;
-      z-index: 99;
+.form.send {
+  .edit {
+    font-size: 14px;
+    width: inherit;
+    max-width: inherit;
+    padding: 15px 10px 10px 10px;
+
+    input {
+      font-size: 12px;
+      margin-top: 6px;
+      opacity: 0.8;
+    }
+    &.success {
+      text-transform: capitalize;
     }
   }
-  .table {
-    tr {
-      display: block;
+  .group3 {
+    top: 0;
+    left: 0;
+    position: relative;
+    margin: 0 auto;
 
-      td,
-      th {
-        display: inline-block;
+    .fa {
+      font-size: 20px;
+      position: relative;
+      top: -4px;
+    }
+  }
+  .steps {
+    padding: 22px 0 38px 0;
+    text-align: center;
 
-        &:first-child,
-        &:first-child {
-          width: 70px;
-        }
-        &:last-child,
-        &:last-child {
-          width: calc(100vw - 92px);
-          overflow-x: auto;
-        }
+    div {
+      display: inline-block;
+      margin: 0 5px;
+      height: 12px;
+      width: 12px;
+      border-radius: 50%;
+      background-color: #383a4e;
+
+      &.current {
+        background-color: #fff;
       }
     }
   }
-  .panel-title {
-    padding: 0;
-  }
-  .panel-body {
-    padding: 0 10px;
-  }
-  .steps-counter {
-    padding: 0;
-    margin: 0;
-    float: none;
-  }
-  .send-step {
-    margin-left: 32px;
-    padding: 0;
-    margin: 0;
-  }
-  .panel-heading {
-    padding: 0 10px !important;    
-    border: none;
-  }
-  .panel {
-    box-shadow: none;
-  }
   .step-title {
-    padding-bottom: 20px;
+    text-align: center;
   }
-  .step {
-    padding: 22px;
-    width: 33.3%;
-    float: left;
+  .control-label {
+    font-size: 14px;
+    display: block;
   }
-  .steps {
-    box-shadow: none;
+  .scan-qr {
+    display: inline-block;
+    position: absolute;
+    right: 15px;
+    margin-top: 50px;
+    font-size: 28px;
+  }
+  .shade {
+    opacity: 0.8; 
+  }
+  .table {
+    background-color: #373A4C;
+    padding: 10px 10px;
+    font-size: 14px;
+    width: 100%;
+
+    td {
+      padding-bottom: 20px;
+    }
+  }
+  .send-step2 {
+    .edit {
+      padding: 0 10px 10px 10px;
+    }
+    .margin-top-5.edit,
+    .padding-top-15.edit {
+      padding: 15px 10px 10px 10px;
+    }
+  }
+  .pin-confirm {
+    input {
+      margin-top: 0;
+      opacity: 1;        
+    }
+  }
+  .group3.explorer {
+    height: 72px;
+    width: 200px;
+
+    .rectangle10copy {
+      background: none;
+      border: solid 1px #acaebf;
+      width: 130px;
+    }
+    .btn {
+      font-size: 14px;
+    }
+    .group2 {
+      left: 108px;
+
+      .fa {
+        font-size: 16px;
+        top: -2px;
+      }
+    }
+  }
+  .btn-inner {
+    &.pull-left {
+      margin-left: 10px;
+      padding: 0 10px;
+
+      .group2 {
+        float: left;
+        left: -14px;
+      }
+      .btn {
+        float: right;
+        position: relative;
+        left: 40px;
+        top: 1px;
+        padding-right: 50px;
+      }
+      img {
+        width: 20px;
+        height: 13px;
+      }
+    }
+    &.pull-right {
+      margin-right: 10px;
+      padding: 0 10px;
+
+      .btn {
+        position: relative;
+        left: 8px;
+        top: 0;
+      }
+    }
+  }
+  .form-control {
+    font-size: 12px;
+    margin-top: 6px;
+    opacity: 0.8;
   }
 }

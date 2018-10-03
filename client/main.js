@@ -6,16 +6,6 @@ import thunk from 'redux-thunk';
 
 import './main.html';
 
-import './assets/global/css/bootstrap.min.css';
-import './styles/main.scss';
-import './styles/addcoin.scss';
-import './styles/interest.scss';
-import './styles/menu.scss';
-import './styles/send.scss';
-import './styles/spinner.scss';
-import './styles/switch.scss';
-import './styles/transactions.scss';
-
 import appReducer from '../imports/ui/reducers';
 import App from '../imports/ui/App';
 
