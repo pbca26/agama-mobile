@@ -51,8 +51,11 @@ jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 release-unsigned.apk agam
 jsqr v1.1.1 breaks the code, needs thorough debugging
 
 ## Meteor 1.6.1.4 apk path (meteorjs bug)
+path is relative to your project's folder
+
 `.meteor/local/cordova-build/platforms/android/build/outputs/apk`
 
 ## Play store
 Run zipalign
-`/Users/pbca26/Library/Android/sdk/build-tools/26.0.0/zipalign -v 4 agama-mobile-v0.1.0.apk agama-mobile-v0.1.0.apk` 
+
+osx example: `/Users/yourusername/Library/Android/sdk/build-tools/26.0.0/zipalign -v 4 agama-mobile-v0.1.0.apk agama-mobile-v0.1.0.apk` 
