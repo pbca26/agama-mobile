@@ -156,7 +156,8 @@ class Transactions extends React.Component {
   }
 
   render() {
-    if (this.props.activeSection === 'dashboard') {
+    if (this.props.activeSection === 'dashboard' &&
+        this.props.coin) {
       const _transactions = this.props.transactions;
       let _items = [];
 

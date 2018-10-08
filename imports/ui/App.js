@@ -212,7 +212,7 @@ class App extends React.Component {
   }
 
   addCoin(coin) {
-    const server = electrumServers[coin];
+    let server = electrumServers[coin];
     let coins = this.state.coins;
 
     // pick a random server to communicate with
