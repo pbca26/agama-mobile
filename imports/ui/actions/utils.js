@@ -64,6 +64,7 @@ export const convertURIToImageData = (URI) => {
 };
 
 export const _coinsList = [
+  // sn related coins/assets
   'KMD',
   'CHIPS',
   'SUPERNET',
@@ -94,6 +95,8 @@ export const _coinsList = [
   'CCL',
   'VRSC',
   'CALL',
+  'DION',
+  // other coins
   'BTC',
   'DOGE',
   'DGB',

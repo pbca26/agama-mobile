@@ -215,6 +215,7 @@ const lang = {
       VRSC: 'VerusCoin',
       CALL: 'Capital',
       CCL: 'CoinCollect',
+      DION: 'DionPay',
       // crypto
       CRW: 'Crown',
       STRAT: 'Stratis',
