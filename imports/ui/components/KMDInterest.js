@@ -65,6 +65,7 @@ class KMDInterest extends React.Component {
         });
 
         Meteor.setTimeout(() => {
+          this.props.dashboardRefresh();
           this.props.changeActiveSection('dashboard');
         }, 10000);
       } else {

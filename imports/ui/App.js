@@ -874,7 +874,8 @@ class App extends React.Component {
             <KMDInterest
               { ...this.state }
               sendtx={ this.props.actions.sendtx }
-              changeActiveSection={ this.changeActiveSection } />
+              changeActiveSection={ this.changeActiveSection }
+              dashboardRefresh={ this.dashboardRefresh } />
             { this.state.auth &&
               this.state.activeSection === 'dashboard' &&
               (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
