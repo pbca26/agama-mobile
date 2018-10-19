@@ -38,6 +38,21 @@ const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, val
 
         devlog('send data', _data);
 
+        if (network.toLowerCase() === 'kmd' &&
+            _data.totalInterest > 0.0002) {
+          fee = fee * 2;
+          value = value - 10000;
+
+          _data = transactionBuilder.data(
+            _network,
+            value,
+            fee,
+            outputAddress,
+            changeAddress,
+            utxoList
+          );
+        }
+
         if (_data.balance) {
           if (!push) {
             resolve ({

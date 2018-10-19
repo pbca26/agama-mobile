@@ -51,7 +51,7 @@ class KMDInterest extends React.Component {
     this.props.sendtx(
       this.props.coin,
       this.props.address,
-      Number(this.props.balance.balanceSats) - 10000,
+      Number(this.props.balance.balanceSats) - 20000,
       null,
       true
     )
@@ -168,7 +168,7 @@ class KMDInterest extends React.Component {
           }
           { this.state.success &&
             <div className="padding-bottom-10 text-center green bold">
-              { translate('CLAIM.YOU_SUCCESFULLY_CLAIMED') } { formatValue(this.props.balance.interest) } KMD
+              { translate('CLAIM.YOU_SUCCESFULLY_CLAIMED') } { formatValue(this.props.balance.interest - 0.0002) } KMD
             </div>
           }
           { !this.props.utxo &&

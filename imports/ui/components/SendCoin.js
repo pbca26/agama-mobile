@@ -169,12 +169,12 @@ class SendCoin extends React.Component {
   }
 
   validate() {
+    const _network = electrumJSNetworks[isKomodoCoin(this.props.coin) ? 'kmd' : this.props.coin];
+    const storageSettings = getLocalStorageVar('settings');
     let _isFailed = false;
     let validTooMuch = false;
     let validIncorrectAddress = false;
     let validNan = false;
-    const _network = electrumJSNetworks[isKomodoCoin(this.props.coin) ? 'kmd' : this.props.coin];
-    const storageSettings = getLocalStorageVar('settings');
 
     if (this.state.sendAmount > this.props.balance.balance) {
       validTooMuch = true;
