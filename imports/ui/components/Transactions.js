@@ -146,6 +146,7 @@ class Transactions extends React.Component {
             <button
               type="button"
               className="btn btn-info waves-effect waves-light margin-left-20 btn-claim"
+              disabled={ this.props.balance.interest < 0.0002 }
               onClick={ this.props.toggleKMDInterest }>
               <i className="fa fa-dollar"></i> { translate('DASHBOARD.CLAIM') }
             </button>
