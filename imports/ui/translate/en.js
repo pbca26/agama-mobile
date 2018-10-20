@@ -80,6 +80,7 @@ const lang = {
       FILL_IN_DETAILS: 'Fill in details',
       CONFIRM: 'Confirm',
       TO: 'To',
+      TO_SM: 'to',
       FROM: 'From',
       WARNING: 'Warning',
       WARNING_SPV_P1: 'your wallet data is verified only by a single server!',

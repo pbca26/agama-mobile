@@ -317,7 +317,9 @@ class SendCoin extends React.Component {
           <div className="edit">
             <label
               className="control-label"
-              htmlFor="kmdWalletSendTo">{ translate('SEND.TO') }</label>
+              htmlFor="kmdWalletSendTo">
+              { translate('SEND.TO') }
+            </label>
             <input
               type="text"
               className="form-control"
@@ -426,149 +428,239 @@ class SendCoin extends React.Component {
             <div className={ 'step' + (this.state.sendCurrentStep === 2 ? ' current' : '') }></div>
           </div>
 
-          <div className={ 'send-step' + (this.state.sendCurrentStep === 0 ? '' : ' hide') }>
-            <div className="margin-bottom-40">
-              <div className="step-title">{ translate('SEND.FILL_IN_DETAILS') }</div>
-              <div
-                onClick={ this.scanQR }
-                className="scan-qr">
-                <i className="fa fa-qrcode"></i>
+          { this.state.sendCurrentStep === 0 &&
+            <div className="send-step">
+              <div className="margin-bottom-40">
+                <div className="step-title">{ translate('SEND.FILL_IN_DETAILS') }</div>
+                <div
+                  onClick={ this.scanQR }
+                  className="scan-qr">
+                  <i className="fa fa-qrcode"></i>
+                </div>
               </div>
+              { this.sendFormRender() }
             </div>
-            { this.sendFormRender() }
-          </div>
+          }
 
-          <div className={ 'send-step' + (this.state.sendCurrentStep === 1 ? '' : ' hide') }>
-            <div className="send-step2">
-              <div className="margin-bottom-35">
-                <div className="step-title">{ translate('SEND.CONFIRM') }</div>
+          { this.state.sendCurrentStep === 1 &&
+            <div className="send-step">
+              <div className="send-step2">
+                <div className="margin-bottom-35">
+                  <div className="step-title">{ translate('SEND.CONFIRM') }</div>
+                </div>
+                <div className="margin-top-5 edit">
+                  <strong>{ translate('SEND.TO') }</strong>
+                </div>
+                <div className="edit">
+                  <span className="shade">{ this.state.sendTo }</span>
+                </div>
+                <div className="padding-top-15 edit">
+                  <strong>{ translate('SEND.AMOUNT') }</strong>
+                </div>
+                <div className="edit">
+                  <span className="shade">
+                  { this.state.sendAmount } { this.props.coin.toUpperCase() }
+                  </span>
+                </div>
+                { this.state.spvPreflightResult &&
+                  this.state.spvPreflightResult.msg === 'success' &&
+                  <div>
+                    <div className="padding-top-15 edit">
+                      <strong>{ translate('SEND.FEE') }</strong>
+                    </div>
+                    <div className="edit">
+                      <span className="shade">
+                      { Number(fromSats(this.state.spvPreflightResult.result.fee)) } { this.props.coin.toUpperCase() }
+                      </span>
+                    </div>
+                    { this.state.spvPreflightResult.result.change === 0 &&
+                      (formatValue((fromSats(this.state.spvPreflightResult.result.value)) - (fromSats(this.state.spvPreflightResult.result.fee))) > 0) &&
+                      <div>
+                        <div className="padding-top-15 edit">
+                          <strong>{ translate('SEND.ADJUSTED_AMOUNT') }</strong>
+                        </div>
+                        <div className="edit">
+                          <span className="shade">
+                          { Number(formatValue((fromSats(this.state.spvPreflightResult.result.value)) - (fromSats(this.state.spvPreflightResult.result.fee)))) }
+                          </span>
+                        </div>
+                      </div>
+                    }
+                    { this.state.spvPreflightResult.result.estimatedFee < 0 &&
+                      this.props.coin.toLowerCase() === 'kmd' &&
+                      <div>
+                        <div className="padding-top-15 edit">
+                          <strong>{ translate('SEND.KMD_INTEREST') }</strong>
+                        </div>
+                        <div className="edit">
+                          <span className="shade">
+                          { Math.abs(formatValue(fromSats(this.state.spvPreflightResult.result.estimatedFee))) } { translate('SEND.TO_SM') } { this.props.address }
+                          </span>
+                        </div>
+                      </div>
+                    }
+                    { this.state.spvPreflightResult.result.estimatedFee > 0 &&
+                      this.props.coin.toLowerCase() === 'kmd' &&
+                      <div>
+                        <div className="padding-top-15 edit">
+                          <strong>{ translate('SEND.KMD_INTEREST') }</strong>
+                        </div>
+                        <div className="edit">
+                          <span className="shade">
+                          { Math.abs(formatValue(fromSats(this.state.spvPreflightResult.result.totalInterest))) } { translate('SEND.TO_SM') } { this.props.address }
+                          </span>
+                        </div>
+                      </div>
+                    }
+                    { this.state.spvPreflightResult.result.change >= 0 &&
+                      <div>
+                        <div className="padding-top-15 edit">
+                          <strong>{ translate('SEND.TOTAL') }</strong>
+                        </div>
+                        <div className="edit">
+                          <span className="shade">
+                          { formatValue(Number(fromSats(this.state.spvPreflightResult.result.value)) + Number(fromSats(this.state.spvPreflightResult.result.fee))) } { this.props.coin.toUpperCase() }
+                          </span>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
               </div>
-              <div className="margin-top-5 edit">
-                <strong>{ translate('SEND.TO') }</strong>
-              </div>
-              <div className="edit">
-                <span className="shade">{ this.state.sendTo }</span>
-              </div>
-              <div className="padding-top-15 edit">
-                <strong>{ translate('SEND.AMOUNT') }</strong>
-              </div>
-              <div className="edit">
-                <span className="shade">
-                { this.state.sendAmount } { this.props.coin.toUpperCase() }
-                </span>
-              </div>
-              { this.state.spvPreflightResult &&
-                this.state.spvPreflightResult.msg === 'success' &&
+              { ((getLocalStorageVar('settings') && getLocalStorageVar('settings').requirePin) ||
+                (config.preload && config.enablePinConfirm)) &&
                 <div>
-                  <div className="padding-top-15 edit">
-                    <strong>{ translate('SEND.FEE') }</strong>
+                  <div className="edit pin-confirm">
+                    <input
+                      type="password"
+                      className="form-control"
+                      name="pin"
+                      value={ this.state.pin }
+                      onChange={ this.updateInput }
+                      placeholder={ translate('SEND.ENTER_YOUR_PIN') }
+                      autoComplete="off" />
                   </div>
-                  <div className="edit">
-                    <span className="shade">
-                    { Number(fromSats(this.state.spvPreflightResult.result.fee)) } { this.props.coin.toUpperCase() }
-                    </span>
-                  </div>
-                  { this.state.spvPreflightResult.result.change === 0 &&
-                    (formatValue((fromSats(this.state.spvPreflightResult.result.value)) - (fromSats(this.state.spvPreflightResult.result.fee))) > 0) &&
-                    <div>
-                      <div className="padding-top-15 edit">
-                        <strong>{ translate('SEND.ADJUSTED_AMOUNT') }</strong>
-                      </div>
-                      <div className="edit">
-                        <span className="shade">
-                        { Number(formatValue((fromSats(this.state.spvPreflightResult.result.value)) - (fromSats(this.state.spvPreflightResult.result.fee)))) }
-                        </span>
-                      </div>
-                    </div>
-                  }
-                  { this.state.spvPreflightResult.result.estimatedFee < 0 &&
-                    this.props.coin.toLowerCase() === 'kmd' &&
-                    <div>
-                      <div className="padding-top-15 edit">
-                        <strong>{ translate('SEND.KMD_INTEREST') }</strong>
-                      </div>
-                      <div className="edit">
-                        <span className="shade">
-                        { Math.abs(formatValue(fromSats(this.state.spvPreflightResult.result.estimatedFee))) } { translate('SEND.TO') } { this.props.address }
-                        </span>
-                      </div>
-                    </div>
-                  }
-                  { this.state.spvPreflightResult.result.estimatedFee > 0 &&
-                    this.props.coin.toLowerCase() === 'kmd' &&
-                    <div>
-                      <div className="padding-top-15 edit">
-                        <strong>{ translate('SEND.KMD_INTEREST') }</strong>
-                      </div>
-                      <div className="edit">
-                        <span className="shade">
-                        { Math.abs(formatValue(fromSats(this.state.spvPreflightResult.result.totalInterest))) } { translate('SEND.TO') } { this.props.address }
-                        </span>
-                      </div>
-                    </div>
-                  }
-                  { this.state.spvPreflightResult.result.change >= 0 &&
-                    <div>
-                      <div className="padding-top-15 edit">
-                        <strong>{ translate('SEND.TOTAL') }</strong>
-                      </div>
-                      <div className="edit">
-                        <span className="shade">
-                        { formatValue(Number(fromSats(this.state.spvPreflightResult.result.value)) + Number(fromSats(this.state.spvPreflightResult.result.fee))) } { this.props.coin.toUpperCase() }
-                        </span>
-                      </div>
-                    </div>
-                  }
                 </div>
               }
-            </div>
-            { ((getLocalStorageVar('settings') && getLocalStorageVar('settings').requirePin) ||
-              (config.preload && config.enablePinConfirm)) &&
-              <div>
-                <div className="edit pin-confirm">
-                  <input
-                    type="password"
-                    className="form-control"
-                    name="pin"
-                    value={ this.state.pin }
-                    onChange={ this.updateInput }
-                    placeholder={ translate('SEND.ENTER_YOUR_PIN') }
-                    autoComplete="off" />
+              { this.state.wrongPin &&
+                <div className="error margin-top-15 margin-bottom-25 fs14">
+                  <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
                 </div>
-              </div>
-            }
-            { this.state.wrongPin &&
-              <div className="error margin-top-15 margin-bottom-25 fs14">
-                <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
-              </div>
-            }
-            { this.state.spvPreflightSendInProgress &&
-              <div className="padding-top-20 fs14 text-center">{ translate('SEND.SPV_VERIFYING') }...</div>
-            }
-            { this.state.spvVerificationWarning &&
-              <div className="padding-top-20 fs14 lh25">
-                <i className="fa fa-warning warning"></i> <strong className="warning">{ translate('SEND.WARNING') }:</strong> { translate('SEND.WARNING_SPV_P1') }
-                <div>{ translate('SEND.WARNING_SPV_P2') }</div>
-              </div>
-            }
-            <div className="widget-body-footer">
-              <div className="group3 margin-top-50">
-                <div
-                  onClick={ () => this.changeSendCoinStep(0, true) }
-                  className="btn-inner pull-left">
-                  <div className="btn">{ translate('SEND.BACK') }</div>
-                  <div className="group2">
-                    <img
-                      className="path6"
-                      src={ `${assetsPath.menu}/trends-combined-shape.png` } />
+              }
+              { this.state.spvPreflightSendInProgress &&
+                <div className="padding-top-20 fs14 text-center">{ translate('SEND.SPV_VERIFYING') }...</div>
+              }
+              { this.state.spvVerificationWarning &&
+                <div className="padding-top-20 fs14 lh25">
+                  <i className="fa fa-warning warning"></i> <strong className="warning">{ translate('SEND.WARNING') }:</strong> { translate('SEND.WARNING_SPV_P1') }
+                  <div>{ translate('SEND.WARNING_SPV_P2') }</div>
+                </div>
+              }
+              <div className="widget-body-footer">
+                <div className="group3 margin-top-50">
+                  <div
+                    onClick={ () => this.changeSendCoinStep(0, true) }
+                    className="btn-inner pull-left">
+                    <div className="btn">{ translate('SEND.BACK') }</div>
+                    <div className="group2">
+                      <img
+                        className="path6"
+                        src={ `${assetsPath.menu}/trends-combined-shape.png` } />
+                    </div>
+                  </div>
+                  <div
+                    onClick={ () => this.changeSendCoinStep(2) }
+                    className="btn-inner pull-right">
+                    <div className="btn">{ translate('SEND.CONFIRM') }</div>
+                    <div className="group2">
+                    <div className="rectangle8copy"></div>
+                      <img
+                        className="path6"
+                        src={ `${assetsPath.login}/reset-password-path-6.png` } />
+                    </div>
                   </div>
                 </div>
-                <div
-                  onClick={ () => this.changeSendCoinStep(2) }
-                  className="btn-inner pull-right">
-                  <div className="btn">{ translate('SEND.CONFIRM') }</div>
+              </div>
+            </div>
+          }
+          { this.state.sendCurrentStep === 2 &&
+            <div className="send-step">
+              <div className="step-title">{ translate('SEND.TX_RESULT') }</div>
+              <div className="margin-top-35">
+                { this.state.sendResult &&
+                  this.state.sendResult.msg === 'success' &&
+                  <div className="send-result">
+                    <div className="edit success">
+                    { translate('SEND.SUCCESS') } <i className="fa fa-check"></i>
+                    </div>
+                    <div className="edit">
+                      { translate('SEND.FROM') }
+                      <div className="shade margin-top-5">{ this.props.address }</div>
+                    </div>
+                    <div className="edit">
+                      { translate('SEND.TO') }
+                      <div className="shade margin-top-5">{ this.state.sendTo }</div>
+                    </div>
+                    <div className="edit">
+                      { translate('SEND.AMOUNT') }
+                      <div className="shade margin-top-5">{ this.state.sendAmount } { this.props.coin.toUpperCase() }</div>
+                    </div>
+                    <div className="edit">
+                      { translate('SEND.TXID') }
+                      <div className="shade margin-top-5">
+                      {
+                        this.state.sendResult &&
+                        this.state.sendResult.result &&
+                        this.state.sendResult.result.txid ? this.renderTxID() : translate('SEND.PROCESSING_SM')
+                      }
+                      </div>
+                    </div>
+                    { this.state.sendResult &&
+                      this.state.sendResult.result &&
+                      this.state.sendResult.result.txid &&
+                      <div className="edit">
+                        <span onClick={ this.openExternalURL }>
+                        { translate('SEND.OPEN_IN_EXPLORER') }<i className="fa fa-external-link margin-left-10"></i>
+                        </span>
+                      </div>
+                    }
+                  </div>
+                }
+                { (!this.state.sendResult || this.state.processing) &&
+                  <div className="send-result">
+                    <div className="edit">
+                    { translate('SEND.PROCESSING_TX') }
+                    </div>
+                  </div>
+                }
+                { this.state.sendResult &&
+                  this.state.sendResult.msg &&
+                  this.state.sendResult.msg === 'error' &&
+                  <div className="send-result">
+                    <div className="edit error">
+                    { translate('SEND.ERROR') } <i className="fa fa-close"></i>
+                    </div>
+                    <div className="edit padding-bottom-15">
+                      <div className="shade">{ this.state.sendResult.result }</div>
+                      { this.state.sendResult.raw &&
+                        this.state.sendResult.raw.txid &&
+                        <div className="shade">{ this.state.sendResult.raw.txid.replace(/\[.*\]/, '') }</div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+              <div
+                disabled={
+                  !this.state.sendResult ||
+                  this.state.processing
+                }
+                onClick={ () => this.changeSendCoinStep(0) }
+                className="group3 margin-top-50">
+                <div className="btn-inner">
+                  <div className="btn">{ translate('SEND.MAKE_ANOTHER_TX') }</div>
                   <div className="group2">
-                  <div className="rectangle8copy"></div>
+                    <div className="rectangle8copy"></div>
                     <img
                       className="path6"
                       src={ `${assetsPath.login}/reset-password-path-6.png` } />
@@ -576,91 +668,7 @@ class SendCoin extends React.Component {
                 </div>
               </div>
             </div>
-          </div>
-          <div className={ 'send-step' + (this.state.sendCurrentStep === 2 ? '' : ' hide') }>
-            <div className="step-title">{ translate('SEND.TX_RESULT') }</div>
-            <div className="margin-top-35">
-              { this.state.sendResult &&
-                this.state.sendResult.msg === 'success' &&
-                <div className="send-result">
-                  <div className="edit success">
-                  { translate('SEND.SUCCESS') } <i className="fa fa-check"></i>
-                  </div>
-                  <div className="edit">
-                    { translate('SEND.FROM') }
-                    <div className="shade margin-top-5">{ this.props.address }</div>
-                  </div>
-                  <div className="edit">
-                    { translate('SEND.TO') }
-                    <div className="shade margin-top-5">{ this.state.sendTo }</div>
-                  </div>
-                  <div className="edit">
-                    { translate('SEND.AMOUNT') }
-                    <div className="shade margin-top-5">{ this.state.sendAmount } { this.props.coin.toUpperCase() }</div>
-                  </div>
-                  <div className="edit">
-                    { translate('SEND.TXID') }
-                    <div className="shade margin-top-5">
-                    {
-                      this.state.sendResult &&
-                      this.state.sendResult.result &&
-                      this.state.sendResult.result.txid ? this.renderTxID() : translate('SEND.PROCESSING_SM')
-                    }
-                    </div>
-                  </div>
-                  { this.state.sendResult &&
-                    this.state.sendResult.result &&
-                    this.state.sendResult.result.txid &&
-                    <div className="edit">
-                      <span onClick={ this.openExternalURL }>
-                      { translate('SEND.OPEN_IN_EXPLORER') }<i className="fa fa-external-link margin-left-10"></i>
-                      </span>
-                    </div>
-                  }
-                </div>
-              }
-              { (!this.state.sendResult || this.state.processing) &&
-                <div className="send-result">
-                  <div className="edit">
-                  { translate('SEND.PROCESSING_TX') }
-                  </div>
-                </div>
-              }
-              { this.state.sendResult &&
-                this.state.sendResult.msg &&
-                this.state.sendResult.msg === 'error' &&
-                <div className="send-result">
-                  <div className="edit error">
-                  { translate('SEND.ERROR') } <i className="fa fa-close"></i>
-                  </div>
-                  <div className="edit padding-bottom-15">
-                    <div className="shade">{ this.state.sendResult.result }</div>
-                    { this.state.sendResult.raw &&
-                      this.state.sendResult.raw.txid &&
-                      <div className="shade">{ this.state.sendResult.raw.txid.replace(/\[.*\]/, '') }</div>
-                    }
-                  </div>
-                </div>
-              }
-            </div>
-            <div
-              disabled={
-                !this.state.sendResult ||
-                this.state.processing
-              }
-              onClick={ () => this.changeSendCoinStep(0) }
-              className="group3 margin-top-50">
-              <div className="btn-inner">
-                <div className="btn">{ translate('SEND.MAKE_ANOTHER_TX') }</div>
-                <div className="group2">
-                  <div className="rectangle8copy"></div>
-                  <img
-                    className="path6"
-                    src={ `${assetsPath.login}/reset-password-path-6.png` } />
-                </div>
-              </div>
-            </div>
-          </div>
+          }
         </div>
       );
     } else {
