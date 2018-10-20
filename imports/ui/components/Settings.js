@@ -91,7 +91,8 @@ class Settings extends React.Component {
             <input
               type="checkbox"
               value="on"
-              checked={ this.state.requirePin } />
+              checked={ this.state.requirePin }
+              readOnly />
             <div
               className="slider"
               onClick={ this.toggleConfirmPin }></div>

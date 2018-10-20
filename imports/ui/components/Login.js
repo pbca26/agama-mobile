@@ -246,7 +246,8 @@ class Login extends React.Component {
                     <input
                       type="checkbox"
                       value="on"
-                      checked={ this.state.createPin } />
+                      checked={ this.state.createPin }
+                      readOnly />
                     <div
                       className="slider"
                       onClick={ this.toggleCreatePin }></div>

@@ -114,7 +114,8 @@ class CreateSeed extends React.Component {
               <input
                 type="checkbox"
                 value="on"
-                checked={ this.state.confirmSeedSaved } />
+                checked={ this.state.confirmSeedSaved }
+                readOnly />
               <div
                 className="slider"
                 onClick={ this.toggleConfirmSeed }></div>
@@ -136,7 +137,8 @@ class CreateSeed extends React.Component {
               <input
                 type="checkbox"
                 value="on"
-                checked={ this.state.createPin } />
+                checked={ this.state.createPin }
+                readOnly />
               <div
                 className="slider"
                 onClick={ this.toggleCreatePin }></div>
