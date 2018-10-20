@@ -58,6 +58,8 @@ const lang = {
       CONFIRMATION_REQUIRED: 'Confirmation is required',
     },
     SEND: {
+      ADJUSTED_AMOUNT: 'Adjusted amount',
+      KMD_INTEREST: 'KMD rewards',
       TOTAL: 'Total',
       FEE: 'Fee',
       BTC_FEE_SLOW: 'Slow (60 min)',

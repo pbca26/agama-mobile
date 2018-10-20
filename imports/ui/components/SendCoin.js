@@ -468,14 +468,57 @@ class SendCoin extends React.Component {
                     { Number(fromSats(this.state.spvPreflightResult.result.fee)) } { this.props.coin.toUpperCase() }
                     </span>
                   </div>
-                  <div className="padding-top-15 edit">
-                    <strong>{ translate('SEND.TOTAL') }</strong>
-                  </div>
-                  <div className="edit">
-                    <span className="shade">
-                    { formatValue(Number(fromSats(this.state.spvPreflightResult.result.value)) + Number(fromSats(this.state.spvPreflightResult.result.fee))) } { this.props.coin.toUpperCase() }
-                    </span>
-                  </div>
+                  { this.state.spvPreflightResult.result.change === 0 &&
+                    (formatValue((fromSats(this.state.spvPreflightResult.result.value)) - (fromSats(this.state.spvPreflightResult.result.fee))) > 0) &&
+                    <div>
+                      <div className="padding-top-15 edit">
+                        <strong>{ translate('SEND.ADJUSTED_AMOUNT') }</strong>
+                      </div>
+                      <div className="edit">
+                        <span className="shade">
+                        { Number(formatValue((fromSats(this.state.spvPreflightResult.result.value)) - (fromSats(this.state.spvPreflightResult.result.fee)))) }
+                        </span>
+                      </div>
+                    </div>
+                  }
+                  { this.state.spvPreflightResult.result.estimatedFee < 0 &&
+                    this.props.coin.toLowerCase() === 'kmd' &&
+                    <div>
+                      <div className="padding-top-15 edit">
+                        <strong>{ translate('SEND.KMD_INTEREST') }</strong>
+                      </div>
+                      <div className="edit">
+                        <span className="shade">
+                        { Math.abs(formatValue(fromSats(this.state.spvPreflightResult.result.estimatedFee))) } { translate('SEND.TO') } { this.props.address }
+                        </span>
+                      </div>
+                    </div>
+                  }
+                  { this.state.spvPreflightResult.result.estimatedFee > 0 &&
+                    this.props.coin.toLowerCase() === 'kmd' &&
+                    <div>
+                      <div className="padding-top-15 edit">
+                        <strong>{ translate('SEND.KMD_INTEREST') }</strong>
+                      </div>
+                      <div className="edit">
+                        <span className="shade">
+                        { Math.abs(formatValue(fromSats(this.state.spvPreflightResult.result.totalInterest))) } { translate('SEND.TO') } { this.props.address }
+                        </span>
+                      </div>
+                    </div>
+                  }
+                  { this.state.spvPreflightResult.result.change >= 0 &&
+                    <div>
+                      <div className="padding-top-15 edit">
+                        <strong>{ translate('SEND.TOTAL') }</strong>
+                      </div>
+                      <div className="edit">
+                        <span className="shade">
+                        { formatValue(Number(fromSats(this.state.spvPreflightResult.result.value)) + Number(fromSats(this.state.spvPreflightResult.result.fee))) } { this.props.coin.toUpperCase() }
+                        </span>
+                      </div>
+                    </div>
+                  }
                 </div>
               }
             </div>
