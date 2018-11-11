@@ -1,11 +1,12 @@
 import translate from '../translate/translate';
+import { Meteor } from 'meteor/meteor';
 
 export const assetsPath = {
-  coinLogo: '/images/cryptologo',
-  login: '/images/template/login',
-  menu: '/images/template/menu',
-  home: '/images/template/home',
-  txs: '/images/template/transactions',
+  coinLogo: Meteor.absoluteUrl('images/cryptologo'),
+  login: Meteor.absoluteUrl('images/template/login'),
+  menu: Meteor.absoluteUrl('images/template/menu'),
+  home: Meteor.absoluteUrl('images/template/home'),
+  txs: Meteor.absoluteUrl('images/template/transactions'),
 };
 
 // https://stackoverflow.com/questions/5467129/sort-javascript-object-by-key
