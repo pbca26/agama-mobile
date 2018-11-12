@@ -482,40 +482,52 @@ class App extends React.Component {
   login(passphrase) {
     const { actions } = this.props;
 
-    actions.auth(passphrase, this.state.coins)
-    .then((res) => {
-      // select a coin and an address
-      let coin;
-      let address;
-
-      if (this.state.coins.kmd) {
-        coin = 'kmd';
-        address = res.kmd;
-      } else {
-        coin = Object.keys(this.state.coins)[0];
-        address = res[coin];
-      }
-
-      if (config.preload &&
-          config.preload.activeCoin) {
-        coin = config.preload.activeCoin;
-        address = res[coin];
-      }
-
-      this.setState({
-        auth: true,
-        pubKeys: res,
-        coin,
-        address,
-        history: null,
-        activeSection: 'dashboard',
+    const _login = () => {
+      actions.auth(passphrase, this.state.coins)
+      .then((res) => {
+        // select a coin and an address
+        let coin;
+        let address;
+  
+        if (this.state.coins.kmd) {
+          coin = 'kmd';
+          address = res.kmd;
+        } else {
+          coin = Object.keys(this.state.coins)[0];
+          address = res[coin];
+        }
+  
+        if (config.preload &&
+            config.preload.activeCoin) {
+          coin = config.preload.activeCoin;
+          address = res[coin];
+        }
+  
+        this.setState({
+          auth: true,
+          pubKeys: res,
+          coin,
+          address,
+          history: null,
+          activeSection: 'dashboard',
+        });
+  
+        this.dashboardRefresh();
+        this.toggleAutoRefresh();
+        this.globalClick();
+        this.scrollToTop();
       });
+    };
 
-      this.dashboardRefresh();
-      this.toggleAutoRefresh();
-      this.globalClick();
-      this.scrollToTop();
-    });
+    if (!Object.keys(this.state.coins).length) {
+      this.addCoin('kmd');
+      
+      Meteor.setTimeout(() => {
+        _login();
+      }, 10); 
+    } else {
+      _login();
+    }
   }
 
   toggleMenu() {
