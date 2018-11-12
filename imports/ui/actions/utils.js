@@ -1,5 +1,6 @@
 import translate from '../translate/translate';
 import { Meteor } from 'meteor/meteor';
+import _coinsList from './coins';
 
 export const assetsPath = {
   coinLogo: '/images/cryptologo',
@@ -63,79 +64,6 @@ export const convertURIToImageData = (URI) => {
     image.src = URI;
   });
 };
-
-export const _coinsList = [
-  // sn related coins/assets
-  'KMD',
-  'CHIPS',
-  'SUPERNET',
-  'REVS',
-  'PANGEA',
-  'DEX',
-  'JUMBLR',
-  'BET',
-  'CRYPTO',
-  'COQUI',
-  'OOT',
-  'HODL',
-  'MSHARK',
-  'BOTS',
-  'MGW',
-  'BTCH',
-  'KV',
-  'WLC',
-  'MNZ',
-  'BNTN',
-  'CHAIN',
-  'GLXT',
-  'EQL',
-  'PRLPAY',
-  'ZILLA',
-  'PIZZA',
-  'BEER',
-  'CCL',
-  'VRSC',
-  'CALL',
-  'DION',
-  // other coins
-  'BTC',
-  'DOGE',
-  'DGB',
-  'BTG',
-  'BCH',
-  'FAIR',
-  'VIA',
-  'MONA',
-  'ZEC',
-  'HUSH',
-  'ARG',
-  'DASH',
-  'CRW',
-  'VTC',
-  'LTC',
-  'NMC',
-  'SIB',
-  'XMY',
-  'ZCL',
-  'EMC2',
-  'FJC',
-  'GAME',
-  'BCBC',
-  'BTCZ',
-  'QTUM',
-  'DNR',
-  'XZC',
-  'FTC',
-  'GBX',
-  //'NINJA',  
-  //'SHARK',
-  //'MVP',
-  //'CEAL',
-  //'MESH',
-  //'VOTE2018',
-  //'BLK',
-  //'BTX', (?) needs a fix
-];
 
 // sorting needs to be done
 export let coinsList = []; // sorted
