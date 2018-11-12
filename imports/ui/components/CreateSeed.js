@@ -61,24 +61,26 @@ class CreateSeed extends React.Component {
         pristine: false,
       });
     } else {
-      if (this.state.createPin) {
-        if (this.state.pinOverride &&
-            this.state.pinOverride.length >= 6) {
-          const _encryptedKey = encryptkey(this.state.pinOverride, this.state.seed);
+      if (this.state.confirmSeedSaved) {
+        if (this.state.createPin) {
+          if (this.state.pinOverride &&
+              this.state.pinOverride.length >= 6) {
+            const _encryptedKey = encryptkey(this.state.pinOverride, this.state.seed);
 
-          setLocalStorageVar('seed', { encryptedKey: _encryptedKey });
+            setLocalStorageVar('seed', { encryptedKey: _encryptedKey });
 
+            this.props.login(this.state.seed);
+            this.setState(this.defaultState);
+          } else {
+            this.setState({
+              pinOverrideTooShort: true,
+              wrongPin: false,
+            });
+          }
+        } else {
           this.props.login(this.state.seed);
           this.setState(this.defaultState);
-        } else {
-          this.setState({
-            pinOverrideTooShort: true,
-            wrongPin: false,
-          });
         }
-      } else {
-        this.props.login(this.state.seed);
-        this.setState(this.defaultState);
       }
     }
   }
