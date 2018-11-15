@@ -67,14 +67,25 @@ export const convertURIToImageData = (URI) => {
 
 // sorting needs to be done
 export let coinsList = []; // sorted
-let _coins = {};
-
-for (let i = 0; i < _coinsList.length; i++) {
-  _coins[translate('COINS.' + _coinsList[i].toUpperCase())] = _coinsList[i];
-}
-
-_coins = sortObject(_coins);
+let _coins = {
+  spv: {},
+  eth: {},
+};
 
 for (let key in _coins) {
-  coinsList.push(_coins[key]);
+  for (let i = 0; i < _coinsList[key].length; i++) {
+    _coins[key][translate(`${key.toUpperCase()}.` + _coinsList[key][i].toUpperCase())] = _coinsList[key][i];
+  }
+  
+  _coins[key] = sortObject(_coins[key]);
+
+  for (let _key in _coins[key]) {
+    coinsList.push({
+      name: _coins[key][_key] + '|' + key,
+      title: _key,
+      mode: key,
+    });
+  }
 }
+
+console.warn(coinsList);
