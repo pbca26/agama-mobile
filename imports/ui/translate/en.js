@@ -102,6 +102,8 @@ const lang = {
       SCAN_QR: 'Scan QR code',
     },
     ADD_COIN: {
+      NO_MATCHING_RESULTS: 'No matching results',
+      QUICK_SEARCH: 'Type to search',
       ADD_ALL_COINS: 'Add all coins',
       SHORTCUTS: 'Shortcuts',
       MULTI_SELECT: 'Multi-select',

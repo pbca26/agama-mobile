@@ -18,9 +18,10 @@
     margin: 0;
 
     .overview-coins {
-      top: 0;
+      top: 40px;
       position: relative;
       height: 100%;
+      padding-bottom: 40px;
   
       .overview-coin {
         height: 80px;
@@ -210,6 +211,31 @@
       position: absolute;
       margin: 0;
       left: 331px;
+    }
+  }
+
+  .form {
+    .edit {
+      max-width: 100%; 
+      position: fixed;
+      z-index: 10;
+      height: 20px;
+
+      input {
+        width: calc(100% - 60px);
+      }
+
+      .search-remove {
+        padding: 10px 15px;
+        font-style: normal;
+        position: fixed;
+        top: 53px;
+        right: 5px;
+        z-index: 20;
+        opacity: 0.7;
+        font-size: 14px;
+        cursor: default;
+      }
     }
   }
 }
