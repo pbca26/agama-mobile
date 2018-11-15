@@ -179,7 +179,7 @@ const lang = {
       'CREATE-SEED': 'Create seed',
       CLAIM: 'Claim rewards',
     },
-    COINS: {
+    SPV: {
       // asset chains
       BET: 'BET',
       BOTS: 'BOTS',
@@ -350,9 +350,11 @@ const lang = {
       PPC: 'Peercoin',
       MZC: 'Mazacoin',
       SDC: 'ShadowCash',
+    },
+    ETH: {
       // eth
       ETH: 'Ethereum',
-      ETH_ROPSTEN: 'Ethereum Ropsten Testnet',
+      ETH_ROPSTEN: 'Ethereum (Ropsten)',
       AE: 'Aeternity',
       AION: 'Aion',
       ANN: 'Agent Not Needed',

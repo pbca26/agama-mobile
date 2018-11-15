@@ -31,20 +31,21 @@ class AddCoin extends React.Component {
     let _items = [];
 
     for (let i = 0; i < coinsList.length; i++) {
-      const key = coinsList[i];
-      const _coin = key.toLowerCase();
+      const _coin = coinsList[i];
+      const _name = _coin.name.split('|')[0].toLowerCase();
+      const _mode = _coin.name.split('|')[1].toLowerCase();
 
       _items.push(
         <div
-          onClick={ () => this.addCoin(_coin) }
-          key={ `overview-coins-${_coin}` }
-          className={ 'overview-coin' + (_coins[_coin] ? ' disabled' : '') }>
+          onClick={ () => this.addCoin(_coin.name) }
+          key={ `overview-coins-${_coin.name}` }
+          className={ 'overview-coin' + (_coins[_coin.name] ? ' disabled' : '') }>
           <div className="btc">
             <img
               className="oval4"
-              src={ `${assetsPath.coinLogo}/${_coin}.png` } />
+              src={ `${assetsPath.coinLogo}/${_mode}/${_name}.png` } />
           </div>
-          <div className="bitcoin">{ translate('COINS.' + _coin.toUpperCase()) }</div>
+          <div className="bitcoin">{ translate(_mode.toUpperCase() + '.' + _name.toUpperCase()) }</div>
         </div>
       );
     }
