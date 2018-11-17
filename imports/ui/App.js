@@ -100,6 +100,7 @@ class App extends React.Component {
 
       for (let key in _localStorageCoins) {
         let _diffFound = false;
+
         if (key.indexOf('|spv') === -1) {
           _localStorageCoins[`${key}|spv`] = _localStorageCoins[key];
           delete _localStorageCoins[key];
@@ -489,8 +490,8 @@ class App extends React.Component {
         let coin;
         let address;
   
-        if (this.state.coins.kmd) {
-          coin = 'kmd';
+        if (this.state.coins['kmd|spv']) {
+          coin = ['kmd|spv'];
           address = res.kmd;
         } else {
           coin = Object.keys(this.state.coins)[0];
@@ -520,7 +521,7 @@ class App extends React.Component {
     };
 
     if (!Object.keys(this.state.coins).length) {
-      this.addCoin('kmd');
+      this.addCoin(['kmd|spv']);
       
       Meteor.setTimeout(() => {
         _login();
@@ -584,12 +585,14 @@ class App extends React.Component {
     _coins = sortObject(_coins);
 
     for (let key in _coins) {
+      const _name = key.name.split('|')[0];
+
       _items.push(
         <div
           onClick={ () => key !== this.state.coin ? this.switchCoin(key) : null }
           key={ `active-coins-${key}` }
           className="active-coins">
-          <img src={ `${assetsPath.coinLogo}/${key}.png` } /> <span>{ key.toUpperCase() }</span>
+          <img src={ `${assetsPath.coinLogo}/${_name}.png` } /> <span>{ _name.toUpperCase() }</span>
           { key === this.state.coin &&
             <i className="fa fa-check"></i>
           }
