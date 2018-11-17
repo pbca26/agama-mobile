@@ -81,7 +81,7 @@ for (let key in _coins) {
 
   for (let _key in _coins[key]) {
     coinsList.push({
-      name: _coins[key][_key] + '|' + key,
+      name: (_coins[key][_key] + '|' + key).toLowerCase(),
       title: _key,
       mode: key,
     });

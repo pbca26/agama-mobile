@@ -49,14 +49,14 @@ class AddCoin extends React.Component {
 
     for (let i = 0; i < coinsList.length; i++) {
       const _coin = coinsList[i];
-      const _name = _coin.name.split('|')[0].toLowerCase();
-      const _mode = _coin.name.split('|')[1].toLowerCase();
+      const _name = _coin.name.split('|')[0];
+      const _mode = _coin.name.split('|')[1];
 
       if (!this.state.searchTerm ||
-          (this.state.searchTerm && (_mode.toLowerCase().indexOf(this.state.searchTerm.toLowerCase()) > -1 || _coin.title.toLowerCase().indexOf(this.state.searchTerm.toLowerCase()) > -1))) {
+          (this.state.searchTerm && (_name.indexOf(this.state.searchTerm.toLowerCase()) > -1 || _mode.indexOf(this.state.searchTerm.toLowerCase()) > -1 || _coin.title.toLowerCase().indexOf(this.state.searchTerm.toLowerCase()) > -1))) {
         _items.push(
           <div
-            onClick={ () => this.addCoin(_coin.name) }
+            onClick={ () => this.addCoin(_coin) }
             key={ `overview-coins-${_coin.name}` }
             className={ 'overview-coin' + (_coins[_coin.name] ? ' disabled' : '') }>
             <div className="btc">

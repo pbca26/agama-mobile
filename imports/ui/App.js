@@ -50,6 +50,7 @@ class App extends React.Component {
       displayMenu: false,
       loading: false,
       coin: null,
+      mode: null,
       coins: {},
       pubKeys: {},
       activeSection: 'login',
@@ -92,9 +93,24 @@ class App extends React.Component {
 
   componentWillMount() {
     const { actions } = this.props;
-    const _localStorageCoins = getLocalStorageVar('coins');
+    let _localStorageCoins = getLocalStorageVar('coins');
 
     if (_localStorageCoins) {
+      // convert coins obj to 0.1.4, applicable to any version below 0.1.4
+
+      for (let key in _localStorageCoins) {
+        let _diffFound = false;
+        if (key.indexOf('|spv') === -1) {
+          _localStorageCoins[`${key}|spv`] = _localStorageCoins[key];
+          delete _localStorageCoins[key];
+          _diffFound = true;
+        }
+
+        if (_diffFound) {
+          setLocalStorageVar('coins', _localStorageCoins);
+        }       
+      }
+      
       this.setState({
         coins: _localStorageCoins,
       });
@@ -170,25 +186,6 @@ class App extends React.Component {
     window.scrollTo(0, 0);
   }
 
-  /*globalClick() {
-    if (this.state.auth) {
-      if (this.globalClickTimeout) {
-        Meteor.clearTimeout(this.globalClickTimeout);
-      }
-
-      if (!config.dev ||
-          (config.dev && config.preload && !config.preload.disableAutoLock) ||
-          (config.dev && !config.preload)) {
-        this.globalClickTimeout = Meteor.setTimeout(() => {
-          devlog(`logout after ${DEFAULT_LOCK_INACTIVE_INTERVAL}ms inactivity`);
-          this.lock();
-        }, DEFAULT_LOCK_INACTIVE_INTERVAL);
-      }
-
-      devlog('global click', 'set timer');
-    }
-  }*/
-
   globalClick() {
     const _storageSettings = getLocalStorageVar('settings');    
     const DEFAULT_LOCK_INACTIVE_INTERVAL = _storageSettings && _storageSettings.autoLockTimeout ? _storageSettings.autoLockTimeout : 600000; // 10m
@@ -212,28 +209,31 @@ class App extends React.Component {
   }
 
   addCoin(coin) {
-    let server = electrumServers[coin];
-    let coins = this.state.coins;
+    if (coin.indexOf('|spv')) {
+      const _coin = coin.split('|')[0];
+      let server = electrumServers[_coin];
+      let coins = this.state.coins;
 
-    // pick a random server to communicate with
-    if (server.serverList &&
-        server.serverList.length > 0) {
-      const randomServerId = getRandomIntInclusive(0, server.serverList.length - 1);
-      const randomServer = server.serverList[randomServerId];
-      const serverDetails = randomServer.split(':');
+      // pick a random server to communicate with
+      if (server.serverList &&
+          server.serverList.length > 0) {
+        const randomServerId = getRandomIntInclusive(0, server.serverList.length - 1);
+        const randomServer = server.serverList[randomServerId];
+        const serverDetails = randomServer.split(':');
 
-      if (serverDetails.length === 3) {
-        server = {
-          ip: serverDetails[0],
-          port: serverDetails[1],
-          proto: serverDetails[2],
-        };
+        if (serverDetails.length === 3) {
+          server = {
+            ip: serverDetails[0],
+            port: serverDetails[1],
+            proto: serverDetails[2],
+          };
+        }
       }
-    }
 
-    coins[coin] = {
-      server,
-    };
+      coins[coin] = {
+        server,
+      };
+    }
 
     setLocalStorageVar('coins', this.state.coins);
 
