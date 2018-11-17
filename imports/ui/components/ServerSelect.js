@@ -1,6 +1,5 @@
 import React from 'react';
 import translate from '../translate/translate';
-import { fail } from 'assert';
 
 class ServerSelect extends React.Component {
   constructor() {
@@ -90,7 +89,9 @@ class ServerSelect extends React.Component {
       _items.push(
         <option
           key={ `spv-server-list-${i}` }
-          value={ _spvServers[i] }>{ `${_spvServers[i]}` }</option>
+          value={ _spvServers[i] }>
+          { `${_spvServers[i]}` }
+        </option>
       );
     }
 
@@ -98,11 +99,14 @@ class ServerSelect extends React.Component {
   }
 
   render() {
+    const _name = _overview[i].coin.split('|')[0];
+    const _mode = _overview[i].coin.split('|')[1];
+
     return (
       <div className="form server-select">
         <div className="bold text-center">
           <i className="fa fa-warning error padding-right-5"></i>
-          <span className="error width-limit">{ translate('DASHBOARD.CON_ERROR', this.props.coin.toUpperCase()) }</span>
+          <span className="error width-limit">{ translate('DASHBOARD.CON_ERROR', _name.toUpperCase()) }</span>
         </div>
         <div className="server-select-inner">
           <div>

@@ -87,5 +87,3 @@ for (let key in _coins) {
     });
   }
 }
-
-console.warn(coinsList);

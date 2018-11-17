@@ -33,7 +33,7 @@ class Transactions extends React.Component {
   showClaimButton() {
     const _props = this.props;
 
-    if (_props.coin === 'kmd' &&
+    if (_props.coin === 'kmd|spv' &&
         _props.balance &&
         _props.balance.interest &&
         _props.balance.interest > 0) {
@@ -183,6 +183,8 @@ class Transactions extends React.Component {
 
       const _coin = this.props.coin;
       const _balance = this.props.balance;
+      const _name = _coin.split('|')[0];
+      const _mode = _coin.split('|')[1];
 
       return (
         <div className="transactions-ui">
@@ -201,15 +203,15 @@ class Transactions extends React.Component {
                 <div className="cryptocardbtc">
                   <img
                     className="coin-icon"
-                    src={ `${assetsPath.coinLogo}/${_coin}.png` } />
-                  <div className="coin-title">{ translate('COINS.' + _coin.toUpperCase()) }</div>
+                    src={ `${assetsPath.coinLogo}/${_name.toLowerCase()}.png` } />
+                  <div className="coin-title">{ translate(_mode.toUpperCase() + '.' + _name.toUpperCase()) }</div>
                   <div className="coin-balance">
                     <div className="balance">
-                    { translate('BALANCE.BALANCE') }: { _balance ? formatValue(_balance.balance) : 0 } { _coin.toUpperCase() }
+                    { translate('BALANCE.BALANCE') }: { _balance ? formatValue(_balance.balance) : 0 } { _name.toUpperCase() }
                     </div>
                     { this.isInterestDefined() &&
                       <div className="interest">
-                      { translate('BALANCE.INTEREST') }: { _balance ? formatValue(_balance.interest) : 0 } { _coin.toUpperCase() }
+                      { translate('BALANCE.INTEREST') }: { _balance ? formatValue(_balance.interest) : 0 } { _name.toUpperCase() }
                       </div>
                     }
                   </div>

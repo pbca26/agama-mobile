@@ -77,6 +77,9 @@ class Overview extends React.Component {
       );
 
       for (let i = 0; i < _overview.length; i++) {
+        const _name = _overview[i].coin.split('|')[0];
+        const _mode = _overview[i].coin.split('|')[1];
+
         _items.push(
           <div
             key={ `overview-coins-${_overview[i].coin}` }
@@ -91,9 +94,9 @@ class Overview extends React.Component {
             <div className="btc">
               <img
                 className="oval4"
-                src={ `${assetsPath.coinLogo}/${_overview[i].coin}.png` } />
+                src={ `${assetsPath.coinLogo}/${_name.toLowerCase()}.png` } />
             </div>
-            <div className="bitcoin">{ translate('COINS.' + _overview[i].coin.toUpperCase()) }</div>
+            <div className="bitcoin">{ translate(_mode.toUpperCase() + '.' + _name.toUpperCase()) }</div>
             <div className="a0000041">{ formatValue(_overview[i].balanceNative) }</div>
             <div className="a123345">${ formatValue(_overview[i].balanceUSD) }</div>
           </div>
