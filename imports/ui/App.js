@@ -412,6 +412,7 @@ class App extends React.Component {
     this.setState({
       loading: true,
     });
+    console.warn(this.state.coin);
 
     actions.transactions(this.state.coin)
     .then((res) => {
@@ -491,17 +492,17 @@ class App extends React.Component {
         let address;
   
         if (this.state.coins['kmd|spv']) {
-          coin = ['kmd|spv'];
-          address = res.kmd;
+          coin = 'kmd|spv';
+          address = res.spv.kmd;
         } else {
-          coin = Object.keys(this.state.coins)[0];
-          address = res[coin];
+          coin = Object.keys(this.state.coins)[0].split('|')[0];
+          address = res.spv[coin] || res.eth[coin];
         }
   
         if (config.preload &&
             config.preload.activeCoin) {
           coin = config.preload.activeCoin;
-          address = res[coin];
+          address = res.spv[coin] || res.eth[coin];
         }
   
         this.setState({
@@ -521,7 +522,7 @@ class App extends React.Component {
     };
 
     if (!Object.keys(this.state.coins).length) {
-      this.addCoin(['kmd|spv']);
+      this.addCoin('kmd|spv');
       
       Meteor.setTimeout(() => {
         _login();

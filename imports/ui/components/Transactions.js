@@ -80,6 +80,7 @@ class Transactions extends React.Component {
   }
 
   renderTxAmount(tx, amountOnly) {
+    const _name = this.props.coin.split('|')[0];    
     let _amountNegative;
 
     if ((tx.category === 'send' ||
@@ -102,7 +103,7 @@ class Transactions extends React.Component {
         }
         { formatValue(tx.amount) * _amountNegative || translate('TRANSACTIONS.UNKNOWN') }
         { Number(tx.amount) !== 0 &&
-          <span className="padding-left-5">{ this.props.coin.toUpperCase() }</span>
+          <span className="padding-left-5">{ _name.toUpperCase() }</span>
         }
         { tx.interest &&
           !amountOnly &&
@@ -203,7 +204,7 @@ class Transactions extends React.Component {
                 <div className="cryptocardbtc">
                   <img
                     className="coin-icon"
-                    src={ `${assetsPath.coinLogo}/${_name.toLowerCase()}.png` } />
+                    src={ `${assetsPath.coinLogo}/${_mode}/${_name.toLowerCase()}.png` } />
                   <div className="coin-title">{ translate(_mode.toUpperCase() + '.' + _name.toUpperCase()) }</div>
                   <div className="coin-balance">
                     <div className="balance">

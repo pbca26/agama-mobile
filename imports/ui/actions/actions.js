@@ -112,7 +112,10 @@ const cache = {
   getDecodedTransaction,
 };
 
-let electrumKeys = {};
+let keys = {
+  spv: {},
+  eth: {},
+};
 let proxyServer = {};
 // pick a random proxy server
 
@@ -162,6 +165,7 @@ const getServersList = () => {
 }
 
 const setDefaultServer = (network, port, ip, proto) => {
+  console.warn('setDefaultServer', network);
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
       HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/server/version`, {
@@ -190,7 +194,10 @@ const setDefaultServer = (network, port, ip, proto) => {
 const clearKeys = () => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
-      electrumKeys = {};
+      keys = {
+        spv: {},
+        eth: {},
+      };
       resolve(true);
     });
   }
@@ -199,28 +206,32 @@ const clearKeys = () => {
 const sendtx = (network, outputAddress, value, verify, push, btcFee) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
-      const changeAddress = electrumKeys[network].pub;
-      let _electrumServer = getLocalStorageVar('coins')[network].server;
-      _electrumServer.serverList = electrumServers[network].serverList;
+      if (network.indexOf('|spv') > -1) {
+        const changeAddress = keys.spv[network].pub;
+        let _electrumServer = getLocalStorageVar('coins')[network].server;
+        _electrumServer.serverList = electrumServers[network].serverList;
 
-      devlog(`sendtx ${network}`);
+        devlog(`sendtx ${network}`);
 
-      createtx(
-        proxyServer,
-        _electrumServer,
-        outputAddress,
-        changeAddress,
-        value,
-        btcFee ? { perbyte: true, value: btcFee } : (isKomodoCoin(network) ? electrumServers.kmd.txfee : electrumServers[network].txfee),
-        electrumKeys[network].priv,
-        network,
-        verify,
-        push,
-        cache
-      )
-      .then((res) => {
-        resolve(res);
-      });
+        createtx(
+          proxyServer,
+          _electrumServer,
+          outputAddress,
+          changeAddress,
+          value,
+          btcFee ? { perbyte: true, value: btcFee } : (isKomodoCoin(network) ? electrumServers.kmd.txfee : electrumServers[network].txfee),
+          keys.spv[network].priv,
+          network,
+          verify,
+          push,
+          cache
+        )
+        .then((res) => {
+          resolve(res);
+        });
+      } else if (network.indexOf('|eth') > -1) {
+        console.warn('sendtx eth path');
+      }
     });
   }
 }
@@ -228,85 +239,98 @@ const sendtx = (network, outputAddress, value, verify, push, btcFee) => {
 const transactions = (network) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
-      let _electrumServer = getLocalStorageVar('coins')[network].server;
-      _electrumServer.serverList = electrumServers[network].serverList;
+      const _name = network.split('|')[0];
+      
+      if (network.indexOf('|spv')) {
+        const address = keys.spv[_name].pub;
+        let _electrumServer = getLocalStorageVar('coins')[network].server;
+        _electrumServer.serverList = electrumServers[_name].serverList;
 
-      listtransactions(
-        proxyServer,
-        _electrumServer,
-        electrumKeys[network].pub,
-        network,
-        true,
-        cache
-      )
-      .then((res) => {
-        resolve(res);
-      });
+        listtransactions(
+          proxyServer,
+          _electrumServer,
+          address,
+          _name,
+          true,
+          cache
+        )
+        .then((res) => {
+          resolve(res);
+        });
+      } else if (network.indexOf('|eth')) {
+        console.warn('transactions eth path');
+      }
     });
   }
 }
 
 const balance = (network) => {
   return async (dispatch) => {
-    const address = electrumKeys[network].pub;
-    let _electrumServer = getLocalStorageVar('coins')[network].server;
-    _electrumServer.serverList = electrumServers[network].serverList;
-
     return new Promise((resolve, reject) => {
-      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`, {
-        params: {
-          port: _electrumServer.port,
-          ip: _electrumServer.ip,
-          proto: _electrumServer.proto,
-          address,
-        },
-      }, (error, result) => {
-        if (!result) {
-          resolve('proxy-error');
-        } else {
-          const _balance = JSON.parse(result.content).result;
-          
-          if (network === 'kmd') {
-            if (!_balance.hasOwnProperty('confirmed')) {
-              resolve('error');
-            } else {
-              getKMDBalance(
-                address,
-                JSON.parse(result.content).result,
-                proxyServer,
-                _electrumServer,
-                cache
-              )
-              .then((res) => {
-                resolve(res);
-              });
-            }
+      const _name = network.split('|')[0];
+
+      if (network.indexOf('|spv')) {
+        const address = keys.spv[_name].pub;
+        let _electrumServer = getLocalStorageVar('coins')[network].server;
+        _electrumServer.serverList = electrumServers[_name].serverList;
+
+        HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`, {
+          params: {
+            port: _electrumServer.port,
+            ip: _electrumServer.ip,
+            proto: _electrumServer.proto,
+            address,
+          },
+        }, (error, result) => {
+          if (!result) {
+            resolve('proxy-error');
           } else {
-            if (!_balance.hasOwnProperty('confirmed')) {
-              resolve('error');
+            const _balance = JSON.parse(result.content).result;
+            
+            if (network === 'kmd|spv') {
+              if (!_balance.hasOwnProperty('confirmed')) {
+                resolve('error');
+              } else {
+                getKMDBalance(
+                  address,
+                  JSON.parse(result.content).result,
+                  proxyServer,
+                  _electrumServer,
+                  cache
+                )
+                .then((res) => {
+                  resolve(res);
+                });
+              }
             } else {
-              resolve({
-                balance: Number(fromSats(_balance.confirmed).toFixed(8)),
-                unconfirmed: Number(fromSats(_balance.unconfirmed).toFixed(8)),
-              });
+              if (!_balance.hasOwnProperty('confirmed')) {
+                resolve('error');
+              } else {
+                resolve({
+                  balance: Number(fromSats(_balance.confirmed).toFixed(8)),
+                  unconfirmed: Number(fromSats(_balance.unconfirmed).toFixed(8)),
+                });
+              }
             }
           }
-        }
-      });
+        });
+      } else if (network.indexOf('|eth')) {
+        console.warn('balance eth path');
+      }
     });
   }
 }
 
 const kmdUnspents = () => {
   return async (dispatch) => {
-    let _electrumServer = getLocalStorageVar('coins').kmd.server;
-    _electrumServer.serverList = electrumServers.kmd.serverList;
+    let _electrumServer = getLocalStorageVar('coins')['kmd|spv'].server;
+    _electrumServer.serverList = electrumServers['kmd|spv'].serverList;
 
     return new Promise((resolve, reject) => {
       listunspent(
         proxyServer,
         _electrumServer,
-        electrumKeys.kmd.pub,
+        keys.spv.kmd.pub,
         'kmd',
         true,
         true,
@@ -322,28 +346,40 @@ const kmdUnspents = () => {
 const auth = (seed, coins) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
-      let _pubKeys = {};
+      let _pubKeys = {
+        spv: {},
+        eth: {},
+      };
 
       for (let key in coins) {
         let isWif = false;
         let _seedToWif;
+        
+        if (key.indexOf('|spv')) {
+          const _key = key.split('|')[0];
 
-        try {
-          bs58check.decode(seed);
-          isWif = true;
-        } catch (e) {}
+          try {
+            bs58check.decode(seed);
+            isWif = true;
+          } catch (e) {}
 
-        if (isWif) {
-          _seedToWif = wifToWif(seed, isKomodoCoin(key) ? electrumJSNetworks.kmd : electrumJSNetworks[key.toLowerCase()]);
-        } else {
-          _seedToWif = seedToWif(seed, isKomodoCoin(key) ? electrumJSNetworks.kmd : electrumJSNetworks[key.toLowerCase()], true);
+          if (isWif) {
+            _seedToWif = wifToWif(seed, isKomodoCoin(_key) ? electrumJSNetworks.kmd : electrumJSNetworks[_key.toLowerCase()]);
+          } else {
+            _seedToWif = seedToWif(seed, isKomodoCoin(_key) ? electrumJSNetworks.kmd : electrumJSNetworks[_key.toLowerCase()], true);
+          }
+
+          keys.spv[_key] = {
+            pub: _seedToWif.pub,
+            priv: _seedToWif.priv,
+          };
+          _pubKeys.spv[_key] = _seedToWif.pub;
+        } else if (key.indexOf('|eth')) {
+          console.warn('auth eth path');
         }
-
-        electrumKeys[key] = _seedToWif;
-        _pubKeys[key] = _seedToWif.pub;
       }
 
-      // console.warn(electrumKeys);
+      console.warn('auth', keys);
       resolve(_pubKeys);
     });
   }
@@ -352,14 +388,19 @@ const auth = (seed, coins) => {
 const addKeyPair = (coin) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
-      const _wif = electrumKeys[Object.keys(electrumKeys)[0]].priv;
-      let _pubKeys = {};
+      if (coin.indexOf('|spv')) {
+        const _wif = keys.spv[Object.keys(keys.spv)[0]].priv;
+        let _pubKeys = {};
 
-      const _wifToWif = wifToWif(_wif, isKomodoCoin(coin) ? electrumJSNetworks.kmd : electrumJSNetworks[coin]);
-      electrumKeys[coin] = _wifToWif;
-      _pubKeys[coin] = _wifToWif.pub;
+        const _wifToWif = wifToWif(_wif, isKomodoCoin(coin) ? electrumJSNetworks.kmd : electrumJSNetworks[coin]);
+        keys.spv[coin] = _wifToWif;
+        _pubKeys[coin] = _wifToWif.pub;
 
-      // console.warn(electrumKeys[coin]);
+        console.warn(addKeyPair, keys.spv[coin]);
+      } else if (coin.indexOf('|eth')) {
+        console.warn('addKeyPair eth path');
+      }
+
       resolve(_pubKeys[coin]);
     });
   }
@@ -373,7 +414,10 @@ const getOverview = (coins) => {
       let _coins = {};
       
       for (let i = 0; i < _coinObjKeys.length; i++) {
-        _coins[translate('COINS.' + _coinObjKeys[i].toUpperCase())] = _coinObjKeys[i];
+        const _name = _overview[i].coin.split('|')[0];
+        const _mode = _overview[i].coin.split('|')[1];
+
+        _coins[_mode.toUpperCase() + '.' + _name.toUpperCase()] = _coinObjKeys[i];
       }
 
       _coins = sortObject(_coins);
