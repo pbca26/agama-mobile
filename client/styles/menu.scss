@@ -169,23 +169,25 @@
 }
 
 .menu-icon {
-  top: 18px;
+  top: 2px;
   height: 14px;
   width: 20px;
   position: absolute;
   margin: 0;
-  right: 14px;
+  right: 2px;
   z-index: 10;
+  padding: 15px;
 }
 
 .menu-back {
-  top: 18px;
+  top: 2px;
   height: 13px;
   width: 20px;
   position: absolute;
   margin: 0;
-  left: 10px;
+  left: 2px;
   z-index: 10;
+  padding: 15px;
 }
 
 .app-header {
