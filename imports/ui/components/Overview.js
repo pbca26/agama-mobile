@@ -94,7 +94,7 @@ class Overview extends React.Component {
             <div className="btc">
               <img
                 className="oval4"
-                src={ `${assetsPath.coinLogo}/${_name.toLowerCase()}.png` } />
+                src={ `${assetsPath.coinLogo}/${_mode}/${_name.toLowerCase()}.png` } />
             </div>
             <div className="bitcoin">{ translate(_mode.toUpperCase() + '.' + _name.toUpperCase()) }</div>
             <div className="a0000041">{ formatValue(_overview[i].balanceNative) }</div>

@@ -29,6 +29,7 @@ import { devlog } from './dev';
 import translate from '../translate/translate';
 import ethers from 'ethers';
 import ethBalance from './eth/balance';
+import ethTransactions from './eth/transactions';
 
 let _cache = {};
 // runtime cache wrapper functions
@@ -268,6 +269,23 @@ const transactions = (network) => {
           resolve(res);
         });
       } else if (network.indexOf('|eth') > -1) {
+        const address = keys.eth[_name].pub;
+        let options;
+
+        if (network.indexOf('eth_ropsten') > -1) {
+          options = {
+            network: 'ropsten',
+          };
+        } else if (_name.indexOf('eth') === -1) {
+          options = {
+            symbol: _name,
+          };
+        }
+
+        ethTransactions(address, options)
+        .then((_transactions) => {
+          resolve(_transactions);
+        });
         console.warn('transactions eth path');
       }
     });
@@ -480,50 +498,57 @@ const getOverview = (coins) => {
       // sort coins
       const _coinObjKeys = Object.keys(coins);
       let _coins = {};
+      let _keys = [];
       
       for (let i = 0; i < _coinObjKeys.length; i++) {
-        const _name = _overview[i].coin.split('|')[0];
-        const _mode = _overview[i].coin.split('|')[1];
+        const _name = _coinObjKeys[i].split('|')[0];
+        const _mode = _coinObjKeys[i].split('|')[1];
+
+        _keys.push({
+          pub: keys[_mode][_name].pub,
+          coin: _coinObjKeys[i],
+        });
 
         _coins[_mode.toUpperCase() + '.' + _name.toUpperCase()] = _coinObjKeys[i];
       }
-
+      
       _coins = sortObject(_coins);
-
-      let _keys = [];
-
-      for (let key in _coins) {
-        _keys.push({
-          pub: electrumKeys[_coins[key]].pub,
-          coin: _coins[key],
-        });
-      }
 
       Promise.all(_keys.map((pair, index) => {
         return new Promise((resolve, reject) => {
-          const _electrumServer = getLocalStorageVar('coins')[pair.coin].server;
-      
-          HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`, {
-            params: {
-              port: _electrumServer.port,
-              ip: _electrumServer.ip,
-              proto: _electrumServer.proto,
-              address: pair.pub,
-            },
-          }, (error, result) => {
-            if (!result) {
-              resolve('proxy-error');
-            } else {
-              const _balance = JSON.parse(result.content).result;
+          if (pair.coin.indexOf('|spv') > -1) {
+            const _electrumServer = getLocalStorageVar('coins')[pair.coin].server;
+        
+            HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`, {
+              params: {
+                port: _electrumServer.port,
+                ip: _electrumServer.ip,
+                proto: _electrumServer.proto,
+                address: pair.pub,
+              },
+            }, (error, result) => {
+              if (!result) {
+                resolve('proxy-error');
+              } else {
+                const _balance = JSON.parse(result.content).result;
 
-              resolve({
-                coin: pair.coin,
-                pub: pair.pub,
-                balance: Number(fromSats(_balance.confirmed).toFixed(8)),
-                unconfirmed: Number(fromSats(_balance.unconfirmed).toFixed(8)),
-              });
-            }
-          });
+                resolve({
+                  coin: pair.coin,
+                  pub: pair.pub,
+                  balance: Number(fromSats(_balance.confirmed).toFixed(8)),
+                  unconfirmed: Number(fromSats(_balance.unconfirmed).toFixed(8)),
+                });
+              }
+            });
+          } else if (pair.coin.indexOf('|eth') > -1) {
+            // TODO: get eth balance
+            resolve({
+              coin: pair.coin,
+              pub: pair.pub,
+              balance: 0,
+              unconfirmed: 0,
+            });
+          }
         });
       }))
       .then(promiseResult => {
