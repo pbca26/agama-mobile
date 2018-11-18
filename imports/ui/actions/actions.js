@@ -27,6 +27,8 @@ import {
 import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 import { devlog } from './dev';
 import translate from '../translate/translate';
+import ethers from 'ethers';
+import ethBalance from './eth/balance';
 
 let _cache = {};
 // runtime cache wrapper functions
@@ -117,6 +119,10 @@ let keys = {
   spv: {},
   eth: {},
 };
+let connect = {
+  eth: null,
+  eth_ropsten: null,
+};
 let proxyServer = {};
 // pick a random proxy server
 
@@ -166,7 +172,6 @@ const getServersList = () => {
 }
 
 const setDefaultServer = (network, port, ip, proto) => {
-  console.warn('setDefaultServer', network);
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
       HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/server/version`, {
@@ -198,6 +203,10 @@ const clearKeys = () => {
       keys = {
         spv: {},
         eth: {},
+      };
+      connect = {
+        eth: null,
+        eth_ropsten: null,
       };
       resolve(true);
     });
@@ -316,7 +325,26 @@ const balance = (network) => {
           }
         });
       } else if (network.indexOf('|eth') > -1) {
-        console.warn('balance eth path');
+        const address = keys.eth[_name].pub;
+        let options;
+
+        if (network.indexOf('eth_ropsten') > -1) {
+          options = {
+            network: 'ropsten',
+          };
+        } else if (_name.indexOf('eth') === -1) {
+          options = {
+            symbol: _name,
+          };
+        }
+
+        ethBalance(address, options)
+        .then((_balance) => {
+          resolve({
+            balance: _balance.balance,
+            unconfirmed: 0,
+          });
+        });
       }
     });
   }
@@ -380,10 +408,14 @@ const auth = (seed, coins) => {
           const _seed = seedToPriv(seed, 'eth');
           const _ethKeys = etherKeys(_seed, true);
           keys.eth[_key] = {
-            pub: _ethKeys.pub,
-            priv: _ethKeys.priv,
+            pub: _ethKeys.address,
+            priv: _ethKeys.signingKey.privateKey,
           };
-          _pubKeys.eth[_key] = _ethKeys.pub;
+          _pubKeys.eth[_key] = _ethKeys.address;
+
+          if (!connect[_key.indexOf('eth_ropsten') > -1 ? 'eth_ropsten' : 'eth']) {
+            connect[_key.indexOf('eth_ropsten') > -1 ? 'eth_ropsten' : 'eth'] = _ethKeys.connect(new ethers.getDefaultProvider(_key.indexOf('eth_ropsten') ? 'ropsten' : 'homestead'));
+          }
         }
       }
 
@@ -424,10 +456,16 @@ const addKeyPair = (coin) => {
 
         const _ethKeys = etherKeys(_srcPriv, true);
         keys.spv[_coin] = {
-          pub: _ethKeys.pub,
-          priv: _ethKeys.priv,
+          pub: _ethKeys.address,
+          priv: _ethKeys.signingKey.privateKey,
         };
-        _pubKeys[_coin] = _ethKeys.pub;
+        _pubKeys[_coin] = _ethKeys.address;
+        
+        if (!connect[_coin.indexOf('eth_ropsten') > -1 ? 'eth_ropsten' : 'eth']) {
+          connect[_coin.indexOf('eth_ropsten') > -1 ? 'eth_ropsten' : 'eth'] = _ethKeys.connect(new ethers.getDefaultProvider(_coin.indexOf('eth_ropsten') ? 'ropsten' : 'homestead'));
+        }
+        
+        console.warn(connect);
         console.warn('addKeyPair eth path');
       }
 
