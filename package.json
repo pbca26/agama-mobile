@@ -12,6 +12,7 @@
     "buffer-reverse": "^1.0.1",
     "cordova": "^7.1.0",
     "jsqr": "^0.2.2",
+    "ethers": "git://github.com/pbca26/ethers.js",
     "meteor-node-stubs": "~0.2.4",
     "nodejs-aes256": "^1.0.1",
     "qrcode.react": "^0.7.1",

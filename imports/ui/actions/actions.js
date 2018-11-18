@@ -10,6 +10,8 @@ import {
 import {
   wifToWif,
   seedToWif,
+  seedToPriv,
+  etherKeys,
 } from 'agama-wallet-lib/build/keys';
 import proxyServers from './proxyServers';
 import electrumServers from 'agama-wallet-lib/build/electrum-servers';
@@ -27,7 +29,6 @@ import { devlog } from './dev';
 import translate from '../translate/translate';
 
 let _cache = {};
-
 // runtime cache wrapper functions
 const getDecodedTransaction = (txid, coin, data) => {
   if (!_cache[coin].txDecoded) {
@@ -241,7 +242,7 @@ const transactions = (network) => {
     return new Promise((resolve, reject) => {
       const _name = network.split('|')[0];
       
-      if (network.indexOf('|spv')) {
+      if (network.indexOf('|spv') > -1) {
         const address = keys.spv[_name].pub;
         let _electrumServer = getLocalStorageVar('coins')[network].server;
         _electrumServer.serverList = electrumServers[_name].serverList;
@@ -257,7 +258,7 @@ const transactions = (network) => {
         .then((res) => {
           resolve(res);
         });
-      } else if (network.indexOf('|eth')) {
+      } else if (network.indexOf('|eth') > -1) {
         console.warn('transactions eth path');
       }
     });
@@ -269,7 +270,7 @@ const balance = (network) => {
     return new Promise((resolve, reject) => {
       const _name = network.split('|')[0];
 
-      if (network.indexOf('|spv')) {
+      if (network.indexOf('|spv') > -1) {
         const address = keys.spv[_name].pub;
         let _electrumServer = getLocalStorageVar('coins')[network].server;
         _electrumServer.serverList = electrumServers[_name].serverList;
@@ -314,7 +315,7 @@ const balance = (network) => {
             }
           }
         });
-      } else if (network.indexOf('|eth')) {
+      } else if (network.indexOf('|eth') > -1) {
         console.warn('balance eth path');
       }
     });
@@ -352,21 +353,22 @@ const auth = (seed, coins) => {
       };
 
       for (let key in coins) {
+        const _key = key.split('|')[0];
         let isWif = false;
         let _seedToWif;
         
-        if (key.indexOf('|spv')) {
-          const _key = key.split('|')[0];
-
+        if (key.indexOf('|spv') > -1) {
+          const _seed = seedToPriv(seed, 'btc');
+          
           try {
             bs58check.decode(seed);
             isWif = true;
           } catch (e) {}
 
           if (isWif) {
-            _seedToWif = wifToWif(seed, isKomodoCoin(_key) ? electrumJSNetworks.kmd : electrumJSNetworks[_key.toLowerCase()]);
+            _seedToWif = wifToWif(_seed, isKomodoCoin(_key) ? electrumJSNetworks.kmd : electrumJSNetworks[_key.toLowerCase()]);
           } else {
-            _seedToWif = seedToWif(seed, isKomodoCoin(_key) ? electrumJSNetworks.kmd : electrumJSNetworks[_key.toLowerCase()], true);
+            _seedToWif = seedToWif(_seed, isKomodoCoin(_key) ? electrumJSNetworks.kmd : electrumJSNetworks[_key.toLowerCase()], true);
           }
 
           keys.spv[_key] = {
@@ -374,8 +376,14 @@ const auth = (seed, coins) => {
             priv: _seedToWif.priv,
           };
           _pubKeys.spv[_key] = _seedToWif.pub;
-        } else if (key.indexOf('|eth')) {
-          console.warn('auth eth path');
+        } else if (key.indexOf('|eth') > -1) {
+          const _seed = seedToPriv(seed, 'eth');
+          const _ethKeys = etherKeys(_seed, true);
+          keys.eth[_key] = {
+            pub: _ethKeys.pub,
+            priv: _ethKeys.priv,
+          };
+          _pubKeys.eth[_key] = _ethKeys.pub;
         }
       }
 
@@ -388,20 +396,42 @@ const auth = (seed, coins) => {
 const addKeyPair = (coin) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
-      if (coin.indexOf('|spv')) {
-        const _wif = keys.spv[Object.keys(keys.spv)[0]].priv;
-        let _pubKeys = {};
+      const _coin = coin.split('|')[0];
+      let _pubKeys = {};
 
-        const _wifToWif = wifToWif(_wif, isKomodoCoin(coin) ? electrumJSNetworks.kmd : electrumJSNetworks[coin]);
-        keys.spv[coin] = _wifToWif;
-        _pubKeys[coin] = _wifToWif.pub;
+      if (coin.indexOf('|spv') > -1) {
+        let _srcPriv;
+        
+        if (Object.keys(keys.spv).length) {
+          _srcPriv = keys.spv[Object.keys(keys.spv)[0]].priv;
+        } else if (Object.keys(keys.eth).length) {
+          _srcPriv = seedToPriv(keys.eth[Object.keys(keys.eth)[0]].priv, 'btc');
+        }        
 
-        console.warn(addKeyPair, keys.spv[coin]);
-      } else if (coin.indexOf('|eth')) {
+        const _wifToWif = wifToWif(_srcPriv, isKomodoCoin(_coin) ? electrumJSNetworks.kmd : electrumJSNetworks[_coin]);
+        keys.spv[_coin] = _wifToWif;
+        _pubKeys[_coin] = _wifToWif.pub;
+
+        console.warn(addKeyPair, keys.spv[_coin]);
+      } else if (coin.indexOf('|eth') > -1) {
+        let _srcPriv;
+        
+        if (Object.keys(keys.spv).length) {
+          _srcPriv = seedToPriv(keys.spv[Object.keys(keys.spv)[0]].priv, 'eth');
+        } else if (Object.keys(keys.eth).length) {
+          _srcPriv = keys.eth[Object.keys(keys.eth)[0]].priv;
+        }
+
+        const _ethKeys = etherKeys(_srcPriv, true);
+        keys.spv[_coin] = {
+          pub: _ethKeys.pub,
+          priv: _ethKeys.priv,
+        };
+        _pubKeys[_coin] = _ethKeys.pub;
         console.warn('addKeyPair eth path');
       }
 
-      resolve(_pubKeys[coin]);
+      resolve(_pubKeys[_coin]);
     });
   }
 }

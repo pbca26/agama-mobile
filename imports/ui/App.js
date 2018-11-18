@@ -101,7 +101,8 @@ class App extends React.Component {
       for (let key in _localStorageCoins) {
         let _diffFound = false;
 
-        if (key.indexOf('|spv') === -1) {
+        if (key.indexOf('|spv') === -1 &&
+            key.indexOf('|eth') === -1) {
           _localStorageCoins[`${key}|spv`] = _localStorageCoins[key];
           delete _localStorageCoins[key];
           _diffFound = true;
@@ -210,10 +211,11 @@ class App extends React.Component {
   }
 
   addCoin(coin) {
-    if (coin.indexOf('|spv')) {
+    let coins = this.state.coins;
+
+    if (coin.indexOf('|spv') > -1) {
       const _coin = coin.split('|')[0];
       let server = electrumServers[_coin];
-      let coins = this.state.coins;
 
       // pick a random server to communicate with
       if (server.serverList &&
@@ -234,6 +236,8 @@ class App extends React.Component {
       coins[coin] = {
         server,
       };
+    } else {
+      coins[coin] = {};
     }
 
     setLocalStorageVar('coins', this.state.coins);
