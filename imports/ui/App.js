@@ -586,14 +586,15 @@ class App extends React.Component {
     _coins = sortObject(_coins);
 
     for (let key in _coins) {
-      const _name = key.name.split('|')[0];
-
+      const _name = key.split('|')[0];
+      const _mode = key.split('|')[1];
+      
       _items.push(
         <div
           onClick={ () => key !== this.state.coin ? this.switchCoin(key) : null }
           key={ `active-coins-${key}` }
           className="active-coins">
-          <img src={ `${assetsPath.coinLogo}/${_name}.png` } /> <span>{ _name.toUpperCase() }</span>
+          <img src={ `${assetsPath.coinLogo}/${_mode}/${_name}.png` } /> <span>{ _name.toUpperCase() }</span>
           { key === this.state.coin &&
             <i className="fa fa-check"></i>
           }
