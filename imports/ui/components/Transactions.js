@@ -205,7 +205,9 @@ class Transactions extends React.Component {
                   <img
                     className="coin-icon"
                     src={ `${assetsPath.coinLogo}/${_mode}/${_name.toLowerCase()}.png` } />
-                  <div className="coin-title">{ translate(_mode.toUpperCase() + '.' + _name.toUpperCase()) }</div>
+                  <div className="coin-title">
+                  { translate(_mode.toUpperCase() + '.' + _name.toUpperCase()).length > 18 ? _name.toUpperCase() :  translate(_mode.toUpperCase() + '.' + _name.toUpperCase()) }
+                  </div>
                   <div className="coin-balance">
                     <div className="balance">
                     { translate('BALANCE.BALANCE') }: { _balance ? formatValue(_balance.balance) : 0 } { _name.toUpperCase() }

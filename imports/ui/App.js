@@ -310,9 +310,12 @@ class App extends React.Component {
   }
 
   switchCoin(coin) {
+    const _name = coin.split('|')[0];
+    const _mode = coin.split('|')[1];
+
     this.setState({
       coin: coin,
-      address: this.state.pubKeys[coin],
+      address: this.state.pubKeys[_mode][_name],
       history: this.state.activeSection,
       activeSection: 'dashboard',
       transactions: this.state.coins[coin] ? this.state.coins[coin].transactions: null,
