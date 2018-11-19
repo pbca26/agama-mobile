@@ -30,6 +30,7 @@ import translate from '../translate/translate';
 import ethers from 'ethers';
 import ethBalance from './eth/balance';
 import ethTransactions from './eth/transactions';
+import ethGasPrice from './eth/gasPrice';
 
 let _cache = {};
 // runtime cache wrapper functions
