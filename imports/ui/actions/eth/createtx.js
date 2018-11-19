@@ -1,26 +1,26 @@
 import ethers from 'ethers';
-import fees from 'agama-wallet-lib/src/fees';
-import { maxSpend } from 'agama-wallet-lib/src/eth';
-import standartABI from 'agama-wallet-lib/src/erc20-standard-abi';
+import fees from 'agama-wallet-lib/build/fees';
+import { maxSpend } from 'agama-wallet-lib/build/eth';
+import standartABI from 'agama-wallet-lib/build/erc20-standard-abi';
 import { Promise } from 'meteor/promise';
-import erc20ContractId from 'agama-wallet-lib/src/eth-erc20-contract-id';
-import decimals from 'agama-wallet-lib/src/eth-erc20-decimals';
+import erc20ContractId from 'agama-wallet-lib/build/eth-erc20-contract-id';
+import decimals from 'agama-wallet-lib/build/eth-erc20-decimals';
 import { devlog } from '../dev';
 import { balanceEtherscan } from './balance';
 
 // TODO: error handling, input vars check
 
 // speed: slow, average, fast
-export const ethCreateTx = (wallet, coin, push, gasLimit, speed, dest, amount, gasPrice, network) => {
-  const coin = coin ? coin.toUpperCase() : null;
-  const push = push ? push : false;
-  const gasLimit = gaslimit || fees[coin.toLowerCase()];
-  const getGas = getgas ? getgas : false;
-  const speed = speed ? speed : 'average';
-  const dest = dest ? dest : null;
-  const network = network ? network : 'homestead';
-  const amount = amount ? amount : 0;
+export const ethCreateTx = (wallet, coin, push, speed, dest, amount, gasPrice, network) => {
   let adjustedAmount = 0;
+
+  coin = coin ? coin.toUpperCase() : null;
+  push = push ? push : false;
+  gasLimit = gaslimit || fees[coin.toLowerCase()];
+  speed = speed ? speed : 'average';
+  dest = dest ? dest : null;
+  network = network ? network : 'homestead';
+  amount = amount ? amount : 0;
 
   balanceEtherscan(
     wallet.signingKey.address,
@@ -92,13 +92,13 @@ export const ethCreateTx = (wallet, coin, push, gasLimit, speed, dest, amount, g
 };
 
 export const ethCreateTxERC20 = (wallet, symbol, push, speed, dest, amount, gasPrice) => {
-  const push = push ? push : false;
-  const speed = speed ? speed : 'average';
-  const dest = dest ? dest : null;
-  const amount = amount ? amount : 0;
-  const symbol = symbol ? symbol : null;
-  const _contract = erc20ContractId[symbol.toUpperCase()];
   let adjustedAmount = 0;
+
+  push = push ? push : false;
+  speed = speed ? speed : 'average';
+  dest = dest ? dest : null;
+  amount = amount ? amount : 0;
+  symbol = symbol ? symbol : null;
 
   balanceEtherscan(
     wallet.signingKey.address,

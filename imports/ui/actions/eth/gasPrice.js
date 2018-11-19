@@ -1,7 +1,7 @@
 import ethers from 'ethers';
 import { Promise } from 'meteor/promise';
 import { devlog } from '../dev';
-import { ethGasStationRateToWei } from 'agama-wallet-lib/src/eth';
+import { ethGasStationRateToWei } from 'agama-wallet-lib/build/eth';
 
 const ethGasPrice = () => {
   return new Promise((resolve, reject) => {

@@ -1,7 +1,7 @@
 import ethers from 'ethers';
 import { Promise } from 'meteor/promise';
-import erc20ContractId from 'agama-wallet-lib/src/eth-erc20-contract-id';
-import decimals from 'agama-wallet-lib/src/eth-erc20-decimals';
+import erc20ContractId from 'agama-wallet-lib/build/eth-erc20-contract-id';
+import decimals from 'agama-wallet-lib/build/eth-erc20-decimals';
 import { devlog } from '../dev';
 
 const balance = (address, options) => {

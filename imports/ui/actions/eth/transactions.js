@@ -1,8 +1,8 @@
 import ethers from 'ethers';
 import { Promise } from 'meteor/promise';
-import erc20ContractId from 'agama-wallet-lib/src/eth-erc20-contract-id';
-import decimals from 'agama-wallet-lib/src/eth-erc20-decimals';
-const { ethTransactionsToBtc } = require('agama-wallet-lib/src/eth');
+import erc20ContractId from 'agama-wallet-lib/build/eth-erc20-contract-id';
+import decimals from 'agama-wallet-lib/build/eth-erc20-decimals';
+import { ethTransactionsToBtc } from 'agama-wallet-lib/build/eth';
 import { devlog } from '../dev';
 
 const transactions = (address, options) => {
