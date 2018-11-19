@@ -419,7 +419,6 @@ class App extends React.Component {
     this.setState({
       loading: true,
     });
-    console.warn(this.state.coin);
 
     actions.transactions(this.state.coin)
     .then((res) => {
@@ -509,7 +508,7 @@ class App extends React.Component {
         if (config.preload &&
             config.preload.activeCoin) {
           coin = config.preload.activeCoin;
-          address = res.spv[coin] || res.eth[coin];
+          address = res.spv[coin.split('|')[0]] || res.eth[coin.split('|')[0]];
         }
   
         this.setState({
@@ -889,6 +888,7 @@ class App extends React.Component {
             <SendCoin
               { ...this.state }
               sendtx={ this.props.actions.sendtx }
+              sendtxEth={ this.props.actions.sendtxEth }
               changeActiveSection={ this.changeActiveSection }
               getBtcFees={ this.getBtcFees } />
             <AddCoin
