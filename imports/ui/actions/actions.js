@@ -470,7 +470,7 @@ const auth = (seed, coins) => {
           _pubKeys.eth[_key] = _ethKeys.address;
 
           if (!connect[_key.indexOf('eth_ropsten') > -1 ? 'eth_ropsten' : 'eth']) {
-            connect[_key.indexOf('eth_ropsten') > -1 ? 'eth_ropsten' : 'eth'] = _ethKeys.connect(new ethers.getDefaultProvider(_key.indexOf('eth_ropsten') ? 'ropsten' : 'homestead'));
+            connect[_key.indexOf('eth_ropsten') > -1 ? 'eth_ropsten' : 'eth'] = _ethKeys.connect(new ethers.getDefaultProvider(_key.indexOf('eth_ropsten') > -1 ? 'ropsten' : 'homestead'));
           }
         }
       }
@@ -518,7 +518,7 @@ const addKeyPair = (coin) => {
         _pubKeys[_coin] = _ethKeys.address;
         
         if (!connect[_coin.indexOf('eth_ropsten') > -1 ? 'eth_ropsten' : 'eth']) {
-          connect[_coin.indexOf('eth_ropsten') > -1 ? 'eth_ropsten' : 'eth'] = _ethKeys.connect(new ethers.getDefaultProvider(_coin.indexOf('eth_ropsten') ? 'ropsten' : 'homestead'));
+          connect[_coin.indexOf('eth_ropsten') > -1 ? 'eth_ropsten' : 'eth'] = _ethKeys.connect(new ethers.getDefaultProvider(_coin.indexOf('eth_ropsten') > -1 ? 'ropsten' : 'homestead'));
         }
         
         console.warn(connect);
