@@ -57,7 +57,6 @@ const transactionsERC20 = (address, symbol) => {
         action: 'tokentx',
         address,
         contractaddress: erc20ContractId[symbol],
-        sort,
         apikey: 'YourApiKeyToken',
       },
     }, (error, result) => {

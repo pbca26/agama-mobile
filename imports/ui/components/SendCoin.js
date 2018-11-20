@@ -370,6 +370,8 @@ class SendCoin extends React.Component {
   }
 
   sendFormRender() {
+    const _name = this.props.coin.split('|')[0];
+
     return (
       <form
         method="post"
@@ -379,7 +381,7 @@ class SendCoin extends React.Component {
             { translate('SEND.FROM') }
             <strong className="padding-left-5">
               [ <span className="success">
-                { formatValue(this.props.balance.balance) } { this.props.coin.toUpperCase() }
+                { formatValue(this.props.balance.balance) } { _name.toUpperCase() }
                 </span> ]
             </strong>
           </label>
@@ -431,7 +433,7 @@ class SendCoin extends React.Component {
             { this.state.validTooMuch &&
               <div className="error margin-top-15">
                 <i className="fa fa-warning padding-right-5"></i>
-                { translate('SEND.TOO_MUCH', `${this.props.balance.balance} ${this.props.coin.toUpperCase()}`) }
+                { translate('SEND.TOO_MUCH', `${this.props.balance.balance} ${_name.toUpperCase()}`) }
               </div>
             }
           </div>
@@ -635,21 +637,62 @@ class SendCoin extends React.Component {
                     </div>
                     <div className="edit">
                       <span className="shade">
-                      { Number(this.state.ethPreflightResult.result.fee) } { _name.toUpperCase() }
+                      { Number(this.state.ethPreflightResult.result.fee) } { _name === 'eth' || _name === 'eth_ropsten' ? _name.toUpperCase() : 'ETH' }
                       </span>
                     </div>
-                    { /*this.state.spvPreflightResult.result.change === 0 &&
-                      (formatValue((fromSats(this.state.spvPreflightResult.result.value)) - (fromSats(this.state.spvPreflightResult.result.fee))) > 0) &&
+                    { _mode === 'eth' &&
+                      _name !== 'eth' &&
+                      _name !== 'eth_ropsten' &&
+                      this.state.ethPreflightResult &&
+                      this.state.ethPreflightResult.msg &&
+                      this.state.ethPreflightResult.msg === 'error' &&
+                      <div className="send-result">
+                        <div className="edit error">
+                        { translate('SEND.ERROR') } <i className="fa fa-close"></i>
+                        </div>
+                        <div className="edit padding-bottom-15">
+                          <div className="shade">{ typeof this.state.sendResult.result === 'object' ? JSON.stringify(this.state.sendResult.result) : this.state.sendResult.result }</div>
+                        </div>
+                      </div>
+                    }
+                    { _mode === 'eth' &&
+                      _name !== 'eth' &&
+                      _name !== 'eth_ropsten' &&
+                      this.state.ethPreflightResult &&
+                      this.state.ethPreflightResult.msg &&
+                      this.state.ethPreflightResult.msg === 'success' &&
                       <div>
-                        <div className="padding-top-15 edit">
-                          <strong>{ translate('SEND.ADJUSTED_AMOUNT') }</strong>
+                        { this.state.ethPreflightResult.result.notEnoughBalance &&
+                          <div className="send-result">
+                            <div className="edit error">
+                            { translate('SEND.ERROR') } <i className="fa fa-close"></i>
+                            </div>
+                            <div className="edit padding-bottom-15">
+                              <div className="shade">{ translate('SEND.ERR_NOT_ENOUGH_ETH') }</div>
+                            </div>
+                          </div>
+                        }
+                        <div>
+                          <div className="padding-top-15 edit">
+                            <strong>{ translate('SEND.CURRENT_BALANCE') }</strong>
+                          </div>
+                          <div className="edit">
+                            <span className="shade padding-bottom-15">
+                            { this.state.ethPreflightResult.result.maxBalance.balance } ETH
+                            </span>
+                          </div>
                         </div>
-                        <div className="edit">
-                          <span className="shade">
-                          { Number(formatValue((fromSats(this.state.spvPreflightResult.result.value)) - (fromSats(this.state.spvPreflightResult.result.fee)))) }
-                          </span>
+                        <div>
+                          <div className="padding-top-15 edit">
+                            <strong>{ translate('SEND.BALANCE_AFTER_FEE') }</strong>
+                          </div>
+                          <div className="edit">
+                            <span className="shade padding-bottom-15">
+                            { this.state.ethPreflightResult.result.balanceAferFee } ETH
+                            </span>
+                          </div>
                         </div>
-                      </div>*/
+                      </div>
                     }
                     { this.state.ethPreflightResult.result.adjustedAmount &&
                       <div>
@@ -775,6 +818,7 @@ class SendCoin extends React.Component {
                 { this.state.sendResult &&
                   this.state.sendResult.msg &&
                   this.state.sendResult.msg === 'error' &&
+                  _mode === 'spv' &&
                   <div className="send-result">
                     <div className="edit error">
                     { translate('SEND.ERROR') } <i className="fa fa-close"></i>
