@@ -27,6 +27,7 @@ import { addressVersionCheck } from 'agama-wallet-lib/build/keys';
 import electrumServers from 'agama-wallet-lib/build/electrum-servers';
 import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 import { Meteor } from 'meteor/meteor';
+import { getAddress } from 'ethers/utils/address';
 
 class SendCoin extends React.Component {
   constructor() {
@@ -48,6 +49,10 @@ class SendCoin extends React.Component {
       processing: false,
       btcFee: 'halfHourFee',
       fee: null,
+      // eth
+      ethPreflightSendInProgress: false,
+      ethPreflightResult: null,
+      ethFee: 'average',
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.changeSendCoinStep = this.changeSendCoinStep.bind(this);
@@ -59,8 +64,10 @@ class SendCoin extends React.Component {
   }
 
   renderTxID() {
-    const _txid1 = this.state.sendResult.result.txid.substr(0, 31);
-    const _txid2 = this.state.sendResult.result.txid.substr(31, 64);
+    const _mid = this.state.sendResult.result.txid.length === 64 ? 31 : 32;
+    const _end = this.state.sendResult.result.txid.length === 64 ? 64 : 66;
+    const _txid1 = this.state.sendResult.result.txid.substr(0, _mid);
+    const _txid2 = this.state.sendResult.result.txid.substr(_mid, _end);
 
     return (
       <div>
@@ -90,7 +97,19 @@ class SendCoin extends React.Component {
   }
 
   openExternalURL() {
-    const url = `${explorerList[this.props.coin.toUpperCase()]}/tx/${this.state.sendResult.result.txid}`;
+    const _name = this.props.coin.split('|')[0];
+    let url;
+    
+    if (this.props.coin.indexOf('|eth') > -1) {
+      if (_name === 'eth' ||
+          _name === 'eth_ropsten') {
+        url = `${explorerList[_name.toUpperCase()]}/tx/${this.state.sendResult.result.txid}`;
+      } else {
+        url = `${explorerList.ETH}/tx/${this.state.sendResult.result.txid}`;
+      }
+    } else if (this.props.coin.indexOf('|spv') > -1) {
+      url = `${explorerList[this.props.coin.toUpperCase()]}/tx/${this.state.sendResult.result.txid}`;
+    }
     window.open(url, '_system');
   }
 
@@ -158,6 +177,8 @@ class SendCoin extends React.Component {
       [e.target.name]: e.target.value,
       spvVerificationWarning: false,
       spvPreflightSendInProgress: false,
+      ethVerificationWarning: false,
+      ethPreflightSendInProgress: false,
       validNan: false,
       validTooMuch: false,
       validIncorrectAddress: false,
@@ -169,7 +190,8 @@ class SendCoin extends React.Component {
   }
 
   validate() {
-    const _network = electrumJSNetworks[isKomodoCoin(this.props.coin) ? 'kmd' : this.props.coin];
+    const _name = this.props.coin.split('|')[0];
+    const _mode = this.props.coin.split('|')[1];
     const storageSettings = getLocalStorageVar('settings');
     let _isFailed = false;
     let validTooMuch = false;
@@ -181,10 +203,21 @@ class SendCoin extends React.Component {
       _isFailed = true;
     }
 
-    if (!addressVersionCheck(_network, this.state.sendTo) ||
-        addressVersionCheck(_network, this.state.sendTo) === 'Invalid pub address') {
-      validIncorrectAddress = true;
-      _isFailed = true;
+    if (_mode === 'spv') {
+      const _network = electrumJSNetworks[isKomodoCoin(_name) ? 'kmd' : _name];
+
+      if (!addressVersionCheck(_network, this.state.sendTo) ||
+          addressVersionCheck(_network, this.state.sendTo) === 'Invalid pub address') {
+        validIncorrectAddress = true;
+        _isFailed = true;
+      }
+    } else if (_mode === 'eth') {
+      try {
+        getAddress(this.state.sendTo);
+      } catch (e) {
+        validIncorrectAddress = true;
+        _isFailed = true;
+      }
     }
 
     if (!isNumber(this.state.sendAmount)) {
@@ -210,10 +243,18 @@ class SendCoin extends React.Component {
 
   changeSendCoinStep(step, back) {
     if (step === 0 &&
-        this.props.coin === 'btc') {
+        this.props.coin === 'btc|spv') {
       this.props.getBtcFees();
       this.setState({
         btcFee: 'halfHourFee',
+      });
+    }
+
+    if (step === 0 &&
+        this.props.coin.indexOf('|eth') > -1) {
+      this.props.getEthGasPrice();
+      this.setState({
+        btcFee: 'average',
       });
     }
 
@@ -363,7 +404,7 @@ class SendCoin extends React.Component {
               </div>
             }
           </div>
-          { this.props.coin === 'btc' &&
+          { this.props.coin === 'btc|spv' &&
             this.props.btcFees &&
             this.props.btcFee !== 'error' &&
             <div className="edit">
@@ -379,26 +420,52 @@ class SendCoin extends React.Component {
               </select>
             </div>
           }
+          { this.props.coin.indexOf('|eth') > -1 &&
+            this.props.ethGasPrice &&
+            this.props.ethGasPrice !== 'error' &&
+            <div className="edit">
+              <label className="control-label">{ translate('SEND.FEE') }</label>
+              <select
+                className="margin-top-15 margin-bottom-10"
+                name="ethGasPrice"
+                value={ this.state.ethGasPrice }
+                onChange={ (event) => this.updateInput(event) }>
+                <option value="fast">{ translate('SEND.ETH_FEE_FAST') }</option>
+                <option value="average">{ translate('SEND.ETH_FEE_AVG') }</option>
+                <option value="slow">{ translate('SEND.ETH_FEE_SLOW') }</option>
+              </select>
+            </div>
+          }
           { this.state.qrScanError &&
             <div className="error margin-top-15 text-center">
               <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
             </div>
           }
-          { this.props.coin === 'btc' &&
+          { this.props.coin === 'btc|spv' &&
             !this.props.btcFees &&
             <div className="margin-top-15 text-center">{ translate('SEND.BTC_FEES_FETCHING') }</div>
           }
-          { this.props.coin === 'btc' &&
+          { this.props.coin === 'btc|spv' &&
             this.props.btcFees &&
             this.props.btcFees === 'error' &&
             <div className="error margin-top-15 text-center">{ translate('SEND.BTC_FEES_FETCHING_FAILED') }</div>
+          }
+          { this.props.coin.indexOf('|eth') > -1 &&
+            !this.props.ethGasPrice &&
+            <div className="margin-top-15 text-center">{ translate('SEND.ETH_FEES_FETCHING') }</div>
+          }
+          { this.props.coin.indexOf('|eth') > -1 &&
+            this.props.ethGasPrice &&
+            this.props.ethGasPrice === 'error' &&
+            <div className="error margin-top-15 text-center">{ translate('SEND.ETH_FEES_FETCHING_FAILED') }</div>
           }
           <div>
             <div
               disabled={
                 !this.state.sendTo ||
                 !this.state.sendAmount ||
-                (this.props.coin === 'btc' && (!this.props.btcFees || this.props.btcFees === 'error'))
+                (this.props.coin === 'btc|spv' && (!this.props.btcFees || this.props.btcFees === 'error')) ||
+                (this.props.coin.indexOf('|eth') > -1 && (!this.props.ethGasPrice || this.props.ethGasPrice === 'error'))
               }
               onClick={ () => this.changeSendCoinStep(1) }
               className="group3 margin-top-50">

@@ -64,6 +64,7 @@ class App extends React.Component {
       overview: null,
       history: null,
       btcFees: null,
+      ethGasPrice: null,
     };
     this.globalClickTimeout = null;
     this.overviewInterval = null;
@@ -87,6 +88,7 @@ class App extends React.Component {
     this.historyBack = this.historyBack.bind(this);
     this.scrollToTop = this.scrollToTop.bind(this);
     this.getBtcFees = this.getBtcFees.bind(this);
+    this.getEthGasPrice = this.getEthGasPrice.bind(this);
     this.retryProxy = this.retryProxy.bind(this);
     this.updateDefaultCoinServer = this.updateDefaultCoinServer.bind(this);
   }
@@ -172,6 +174,28 @@ class App extends React.Component {
       if (res === 'error') {
         Meteor.setTimeout(() => {
           this.getBtcFees();
+        }, 5000);
+      }
+    });
+  }
+
+  getEthGasPrice() {
+    const { actions } = this.props;
+  
+    this.setState({
+      ethGasPrice: null,
+    });
+
+    actions.getEthGasPrice()
+    .then((res) => {
+      console.warn(res);
+      this.setState({
+        ethGasPrice: res,
+      });
+
+      if (res === 'error') {
+        Meteor.setTimeout(() => {
+          this.ethGasPrice();
         }, 5000);
       }
     });
@@ -301,9 +325,14 @@ class App extends React.Component {
       });
     }
 
-    if (this.state.coin === 'btc' &&
+    if (this.state.coin === 'btc|spv' &&
         section === 'send') {
       this.getBtcFees();
+    }
+
+    if (this.state.coin.indexOf('|eth') > -1 &&
+        section === 'send') {
+      this.getEthGasPrice();
     }
 
     this.scrollToTop();
@@ -888,6 +917,7 @@ class App extends React.Component {
             <SendCoin
               { ...this.state }
               sendtx={ this.props.actions.sendtx }
+              getEthGasPrice={ this.getEthGasPrice }
               sendtxEth={ this.props.actions.sendtxEth }
               changeActiveSection={ this.changeActiveSection }
               getBtcFees={ this.getBtcFees } />
