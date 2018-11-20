@@ -106,8 +106,8 @@ export const ethCreateTxERC20 = (wallet, symbol, push, dest, amount, gasPrice) =
       const contractAddress = erc20ContractId[symbol.toUpperCase()];
       const contract = new ethers.Contract(contractAddress, standartABI, wallet);
       const numberOfDecimals = decimals[symbol.toUpperCase()] || 18;
-      const numberOfTokens = ethers.utils.parseUnits(amount, numberOfDecimals);
-
+      const numberOfTokens = ethers.utils.parseUnits(amount.toString(), numberOfDecimals);
+      
       devlog(`${symbol.toUpperCase()} decimals ${decimals[symbol.toUpperCase()]}`);
       
       if (!push) {
