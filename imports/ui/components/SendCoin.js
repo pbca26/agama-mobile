@@ -276,34 +276,62 @@ class SendCoin extends React.Component {
             break;
           case 1:
             this.setState({
-              spvPreflightSendInProgress: true,
+              spvPreflightSendInProgress: this.props.coin.indexOf('|spv') > -1 ? true : false,
+              ethPreflightSendInProgress: this.props.coin.indexOf('|eth') > -1 ? true : false,
               currentStep: step,
             });
 
-            // spv pre tx push request
-            this.props.sendtx(
-              this.props.coin,
-              this.state.sendTo,
-              Math.abs(toSats(this.state.sendAmount)),
-              true,
-              false,
-              this.props.coin === 'btc' ? this.props.btcFees[this.state.btcFee] : null
-            )
-            .then((sendPreflight) => {
-              if (sendPreflight &&
-                  sendPreflight.msg === 'success') {
-                this.setState({
-                  spvVerificationWarning: !sendPreflight.result.utxoVerified,
-                  spvPreflightSendInProgress: false,
-                  spvPreflightResult: sendPreflight,
-                });
-              } else {
-                this.setState({
-                  spvPreflightSendInProgress: false,
-                  spvPreflightResult: sendPreflight,
-                });
-              }
-            });
+            if (this.props.coin.indexOf('|spv') > -1) {
+              // spv pre tx push request
+              this.props.sendtx(
+                this.props.coin,
+                this.state.sendTo,
+                Math.abs(toSats(this.state.sendAmount)),
+                true,
+                false,
+                this.props.coin === 'btc' ? this.props.btcFees[this.state.btcFee] : null
+              )
+              .then((sendPreflight) => {
+                if (sendPreflight &&
+                    sendPreflight.msg === 'success') {
+                  this.setState({
+                    spvVerificationWarning: !sendPreflight.result.utxoVerified,
+                    spvPreflightSendInProgress: false,
+                    spvPreflightResult: sendPreflight,
+                  });
+                } else {
+                  this.setState({
+                    spvPreflightSendInProgress: false,
+                    spvPreflightResult: sendPreflight,
+                  });
+                }
+              });
+            } else if (this.props.coin.indexOf('|eth') > -1) {
+              // eth pre tx push request
+              // network, dest, amount, gasPrice, push
+              this.props.sendtxEth(
+                this.props.coin,
+                this.state.sendTo,
+                Math.abs(this.state.sendAmount),
+                this.props.ethGasPrice[this.state.ethFee]
+              )
+              .then((sendPreflight) => {
+                console.warn('sendPreflight', sendPreflight);
+
+                if (sendPreflight &&
+                    sendPreflight.msg === 'success') {
+                  this.setState({
+                    ethPreflightSendInProgress: false,
+                    ethPreflightResult: sendPreflight,
+                  });
+                } else {
+                  this.setState({
+                    ethPreflightSendInProgress: false,
+                    ethPreflightResult: sendPreflight,
+                  });
+                }
+              });
+            }
 
             this.setState({
               sendCurrentStep: 1,
@@ -315,23 +343,26 @@ class SendCoin extends React.Component {
               processing: true,
             });
 
-            this.props.sendtx(
-              this.props.coin,
-              this.state.sendTo,
-              Math.abs(toSats(this.state.sendAmount)),
-              null,
-              true,
-              this.props.coin === 'btc' ? this.props.btcFees[this.state.btcFee] : null
-            )
-            .then((res) => {
-              devlog('sendtx result');
-              devlog(res);
+            if (this.props.coin.indexOf('|spv') > -1) {
+              this.props.sendtx(
+                this.props.coin,
+                this.state.sendTo,
+                Math.abs(toSats(this.state.sendAmount)),
+                null,
+                true,
+                this.props.coin === 'btc' ? this.props.btcFees[this.state.btcFee] : null
+              )
+              .then((res) => {
+                devlog('spv sendtx result');
+                devlog(res);
 
-              this.setState({
-                sendResult: res,
-                processing: false,
+                this.setState({
+                  sendResult: res,
+                  processing: false,
+                });
               });
-            });
+            } else if (this.props.coin.indexOf('|eth') > -1) {
+            }
             break;
         }
       }
@@ -487,6 +518,9 @@ class SendCoin extends React.Component {
 
   render() {
     if (this.props.activeSection === 'send') {
+      const _name = this.props.coin.split('|')[0];
+      const _mode = this.props.coin.split('|')[1];
+  
       return (
         <div className="form send">
           <div className="steps margin-top-10">
@@ -526,7 +560,7 @@ class SendCoin extends React.Component {
                 </div>
                 <div className="edit">
                   <span className="shade">
-                  { this.state.sendAmount } { this.props.coin.toUpperCase() }
+                  { this.state.sendAmount } { _name.toUpperCase() }
                   </span>
                 </div>
                 { this.state.spvPreflightResult &&
@@ -537,7 +571,7 @@ class SendCoin extends React.Component {
                     </div>
                     <div className="edit">
                       <span className="shade">
-                      { Number(fromSats(this.state.spvPreflightResult.result.fee)) } { this.props.coin.toUpperCase() }
+                      { Number(fromSats(this.state.spvPreflightResult.result.fee)) } { _name.toUpperCase() }
                       </span>
                     </div>
                     { this.state.spvPreflightResult.result.change === 0 &&
@@ -554,7 +588,7 @@ class SendCoin extends React.Component {
                       </div>
                     }
                     { this.state.spvPreflightResult.result.estimatedFee < 0 &&
-                      this.props.coin.toLowerCase() === 'kmd' &&
+                      _name.toLowerCase() === 'kmd' &&
                       <div>
                         <div className="padding-top-15 edit">
                           <strong>{ translate('SEND.KMD_INTEREST') }</strong>
@@ -567,7 +601,7 @@ class SendCoin extends React.Component {
                       </div>
                     }
                     { this.state.spvPreflightResult.result.estimatedFee > 0 &&
-                      this.props.coin.toLowerCase() === 'kmd' &&
+                      _name.toLowerCase() === 'kmd' &&
                       <div>
                         <div className="padding-top-15 edit">
                           <strong>{ translate('SEND.KMD_INTEREST') }</strong>
@@ -586,7 +620,45 @@ class SendCoin extends React.Component {
                         </div>
                         <div className="edit">
                           <span className="shade">
-                          { formatValue(Number(fromSats(this.state.spvPreflightResult.result.value)) + Number(fromSats(this.state.spvPreflightResult.result.fee))) } { this.props.coin.toUpperCase() }
+                          { formatValue(Number(fromSats(this.state.spvPreflightResult.result.value)) + Number(fromSats(this.state.spvPreflightResult.result.fee))) } { _name.toUpperCase() }
+                          </span>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+                { this.state.ethPreflightResult &&
+                  this.state.ethPreflightResult.msg === 'success' &&
+                  <div>
+                    <div className="padding-top-15 edit">
+                      <strong>{ translate('SEND.FEE') }</strong>
+                    </div>
+                    <div className="edit">
+                      <span className="shade">
+                      { Number(this.state.ethPreflightResult.result.fee) } { _name.toUpperCase() }
+                      </span>
+                    </div>
+                    { /*this.state.spvPreflightResult.result.change === 0 &&
+                      (formatValue((fromSats(this.state.spvPreflightResult.result.value)) - (fromSats(this.state.spvPreflightResult.result.fee))) > 0) &&
+                      <div>
+                        <div className="padding-top-15 edit">
+                          <strong>{ translate('SEND.ADJUSTED_AMOUNT') }</strong>
+                        </div>
+                        <div className="edit">
+                          <span className="shade">
+                          { Number(formatValue((fromSats(this.state.spvPreflightResult.result.value)) - (fromSats(this.state.spvPreflightResult.result.fee)))) }
+                          </span>
+                        </div>
+                      </div>*/
+                    }
+                    { this.state.ethPreflightResult.result.adjustedAmount &&
+                      <div>
+                        <div className="padding-top-15 edit">
+                          <strong>{ translate('SEND.TOTAL') }</strong>
+                        </div>
+                        <div className="edit">
+                          <span className="shade">
+                          { formatValue(Number(this.state.ethPreflightResult.result.adjustedAmount) + Number(this.state.ethPreflightResult.result.fee)) } { _name.toUpperCase() }
                           </span>
                         </div>
                       </div>
@@ -614,7 +686,7 @@ class SendCoin extends React.Component {
                   <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
                 </div>
               }
-              { this.state.spvPreflightSendInProgress &&
+              { (this.state.spvPreflightSendInProgress || this.state.ethPreflightSendInProgress) &&
                 <div className="padding-top-20 fs14 text-center">{ translate('SEND.SPV_VERIFYING') }...</div>
               }
               { this.state.spvVerificationWarning &&

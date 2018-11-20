@@ -255,7 +255,7 @@ const sendtxEth = (network, dest, amount, gasPrice, push) => {
 
       if (_name === 'eth' ||
           _name === 'eth_ropsten') {
-        // wallet, coin, push, speed, dest, amount, gasPrice, network
+        // wallet, coin, push, dest, amount, gasPrice, network
         ethCreateTx(
           connect[_name],
           _name,
@@ -269,7 +269,7 @@ const sendtxEth = (network, dest, amount, gasPrice, push) => {
           resolve(res);
         })
       } else {
-        // wallet, symbol, push, speed, dest, amount, gasPrice
+        // wallet, symbol, push, dest, amount, gasPrice
         ethCreateTxERC20(
           connect.eth,
           _name,

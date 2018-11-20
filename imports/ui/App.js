@@ -188,7 +188,6 @@ class App extends React.Component {
 
     actions.getEthGasPrice()
     .then((res) => {
-      console.warn(res);
       this.setState({
         ethGasPrice: res,
       });

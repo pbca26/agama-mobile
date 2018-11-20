@@ -20,7 +20,7 @@ const balance = (address, options) => {
   });
 };
 
-const balanceEtherscan = (address, network = 'homestead') => {
+export const balanceEtherscan = (address, network = 'homestead') => {
   return new Promise((resolve, reject) => {
     const _etherscanEndPoint = network === 'homestead' ? 'https://api.etherscan.io/api' : `https://api-${network}.etherscan.io/api`;
 
