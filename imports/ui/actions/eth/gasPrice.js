@@ -22,7 +22,7 @@ const ethGasPrice = () => {
 
         resolve(_gasPrice);
       } else {
-        resolve(false);
+        resolve('error');
       }
     });
   });

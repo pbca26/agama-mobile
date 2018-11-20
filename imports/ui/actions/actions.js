@@ -31,6 +31,10 @@ import ethers from 'ethers';
 import ethBalance from './eth/balance';
 import ethTransactions from './eth/transactions';
 import ethGasPrice from './eth/gasPrice';
+import {
+  ethCreateTx,
+  ethCreateTxERC20,
+} from './eth/createtx';
 
 let _cache = {};
 // runtime cache wrapper functions
@@ -218,31 +222,67 @@ const clearKeys = () => {
 const sendtx = (network, outputAddress, value, verify, push, btcFee) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
-      if (network.indexOf('|spv') > -1) {
-        const changeAddress = keys.spv[network].pub;
-        let _electrumServer = getLocalStorageVar('coins')[network].server;
-        _electrumServer.serverList = electrumServers[network].serverList;
+      const changeAddress = keys.spv[network].pub;
+      let _electrumServer = getLocalStorageVar('coins')[network].server;
+      _electrumServer.serverList = electrumServers[network].serverList;
 
-        devlog(`sendtx ${network}`);
+      devlog(`sendtx ${network}`);
 
-        createtx(
-          proxyServer,
-          _electrumServer,
-          outputAddress,
-          changeAddress,
-          value,
-          btcFee ? { perbyte: true, value: btcFee } : (isKomodoCoin(network) ? electrumServers.kmd.txfee : electrumServers[network].txfee),
-          keys.spv[network].priv,
-          network,
-          verify,
-          push,
-          cache
+      createtx(
+        proxyServer,
+        _electrumServer,
+        outputAddress,
+        changeAddress,
+        value,
+        btcFee ? { perbyte: true, value: btcFee } : (isKomodoCoin(network) ? electrumServers.kmd.txfee : electrumServers[network].txfee),
+        keys.spv[network].priv,
+        network,
+        verify,
+        push,
+        cache
+      )
+      .then((res) => {
+        resolve(res);
+      });
+    });
+  }
+}
+
+const sendtxEth = (network, push, speed, dest, amount, gasPrice) => {
+  return async (dispatch) => {
+    return new Promise((resolve, reject) => {
+      const _name = network.split('|')[0];
+
+      if (_name === 'eth' ||
+          _name === 'eth_ropsten') {
+        // wallet, coin, push, speed, dest, amount, gasPrice, network
+        ethCreateTx(
+          connect[_name],
+          _name,
+          false,
+          speed,
+          dest,
+          amount,
+          gasPrice,
+          _name === 'eth_ropsten' ? 'ropsten' : 'homestead'
         )
         .then((res) => {
           resolve(res);
-        });
-      } else if (network.indexOf('|eth') > -1) {
-        console.warn('sendtx eth path');
+        })
+      } else {
+        // wallet, symbol, push, speed, dest, amount, gasPrice
+        ethCreateTxERC20(
+          connect.eth,
+          _name,
+          false,
+          speed,
+          dest,
+          amount,
+          gasPrice
+        )
+        .then((res) => {
+          resolve(res);
+        })
       }
     });
   }
@@ -287,7 +327,6 @@ const transactions = (network) => {
         .then((_transactions) => {
           resolve(_transactions);
         });
-        console.warn('transactions eth path');
       }
     });
   }
@@ -648,6 +687,17 @@ const getBtcFees = () => {
   }
 }
 
+const getEthGasPrice = () => {
+  return async (dispatch) => {
+    return new Promise((resolve, reject) => {    
+      ethGasPrice()
+      .then((res) => {
+        resolve(res);
+      });
+    });
+  }
+}
+
 export default {
   auth,
   getOverview,
@@ -655,10 +705,12 @@ export default {
   balance,
   transactions,
   sendtx,
+  sendtxEth,
   getServersList,
   setDefaultServer,
   addKeyPair,
   kmdUnspents,
   getBtcFees,
+  getEthGasPrice,
   getAnotherProxy,
 }
