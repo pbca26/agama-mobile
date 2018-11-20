@@ -10,14 +10,12 @@ import { balanceEtherscan } from './balance';
 
 // TODO: error handling, input vars check
 
-// speed: slow, average, fast
-export const ethCreateTx = (wallet, coin, push, speed, dest, amount, gasPrice, network) => {
+export const ethCreateTx = (wallet, coin, push, dest, amount, gasPrice, network) => {
   let adjustedAmount = 0;
-
+  let gasLimit = fees[coin.toLowerCase()];
+  
   coin = coin ? coin.toUpperCase() : null;
   push = push ? push : false;
-  gasLimit = gaslimit || fees[coin.toLowerCase()];
-  speed = speed ? speed : 'average';
   dest = dest ? dest : null;
   network = network ? network : 'homestead';
   amount = amount ? amount : 0;
@@ -27,7 +25,7 @@ export const ethCreateTx = (wallet, coin, push, speed, dest, amount, gasPrice, n
     network
   )
   .then((maxBalance) => {
-    const fee = ethers.utils.formatEther(ethers.utils.bigNumberify(gasLimit).mul(ethers.utils.bigNumberify(gasPrice[speed])));
+    const fee = ethers.utils.formatEther(ethers.utils.bigNumberify(gasLimit).mul(ethers.utils.bigNumberify(gasPrice)));
     const _adjustedAmount = maxSpend(maxBalance.balance, fee, amount);
     const _adjustedAmountWei = Number(ethers.utils.parseEther(Number(_adjustedAmount).toPrecision(8)).toString());
 
@@ -40,10 +38,8 @@ export const ethCreateTx = (wallet, coin, push, speed, dest, amount, gasPrice, n
         push,
         gasLimit,
         gasPrice,
-        gasPriceUsed: gasPrice[speed],
-        speed,
         fee,
-        feeWei: ethers.utils.bigNumberify(gasLimit).mul(ethers.utils.bigNumberify(gasPrice[speed])).toString(),
+        feeWei: ethers.utils.bigNumberify(gasLimit).mul(ethers.utils.bigNumberify(gasPrice)).toString(),
         amount,
         amountWei: ethers.utils.parseEther(Number(amount).toPrecision(8)).toString(),
         adjustedAmount: _adjustedAmount,
@@ -64,7 +60,7 @@ export const ethCreateTx = (wallet, coin, push, speed, dest, amount, gasPrice, n
       wallet.sendTransaction({
         to: dest,
         value: _adjustedAmountWei,
-        gasPrice: ethers.utils.bigNumberify(gasPrice[speed]),
+        gasPrice: ethers.utils.bigNumberify(gasPrice),
         gasLimit,
       })
       .then((tx) => {
@@ -91,11 +87,10 @@ export const ethCreateTx = (wallet, coin, push, speed, dest, amount, gasPrice, n
   });
 };
 
-export const ethCreateTxERC20 = (wallet, symbol, push, speed, dest, amount, gasPrice) => {
+export const ethCreateTxERC20 = (wallet, symbol, push, dest, amount, gasPrice) => {
   let adjustedAmount = 0;
 
   push = push ? push : false;
-  speed = speed ? speed : 'average';
   dest = dest ? dest : null;
   amount = amount ? amount : 0;
   symbol = symbol ? symbol : null;
@@ -117,9 +112,9 @@ export const ethCreateTxERC20 = (wallet, symbol, push, speed, dest, amount, gasP
       .then((estimate) => {
         const _estimate = estimate.toString();
         devlog(`erc20 ${symbol.toUpperCase()} transfer estimate ${_estimate}`);
-        devlog(`gas price ${gasPrice[speed]}`);
+        devlog(`gas price ${gasPrice}`);
 
-        const _fee = ethers.utils.bigNumberify(_estimate).mul(ethers.utils.bigNumberify(gasPrice[speed]));
+        const _fee = ethers.utils.bigNumberify(_estimate).mul(ethers.utils.bigNumberify(gasPrice));
         const _balanceAferFee = ethers.utils.bigNumberify(maxBalance.balanceWei).sub(_fee).toString();
 
         const retObj = {
@@ -127,7 +122,7 @@ export const ethCreateTxERC20 = (wallet, symbol, push, speed, dest, amount, gasP
           result: {
             symbol,
             gasLimit: _estimate,
-            gasPrice: ethers.utils.bigNumberify(gasPrice[speed]).toString(),
+            gasPrice: ethers.utils.bigNumberify(gasPrice).toString(),
             feeWei: _fee.toString(),
             fee: ethers.utils.formatEther(_fee.toString()),
             maxBalance,
@@ -141,7 +136,7 @@ export const ethCreateTxERC20 = (wallet, symbol, push, speed, dest, amount, gasP
       });
     } else {
       contract.transfer(dest, numberOfTokens, {
-        gasPrice: ethers.utils.bigNumberify(gasPrice[speed]),
+        gasPrice: ethers.utils.bigNumberify(gasPrice),
       })
       .then((tx) => {
         devlog('erc20 tx pushed');

@@ -248,7 +248,7 @@ const sendtx = (network, outputAddress, value, verify, push, btcFee) => {
   }
 }
 
-const sendtxEth = (network, push, speed, dest, amount, gasPrice) => {
+const sendtxEth = (network, dest, amount, gasPrice, push) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
       const _name = network.split('|')[0];
@@ -260,7 +260,6 @@ const sendtxEth = (network, push, speed, dest, amount, gasPrice) => {
           connect[_name],
           _name,
           false,
-          speed,
           dest,
           amount,
           gasPrice,
@@ -275,7 +274,6 @@ const sendtxEth = (network, push, speed, dest, amount, gasPrice) => {
           connect.eth,
           _name,
           false,
-          speed,
           dest,
           amount,
           gasPrice
