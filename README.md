@@ -3,10 +3,10 @@
 ## How to install
 
 ```
-intall meteor 1.6.1.4
+intall meteor 1.8
 install npm
 install nodejs
-install java8, don't install java9 it won't work with meteor 1.6.x
+install java8, don't install java9 it won't work with meteor 1.6.x+
 
 git clone
 cd to project's folder
@@ -50,7 +50,7 @@ jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 release-unsigned.apk agam
 ## Notes
 jsqr v1.1.1 breaks the code, needs thorough debugging
 
-## Meteor 1.6.1.4 apk path (meteorjs bug)
+## Meteor 1.6+ apk path (meteorjs bug)
 path is relative to your project's folder
 
 `.meteor/local/cordova-build/platforms/android/build/outputs/apk`
@@ -59,3 +59,6 @@ path is relative to your project's folder
 Run zipalign
 
 osx example: `/Users/yourusername/Library/Android/sdk/build-tools/26.0.0/zipalign -v 4 agama-mobile-v0.1.0.apk agama-mobile-v0.1.0.apk` 
+
+## Meteor 1.7 ES6 transpile (symlink)
+https://github.com/meteor/meteor/pull/9826#issuecomment-392541768
