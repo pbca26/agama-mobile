@@ -324,12 +324,14 @@ class App extends React.Component {
       });
     }
 
-    if (this.state.coin === 'btc|spv' &&
+    if (this.state.coin &&
+        this.state.coin === 'btc|spv' &&
         section === 'send') {
       this.getBtcFees();
     }
 
-    if (this.state.coin.indexOf('|eth') > -1 &&
+    if (this.state.coin &&
+        this.state.coin.indexOf('|eth') > -1 &&
         section === 'send') {
       this.getEthGasPrice();
     }

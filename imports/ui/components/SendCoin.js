@@ -103,12 +103,12 @@ class SendCoin extends React.Component {
     if (this.props.coin.indexOf('|eth') > -1) {
       if (_name === 'eth' ||
           _name === 'eth_ropsten') {
-        url = `${explorerList[_name.toUpperCase()]}/tx/${this.state.sendResult.result.txid}`;
+        url = `${explorerList[_name.toUpperCase()]}${this.state.sendResult.result.txid}`;
       } else {
-        url = `${explorerList.ETH}/tx/${this.state.sendResult.result.txid}`;
+        url = `${explorerList.ETH}${this.state.sendResult.result.txid}`;
       }
     } else if (this.props.coin.indexOf('|spv') > -1) {
-      url = `${explorerList[this.props.coin.toUpperCase()]}/tx/${this.state.sendResult.result.txid}`;
+      url = `${explorerList[_name.toUpperCase()]}/tx/${this.state.sendResult.result.txid}`;
     }
     window.open(url, '_system');
   }
@@ -254,7 +254,7 @@ class SendCoin extends React.Component {
         this.props.coin.indexOf('|eth') > -1) {
       this.props.getEthGasPrice();
       this.setState({
-        btcFee: 'average',
+        ethFee: 'average',
       });
     }
 
@@ -313,11 +313,10 @@ class SendCoin extends React.Component {
                 this.props.coin,
                 this.state.sendTo,
                 Math.abs(this.state.sendAmount),
-                this.props.ethGasPrice[this.state.ethFee]
+                this.props.ethGasPrice[this.state.ethFee],
+                false
               )
               .then((sendPreflight) => {
-                console.warn('sendPreflight', sendPreflight);
-
                 if (sendPreflight &&
                     sendPreflight.msg === 'success') {
                   this.setState({
@@ -362,6 +361,22 @@ class SendCoin extends React.Component {
                 });
               });
             } else if (this.props.coin.indexOf('|eth') > -1) {
+              this.props.sendtxEth(
+                this.props.coin,
+                this.state.sendTo,
+                Math.abs(this.state.sendAmount),
+                this.props.ethGasPrice[this.state.ethFee],
+                true
+              )
+              .then((res) => {
+                devlog('eth sendtx result');
+                devlog(res);
+
+                this.setState({
+                  sendResult: res,
+                  processing: false,
+                });
+              });
             }
             break;
         }
@@ -460,8 +475,8 @@ class SendCoin extends React.Component {
               <label className="control-label">{ translate('SEND.FEE') }</label>
               <select
                 className="margin-top-15 margin-bottom-10"
-                name="ethGasPrice"
-                value={ this.state.ethGasPrice }
+                name="ethFee"
+                value={ this.state.ethFee }
                 onChange={ (event) => this.updateInput(event) }>
                 <option value="fast">{ translate('SEND.ETH_FEE_FAST') }</option>
                 <option value="average">{ translate('SEND.ETH_FEE_AVG') }</option>
@@ -785,7 +800,7 @@ class SendCoin extends React.Component {
                     </div>
                     <div className="edit">
                       { translate('SEND.AMOUNT') }
-                      <div className="shade margin-top-5">{ this.state.sendAmount } { this.props.coin.toUpperCase() }</div>
+                      <div className="shade margin-top-5">{ this.state.sendAmount } { _name.toUpperCase() }</div>
                     </div>
                     <div className="edit">
                       { translate('SEND.TXID') }

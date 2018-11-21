@@ -6,13 +6,14 @@ import { devlog } from '../dev';
 
 const balance = (address, options) => {
   return new Promise((resolve, reject) => {
-    if (options.symbol) {
+    if (options &&
+        options.symbol) {
       balanceERC20(address, options.symbol.toUpperCase())
       .then((balance) => {
         resolve(balance);
       });
     } else {
-      balanceEtherscan(address, options ? options.network : null)
+      balanceEtherscan(address, options ? options.network : 'homestead')
       .then((balance) => {
         resolve(balance);
       });

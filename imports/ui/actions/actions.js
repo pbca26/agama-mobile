@@ -192,9 +192,11 @@ const setDefaultServer = (network, port, ip, proto) => {
         if (result.msg === 'error') {
           resolve('error');
         } else {
-          electrumServers[network].port = port;
-          electrumServers[network].ip = ip;
-          electrumServers[network].proto = proto;
+          const _name = network.split('|')[0];
+          
+          electrumServers[_name].port = port;
+          electrumServers[_name].ip = ip;
+          electrumServers[_name].proto = proto;
 
           resolve(true);
         }
@@ -222,9 +224,10 @@ const clearKeys = () => {
 const sendtx = (network, outputAddress, value, verify, push, btcFee) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
-      const changeAddress = keys.spv[network].pub;
+      const _name = network.split('|')[0];
+      const changeAddress = keys.spv[_name].pub;
       let _electrumServer = getLocalStorageVar('coins')[network].server;
-      _electrumServer.serverList = electrumServers[network].serverList;
+      _electrumServer.serverList = electrumServers[_name].serverList;
 
       devlog(`sendtx ${network}`);
 
@@ -234,9 +237,9 @@ const sendtx = (network, outputAddress, value, verify, push, btcFee) => {
         outputAddress,
         changeAddress,
         value,
-        btcFee ? { perbyte: true, value: btcFee } : (isKomodoCoin(network) ? electrumServers.kmd.txfee : electrumServers[network].txfee),
-        keys.spv[network].priv,
-        network,
+        btcFee ? { perbyte: true, value: btcFee } : (isKomodoCoin(network) ? electrumServers.kmd.txfee : electrumServers[_name].txfee),
+        keys.spv[_name].priv,
+        _name,
         verify,
         push,
         cache
@@ -259,7 +262,7 @@ const sendtxEth = (network, dest, amount, gasPrice, push) => {
         ethCreateTx(
           connect[_name],
           _name,
-          false,
+          push,
           dest,
           amount,
           gasPrice,
@@ -273,7 +276,7 @@ const sendtxEth = (network, dest, amount, gasPrice, push) => {
         ethCreateTxERC20(
           connect.eth,
           _name,
-          false,
+          push,
           dest,
           amount,
           gasPrice
@@ -409,7 +412,7 @@ const balance = (network) => {
 const kmdUnspents = () => {
   return async (dispatch) => {
     let _electrumServer = getLocalStorageVar('coins')['kmd|spv'].server;
-    _electrumServer.serverList = electrumServers['kmd|spv'].serverList;
+    _electrumServer.serverList = electrumServers.kmd.serverList;
 
     return new Promise((resolve, reject) => {
       listunspent(
@@ -475,7 +478,6 @@ const auth = (seed, coins) => {
         }
       }
 
-      console.warn('auth', keys);
       resolve(_pubKeys);
     });
   }
@@ -485,7 +487,10 @@ const addKeyPair = (coin) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
       const _coin = coin.split('|')[0];
-      let _pubKeys = {};
+      let _pubKeys = {
+        spv: {},
+        eth: {},
+      };
 
       if (coin.indexOf('|spv') > -1) {
         let _srcPriv;
@@ -498,9 +503,8 @@ const addKeyPair = (coin) => {
 
         const _wifToWif = wifToWif(_srcPriv, isKomodoCoin(_coin) ? electrumJSNetworks.kmd : electrumJSNetworks[_coin]);
         keys.spv[_coin] = _wifToWif;
-        _pubKeys[_coin] = _wifToWif.pub;
+        _pubKeys.spv[_coin] = _wifToWif.pub;
 
-        console.warn(addKeyPair, keys.spv[_coin]);
       } else if (coin.indexOf('|eth') > -1) {
         let _srcPriv;
         
@@ -515,14 +519,11 @@ const addKeyPair = (coin) => {
           pub: _ethKeys.address,
           priv: _ethKeys.signingKey.privateKey,
         };
-        _pubKeys[_coin] = _ethKeys.address;
+        _pubKeys.eth[_coin] = _ethKeys.address;
         
         if (!connect[_coin.indexOf('eth_ropsten') > -1 ? 'eth_ropsten' : 'eth']) {
           connect[_coin.indexOf('eth_ropsten') > -1 ? 'eth_ropsten' : 'eth'] = _ethKeys.connect(new ethers.getDefaultProvider(_coin.indexOf('eth_ropsten') > -1 ? 'ropsten' : 'homestead'));
-        }
-        
-        console.warn(connect);
-        console.warn('addKeyPair eth path');
+        }        
       }
 
       resolve(_pubKeys[_coin]);

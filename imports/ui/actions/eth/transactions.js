@@ -7,13 +7,14 @@ import { devlog } from '../dev';
 
 const transactions = (address, options) => {
   return new Promise((resolve, reject) => {
-    if (options.symbol) {
+    if (options &&
+        options.symbol) {
       transactionsERC20(address, options.symbol.toUpperCase())
       .then((balance) => {
         resolve(balance);
       });
     } else {
-      transactionsEtherscan(address, options ? options.network : null)
+      transactionsEtherscan(address, options ? options.network : 'homestead')
       .then((transactions) => {
         resolve(transactions);
       });
