@@ -505,6 +505,7 @@ const addKeyPair = (coin) => {
         keys.spv[_coin] = _wifToWif;
         _pubKeys.spv[_coin] = _wifToWif.pub;
 
+        resolve(_pubKeys.spv[_coin]);
       } else if (coin.indexOf('|eth') > -1) {
         let _srcPriv;
         
@@ -523,10 +524,10 @@ const addKeyPair = (coin) => {
         
         if (!connect[_coin.indexOf('eth_ropsten') > -1 ? 'eth_ropsten' : 'eth']) {
           connect[_coin.indexOf('eth_ropsten') > -1 ? 'eth_ropsten' : 'eth'] = _ethKeys.connect(new ethers.getDefaultProvider(_coin.indexOf('eth_ropsten') > -1 ? 'ropsten' : 'homestead'));
-        }        
-      }
+        }
 
-      resolve(_pubKeys[_coin]);
+        resolve(_pubKeys.eth[_coin]);
+      }
     });
   }
 }

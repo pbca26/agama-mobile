@@ -112,6 +112,7 @@ App.accessRule('http://explorer.fujicoin.org');
 App.accessRule('http://zilla.explorer.dexstats.info');
 App.accessRule('https://explorer.dionpay.com');
 App.accessRule('https://explorer.zcoin.io');
+// eth
 App.accessRule('https://etherscan.io');
 App.accessRule('https://api.etherscan.io');
 App.accessRule('https://ropsten.etherscan.io');
