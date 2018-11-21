@@ -400,7 +400,7 @@ class SendCoin extends React.Component {
                 </span> ]
             </strong>
           </label>
-          <div className="shade">{ this.props.address }</div>
+          <div className="shade wb--all">{ this.props.address }</div>
         </div>
         <div className="row">
           <div className="edit">
@@ -792,11 +792,11 @@ class SendCoin extends React.Component {
                     </div>
                     <div className="edit">
                       { translate('SEND.FROM') }
-                      <div className="shade margin-top-5">{ this.props.address }</div>
+                      <div className="shade margin-top-5 wb--all">{ this.props.address }</div>
                     </div>
                     <div className="edit">
                       { translate('SEND.TO') }
-                      <div className="shade margin-top-5">{ this.state.sendTo }</div>
+                      <div className="shade margin-top-5 wb--all">{ this.state.sendTo }</div>
                     </div>
                     <div className="edit">
                       { translate('SEND.AMOUNT') }
