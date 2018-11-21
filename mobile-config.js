@@ -113,6 +113,12 @@ App.accessRule('http://zilla.explorer.dexstats.info');
 App.accessRule('https://explorer.dionpay.com');
 App.accessRule('https://explorer.zcoin.io');
 App.accessRule('https://etherscan.io');
+App.accessRule('https://api.etherscan.io');
+App.accessRule('https://ropsten.etherscan.io');
+App.accessRule('https://api-ropsten.etherscan.io');
+App.accessRule('https://ethgasstation.info');
+App.accessRule('https://mainnet.infura.io');
+App.accessRule('https://ropsten.infura.io');
 
 // Set PhoneGap/Cordova preferences.
 App.setPreference('BackgroundColor', '0xffffffff'); // 0x45485FFF
