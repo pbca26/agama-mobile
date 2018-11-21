@@ -516,7 +516,7 @@ const addKeyPair = (coin) => {
         }
 
         const _ethKeys = etherKeys(_srcPriv, true);
-        keys.spv[_coin] = {
+        keys.eth[_coin] = {
           pub: _ethKeys.address,
           priv: _ethKeys.signingKey.privateKey,
         };
