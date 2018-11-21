@@ -580,12 +580,28 @@ const getOverview = (coins) => {
               }
             });
           } else if (pair.coin.indexOf('|eth') > -1) {
-            // TODO: get eth balance
-            resolve({
-              coin: pair.coin,
-              pub: pair.pub,
-              balance: 0,
-              unconfirmed: 0,
+            const _name = pair.coin.split('|')[0];
+            const address = keys.eth[_name].pub;
+            let options;
+    
+            if (pair.coin.indexOf('eth_ropsten') > -1) {
+              options = {
+                network: 'ropsten',
+              };
+            } else if (pair.coin.indexOf('eth|') === -1) {
+              options = {
+                symbol: _name,
+              };
+            }
+    
+            ethBalance(address, options)
+            .then((_balance) => {
+              resolve({
+                coin: pair.coin,
+                pub: pair.pub,
+                balance: _balance.balance,
+                unconfirmed: 0,
+              });
             });
           }
         });
@@ -627,12 +643,13 @@ const getOverview = (coins) => {
             let _overviewItems = [];
 
             for (let i = 0; i < promiseResult.length; i++) {
+              const _coin = promiseResult[i].coin.split('|')[0];
               let _coinKMDPrice = 0;
               let _usdPricePerItem = 0;
 
-              if (pricesResult[1][`${promiseResult[i].coin.toUpperCase()}/KMD`]) {
-                _coinKMDPrice = pricesResult[1][`${promiseResult[i].coin.toUpperCase()}/KMD`].low;
-              } else if (promiseResult[i].coin === 'kmd') {
+              if (pricesResult[1][`${_coin.toUpperCase()}/KMD`]) {
+                _coinKMDPrice = pricesResult[1][`${_coin.toUpperCase()}/KMD`].low;
+              } else if (_coin === 'kmd') {
                 _coinKMDPrice = 1;
               }
 
