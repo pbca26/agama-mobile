@@ -531,8 +531,9 @@ class App extends React.Component {
           coin = 'kmd|spv';
           address = res.spv.kmd;
         } else {
-          coin = Object.keys(this.state.coins)[0].split('|')[0];
-          address = res.spv[coin] || res.eth[coin];
+          const _name = Object.keys(this.state.coins)[0].split('|')[0];
+          coin = Object.keys(this.state.coins)[0];
+          address = res.spv[_name] || res.eth[_name];
         }
   
         if (config.preload &&
