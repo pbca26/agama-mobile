@@ -693,7 +693,7 @@ class SendCoin extends React.Component {
                           </div>
                           <div className="edit">
                             <span className="shade padding-bottom-15">
-                            { this.state.ethPreflightResult.result.maxBalance.balance } ETH
+                            { this.state.ethPreflightResult.result.maxBalance.balance }
                             </span>
                           </div>
                         </div>
@@ -703,7 +703,7 @@ class SendCoin extends React.Component {
                           </div>
                           <div className="edit">
                             <span className="shade padding-bottom-15">
-                            { this.state.ethPreflightResult.result.balanceAferFee } ETH
+                            { this.state.ethPreflightResult.result.balanceAferFee }
                             </span>
                           </div>
                         </div>

@@ -58,8 +58,8 @@ const lang = {
       CONFIRMATION_REQUIRED: 'Confirmation is required',
     },
     SEND: {
-      CURRENT_BALANCE: 'Current balance',
-      BALANCE_AFTER_FEE: 'Balace after the fee',
+      CURRENT_BALANCE: 'Current balance (ETH)',
+      BALANCE_AFTER_FEE: 'Balace after the fee (ETH)',
       ERR_NOT_ENOUGH_ETH: 'Not enough ETH to send the transaction',
       ADJUSTED_AMOUNT: 'Adjusted amount',
       KMD_INTEREST: 'KMD rewards',

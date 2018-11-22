@@ -20,12 +20,13 @@ class ServerSelect extends React.Component {
     this.props.getServersList()
     .then((res) => {
       const _coin = this.props.coin;
+      const _name = _coin.split('|')[0];
       const _server = this.props.coins[this.props.coin].server;
 
       this.setState({
         selectedOption: _server.ip + ':' + _server.port + ':' + _server.proto,
         electrumServer: _server.ip + ':' + _server.port + ':' + _server.proto,
-        serverList: res[_coin].serverList,
+        serverList: res[_name].serverList,
         errorTestingServer: false,
         connecting: false,
         spvServerRetryInProgress: false,
@@ -99,8 +100,8 @@ class ServerSelect extends React.Component {
   }
 
   render() {
-    const _name = _overview[i].coin.split('|')[0];
-    const _mode = _overview[i].coin.split('|')[1];
+    const _name = this.props.coin.split('|')[0];
+    const _mode = this.props.coin.split('|')[1];
 
     return (
       <div className="form server-select">

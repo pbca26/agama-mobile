@@ -1,7 +1,5 @@
-const bs58check = require('bs58check');
-
+import bs58check from 'bs58check';
 import { Promise } from 'meteor/promise';
-
 import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
 import {
   getLocalStorageVar,
