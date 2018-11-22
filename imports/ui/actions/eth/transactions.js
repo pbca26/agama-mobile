@@ -39,7 +39,7 @@ const transactionsEtherscan = (address, network = 'homestead', sort = 'asc') => 
     }, (error, result) => {    
       const _json = JSON.parse(result.content);
 
-      if (_json.message === 'OK' &&
+      if ((_json.message === 'OK' || _json.message === 'No transactions found') &&
           _json.result) {
         const _txs = ethTransactionsToBtc(_json.result, address);
         resolve(_txs);
@@ -63,7 +63,7 @@ const transactionsERC20 = (address, symbol) => {
     }, (error, result) => {
       const _json = JSON.parse(result.content);
     
-      if (_json.message === 'OK' &&
+      if ((_json.message === 'OK' || _json.message === 'No transactions found') &&
           _json.result) {
         const _decimals = decimals[symbol];
         const _txs = ethTransactionsToBtc(_json.result, address, true, _decimals < 18 && _decimals >= 0 ? 18 - _decimals : 0);
