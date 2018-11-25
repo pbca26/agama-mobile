@@ -69,6 +69,7 @@ App.accessRule('https://bots.kmdexplorer.io');
 App.accessRule('https://mgw.kmdexplorer.io');
 App.accessRule('https://wlc.kmdexplorer.io');
 App.accessRule('https://vrsc.kmdexplorer.io');
+App.accessRule('https://explorer.veruscoin.io');
 App.accessRule('https://call.explorer.mycapitalco.in');
 App.accessRule('http://ccl.explorer.dexstats.info');
 App.accessRule('http://chips.explorer.supernet.org');

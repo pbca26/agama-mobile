@@ -1,10 +1,6 @@
 import aes256 from 'nodejs-aes256';
 
-// TODO: check pin strength
-
 export const encryptkey = (cipherKey, string) => {
-  // const _pinTest = _pin.match('^(?=.*[A-Z])(?=.*[^<>{}\"/|;:.,~!?@#$%^=&*\\]\\\\()\\[_+]*$)(?=.*[0-9])(?=.*[a-z]).{8}$');
-
   const encryptedString = aes256.encrypt(cipherKey, string);
 
   return encryptedString;
