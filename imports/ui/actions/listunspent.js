@@ -162,6 +162,7 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
                                   amount: Number(fromSats(_utxoItem.value)),
                                   amountSats: _utxoItem.value,
                                   confirmations: Number(_utxoItem.height) === 0 ? 0 : currentHeight - _utxoItem.height,
+                                  currentHeight,
                                   spendable: true,
                                   verified: false,
                                 };
