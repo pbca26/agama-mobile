@@ -451,9 +451,9 @@ const auth = (seed, coins) => {
           } catch (e) {}
 
           if (isWif) {
-            _seedToWif = wifToWif(_seed, isKomodoCoin(_key) ? electrumJSNetworks.kmd : electrumJSNetworks[_key.toLowerCase()]);
+            _seedToWif = wifToWif(_seed, electrumJSNetworks[_key.toLowerCase()] || isKomodoCoin(_key) ? electrumJSNetworks.kmd : electrumJSNetworks[_key.toLowerCase()]);
           } else {
-            _seedToWif = seedToWif(_seed, isKomodoCoin(_key) ? electrumJSNetworks.kmd : electrumJSNetworks[_key.toLowerCase()], true);
+            _seedToWif = seedToWif(_seed, electrumJSNetworks[_key.toLowerCase()] || isKomodoCoin(_key) ? electrumJSNetworks.kmd : electrumJSNetworks[_key.toLowerCase()], true);
           }
 
           keys.spv[_key] = {
@@ -499,7 +499,7 @@ const addKeyPair = (coin) => {
           _srcPriv = seedToPriv(keys.eth[Object.keys(keys.eth)[0]].priv, 'btc');
         }        
 
-        const _wifToWif = wifToWif(_srcPriv, isKomodoCoin(_coin) ? electrumJSNetworks.kmd : electrumJSNetworks[_coin]);
+        const _wifToWif = wifToWif(_srcPriv, electrumJSNetworks[_coin] || isKomodoCoin(_coin) ? electrumJSNetworks.kmd : electrumJSNetworks[_coin]);
         keys.spv[_coin] = _wifToWif;
         _pubKeys.spv[_coin] = _wifToWif.pub;
 

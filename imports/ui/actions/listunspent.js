@@ -93,7 +93,7 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
                             devlog(_rawtxJSON);
 
                             // decode tx
-                            const _network = electrumJSNetworks[isKomodoCoin(network) ? 'kmd' : network];
+                            const _network = electrumJSNetworks[network.toLowerCase()] || electrumJSNetworks[isKomodoCoin(network) ? 'kmd' : network];
                             let decodedTx;
                             
                             if (cache.getDecodedTransaction(_utxoItem.tx_hash, network)) {

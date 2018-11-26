@@ -191,7 +191,7 @@ class SendCoin extends React.Component {
     }
 
     if (_mode === 'spv') {
-      const _network = electrumJSNetworks[isKomodoCoin(_name) ? 'kmd' : _name];
+      const _network = electrumJSNetworks[_name.toLowerCase()] || electrumJSNetworks[isKomodoCoin(_name) ? 'kmd' : _name];
 
       if (!addressVersionCheck(_network, this.state.sendTo) ||
           addressVersionCheck(_network, this.state.sendTo) === 'Invalid pub address') {
@@ -229,20 +229,19 @@ class SendCoin extends React.Component {
   }
 
   changeSendCoinStep(step, back) {
-    if (step === 0 &&
-        this.props.coin === 'btc|spv') {
-      this.props.getBtcFees();
-      this.setState({
-        btcFee: 'halfHourFee',
-      });
-    }
+    if (step === 0) {
 
-    if (step === 0 &&
-        this.props.coin.indexOf('|eth') > -1) {
-      this.props.getEthGasPrice();
-      this.setState({
-        ethFee: 'average',
-      });
+      if (this.props.coin === 'btc|spv') {
+        this.props.getBtcFees();
+        this.setState({
+          btcFee: 'halfHourFee',
+        });
+      } else if (this.props.coin.indexOf('|eth') > -1) {
+        this.props.getEthGasPrice();
+        this.setState({
+          ethFee: 'average',
+        });
+      }
     }
 
     if (back) {
