@@ -63,20 +63,6 @@ class SendCoin extends React.Component {
     this.openExternalURL = this.openExternalURL.bind(this);
   }
 
-  renderTxID() {
-    const _mid = this.state.sendResult.result.txid.length === 64 ? 31 : 32;
-    const _end = this.state.sendResult.result.txid.length === 64 ? 64 : 66;
-    const _txid1 = this.state.sendResult.result.txid.substr(0, _mid);
-    const _txid2 = this.state.sendResult.result.txid.substr(_mid, _end);
-
-    return (
-      <div>
-        <div>{ _txid1 }</div>
-        <div>{ _txid2 }</div>
-      </div>
-    );
-  }
-
   decodeSeed() {
     const _encryptedKey = getLocalStorageVar('seed');
     const _decryptedKey = decryptkey(this.state.pin, _encryptedKey.encryptedKey);
@@ -805,11 +791,11 @@ class SendCoin extends React.Component {
                     </div>
                     <div className="edit">
                       { translate('SEND.TXID') }
-                      <div className="shade margin-top-5">
+                      <div className="shade margin-top-5 wb--all">
                       {
                         this.state.sendResult &&
                         this.state.sendResult.result &&
-                        this.state.sendResult.result.txid ? this.renderTxID() : translate('SEND.PROCESSING_SM')
+                        this.state.sendResult.result.txid ? this.state.sendResult.result.txid : translate('SEND.PROCESSING_SM')
                       }
                       </div>
                     </div>
