@@ -65,6 +65,8 @@ const _coinsList = {
     'XZC',
     'FTC',
     'GBX',
+    'SUQA',
+    'BZC',
     //'NINJA',
     //'SHARK',
     //'MVP',

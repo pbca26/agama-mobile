@@ -234,6 +234,8 @@ const lang = {
       MGNX: 'MagnaX',
       PTX: 'PatentTX',
       // crypto
+      SUQA: 'SUQA',
+      BZC: 'Bitzec',
       CRW: 'Crown',
       STRAT: 'Stratis',
       TOA: 'TOA',
