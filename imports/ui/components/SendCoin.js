@@ -108,8 +108,9 @@ class SendCoin extends React.Component {
         url = `${explorerList.ETH}${this.state.sendResult.result.txid}`;
       }
     } else if (this.props.coin.indexOf('|spv') > -1) {
-      url = `${explorerList[_name.toUpperCase()]}/tx/${this.state.sendResult.result.txid}`;
+      url = explorerList[_name.toUpperCase()].split('/').length - 1 > 2 ? `${explorerList[_name.toUpperCase()]}${this.state.sendResult.result.txid}` : `${explorerList[_name.toUpperCase()]}/tx/${this.state.sendResult.result.txid}`;
     }
+
     window.open(url, '_system');
   }
 
@@ -748,7 +749,7 @@ class SendCoin extends React.Component {
                 <div className="padding-top-20 fs14 text-center">{ translate('SEND.SPV_VERIFYING') }...</div>
               }
               { this.state.spvVerificationWarning &&
-                <div className="padding-top-20 fs14 lh25">
+                <div className="padding-top-20 fs14 lh25 padding-left-15">
                   <i className="fa fa-warning warning"></i> <strong className="warning">{ translate('SEND.WARNING') }:</strong> { translate('SEND.WARNING_SPV_P1') }
                   <div>{ translate('SEND.WARNING_SPV_P2') }</div>
                 </div>
