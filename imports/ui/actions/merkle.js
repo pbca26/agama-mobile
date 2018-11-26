@@ -39,88 +39,95 @@ const getMerkleRoot = (txid, proof, pos) => {
 
 const verifyMerkle = (txid, height, serverList, electrumServer, proxyServer, cache, network) => {
   // select random server
-  const _rnd = getRandomIntInclusive(0, serverList.length - 1);
-  const randomServer = serverList[_rnd];
-  const _randomServer = randomServer.split(':');
-  const _currentServer = electrumServer;
+  if (serverList.length === 1 ||
+      !getRandomIntInclusive(0, serverList.length - 1)) {
+    return new Promise((resolve, reject) => {
+      resolve(false);
+    });
+  } else {
+    const _rnd = getRandomIntInclusive(0, serverList.length - 1);
+    const randomServer = serverList[_rnd];
+    const _randomServer = randomServer.split(':');
+    const _currentServer = electrumServer;
 
-  devlog(`current server: ${_currentServer}`);
-  devlog(`verification server: ${randomServer}`);
+    devlog(`current server: ${_currentServer}`);
+    devlog(`verification server: ${randomServer}`);
 
-  return new Promise((resolve, reject) => {
-    HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getmerkle`, {
-      params: {
-        port: electrumServer.port,
-        ip: electrumServer.ip,
-        proto: electrumServer.proto,
-        txid,
-        height,
-      },
-    }, (error, result) => {
-      result = JSON.parse(result.content);
+    return new Promise((resolve, reject) => {
+      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getmerkle`, {
+        params: {
+          port: electrumServer.port,
+          ip: electrumServer.ip,
+          proto: electrumServer.proto,
+          txid,
+          height,
+        },
+      }, (error, result) => {
+        result = JSON.parse(result.content);
 
-      if (result.msg === 'error') {
-        resolve(CONNECTION_ERROR_OR_INCOMPLETE_DATA);
-      } else {
-        const merkleData = result.result;
+        if (result.msg === 'error') {
+          resolve(CONNECTION_ERROR_OR_INCOMPLETE_DATA);
+        } else {
+          const merkleData = result.result;
 
-        if (merkleData &&
-            merkleData.merkle &&
-            merkleData.pos) {
-          devlog('electrum getmerkle =>');
-          devlog(merkleData);
+          if (merkleData &&
+              merkleData.merkle &&
+              merkleData.pos) {
+            devlog('electrum getmerkle =>');
+            devlog(merkleData);
 
-          const _res = getMerkleRoot(txid, merkleData.merkle, merkleData.pos);
-          devlog(_res, true);
+            const _res = getMerkleRoot(txid, merkleData.merkle, merkleData.pos);
+            devlog(_res, true);
 
-          cache.getBlockheader(
-            height,
-            network,
-            {
-              url: `http://${proxyServer.ip}:${proxyServer.port}/api/getblockinfo`,
-              params: {
-                ip: _randomServer[0],
-                port: _randomServer[1],
-                proto: _randomServer[2],
-                height,
-              },
-            }
-          )
-          .then((result) => {
-            result = JSON.parse(result.content);
+            cache.getBlockheader(
+              height,
+              network,
+              {
+                url: `http://${proxyServer.ip}:${proxyServer.port}/api/getblockinfo`,
+                params: {
+                  ip: _randomServer[0],
+                  port: _randomServer[1],
+                  proto: _randomServer[2],
+                  height,
+                },
+              }
+            )
+            .then((result) => {
+              result = JSON.parse(result.content);
 
-            if (result.msg === 'error') {
-              resolve(CONNECTION_ERROR_OR_INCOMPLETE_DATA);
-            } else {
-              const blockInfo = result.result;
-
-              if (blockInfo &&
-                  blockInfo['merkle_root']) {
-                devlog('blockinfo =>');
-                devlog(blockInfo);
-                devlog(blockInfo['merkle_root']);
+              if (result.msg === 'error') {
+                resolve(CONNECTION_ERROR_OR_INCOMPLETE_DATA);
+              } else {
+                const blockInfo = result.result;
 
                 if (blockInfo &&
                     blockInfo['merkle_root']) {
-                  if (_res === blockInfo['merkle_root']) {
-                    resolve(true);
+                  devlog('blockinfo =>');
+                  devlog(blockInfo);
+                  devlog(blockInfo['merkle_root']);
+
+                  if (blockInfo &&
+                      blockInfo['merkle_root']) {
+                    if (_res === blockInfo['merkle_root']) {
+                      resolve(true);
+                    } else {
+                      resolve(false);
+                    }
                   } else {
-                    resolve(false);
+                    resolve(CONNECTION_ERROR_OR_INCOMPLETE_DATA);
                   }
                 } else {
                   resolve(CONNECTION_ERROR_OR_INCOMPLETE_DATA);
                 }
-              } else {
-                resolve(CONNECTION_ERROR_OR_INCOMPLETE_DATA);
               }
-            }
-          });
-        } else {
-          resolve(CONNECTION_ERROR_OR_INCOMPLETE_DATA);
+            });
+          } else {
+            resolve(CONNECTION_ERROR_OR_INCOMPLETE_DATA);
+          }
         }
-      }
+      });
     });
-  });
+  }
 }
 
 const verifyMerkleByCoin = (txid, height, electrumServer, proxyServer, cache, network) => {
