@@ -38,8 +38,7 @@ const getMerkleRoot = (txid, proof, pos) => {
 
 const verifyMerkle = (txid, height, serverList, electrumServer, proxyServer, cache, network) => {
   // select random server
-  if (serverList.length === 1 ||
-      !getRandomIntInclusive(0, serverList.length - 1)) {
+  if (serverList.length === 0) {
     return new Promise((resolve, reject) => {
       resolve(false);
     });
