@@ -18,6 +18,7 @@ import {
   toSats,
   formatValue,
   isNumber,
+  parseBitcoinURL,
 } from 'agama-wallet-lib/build/utils';
 import {
   explorerList,
@@ -141,10 +142,38 @@ class SendCoin extends React.Component {
               });
             }, 5000);
           } else {
-            this.setState({
+            let _newState = {
               qrScanError: false,
-              sendTo: decodedQR,
-            });
+            };
+
+            try {
+              const recObj = JSON.parse(decodedQR);
+        
+              if (recObj &&
+                  typeof recObj === 'object') {
+                if (recObj.amount) {
+                  _newState.amount = recObj.amount;
+                }
+                if (recObj.address) {
+                  _newState.sendTo = recObj.address;
+                }
+              }
+            } catch (e) {
+              if (decodedQR.indexOf(':') > -1) {
+                const _parsedBitcoinURL = parseBitcoinURL(decodedQR);
+                
+                if (_parsedBitcoinURL.amount) {
+                  _newState.amount = _parsedBitcoinURL.amount;
+                }
+                if (_parsedBitcoinURL.address) {
+                  _newState.sendTo = _parsedBitcoinURL.address;
+                }
+              } else {
+                _newState.sendTo = decodedQR;
+              }
+            }
+
+            this.setState(_newState);
           }
         });
       }
