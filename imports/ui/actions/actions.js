@@ -451,9 +451,9 @@ const auth = (seed, coins) => {
           } catch (e) {}
 
           if (isWif) {
-            _seedToWif = wifToWif(_seed, electrumJSNetworks[_key.toLowerCase()] || isKomodoCoin(_key) ? electrumJSNetworks.kmd : electrumJSNetworks[_key.toLowerCase()]);
+            _seedToWif = wifToWif(_seed, electrumJSNetworks[_key.toLowerCase()] || electrumJSNetworks.kmd);
           } else {
-            _seedToWif = seedToWif(_seed, electrumJSNetworks[_key.toLowerCase()] || isKomodoCoin(_key) ? electrumJSNetworks.kmd : electrumJSNetworks[_key.toLowerCase()], true);
+            _seedToWif = seedToWif(_seed, electrumJSNetworks[_key.toLowerCase()] || electrumJSNetworks.kmd, true);
           }
 
           keys.spv[_key] = {
@@ -499,7 +499,7 @@ const addKeyPair = (coin) => {
           _srcPriv = seedToPriv(keys.eth[Object.keys(keys.eth)[0]].priv, 'btc');
         }        
 
-        const _wifToWif = wifToWif(_srcPriv, electrumJSNetworks[_coin] || isKomodoCoin(_coin) ? electrumJSNetworks.kmd : electrumJSNetworks[_coin]);
+        const _wifToWif = wifToWif(_srcPriv, electrumJSNetworks[_key.toLowerCase()] || electrumJSNetworks.kmd);
         keys.spv[_coin] = _wifToWif;
         _pubKeys.spv[_coin] = _wifToWif.pub;
 
@@ -606,66 +606,37 @@ const getOverview = (coins) => {
         });
       }))
       .then(promiseResult => {
-        const _pricesUrl = [
-          'https://www.atomicexplorer.com/api/rates/kmd',
-          'https://www.atomicexplorer.com/api/mm/prices'
-        ];
+        let _coins = [];
 
-        Promise.all(_pricesUrl.map((url, index) => {
-          return new Promise((resolve, reject) => {
-            HTTP.call('GET', url, {
-            }, (error, result) => {
-              if (!result) {
-                resolve('prices-error');
-              } else {
-                const _prices = JSON.parse(result.content).result;    
-                resolve(_prices);
-              }
-            });
-          });
-        }))
-        .then(pricesResult => {
-          if (pricesResult[0] === 'prices-error') {
+        for (let i = 0; i < promiseResult.length; i++) {
+          _coins.push(promiseResult[i].coin.split('|')[0]);
+        }
+
+        HTTP.call('GET',
+          'https://www.atomicexplorer.com/api/mm/prices/v2', {
+          params: {
+            coins: _coins.length > 1 ? _coins.join(',') : _coins,
+            currency: 'usd',
+          },
+        }, (error, result) => {
+          if (!result) {
             resolve('error');
           } else {
-            let _kmdRates = {
-              BTC: 0,
-              USD: 0,
-            };
-
-            if (pricesResult[0].BTC &&
-                pricesResult[0].USD) {
-              _kmdRates.BTC = pricesResult[0].BTC;
-              _kmdRates.USD = pricesResult[0].USD;
-            }
+            const _prices = JSON.parse(result.content).result;
 
             let _overviewItems = [];
-
+  
             for (let i = 0; i < promiseResult.length; i++) {
               const _coin = promiseResult[i].coin.split('|')[0];
-              let _coinKMDPrice = 0;
-              let _usdPricePerItem = 0;
-
-              if (pricesResult[1][`${_coin.toUpperCase()}/KMD`]) {
-                _coinKMDPrice = pricesResult[1][`${_coin.toUpperCase()}/KMD`].low;
-              } else if (_coin === 'kmd') {
-                _coinKMDPrice = 1;
-              }
-
-              if (!promiseResult[i].balance) {
-                promiseResult[i].balance = 0;
-              }
-
+  
               _overviewItems.push({
                 coin: promiseResult[i].coin,
-                balanceNative: promiseResult[i].balance,
-                balanceKMD: promiseResult[i].balance * _coinKMDPrice,
-                balanceBTC: promiseResult[i].balance * _kmdRates.BTC,
-                balanceUSD: promiseResult[i].balance * _coinKMDPrice * _kmdRates.USD,
-                usdPricePerItem: _coinKMDPrice * _kmdRates.USD,
+                balanceNative: Number(promiseResult[i].balance),
+                balanceUSD: _prices[_coin.toUpperCase()] ? Number(_prices[_coin.toUpperCase()]) * Number(promiseResult[i].balance) : 0,
+                usdPricePerItem: _prices[_coin.toUpperCase()] ? Number(_prices[_coin.toUpperCase()]) : 0,
               });
             }
-
+  
             resolve(_overviewItems);
           }
         });
