@@ -28,6 +28,7 @@ const lang = {
       TOTAL_VALUE: 'Total Value',
       PER_COIN: 'per coin',
       YOUR_COINS: 'Your Coins',
+      LOADING: 'Loading...',
     },
     OFFLINE: {
       TX_SIG_FAIL: 'failed to sign transaction',

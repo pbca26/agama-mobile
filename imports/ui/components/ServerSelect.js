@@ -24,8 +24,8 @@ class ServerSelect extends React.Component {
       const _server = this.props.coins[this.props.coin].server;
 
       this.setState({
-        selectedOption: _server.ip + ':' + _server.port + ':' + _server.proto,
-        electrumServer: _server.ip + ':' + _server.port + ':' + _server.proto,
+        selectedOption: `${_server.ip}:${_server.port}:${_server.proto}`,
+        electrumServer: `${_server.ip}:${_server.port}:${_server.proto}`,
         serverList: res[_name].serverList,
         errorTestingServer: false,
         connecting: false,

@@ -17,11 +17,9 @@ class Overview extends React.Component {
       const _overview = this.props.overview;
       let _items = [];
       let _totalUSDBalance = 0;
-      let _totalBTCBalance = 0;
 
       for (let i = 0; i < _overview.length; i++) {
         _totalUSDBalance += _overview[i].balanceUSD;
-        _totalBTCBalance += _overview[i].balanceBTC;
       }
 
       _items.push(
@@ -87,9 +85,11 @@ class Overview extends React.Component {
             <img
               className="div1"
               src={ `${assetsPath.home}/trends-rectangle-7.png` } />
-            <div className="a1241">
-              ~ $ { formatValue(_overview[i].usdPricePerItem) } { translate('OVERVIEW.PER_COIN') }
-            </div>
+            { _overview[i].usdPricePerItem > 0 &&
+              <div className="a1241">
+                ~ $ { Number(Number(_overview[i].usdPricePerItem).toFixed(4)) } { translate('OVERVIEW.PER_COIN') }
+              </div>
+            }
             { /*<img className="path5" src={ `${assetsPath.home}/home-path-5.png` } />*/ }
             <div className="btc">
               <img
@@ -98,7 +98,9 @@ class Overview extends React.Component {
             </div>
             <div className="bitcoin">{ translate(_mode.toUpperCase() + '.' + _name.toUpperCase()) }</div>
             <div className="a0000041">{ formatValue(_overview[i].balanceNative) }</div>
-            <div className="a123345">${ formatValue(_overview[i].balanceUSD) }</div>
+            { _overview[i].balanceUSD > 0 &&
+              <div className="a123345">${ Number(Number(_overview[i].balanceUSD).toFixed(4)) }</div>
+            }
           </div>
         );
       }
@@ -108,10 +110,6 @@ class Overview extends React.Component {
           { _items[0] }
           <div className="overview-coins">{ _items.splice(1) }</div>
         </div>
-      );
-    } else {
-      return (
-        <Spinner />
       );
     }
   }
@@ -128,7 +126,11 @@ class Overview extends React.Component {
           { this.props.overview !== 'error' &&
             <div className="home-inner">
               { this.renderOverview() }
-              <div className="yourcoins">{ translate('OVERVIEW.YOUR_COINS') }</div>
+              <div className="yourcoins">{ translate('OVERVIEW.' + (this.props.overview && this.props.overview.length ? 'YOUR_COINS' : 'LOADING')) }</div>
+              { this.props.overview &&
+                !this.props.overview.length &&
+                <Spinner />
+              }
               { /*<img
                 className="combinedshape2"
                 src={ `${assetsPath.home}/home-combined-shape 2.png` } />*/ }
