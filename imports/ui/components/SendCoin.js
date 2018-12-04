@@ -152,7 +152,7 @@ class SendCoin extends React.Component {
               if (recObj &&
                   typeof recObj === 'object') {
                 if (recObj.amount) {
-                  _newState.amount = recObj.amount;
+                  _newState.sendAmount = recObj.amount;
                 }
                 if (recObj.address) {
                   _newState.sendTo = recObj.address;
@@ -163,7 +163,7 @@ class SendCoin extends React.Component {
                 const _parsedBitcoinURL = parseBitcoinURL(decodedQR);
                 
                 if (_parsedBitcoinURL.amount) {
-                  _newState.amount = _parsedBitcoinURL.amount;
+                  _newState.sendAmount = _parsedBitcoinURL.amount;
                 }
                 if (_parsedBitcoinURL.address) {
                   _newState.sendTo = _parsedBitcoinURL.address;
