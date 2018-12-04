@@ -62,3 +62,7 @@ osx example: `/Users/yourusername/Library/Android/sdk/build-tools/26.0.0/zipalig
 
 ## Meteor 1.7 ES6 transpile (symlink)
 https://github.com/meteor/meteor/pull/9826#issuecomment-392541768
+
+## Possible compatibility (legacy?) issues during build between different MacOS/Xcode versions
+Xcode 10.1 / 9.2
+MacOS 10.14.1 / 0.12.6 
