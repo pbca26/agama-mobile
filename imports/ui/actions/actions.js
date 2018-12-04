@@ -497,9 +497,9 @@ const addKeyPair = (coin) => {
           _srcPriv = keys.spv[Object.keys(keys.spv)[0]].priv;
         } else if (Object.keys(keys.eth).length) {
           _srcPriv = seedToPriv(keys.eth[Object.keys(keys.eth)[0]].priv, 'btc');
-        }        
+        }
 
-        const _wifToWif = wifToWif(_srcPriv, electrumJSNetworks[_key.toLowerCase()] || electrumJSNetworks.kmd);
+        const _wifToWif = wifToWif(_srcPriv, electrumJSNetworks[_coin.toLowerCase()] || electrumJSNetworks.kmd);
         keys.spv[_coin] = _wifToWif;
         _pubKeys.spv[_coin] = _wifToWif.pub;
 
