@@ -35,6 +35,7 @@ const _coinsList = {
     'KMDICE',
     'MGNX',
     'PGT',
+    'SPLTEST',
     // other coins
     'BTC',
     'DOGE',

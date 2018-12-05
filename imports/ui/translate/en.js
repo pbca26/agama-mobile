@@ -234,6 +234,7 @@ const lang = {
       KMDICE: 'KMDICE',
       MGNX: 'MagnaX',
       PTX: 'PatentTX',
+      SPLTEST: 'Sapling Test Chain',
       // crypto
       SUQA: 'SUQA',
       BZC: 'Bitzec',
