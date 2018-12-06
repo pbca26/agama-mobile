@@ -35,6 +35,7 @@ const _coinsList = {
     'MGNX',
     'PGT',
     'SPLTEST',
+    'PTX',
     // other coins
     'BTC',
     'DOGE',
