@@ -1,7 +1,7 @@
 App.info({
   id: 'com.supernet.agama',
-  version: '0.1.3',
-  buildNumber: '779',
+  version: '0.1.4',
+  buildNumber: '780',
   name: 'Agama',
   description: 'Agama Mobile is a lightweight wallet application that allows users to manage multiple crypto currencies. It\'s built on top of SPV technology which provides a quick way to retrieve and push transaction data.',
   author: 'SuperNET',
@@ -113,6 +113,8 @@ App.accessRule('http://explorer.fujicoin.org');
 App.accessRule('http://zilla.explorer.dexstats.info');
 App.accessRule('https://explorer.dionpay.com');
 App.accessRule('https://explorer.zcoin.io');
+App.accessRule('http://explorer1.patenttx.com');
+App.accessRule('http://kmdice.explorer.dexstats.info');
 // eth
 App.accessRule('https://etherscan.io');
 App.accessRule('https://api.etherscan.io');
