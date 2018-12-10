@@ -65,7 +65,9 @@ const getTransaction = (txid, coin, httpParams) => {
     if (!_cache[coin].tx[txid]) {
       devlog(`raw input tx ${txid}`);
 
-      HTTP.call('GET', httpParams.url, {
+      HTTP.call(
+        'GET',
+        httpParams.url, {
         params: httpParams.params,
       }, (error, result) => {
         const _result = JSON.parse(result.content);
@@ -178,7 +180,9 @@ const getServersList = () => {
 const setDefaultServer = (network, port, ip, proto) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
-      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/server/version`, {
+      HTTP.call(
+        'GET',
+        `http://${proxyServer.ip}:${proxyServer.port}/api/server/version`, {
         params: {
           port,
           ip,
@@ -341,7 +345,9 @@ const balance = (network) => {
         let _electrumServer = getLocalStorageVar('coins')[network].server;
         _electrumServer.serverList = electrumServers[_name].serverList;
 
-        HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`, {
+        HTTP.call(
+          'GET',
+          `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`, {
           params: {
             port: _electrumServer.port,
             ip: _electrumServer.ip,
@@ -557,7 +563,9 @@ const getOverview = (coins) => {
           if (pair.coin.indexOf('|spv') > -1) {
             const _electrumServer = getLocalStorageVar('coins')[pair.coin].server;
         
-            HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`, {
+            HTTP.call(
+              'GET',
+              `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`, {
               params: {
                 port: _electrumServer.port,
                 ip: _electrumServer.ip,
@@ -612,11 +620,13 @@ const getOverview = (coins) => {
           _coins.push(promiseResult[i].coin.split('|')[0]);
         }
 
-        HTTP.call('GET',
+        HTTP.call(
+          'GET',
           'https://www.atomicexplorer.com/api/mm/prices/v2', {
           params: {
             coins: _coins.length > 1 ? _coins.join(',') : _coins,
             currency: 'usd',
+            pricechange: true,
           },
         }, (error, result) => {
           if (!result) {
@@ -632,8 +642,9 @@ const getOverview = (coins) => {
               _overviewItems.push({
                 coin: promiseResult[i].coin,
                 balanceNative: Number(promiseResult[i].balance),
-                balanceUSD: _prices[_coin.toUpperCase()] ? Number(_prices[_coin.toUpperCase()]) * Number(promiseResult[i].balance) : 0,
-                usdPricePerItem: _prices[_coin.toUpperCase()] ? Number(_prices[_coin.toUpperCase()]) : 0,
+                balanceUSD: _prices[_coin.toUpperCase()] && _prices[_coin.toUpperCase()].USD ? Number(_prices[_coin.toUpperCase()].USD) * Number(promiseResult[i].balance) : 0,
+                usdPricePerItem: _prices[_coin.toUpperCase()] && _prices[_coin.toUpperCase()].USD ? Number(_prices[_coin.toUpperCase()].USD) : 0,
+                priceChange: _prices[_coin.toUpperCase()] && _prices[_coin.toUpperCase()].priceChange ? _prices[_coin.toUpperCase()].priceChange : null,
               });
             }
   
@@ -648,7 +659,9 @@ const getOverview = (coins) => {
 const getBtcFees = () => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {    
-      HTTP.call('GET', `https://www.atomicexplorer.com/api/btc/fees`, {
+      HTTP.call(
+        'GET',
+        `https://www.atomicexplorer.com/api/btc/fees`, {
         params: {},
       }, (error, result) => {
         if (!result) {

@@ -79,7 +79,10 @@ const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, val
 
         // push to network
         if (push) {
-          HTTP.call('POST', `http://${proxyServer.ip}:${proxyServer.port}/api/pushtx`, {
+          HTTP.call(
+            'POST',
+            `http://${proxyServer.ip}:${proxyServer.port}/api/pushtx`,
+          {
             headers: {
               'Content-Type': 'application/json',
             },

@@ -26,7 +26,10 @@ const transactionsEtherscan = (address, network = 'homestead', sort = 'asc') => 
   return new Promise((resolve, reject) => {
     const _etherscanEndPoint = network === 'homestead' ? 'https://api.etherscan.io/api' : `https://api-${network}.etherscan.io/api`;
 
-    HTTP.call('GET', _etherscanEndPoint, {
+    HTTP.call(
+      'GET',
+      _etherscanEndPoint,
+    {
       params: {
         module: 'account',
         action: 'txlist',
@@ -52,7 +55,10 @@ const transactionsEtherscan = (address, network = 'homestead', sort = 'asc') => 
 
 const transactionsERC20 = (address, symbol) => {
   return new Promise((resolve, reject) => {
-    HTTP.call('GET', 'https://api.etherscan.io/api', {
+    HTTP.call(
+      'GET',
+      'https://api.etherscan.io/api',
+    {
       params: {
         module: 'account',
         action: 'tokentx',

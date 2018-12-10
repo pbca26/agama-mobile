@@ -52,7 +52,10 @@ const verifyMerkle = (txid, height, serverList, electrumServer, proxyServer, cac
     devlog(`verification server: ${randomServer}`);
 
     return new Promise((resolve, reject) => {
-      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getmerkle`, {
+      HTTP.call(
+        'GET',
+        `http://${proxyServer.ip}:${proxyServer.port}/api/getmerkle`,
+      {
         params: {
           port: electrumServer.port,
           ip: electrumServer.ip,

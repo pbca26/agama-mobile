@@ -27,7 +27,10 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
         devlog('currentHeight =>');
         devlog(currentHeight);
 
-        HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listtransactions`, {
+        HTTP.call(
+          'GET',
+          `http://${proxyServer.ip}:${proxyServer.port}/api/listtransactions`,
+        {
           params: {
             port: electrumServer.port,
             ip: electrumServer.ip,
@@ -78,7 +81,7 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
                       devlog(transaction.raw);
 
                       // decode tx
-                      const _network = electrumJSNetworks[isKomodoCoin(network) || network === 'kmd' ? 'kmd' : network];
+                      const _network = electrumJSNetworks[network.toLowerCase()] || electrumJSNetworks[isKomodoCoin(network) || network === 'kmd' ? 'kmd' : network];
                       const decodedTx = electrumJSTxDecoder(transaction.raw, _network);
 
                       let txInputs = [];

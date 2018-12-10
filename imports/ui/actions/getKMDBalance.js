@@ -12,7 +12,10 @@ const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data
 
 export const getKMDBalance = (address, json, proxyServer, electrumServer, cache) => {
   return new Promise((resolve, reject) => {
-    HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent`, {
+    HTTP.call(
+      'GET',
+      `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent`,
+    {
       params: {
         port: electrumServer.port,
         ip: electrumServer.ip,

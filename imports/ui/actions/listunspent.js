@@ -218,7 +218,10 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
     });
   } else {
     return new Promise((resolve, reject) => {
-      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent`, {
+      HTTP.call(
+        'GET',
+        `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent`,
+      {
         params: {
           port: electrumServer.port,
           ip: electrumServer.ip,

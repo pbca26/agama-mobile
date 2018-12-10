@@ -77,6 +77,21 @@ class Overview extends React.Component {
       for (let i = 0; i < _overview.length; i++) {
         const _name = _overview[i].coin.split('|')[0];
         const _mode = _overview[i].coin.split('|')[1];
+        let _priceChangeColor = 'green';
+        
+        if (_overview[i].priceChange &&
+            _overview[i].priceChange.data &&
+            _overview[i].priceChange.data.hasOwnProperty('percent_change_1h') &&
+            _overview[i].priceChange.data.percent_change_1h < 0) {
+          _priceChangeColor = 'red';
+        }
+  
+        if (_overview[i].priceChange &&
+            _overview[i].priceChange.data &&
+            _overview[i].priceChange.data.hasOwnProperty('percent_change_24h') &&
+            _overview[i].priceChange.data.percent_change_24h < 0) {
+          _priceChangeColor = 'red';
+        }
 
         _items.push(
           <div
@@ -99,7 +114,13 @@ class Overview extends React.Component {
             <div className="bitcoin">{ translate(_mode.toUpperCase() + '.' + _name.toUpperCase()) }</div>
             <div className="a0000041">{ formatValue(_overview[i].balanceNative) }</div>
             { _overview[i].balanceUSD > 0 &&
-              <div className="a123345">${ Number(Number(_overview[i].balanceUSD).toFixed(4)) }</div>
+              <div className="a123345">
+              ${ Number(Number(_overview[i].balanceUSD).toFixed(4)) }
+              { _overview[i].priceChange &&
+                _overview[i].priceChange.data &&
+                <i className={ `fa fa-arrow-${_priceChangeColor === 'red' ? 'down' : 'up'} icon-price-change ${_priceChangeColor}` }></i>
+              }
+              </div>
             }
           </div>
         );
