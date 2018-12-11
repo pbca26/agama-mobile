@@ -576,14 +576,25 @@ const getOverview = (coins) => {
               if (!result) {
                 resolve('proxy-error');
               } else {
-                const _balance = JSON.parse(result.content).result;
+                try {
+                  const _balance = JSON.parse(result.content).result;
 
-                resolve({
-                  coin: pair.coin,
-                  pub: pair.pub,
-                  balance: Number(fromSats(_balance.confirmed).toFixed(8)),
-                  unconfirmed: Number(fromSats(_balance.unconfirmed).toFixed(8)),
-                });
+                  resolve({
+                    coin: pair.coin,
+                    pub: pair.pub,
+                    balance: Number(fromSats(_balance.confirmed).toFixed(8)),
+                    unconfirmed: Number(fromSats(_balance.unconfirmed).toFixed(8)),
+                  });
+                } catch (e) {
+                  resolve({
+                    coin: pair.coin,
+                    pub: pair.pub,
+                    balance: 0,
+                    unconfirmed: 0,
+                  });
+                  devlog('unable to get spv balance for ' + pair.coin);
+                  devlog(JSON.stringify(result));
+                }
               }
             });
           } else if (pair.coin.indexOf('|eth') > -1) {
@@ -601,19 +612,32 @@ const getOverview = (coins) => {
               };
             }
     
-            ethBalance(address, options)
-            .then((_balance) => {
+            try {
+              ethBalance(address, options)
+              .then((_balance) => {
+                resolve({
+                  coin: pair.coin,
+                  pub: pair.pub,
+                  balance: _balance.balance,
+                  unconfirmed: 0,
+                });
+              });
+            } catch (e) {
               resolve({
                 coin: pair.coin,
                 pub: pair.pub,
-                balance: _balance.balance,
+                balance: 0,
                 unconfirmed: 0,
               });
-            });
+              devlog('unable to get eth balance for ' + pair.coin);
+            }
           }
         });
       }))
       .then(promiseResult => {
+        devlog('coin balances');
+        devlog(JSON.stringify(promiseResult));
+        
         let _coins = [];
 
         for (let i = 0; i < promiseResult.length; i++) {
@@ -632,7 +656,19 @@ const getOverview = (coins) => {
           if (!result) {
             resolve('error');
           } else {
-            const _prices = JSON.parse(result.content).result;
+            let _prices = {};
+            
+            try {
+              _prices = JSON.parse(result.content).result;
+            } catch (e) {
+              devlog('unable to get https://www.atomicexplorer.com/api/mm/prices/v2');
+              devlog(JSON.stringify({
+                coins: _coins.length > 1 ? _coins.join(',') : _coins,
+                currency: 'usd',
+                pricechange: true,
+              }));
+              devlog(JSON.stringify(result));
+            }
 
             let _overviewItems = [];
   
