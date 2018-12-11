@@ -894,6 +894,10 @@ class App extends React.Component {
         { (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
           !this.state.displayMenu &&
           this.state.conError &&
+          this.state.activeSection !== 'overview' &&
+          this.state.activeSection !== 'settings' &&
+          this.state.activeSection !== 'recovery' &&
+          this.state.activeSection !== 'addcoin' &&
           <ServerSelect
             { ...this.state }
             dashboardRefresh={ this.dashboardRefresh }
@@ -903,7 +907,6 @@ class App extends React.Component {
         }
         { (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
           !this.state.displayMenu &&
-          !this.state.conError &&
           <div className="app-main">
             { (this.state.activeSection !== 'pin' || this.state.activeSection !== 'offlinesig') &&
               <Login
@@ -916,25 +919,29 @@ class App extends React.Component {
                 login={ this.login }
                 changeActiveSection={ this.changeActiveSection } />
             }
-            <SendCoin
-              { ...this.state }
-              sendtx={ this.props.actions.sendtx }
-              getEthGasPrice={ this.getEthGasPrice }
-              sendtxEth={ this.props.actions.sendtxEth }
-              changeActiveSection={ this.changeActiveSection }
-              getBtcFees={ this.getBtcFees } />
+            { !this.state.conError &&
+              <SendCoin
+                { ...this.state }
+                sendtx={ this.props.actions.sendtx }
+                getEthGasPrice={ this.getEthGasPrice }
+                sendtxEth={ this.props.actions.sendtxEth }
+                changeActiveSection={ this.changeActiveSection }
+                getBtcFees={ this.getBtcFees } />
+            }
             <AddCoin
               { ...this.state }
               addCoin={ this.addCoin }
               changeActiveSection={ this.changeActiveSection } />
-            <KMDInterest
-              { ...this.state }
-              sendtx={ this.props.actions.sendtx }
-              changeActiveSection={ this.changeActiveSection }
-              dashboardRefresh={ this.dashboardRefresh } />
+            { !this.state.conError &&
+              <KMDInterest
+                { ...this.state }
+                sendtx={ this.props.actions.sendtx }
+                changeActiveSection={ this.changeActiveSection }
+                dashboardRefresh={ this.dashboardRefresh } />
+            }
             { this.state.auth &&
               this.state.activeSection === 'dashboard' &&
-              (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
+              !this.state.conError &&
               <Transactions
                 { ...this.state }
                 dashboardRefresh={ this.dashboardRefresh }

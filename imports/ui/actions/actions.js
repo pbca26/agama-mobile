@@ -553,7 +553,7 @@ const getOverview = (coins) => {
           coin: _coinObjKeys[i],
         });
 
-        _coins[_mode.toUpperCase() + '.' + _name.toUpperCase()] = _coinObjKeys[i];
+        _coins[`${_mode.toUpperCase()}.${_name.toUpperCase()}`] = _coinObjKeys[i];
       }
       
       _coins = sortObject(_coins);
@@ -634,10 +634,7 @@ const getOverview = (coins) => {
           }
         });
       }))
-      .then(promiseResult => {
-        devlog('coin balances');
-        devlog(JSON.stringify(promiseResult));
-        
+      .then(promiseResult => {        
         let _coins = [];
 
         for (let i = 0; i < promiseResult.length; i++) {
@@ -677,8 +674,8 @@ const getOverview = (coins) => {
   
               _overviewItems.push({
                 coin: promiseResult[i].coin,
-                balanceNative: Number(promiseResult[i].balance),
-                balanceUSD: _prices[_coin.toUpperCase()] && _prices[_coin.toUpperCase()].USD ? Number(_prices[_coin.toUpperCase()].USD) * Number(promiseResult[i].balance) : 0,
+                balanceNative: Number(promiseResult[i].balance) || 'n/a',
+                balanceUSD: _prices[_coin.toUpperCase()] && _prices[_coin.toUpperCase()].USD && Number(promiseResult[i].balance) ? Number(_prices[_coin.toUpperCase()].USD) * Number(promiseResult[i].balance) : 0,
                 usdPricePerItem: _prices[_coin.toUpperCase()] && _prices[_coin.toUpperCase()].USD ? Number(_prices[_coin.toUpperCase()].USD) : 0,
                 priceChange: _prices[_coin.toUpperCase()] && _prices[_coin.toUpperCase()].priceChange ? _prices[_coin.toUpperCase()].priceChange : null,
               });
