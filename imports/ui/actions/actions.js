@@ -582,8 +582,8 @@ const getOverview = (coins) => {
                   resolve({
                     coin: pair.coin,
                     pub: pair.pub,
-                    balance: Number(fromSats(_balance.confirmed).toFixed(8)),
-                    unconfirmed: Number(fromSats(_balance.unconfirmed).toFixed(8)),
+                    balance: _balance.hasOwnProperty('confirmed') ? Number(fromSats(_balance.confirmed).toFixed(8)) : 'n/a',
+                    unconfirmed: _balance.hasOwnProperty('unconfirmed') ? Number(fromSats(_balance.unconfirmed).toFixed(8)) : 'n/a',
                   });
                 } catch (e) {
                   resolve({
@@ -674,7 +674,7 @@ const getOverview = (coins) => {
   
               _overviewItems.push({
                 coin: promiseResult[i].coin,
-                balanceNative: Number(promiseResult[i].balance) || 'n/a',
+                balanceNative: promiseResult[i].balance,
                 balanceUSD: _prices[_coin.toUpperCase()] && _prices[_coin.toUpperCase()].USD && Number(promiseResult[i].balance) ? Number(_prices[_coin.toUpperCase()].USD) * Number(promiseResult[i].balance) : 0,
                 usdPricePerItem: _prices[_coin.toUpperCase()] && _prices[_coin.toUpperCase()].USD ? Number(_prices[_coin.toUpperCase()].USD) : 0,
                 priceChange: _prices[_coin.toUpperCase()] && _prices[_coin.toUpperCase()].priceChange ? _prices[_coin.toUpperCase()].priceChange : null,
