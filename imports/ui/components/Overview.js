@@ -147,7 +147,9 @@ class Overview extends React.Component {
           { this.props.overview !== 'error' &&
             <div className="home-inner">
               { this.renderOverview() }
-              <div className="yourcoins">{ translate('OVERVIEW.' + (this.props.overview && this.props.overview.length ? 'YOUR_COINS' : 'LOADING')) }</div>
+              <div className="yourcoins">
+              { translate('OVERVIEW.' + (this.props.overview && this.props.overview.length ? 'YOUR_COINS' : 'LOADING')) }
+              </div>
               { this.props.overview &&
                 !this.props.overview.length &&
                 <Spinner />

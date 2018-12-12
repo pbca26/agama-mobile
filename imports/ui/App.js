@@ -10,6 +10,7 @@ import {
   convertURIToImageData,
   assetsPath,
   sortObject,
+  removeDisabledSPVCoins,
 } from './actions/utils';
 import translate from './translate/translate';
 import {
@@ -97,9 +98,12 @@ class App extends React.Component {
     const { actions } = this.props;
     let _localStorageCoins = getLocalStorageVar('coins');
 
-    if (_localStorageCoins) {
-      // convert coins obj to 0.1.4, applicable to any version below 0.1.4
+    if (_localStorageCoins) {      
+      // remove coins that are no longer supported/temp disabled
+      removeDisabledSPVCoins(_localStorageCoins);
+      setLocalStorageVar('coins', _localStorageCoins);
 
+      // convert coins obj to 0.1.4, applicable to any version below 0.1.4
       for (let key in _localStorageCoins) {
         let _diffFound = false;
 

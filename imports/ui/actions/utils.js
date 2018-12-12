@@ -1,6 +1,7 @@
 import translate from '../translate/translate';
 import { Meteor } from 'meteor/meteor';
 import _coinsList from './coins';
+import electrumServers from 'agama-wallet-lib/build/electrum-servers';
 
 export const assetsPath = {
   coinLogo: '/images/cryptologo',
@@ -87,3 +88,15 @@ for (let key in _coins) {
     });
   }
 }
+
+export const removeDisabledSPVCoins = (coins) => {
+  for (let key in coins) {
+    if (key.indexOf('|spv') > -1) {
+      const _name = key.split('|')[0];
+    
+      if (!electrumServers[_name]) delete coins[key];
+    }
+  }
+
+  return coins;
+};
