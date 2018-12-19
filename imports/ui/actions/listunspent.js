@@ -56,7 +56,7 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
                     Number(currentHeight) > 0) {
                   // filter out unconfirmed utxos
                   for (let i = 0; i < _utxoJSON.length; i++) {
-                    if (Number(currentHeight) - Number(_utxoJSON[i].height) !== 0) {
+                    if (Number(currentHeight) - Number(_utxoJSON[i].height) > 0) {
                       _utxo.push(_utxoJSON[i]);
                     }
                   }
