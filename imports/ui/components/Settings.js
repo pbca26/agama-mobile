@@ -14,6 +14,7 @@ import { Meteor } from 'meteor/meteor';
 // TODO: reset settings/purge seed and pin
 
 const SETTINGS_SAVED_MSG_TIMEOUT = 5000;
+const SETTINGS_SAVED_PURGE_MSG_TIMEOUT = 2000;
 
 class Settings extends React.Component {
   constructor() {
@@ -22,9 +23,11 @@ class Settings extends React.Component {
       autoLockTimeout: 600000,
       requirePin: false,
       isSaved: false,
+      purgeData: false,
     };
     this.updateInput = this.updateInput.bind(this);
     this.toggleConfirmPin = this.toggleConfirmPin.bind(this);
+    this.togglePurgeData = this.togglePurgeData.bind(this);
     this.save = this.save.bind(this);
   }
 
@@ -35,6 +38,7 @@ class Settings extends React.Component {
       this.setState({
         autoLockTimeout: _settings.autoLockTimeout,
         requirePin: _settings.requirePin,
+        purgeData: false,
       });
     }
   }
@@ -42,6 +46,12 @@ class Settings extends React.Component {
   updateInput(e) {
     this.setState({
       [e.target.name]: e.target.value,
+    });
+  }
+
+  togglePurgeData() {
+    this.setState({
+      purgeData: !this.state.purgeData,
     });
   }
   
@@ -52,10 +62,19 @@ class Settings extends React.Component {
   }
 
   save() {
-    setLocalStorageVar('settings', {
-      autoLockTimeout: this.state.autoLockTimeout,
-      requirePin: this.state.requirePin,
-    });
+    if (this.state.purgeData) {
+      setLocalStorageVar('settings', {
+        autoLockTimeout: 600000,
+        requirePin: false,
+      });
+      setLocalStorageVar('coins', {});
+      setLocalStorageVar('seed', null);
+    } else {
+      setLocalStorageVar('settings', {
+        autoLockTimeout: this.state.autoLockTimeout,
+        requirePin: this.state.requirePin,
+      });
+    }
 
     this.setState({
       isSaved: true,
@@ -65,7 +84,11 @@ class Settings extends React.Component {
       this.setState({
         isSaved: false,
       });
-    }, SETTINGS_SAVED_MSG_TIMEOUT);
+
+      if (this.state.purgeData) {
+        location.reload();
+      }
+    }, this.state.purgeData ? SETTINGS_SAVED_PURGE_MSG_TIMEOUT : SETTINGS_SAVED_MSG_TIMEOUT);
 
     this.props.globalClick();
   }
@@ -86,7 +109,7 @@ class Settings extends React.Component {
             <option value="1800000">30 { translate('SETTINGS.MINUTES') }</option>
           </select>
         </div>
-        <div className="item last">
+        <div className="item">
           <label className="switch">
             <input
               type="checkbox"
@@ -102,6 +125,28 @@ class Settings extends React.Component {
             onClick={ this.toggleConfirmPin }>
             { translate('SETTINGS.REQUIRE_PIN_CONFIRM') }
           </div>
+        </div>
+        <div className="item last">
+          <label className="switch">
+            <input
+              type="checkbox"
+              value="on"
+              checked={ this.state.purgeData }
+              readOnly />
+            <div
+              className="slider"
+              onClick={ this.togglePurgeData }></div>
+          </label>
+          <div
+            className="toggle-label"
+            onClick={ this.togglePurgeData }>
+            { translate('SETTINGS.PURGE_ALL_DATA') }
+          </div>
+          { this.state.purgeData &&
+            <div className="error margin-top-15 sz350">
+              <i className="fa fa-warning"></i> { translate('SETTINGS.PURGE_ALL_DATA_WARNING') }
+            </div>
+          }
         </div>
         { this.state.isSaved &&
           <div className="padding-bottom-20 text-center success">{ translate('SETTINGS.SAVED') }</div>
