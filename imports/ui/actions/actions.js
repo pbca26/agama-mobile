@@ -33,6 +33,9 @@ import {
   ethCreateTx,
   ethCreateTxERC20,
 } from './eth/createtx';
+import {
+  getCoinswitchCoins,
+} from './exchanges';
 
 let _cache = {};
 // runtime cache wrapper functions
@@ -565,7 +568,7 @@ const getOverview = (coins) => {
         
             HTTP.call(
               'GET',
-              `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`, {
+              'http://${proxyServer.ip}:${proxyServer.port}/api/getbalance', {
               params: {
                 port: _electrumServer.port,
                 ip: _electrumServer.ip,
@@ -592,7 +595,7 @@ const getOverview = (coins) => {
                     balance: 0,
                     unconfirmed: 0,
                   });
-                  devlog('unable to get spv balance for ' + pair.coin);
+                  devlog(`unable to get spv balance for ${pair.coin}`);
                   devlog(JSON.stringify(result));
                 }
               }
@@ -629,7 +632,7 @@ const getOverview = (coins) => {
                 balance: 0,
                 unconfirmed: 0,
               });
-              devlog('unable to get eth balance for ' + pair.coin);
+              devlog(`unable to get eth balance for ${pair.coin}`);
             }
           }
         });
@@ -694,7 +697,7 @@ const getBtcFees = () => {
     return new Promise((resolve, reject) => {    
       HTTP.call(
         'GET',
-        `https://www.atomicexplorer.com/api/btc/fees`, {
+        'https://www.atomicexplorer.com/api/btc/fees', {
         params: {},
       }, (error, result) => {
         if (!result) {
@@ -745,4 +748,5 @@ export default {
   getBtcFees,
   getEthGasPrice,
   getAnotherProxy,
+  getCoinswitchCoins,
 }
