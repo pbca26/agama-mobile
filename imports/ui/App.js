@@ -34,6 +34,7 @@ import Pin from './components/Pin';
 import Recovery from './components/Recovery';
 import Overview  from './components/Overview';
 import Settings  from './components/Settings';
+import Exchanges  from './components/Exchanges';
 
 const DASHBOARD_UPDATE_INTERVAL = 120000; // 2m
 const PROXY_RETRY_COUNT = 2;
@@ -92,6 +93,7 @@ class App extends React.Component {
     this.getEthGasPrice = this.getEthGasPrice.bind(this);
     this.retryProxy = this.retryProxy.bind(this);
     this.updateDefaultCoinServer = this.updateDefaultCoinServer.bind(this);
+    this.toggleExchanges = this.toggleExchanges.bind(this);
   }
 
   componentWillMount() {
@@ -579,6 +581,12 @@ class App extends React.Component {
     });
   }
 
+  toggleExchanges() {
+    const { actions } = this.props;
+
+    this.toggleMenuOption('exchanges');
+  }
+
   toggleOverview() {
     const { actions } = this.props;
     
@@ -665,6 +673,18 @@ class App extends React.Component {
               </div>
               { this.state.auth &&
                 <div className="items">
+                  <div
+                    className="item"
+                    disabled={ this.state.activeSection === 'exchanges' }>
+                    <div
+                      className="title"
+                      onClick={ this.toggleExchanges }>
+                      { translate('APP_TITLE.EXCHANGES') }
+                    </div>
+                    <img
+                      className="line"
+                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                  </div>
                   <div
                     className="item"
                     disabled={ this.state.activeSection === 'overview' }>
@@ -932,10 +952,12 @@ class App extends React.Component {
                 changeActiveSection={ this.changeActiveSection }
                 getBtcFees={ this.getBtcFees } />
             }
-            <AddCoin
-              { ...this.state }
-              addCoin={ this.addCoin }
-              changeActiveSection={ this.changeActiveSection } />
+            { this.state.activeSection !== 'exchanges' &&
+              <AddCoin
+                { ...this.state }
+                addCoin={ this.addCoin }
+                changeActiveSection={ this.changeActiveSection } />
+            }
             { !this.state.conError &&
               <KMDInterest
                 { ...this.state }
@@ -970,6 +992,12 @@ class App extends React.Component {
             }
             { this.state.activeSection === 'settings' &&
               <Settings globalClick={ this.globalClick } />
+            }
+            { this.state.auth &&
+              this.state.activeSection === 'exchanges' &&
+              <Exchanges
+                { ...this.state }
+                getCoinswitchCoins={ this.props.actions.getCoinswitchCoins } />
             }
           </div>
         }

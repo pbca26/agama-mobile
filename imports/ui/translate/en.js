@@ -191,6 +191,7 @@ const lang = {
       ADDCOIN: 'Add coin',
       'CREATE-SEED': 'Create seed',
       CLAIM: 'Claim rewards',
+      EXCHANGES: 'Exchange',
     },
     SPV: {
       // asset chains
