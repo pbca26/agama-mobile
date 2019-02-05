@@ -1,6 +1,4 @@
 import React from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
 import translate from '../translate/translate';
 import {
   convertURIToImageData,
@@ -62,6 +60,24 @@ class SendCoin extends React.Component {
     this.validate = this.validate.bind(this);
     this.decodeSeed = this.decodeSeed.bind(this);
     this.openExternalURL = this.openExternalURL.bind(this);
+    this.setSendAmountAll = this.setSendAmountAll.bind(this);
+  }
+
+  setSendAmountAll() {
+    const _coin = this.props.coin.split('|')[0];
+    const _balance = this.props.balance;
+
+    if (this.props.coin.indexOf('|spv') > -1) {
+      const _amount = Number(_balance.balance + _balance.unconfirmed).toFixed(8);
+
+      this.setState({
+        sendAmount: Number(_amount) > 0 ? _amount : this.state.sendAmount,
+      });
+    } else if (this.props.coin.indexOf('|eth') > -1) {
+      this.setState({
+        sendAmount: Number(_balance.balance),
+      });
+    }
   }
 
   decodeSeed() {
@@ -460,6 +476,9 @@ class SendCoin extends React.Component {
                 <i className="fa fa-warning"></i> { translate('SEND.NAN') }
               </div>
             }
+            <div
+              onClick={ this.setSendAmountAll }
+              className="send-use-all-btn">Use all</div>
             { this.state.validTooMuch &&
               <div className="error margin-top-15">
                 <i className="fa fa-warning padding-right-5"></i>
