@@ -31,15 +31,19 @@ class AddCoin extends React.Component {
   }
 
   addCoin(coin) {
-    const _props = this.props;
+    if (this.props.activate) {
+      this.props.cb(coin);
+    } else {
+      const _props = this.props;
 
-    _props.addCoin(coin);
-    _props.changeActiveSection(_props.auth ? 'dashboard' : 'login');
+      _props.addCoin(coin);
+      _props.changeActiveSection(_props.auth ? 'dashboard' : 'login');
 
-    this.setState({
-      multiSelect: {},
-      searchTerm: '',
-    });
+      this.setState({
+        multiSelect: {},
+        searchTerm: '',
+      });
+    }
   }
 
   renderCoins(singleSelect) {
@@ -67,6 +71,11 @@ class AddCoin extends React.Component {
             <div className="bitcoin">{ translate(_mode.toUpperCase() + '.' + _name.toUpperCase()) }</div>
           </div>
         );
+
+        if (this.props.activate &&
+            Object.keys(this.props.coins).indexOf(_coin.name) === -1) {
+          _items.pop();
+        }
       }
     }
 
@@ -80,10 +89,13 @@ class AddCoin extends React.Component {
   }
 
   render() {
-    if (this.props.activeSection !== 'create-seed' &&
+    console.warn(this.props);
+    if (this.props.activate &&
+        (this.props.activeSection !== 'create-seed' &&
         this.props.activeSection !== 'pin' &&
-        this.props.activeSection !== 'offlinesig') {
-      if (this.props.activeSection === 'addcoin' ||
+        this.props.activeSection !== 'offlinesig')) {
+      if (this.props.activate ||
+          this.props.activeSection === 'addcoin' ||
           !this.props.coins ||
           (this.props.coins && !Object.keys(this.props.coins).length)) {
         return (
