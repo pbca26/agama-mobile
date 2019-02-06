@@ -36,6 +36,7 @@ import {
 import {
   getCoinswitchCoins,
 } from './exchanges';
+import getPrices from './prices';
 
 let _cache = {};
 // runtime cache wrapper functions
@@ -749,4 +750,5 @@ export default {
   getEthGasPrice,
   getAnotherProxy,
   getCoinswitchCoins,
+  getPrices,
 }

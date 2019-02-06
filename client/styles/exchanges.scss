@@ -1,0 +1,74 @@
+.exchanges {
+  .exchanges-menu {
+    position: absolute;
+    top: -13px;
+    right: 15px;
+  }
+
+  .steps {
+    padding: 22px 0 38px 0;
+    text-align: center;
+
+    div {
+      display: inline-block;
+      margin: 0 5px;
+      height: 12px;
+      width: 12px;
+      border-radius: 50%;
+      background-color: #383a4e;
+
+      &.current {
+        background-color: #fff;
+      }
+    }
+  }
+  .step-title {
+    text-align: center;
+  }
+  .edit {
+    &.coin {
+      font-size: 14px;      
+      line-height: 10px;
+
+      img {
+        margin-left: 40px;
+        margin-right: 5px;
+        width: 30px;
+      }
+      .label {
+        position: relative;
+        top: -9px;
+      }
+      i {
+        position: relative;
+        top: -8px;
+        left: 10px;
+      }
+    }
+    &.empty {
+      height: 30px;
+
+      .label {
+        position: relative;
+        top: 9px;
+
+        &.empty {
+          margin-left: 40px;
+        }
+      }
+      i {
+        top: 9px;
+      }
+    }
+  }
+  .addcoin-ui {
+    .home {
+      .overview-coin {
+        &.disabled {
+          opacity: 1;
+          pointer-events: all;
+        }
+      }
+    }
+  }
+}

@@ -97,6 +97,32 @@ class Exchanges extends React.Component {
 
   addcoinCB(coin) {
     console.warn('addcoinCB', coin);
+    const _fetchData = (_coin) => {
+      this.props.getBalance(_coin)
+      .then((res) => {
+        if (res &&
+            res.hasOwnProperty('balance') &&
+            JSON.stringify(res).indexOf('error') === -1) {
+          devlog(`${_coin} balance`, res);
+          this.setState({
+            currentBalance: res.balance,
+          });
+        } else {
+          devlog(`error getting ${_coin} balance`);
+        }
+      });
+
+      this.props.getPrices(_coin.split('|')[0])
+      .then((res) => {
+        devlog(`${_coin} price`, res);
+        if (res &&
+            res !== 'error') {
+          this.setState({
+            fiatPrices: res,
+          });
+        }
+      });
+    }
     
     if (this.state.addcoinDirection === 'dest') {
       let _newState = {
@@ -107,6 +133,7 @@ class Exchanges extends React.Component {
       if (Object.keys(this.props.coins).length === 2) {
         const _coins = Object.keys(this.props.coins);
         _newState.coinSrc = _coins[_coins.indexOf(coin) === 0 ? 1 : 0];
+        _fetchData(_newState.coinSrc);
       }
       this.setState(_newState);
     } else {
@@ -119,21 +146,8 @@ class Exchanges extends React.Component {
         const _coins = Object.keys(this.props.coins);
         _newState.coinDest = _coins[_coins.indexOf(coin) === 0 ? 1 : 0];
       }
+      _fetchData(coin);
       this.setState(_newState);
-
-      this.props.balance(coin)
-      .then((res) => {
-        if (res &&
-            res.hasOwnProperty('balance') &&
-            JSON.stringify(res).indexOf('error') === -1) {
-          devlog(`${coin} balance`, res);
-          setState({
-            currentBalance: res.balance,
-          });
-        } else {
-          devlog(`error getting ${coin} balance`);
-        }
-      });
     }
   }
 
