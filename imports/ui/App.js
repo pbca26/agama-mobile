@@ -998,7 +998,8 @@ class App extends React.Component {
               <Exchanges
                 { ...this.state }
                 getCoinswitchCoins={ this.props.actions.getCoinswitchCoins }
-                balance={ this.props.actions.balance } />
+                getBalance={ this.props.actions.balance }
+                getPrices={ this.props.actions.getPrices } />
             }
           </div>
         }

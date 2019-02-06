@@ -34,7 +34,7 @@ const _coinsList = {
     'KMDICE',
     'MGNX',
     'PGT',
-    'SPLTEST',
+    'KOIN',
     'PTX',
     // other coins
     'BTC',
@@ -250,8 +250,6 @@ const _coinsList = {
     'FYN',
     'EOS',
     'ZIL',
-    'OCALL',
-    'CALLG',
   ],
 };
 

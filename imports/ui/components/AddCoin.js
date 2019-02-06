@@ -89,8 +89,7 @@ class AddCoin extends React.Component {
   }
 
   render() {
-    console.warn(this.props);
-    if (this.props.activate &&
+    if (this.props.activate ||
         (this.props.activeSection !== 'create-seed' &&
         this.props.activeSection !== 'pin' &&
         this.props.activeSection !== 'offlinesig')) {

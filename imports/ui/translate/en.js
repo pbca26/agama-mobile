@@ -367,6 +367,7 @@ const lang = {
       PPC: 'Peercoin',
       MZC: 'Mazacoin',
       SDC: 'ShadowCash',
+      KOIN: 'Koinon Coin',
     },
     ETH: {
       // eth
