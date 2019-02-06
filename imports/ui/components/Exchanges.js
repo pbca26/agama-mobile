@@ -44,9 +44,10 @@ class Exchanges extends React.Component {
       coinswitchOrders: {},
       deposits: {},
       addcoinActive: false,
-      addcoinDirection: null,
+      addcoinDirection: 'buy',
     };
-    this.coinsList = null;
+    this.coinsListSrc = null;
+    this.coinsListDest = null;
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.exchangesCacheInterval = null;
     this.updateInput = this.updateInput.bind(this);
@@ -54,6 +55,33 @@ class Exchanges extends React.Component {
     this.addcoinCB = this.addcoinCB.bind(this);
     this.activateAddcoin = this.activateAddcoin.bind(this);
     this.changeActiveSection = this.changeActiveSection.bind(this);
+    this.updateExchangesMenu = this.updateExchangesMenu.bind(this);
+  }
+
+  updateExchangesMenu(e) {
+    this.setState({
+      [e.target.name]: e.target.value,
+    });
+
+    if (e.target.value === 'clear') {
+      this.clearOrder();
+    } else if (e.target.value === 'order') {
+      this.coinsListSrc = Object.keys(this.props.coins);
+      this.coinsListDest = Object.keys(this.props.coins);
+    }
+  }  
+
+  clearOrder() {
+    this.setState({
+      activeSection: 'order',
+      amount: 0,
+      coinSrc: null,
+      coinDest: null,
+      step: 0,
+    });
+
+    this.coinsListSrc = Object.keys(this.props.coins);
+    this.coinsListDest = Object.keys(this.props.coins);
   }
 
   changeActiveSection(sectionName) {
@@ -64,13 +92,40 @@ class Exchanges extends React.Component {
 
   addcoinCB(coin) {
     console.warn('addcoinCB', coin);
+    
+    if (this.state.addcoinDirection === 'dest') {
+      let _newState = {
+        coinDest: coin,
+        addcoinActive: false,
+      };
+
+      if (Object.keys(this.props.coins).length === 2) {
+        const _coins = Object.keys(this.props.coins);
+        _newState.coinSrc = _coins[_coins.indexOf(coin) === 0 ? 1 : 0];
+      }
+      this.setState(_newState);
+    } else {
+      let _newState = {
+        coinSrc: coin,
+        addcoinActive: false,
+      };
+      
+      if (Object.keys(this.props.coins).length === 2) {
+        const _coins = Object.keys(this.props.coins);
+        _newState.coinDest = _coins[_coins.indexOf(coin) === 0 ? 1 : 0];
+      }
+      this.setState(_newState);
+    }
   }
 
   activateAddcoin(direction) {
-    this.setState({
-      addcoinDirection: direction,
-      addcoinActive: true,
-    });
+    if ((direction === 'src' && (Object.keys(this.props.coins).length > 2 || (Object.keys(this.props.coins).length === 2 && !this.state.coinSrc))) ||
+        (direction === 'dest' && (Object.keys(this.props.coins).length > 2 || (Object.keys(this.props.coins).length === 2 && !this.state.coinDest)))) {
+      this.setState({
+        addcoinDirection: direction,
+        addcoinActive: true,
+      });
+    }
   }
 
   componentWillMount() {
@@ -112,18 +167,28 @@ class Exchanges extends React.Component {
       return (
         <div className="form exchanges">
           <select
+            name="activeSection"
+            onChange={ this.updateExchangesMenu }
+            value={ this.state.activeSection }
             className="exchanges-menu">
             <option value="order">New order</option>
-            <option value="clear">Clear current order</option>
+            { this.state.activeSection === 'order' &&
+              <option value="clear">Clear current order</option>
+            }
             <option value="history">Order history</option>
-            <option value="sync">Sync history</option>
-            <option value="update">Refresh history</option>
+            { this.state.activeSection === 'history' &&
+              <option value="sync">Sync history</option>
+            }
+            { this.state.activeSection === 'history' &&
+              <option value="update">Refresh history</option>
+            }
           </select>
 
-          { this.state.changeActiveSection === 'order' &&
+          { this.state.activeSection === 'order' &&
             <div className="exchanges-new-order">
               <AddCoin
-                coins={ this.coinsList }
+                coins={ Object.keys(this.props.coins) }
+                filterOut={ [this.state.coinDest, this.state.coinSrc] }
                 activate={ this.state.addcoinActive }
                 cb={ this.addcoinCB } />
               <div className="steps margin-top-45 padding-bottom-35">
@@ -135,7 +200,7 @@ class Exchanges extends React.Component {
               { this.state.step === 0 &&
                 <div className="send-step">
                   <div className="margin-bottom-40">
-                    <div className="step-title">Fill in details</div>
+                    <div className="step-title">Fill in order details</div>
                   </div>
                 </div>
               }
@@ -146,13 +211,15 @@ class Exchanges extends React.Component {
                   <span className="label">Pay</span>
                   { this.state.coinSrc &&
                     <span>
-                      <img src="/images/cryptologo/spv/kmd.png" /> <span className="label">Komodo</span>
+                      <img src={ `/images/cryptologo/${this.state.coinSrc.split('|')[1].toLowerCase()}/${this.state.coinSrc.split('|')[0].toLowerCase()}.png` } /> <span className="label">{ translate((this.state.coinSrc.indexOf('|spv') > -1 ? 'SPV.' : 'ETH.') + this.state.coinSrc.split('|')[0].toUpperCase()) }</span>
                     </span>
                   }
                   { !this.state.coinSrc &&
                     <span className="label empty">tap to select a coin</span>
                   }
-                  <i className="fa fa-caret-down"></i>
+                  { (Object.keys(this.props.coins).length > 2 || (Object.keys(this.props.coins).length === 2 && !this.state.coinSrc)) &&
+                    <i className="fa fa-caret-down"></i>
+                  }
                 </div>
               </div>
               <div className="margin-bottom-25">
@@ -162,37 +229,38 @@ class Exchanges extends React.Component {
                   <span className="label">Buy</span>
                   { this.state.coinDest &&
                     <span>
-                      <img src="/images/cryptologo/spv/kmd.png" /> <span className="label">Komodo</span>
+                      <img src={ `/images/cryptologo/${this.state.coinDest.split('|')[1].toLowerCase()}/${this.state.coinDest.split('|')[0].toLowerCase()}.png` } /> <span className="label">{ translate((this.state.coinDest.indexOf('|spv') > -1 ? 'SPV.' : 'ETH.') + this.state.coinDest.split('|')[0].toUpperCase()) }</span>
                     </span>
                   }
                   { !this.state.coinDest &&
                     <span className="label empty">tap to select a coin</span>
                   }
-                  <i className="fa fa-caret-down"></i>
+                  { (Object.keys(this.props.coins).length > 2 || (Object.keys(this.props.coins).length === 2 && !this.state.coinDest)) &&
+                    <i className="fa fa-caret-down"></i>
+                  }
                 </div>
               </div>
               <div className="margin-bottom-25">
                 <div className="edit">
                   <input
-                    type="password"
+                    type="text"
                     className="form-control"
-                    name="pin"
+                    name="amount"
                     onChange={ this.updateInput }
-                    placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
-                    value={ this.state.pin || '' } />
+                    placeholder="Enter an amount"
+                    value={ this.state.amount || '' } />
                 </div>
-                { this.state.wrongPin &&
-                  <div className="error margin-top-15 sz350">
-                    <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
-                  </div>
-                }
               </div>
               <div
-                disabled={ !this.state.pin }
-                onClick={ this.decodeSeed }
+                disabled={
+                  !this.state.coinSrc ||
+                  !this.state.coinDest ||
+                  !this.state.amount
+                }
+                onClick={ this.nextStep }
                 className="group3 margin-top-40">
                 <div className="btn-inner">
-                  <div className="btn">{ translate('RECOVERY.SHOW') }</div>
+                  <div className="btn">Next</div>
                   <div className="group2">
                     <div className="rectangle8copy"></div>
                     <img

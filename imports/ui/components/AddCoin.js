@@ -73,7 +73,7 @@ class AddCoin extends React.Component {
         );
 
         if (this.props.activate &&
-            Object.keys(this.props.coins).indexOf(_coin.name) === -1) {
+            (this.props.coins.indexOf(_coin.name) === -1 || this.props.filterOut.indexOf(_coin.name) > -1)) {
           _items.pop();
         }
       }
