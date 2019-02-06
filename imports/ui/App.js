@@ -997,7 +997,8 @@ class App extends React.Component {
               this.state.activeSection === 'exchanges' &&
               <Exchanges
                 { ...this.state }
-                getCoinswitchCoins={ this.props.actions.getCoinswitchCoins } />
+                getCoinswitchCoins={ this.props.actions.getCoinswitchCoins }
+                balance={ this.props.actions.balance } />
             }
           </div>
         }

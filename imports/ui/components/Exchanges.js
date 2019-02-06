@@ -56,6 +56,11 @@ class Exchanges extends React.Component {
     this.activateAddcoin = this.activateAddcoin.bind(this);
     this.changeActiveSection = this.changeActiveSection.bind(this);
     this.updateExchangesMenu = this.updateExchangesMenu.bind(this);
+    this.nextStep = this.nextStep.bind(this);
+  }
+
+  nextStep() {
+
   }
 
   updateExchangesMenu(e) {
@@ -115,6 +120,20 @@ class Exchanges extends React.Component {
         _newState.coinDest = _coins[_coins.indexOf(coin) === 0 ? 1 : 0];
       }
       this.setState(_newState);
+
+      this.props.balance(coin)
+      .then((res) => {
+        if (res &&
+            res.hasOwnProperty('balance') &&
+            JSON.stringify(res).indexOf('error') === -1) {
+          devlog(`${coin} balance`, res);
+          setState({
+            currentBalance: res.balance,
+          });
+        } else {
+          devlog(`error getting ${coin} balance`);
+        }
+      });
     }
   }
 
@@ -247,7 +266,7 @@ class Exchanges extends React.Component {
                     className="form-control"
                     name="amount"
                     onChange={ this.updateInput }
-                    placeholder="Enter an amount"
+                    placeholder={ 'Enter an amount' + (this.state.coinDest ? `in ${this.state.coinDest.split('|')[0].toUpperCase()}` : '') }
                     value={ this.state.amount || '' } />
                 </div>
               </div>
@@ -255,12 +274,13 @@ class Exchanges extends React.Component {
                 disabled={
                   !this.state.coinSrc ||
                   !this.state.coinDest ||
-                  !this.state.amount
+                  !this.state.amount ||
+                  this.state.processing
                 }
                 onClick={ this.nextStep }
                 className="group3 margin-top-40">
                 <div className="btn-inner">
-                  <div className="btn">Next</div>
+                  <div className="btn">{ this.state.processing ? 'Please wait...' : 'Next' }</div>
                   <div className="group2">
                     <div className="rectangle8copy"></div>
                     <img
