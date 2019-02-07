@@ -162,6 +162,7 @@ class Exchanges extends React.Component {
         this.setState({
           processing: false,
           exchangeOrder,
+          step: 2,
         });
       }, 2000);
       //provider, src, dest, srcAmount, destAmount, destPub, refundPub
@@ -381,6 +382,7 @@ class Exchanges extends React.Component {
             className="exchanges-menu">
             <option value="order">New order</option>
             { this.state.activeSection === 'order' &&
+              (this.state.step === 0 || this.state.step === 1) &&
               <option value="clear">Clear current order</option>
             }
             <option value="history">Order history</option>
@@ -545,7 +547,8 @@ class Exchanges extends React.Component {
                     <div className="group3 margin-top-40">
                       <div
                         onClick={ this.prevStep }
-                        className="btn-inner pull-left btn-back margin-left-15">
+                        className="btn-inner pull-left btn-back margin-left-15"
+                        disabled={ this.state.processing }>
                         <div className="btn">{ translate('SEND.BACK') }</div>
                         <div className="group2">
                           <img
@@ -555,8 +558,76 @@ class Exchanges extends React.Component {
                       </div>
                       <div
                         onClick={ this.nextStep }
-                        className="btn-inner pull-right margin-right-15">
+                        className="btn-inner pull-right margin-right-15"
+                        disabled={ this.state.processing }>
                         <div className="btn">{ this.state.processing ? 'Please wait...' : 'Next' }</div>
+                        <div className="group2">
+                          <div className="rectangle8copy"></div>
+                          <img
+                            className="path6"
+                            src={ `${assetsPath.login}/reset-password-path-6.png` } />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              }
+              { this.state.step === 2 &&
+                <section className="exchanges-order-confirm-step">
+                  <div className="edit">
+                    Date
+                    <div className="shade margin-top-5">
+                    { secondsToString(this.state.exchangeOrder.createdAt / 1000) }
+                    </div>
+                  </div>
+                  <div className="edit">
+                    Valid until
+                    <div className="shade margin-top-5">
+                    { secondsToString(this.state.exchangeOrder.validTill / 1000) }
+                    </div>
+                  </div>
+                  <div className="edit">
+                    You pay
+                    <div className="shade margin-top-5">
+                    { Number(this.state.exchangeOrder.expectedDepositCoinAmount).toFixed(8) } { this.state.exchangeOrder.depositCoin.toUpperCase() }
+                    </div>
+                  </div>
+                  <div className="edit">
+                    You receive
+                    <div className="shade margin-top-5">
+                    { Number(this.state.exchangeOrder.expectedDestinationCoinAmount).toFixed(8) } { this.state.exchangeOrder.destinationCoin.toUpperCase() }
+                    </div>
+                  </div>
+                  <div className="edit">
+                    Exchange rate
+                    <div className="shade margin-top-5">
+                    { Number((1 / this.state.exchangeOrder.expectedDepositCoinAmount) * this.state.exchangeOrder.expectedDestinationCoinAmount).toFixed(8) } { this.state.exchangeOrder.destinationCoin.toUpperCase() } for 1 { this.state.exchangeOrder.depositCoin.toUpperCase() }
+                    </div>
+                  </div>
+                  <div className="edit">
+                    Deposit address
+                    <div className="shade margin-top-5">
+                    { this.state.exchangeOrder.exchangeAddress.address }
+                    </div>
+                  </div>
+                  <div className="edit">
+                    Receive address
+                    <div className="shade margin-top-5">
+                    { this.state.exchangeOrder.destinationAddress.address }
+                    </div>
+                  </div>
+                  <div className="edit">
+                    Order ID
+                    <div className="shade margin-top-5">
+                    { this.state.exchangeOrder.orderId }
+                    </div>
+                  </div>
+                  <div className="widget-body-footer">
+                    <div className="group3 margin-top-40">
+                      <div
+                        onClick={ this.nextStep }
+                        className="btn-inner">
+                        <div className="btn">{ this.state.processing ? 'Please wait...' : 'Proceed to deposit' }</div>
                         <div className="group2">
                           <div className="rectangle8copy"></div>
                           <img
