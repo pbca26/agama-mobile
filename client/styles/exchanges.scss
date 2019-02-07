@@ -1,4 +1,4 @@
-.exchanges {
+.form.exchanges {
   .exchanges-menu {
     position: absolute;
     top: -13px;
@@ -24,6 +24,26 @@
   }
   .step-title {
     text-align: center;
+  }
+  .exchanges-order-confirm-step {
+    .shade {
+      font-size: 13px;
+    }
+    .edit {
+      font-size: 14px;
+      width: inherit;
+      max-width: inherit;
+      padding: 15px 10px 10px 10px;
+  
+      input {
+        font-size: 12px;
+        margin-top: 6px;
+        opacity: 0.8;
+      }
+      &.success {
+        text-transform: capitalize;
+      }
+    }
   }
   .edit {
     &.coin {
@@ -72,9 +92,36 @@
     }
   }
   
-  .btn-back {
-    .group2 .path6 {
-      width: inherit;
+  .btn-inner {
+    &.pull-left {
+      margin-left: 10px;
+      padding: 0 10px;
+
+      .group2 {
+        float: left;
+        left: -14px;
+      }
+      .btn {
+        float: right;
+        position: relative;
+        left: 40px;
+        top: 1px;
+        padding-right: 50px;
+      }
+      img {
+        width: 20px;
+        height: 13px;
+      }
+    }
+    &.pull-right {
+      margin-right: 10px;
+      padding: 0 10px;
+
+      .btn {
+        position: relative;
+        left: 8px;
+        top: 0;
+      }
     }
   }
 }

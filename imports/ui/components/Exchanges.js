@@ -16,6 +16,7 @@ import {
   fromSats,
   toSats,
 } from 'agama-wallet-lib/build/utils';
+import { secondsToString } from 'agama-wallet-lib/src/time';
 
 class Exchanges extends React.Component {
   constructor() {
@@ -41,7 +42,6 @@ class Exchanges extends React.Component {
       minAmount: null,
       exchangeRate: null,
       fiatPrices: null,
-      //exchangeOrder: {"orderId":"5a3c3bc4-7005-45c6-a106-4580aeb52f53","exchangeAddress":{"address":"QjibDEZiKV33xiNR7prhMAU4VanXGvZUN5","tag":null},"destinationAddress":{"address":"GNA1Hwa4vf3Y9LHZoMAYmGEngN2rmMTCU3","tag":null},"createdAt":1544871347246,"status":"timeout","inputTransactionHash":null,"outputTransactionHash":null,"depositCoin":"qtum","destinationCoin":"game","depositCoinAmount":null,"destinationCoinAmount":0,"validTill":1544914547246,"userReferenceId":null,"expectedDepositCoinAmount":9.60589756391216,"expectedDestinationCoinAmount":237},
       exchangeOrder: null,
       sendCoinState: null,
       //},
@@ -75,9 +75,15 @@ class Exchanges extends React.Component {
   }
 
   prevStep() {
-    this.setState({
+    let _newState = {
       step: this.state.step - 1,
-    });
+    };
+
+    if (!this.state.buyFixedDestCoin) {
+      _newState.amount = Number(Number(this.state.amount * this.state.exchangeRate.rate).toFixed(8)); 
+    }
+
+    this.setState(_newState);
   }
 
   nextStep() {
@@ -150,8 +156,16 @@ class Exchanges extends React.Component {
         processing: true,
       });
 
+      const exchangeOrder = {"orderId":"5a3c3bc4-7005-45c6-a106-4580aeb52f53","exchangeAddress":{"address":"QjibDEZiKV33xiNR7prhMAU4VanXGvZUN5","tag":null},"destinationAddress":{"address":"GNA1Hwa4vf3Y9LHZoMAYmGEngN2rmMTCU3","tag":null},"createdAt":1544871347246,"status":"timeout","inputTransactionHash":null,"outputTransactionHash":null,"depositCoin":"qtum","destinationCoin":"game","depositCoinAmount":null,"destinationCoinAmount":0,"validTill":1544914547246,"userReferenceId":null,"expectedDepositCoinAmount":9.60589756391216,"expectedDestinationCoinAmount":237};
+
+      setTimeout(() => {
+        this.setState({
+          processing: false,
+          exchangeOrder,
+        });
+      }, 2000);
       //provider, src, dest, srcAmount, destAmount, destPub, refundPub
-      exchangesPlaceOrder(
+      /*exchangesPlaceOrder(
         this.state.provider,
         srcCoinSym,
         destCoinSym,
@@ -188,8 +202,8 @@ class Exchanges extends React.Component {
               'error'
             )
           );*/
-        }
-      });
+        //}
+      //});
     } else if (this.state.step === 2) {
       this.setState({
         step: 3,
@@ -399,6 +413,22 @@ class Exchanges extends React.Component {
                 </div>
               }
 
+              { this.state.step === 1 &&
+                <div className="send-step">
+                  <div className="margin-bottom-40">
+                    <div className="step-title">Confirm order details</div>
+                  </div>
+                </div>
+              }
+
+              { this.state.step === 2 &&
+                <div className="send-step">
+                  <div className="margin-bottom-40">
+                    <div className="step-title">Review order details</div>
+                  </div>
+                </div>
+              }
+
               { this.state.step === 0 &&
                 <section>
                   <div
@@ -468,6 +498,71 @@ class Exchanges extends React.Component {
                         <img
                           className="path6"
                           src={ `${assetsPath.login}/reset-password-path-6.png` } />
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              }
+              { this.state.step === 1 &&
+                <section className="exchanges-order-confirm-step">
+                  <div className="edit">
+                    You pay
+                    <div className="shade margin-top-5">
+                    { this.state.amount } { this.state.coinSrc.split('|')[0].toUpperCase() }
+                    <span className="padding-left-30">{ Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()].USD).toFixed(8) } USD</span>
+                    </div>
+                  </div>
+                  <div className="edit">
+                    You receive
+                    <div className="shade margin-top-5">
+                    { Number(this.state.amount * this.state.exchangeRate.rate).toFixed(8) } { this.state.coinDest.split('|')[0].toUpperCase() }
+                    <span className="padding-left-30">{ Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()].USD).toFixed(8) } USD</span>
+                    </div>
+                  </div>
+                  <div className="edit">
+                    Exchange rate
+                    <div className="shade margin-top-5">
+                    { this.state.exchangeRate.rate } { this.state.coinDest.split('|')[0].toUpperCase() } for 1 { this.state.coinSrc.split('|')[0].toUpperCase() }
+                    </div>
+                  </div>
+                  { this.state.amount > this.state.exchangeRate.limitMaxDepositCoin &&
+                    <div className="edit error">
+                      Error
+                      <div className="shade margin-top-5">
+                        { this.state.coinSrc.split('|')[0].toUpperCase() } amount exceeds max allowed value { this.state.exchangeRate.limitMaxDepositCoin }
+                      </div>
+                    </div>
+                  }
+                  { this.state.amount < this.state.exchangeRate.limitMinDepositCoin &&
+                    <div className="edit error">
+                      Error
+                      <div className="shade margin-top-5">
+                        { this.state.coinSrc.split('|')[0].toUpperCase() } amount is too low, min deposit amount is { this.state.exchangeRate.limitMinDepositCoin }
+                      </div>
+                    </div>
+                  }
+                  <div className="widget-body-footer">
+                    <div className="group3 margin-top-40">
+                      <div
+                        onClick={ this.prevStep }
+                        className="btn-inner pull-left btn-back margin-left-15">
+                        <div className="btn">{ translate('SEND.BACK') }</div>
+                        <div className="group2">
+                          <img
+                            className="path6"
+                            src={ `${assetsPath.menu}/trends-combined-shape.png` } />
+                        </div>
+                      </div>
+                      <div
+                        onClick={ this.nextStep }
+                        className="btn-inner pull-right margin-right-15">
+                        <div className="btn">{ this.state.processing ? 'Please wait...' : 'Next' }</div>
+                        <div className="group2">
+                          <div className="rectangle8copy"></div>
+                          <img
+                            className="path6"
+                            src={ `${assetsPath.login}/reset-password-path-6.png` } />
+                        </div>
                       </div>
                     </div>
                   </div>
