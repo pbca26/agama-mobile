@@ -35,6 +35,7 @@ import {
 } from './eth/createtx';
 import {
   getCoinswitchCoins,
+  getRate,
 } from './exchanges';
 import getPrices from './prices';
 
@@ -751,4 +752,5 @@ export default {
   getAnotherProxy,
   getCoinswitchCoins,
   getPrices,
+  getRate,
 }

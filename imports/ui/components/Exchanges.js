@@ -11,6 +11,11 @@ import {
   config,
 } from '../actions/dev';
 import AddCoin from './AddCoin';
+import fees from 'agama-wallet-lib/build/fees';
+import {
+  fromSats,
+  toSats,
+} from 'agama-wallet-lib/build/utils';
 
 class Exchanges extends React.Component {
   constructor() {
@@ -57,10 +62,140 @@ class Exchanges extends React.Component {
     this.changeActiveSection = this.changeActiveSection.bind(this);
     this.updateExchangesMenu = this.updateExchangesMenu.bind(this);
     this.nextStep = this.nextStep.bind(this);
+    this.prevStep = this.prevStep.bind(this);
+    this.loadTestData = this.loadTestData.bind(this);
+  }
+
+  loadTestData() {
+    this.addcoinCB('kmd|spv');
+
+    this.setState({
+      amount: 10,
+    });
+  }
+
+  prevStep() {
+    this.setState({
+      step: this.state.step - 1,
+    });
   }
 
   nextStep() {
+    // TODO: move to backend, account for tx fee
+    console.warn('state', this.state);
 
+    if (this.state.step === 0) {
+      const srcCoinSym = this.state.coinSrc.split('|')[0].toLowerCase();
+      const destCoinSym = this.state.coinDest.split('|')[0].toLowerCase();
+
+      this.setState({
+        processing: true,
+      });
+
+      this.props.getRate(
+        this.state.provider,
+        srcCoinSym,
+        destCoinSym
+      )
+      .then((exchangeRate) => {
+        console.warn('rate', exchangeRate);
+
+        if (this.state.provider === 'coinswitch') {
+          if (exchangeRate.data) {
+            let valid = true;
+            let amount;
+
+            if (!this.state.buyFixedDestCoin) {
+              amount = Number(this.state.amount / exchangeRate.data.rate).toFixed(8);
+
+              if (Number(amount) > Number(this.state.currentBalance)) {
+                const _maxBuy = Number(Number((this.state.currentBalance - fromSats(fees[srcCoinSym])) * exchangeRate.data.rate).toFixed(8));
+
+                console.warn('_maxBuy error', _maxBuy);
+                /*Store.dispatch(
+                  triggerToaster(
+                    `${translate('SEND.INSUFFICIENT_FUNDS')} you can buy up to ${_maxBuy} ${destCoinSym.toUpperCase()} max.`,
+                    translate('TOASTR.WALLET_NOTIFICATION'),
+                    'error'
+                  )
+                );*/
+                valid = false;
+                this.setState({
+                  processing: false,
+                });
+              }
+            }
+
+            if (valid) {
+              this.setState({
+                processing: false,
+                step: 1,
+                exchangeRate: exchangeRate.data,
+                amount,
+              });
+            }
+          } else {
+            this.setState({
+              processing: false,
+            });
+            devlog('This pair is not available for exchange.');
+          }
+        }
+      });
+    } else if (this.state.step === 1) {
+      const srcCoinSym = this.state.coinSrc.split('|')[0].toLowerCase();
+      const destCoinSym = this.state.coinDest.split('|')[0].toLowerCase();
+
+      this.setState({
+        processing: true,
+      });
+
+      //provider, src, dest, srcAmount, destAmount, destPub, refundPub
+      exchangesPlaceOrder(
+        this.state.provider,
+        srcCoinSym,
+        destCoinSym,
+        this.state.newExchangeOrderDetails.amount,
+        0,
+        this.props.Dashboard.electrumCoins[destCoinSym.toUpperCase()].pub,
+        this.props.Dashboard.electrumCoins[srcCoinSym.toUpperCase()].pub,
+      )
+      .then((order) => {
+        console.warn('order place', order);
+
+        if (order.data) {
+          Store.dispatch(dashboardChangeActiveCoin(srcCoinSym.toUpperCase(), 'spv'));
+          Store.dispatch(apiElectrumBalance(srcCoinSym.toUpperCase(), this.props.Dashboard.electrumCoins[srcCoinSym.toUpperCase()].pub));
+
+          setTimeout(() => {
+            let _newState = JSON.parse(JSON.stringify(this.state.newExchangeOrderDetails));
+            _newState.orderStep = 2;
+            _newState.exchangeOrder = order.data;
+
+            this.setState({
+              processing: false,
+              newExchangeOrderDetails: _newState,
+            });
+          }, 100);
+        } else {
+          this.setState({
+            processing: false,
+          });
+          /*Store.dispatch(
+            triggerToaster(
+              'Something went wrong. Please try again.',
+              translate('TOASTR.ERROR'),
+              'error'
+            )
+          );*/
+        }
+      });
+    } else if (this.state.step === 2) {
+      this.setState({
+        step: 3,
+      });
+      // update history Store.dispatch(getExchangesCache(this.state.provider));
+    }
   }
 
   updateExchangesMenu(e) {
@@ -97,7 +232,9 @@ class Exchanges extends React.Component {
 
   addcoinCB(coin) {
     console.warn('addcoinCB', coin);
-    const _fetchData = (_coin) => {
+
+    const fetchData = (_coin, pricesCoins) => {
+      console.warn(pricesCoins);
       this.props.getBalance(_coin)
       .then((res) => {
         if (res &&
@@ -112,9 +249,9 @@ class Exchanges extends React.Component {
         }
       });
 
-      this.props.getPrices(_coin.split('|')[0])
+      this.props.getPrices(pricesCoins)
       .then((res) => {
-        devlog(`${_coin} price`, res);
+        devlog('coin prices', res);
         if (res &&
             res !== 'error') {
           this.setState({
@@ -133,7 +270,18 @@ class Exchanges extends React.Component {
       if (Object.keys(this.props.coins).length === 2) {
         const _coins = Object.keys(this.props.coins);
         _newState.coinSrc = _coins[_coins.indexOf(coin) === 0 ? 1 : 0];
-        _fetchData(_newState.coinSrc);
+        fetchData(_newState.coinSrc, [coin.split('|')[0], _newState.coinSrc.split('|')[0]]);
+      } else if (this.state.coinSrc) {
+        this.props.getPrices([coin.split('|')[0], this.state.coinSrc.split('|')[0]])
+        .then((res) => {
+          devlog('coin prices', res);
+          if (res &&
+              res !== 'error') {
+            this.setState({
+              fiatPrices: res,
+            });
+          }
+        });
       }
       this.setState(_newState);
     } else {
@@ -145,8 +293,21 @@ class Exchanges extends React.Component {
       if (Object.keys(this.props.coins).length === 2) {
         const _coins = Object.keys(this.props.coins);
         _newState.coinDest = _coins[_coins.indexOf(coin) === 0 ? 1 : 0];
+        fetchData(coin, [coin.split('|')[0], _newState.coinDest.split('|')[0]]);
+      } else if (this.state.coinDest) {
+        this.props.getPrices([coin.split('|')[0], this.state.coinDest.split('|')[0]])
+        .then((res) => {
+          devlog('coin prices', res);
+          if (res &&
+              res !== 'error') {
+            this.setState({
+              fiatPrices: res,
+            });
+          }
+        });
+      } else {
+        fetchData(coin, coin.split('|')[0]);
       }
-      _fetchData(coin);
       this.setState(_newState);
     }
   }
@@ -237,72 +398,81 @@ class Exchanges extends React.Component {
                   </div>
                 </div>
               }
-              <div className="margin-bottom-25">
-                <div
-                  onClick={ () => this.activateAddcoin('src') }
-                  className={ 'edit coin' + (!this.state.coinSrc ? ' empty' : '') }>
-                  <span className="label">Pay</span>
-                  { this.state.coinSrc &&
-                    <span>
-                      <img src={ `/images/cryptologo/${this.state.coinSrc.split('|')[1].toLowerCase()}/${this.state.coinSrc.split('|')[0].toLowerCase()}.png` } /> <span className="label">{ translate((this.state.coinSrc.indexOf('|spv') > -1 ? 'SPV.' : 'ETH.') + this.state.coinSrc.split('|')[0].toUpperCase()) }</span>
-                    </span>
-                  }
-                  { !this.state.coinSrc &&
-                    <span className="label empty">tap to select a coin</span>
-                  }
-                  { (Object.keys(this.props.coins).length > 2 || (Object.keys(this.props.coins).length === 2 && !this.state.coinSrc)) &&
-                    <i className="fa fa-caret-down"></i>
-                  }
-                </div>
-              </div>
-              <div className="margin-bottom-25">
-                <div
-                  onClick={ () => this.activateAddcoin('dest') }
-                  className={ 'edit coin' + (!this.state.coinDest ? ' empty' : '') }>
-                  <span className="label">Buy</span>
-                  { this.state.coinDest &&
-                    <span>
-                      <img src={ `/images/cryptologo/${this.state.coinDest.split('|')[1].toLowerCase()}/${this.state.coinDest.split('|')[0].toLowerCase()}.png` } /> <span className="label">{ translate((this.state.coinDest.indexOf('|spv') > -1 ? 'SPV.' : 'ETH.') + this.state.coinDest.split('|')[0].toUpperCase()) }</span>
-                    </span>
-                  }
-                  { !this.state.coinDest &&
-                    <span className="label empty">tap to select a coin</span>
-                  }
-                  { (Object.keys(this.props.coins).length > 2 || (Object.keys(this.props.coins).length === 2 && !this.state.coinDest)) &&
-                    <i className="fa fa-caret-down"></i>
-                  }
-                </div>
-              </div>
-              <div className="margin-bottom-25">
-                <div className="edit">
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="amount"
-                    onChange={ this.updateInput }
-                    placeholder={ 'Enter an amount' + (this.state.coinDest ? `in ${this.state.coinDest.split('|')[0].toUpperCase()}` : '') }
-                    value={ this.state.amount || '' } />
-                </div>
-              </div>
-              <div
-                disabled={
-                  !this.state.coinSrc ||
-                  !this.state.coinDest ||
-                  !this.state.amount ||
-                  this.state.processing
-                }
-                onClick={ this.nextStep }
-                className="group3 margin-top-40">
-                <div className="btn-inner">
-                  <div className="btn">{ this.state.processing ? 'Please wait...' : 'Next' }</div>
-                  <div className="group2">
-                    <div className="rectangle8copy"></div>
-                    <img
-                      className="path6"
-                      src={ `${assetsPath.login}/reset-password-path-6.png` } />
+
+              { this.state.step === 0 &&
+                <section>
+                  <div
+                    className="padding-bottom-20"
+                    onClick={ this.loadTestData }>Test data</div>
+
+                  <div className="margin-bottom-25">
+                    <div
+                      onClick={ () => this.activateAddcoin('src') }
+                      className={ 'edit coin' + (!this.state.coinSrc ? ' empty' : '') }>
+                      <span className="label">Pay</span>
+                      { this.state.coinSrc &&
+                        <span>
+                          <img src={ `/images/cryptologo/${this.state.coinSrc.split('|')[1].toLowerCase()}/${this.state.coinSrc.split('|')[0].toLowerCase()}.png` } /> <span className="label">{ translate((this.state.coinSrc.indexOf('|spv') > -1 ? 'SPV.' : 'ETH.') + this.state.coinSrc.split('|')[0].toUpperCase()) }</span>
+                        </span>
+                      }
+                      { !this.state.coinSrc &&
+                        <span className="label empty">tap to select a coin</span>
+                      }
+                      { (Object.keys(this.props.coins).length > 2 || (Object.keys(this.props.coins).length === 2 && !this.state.coinSrc)) &&
+                        <i className="fa fa-caret-down"></i>
+                      }
+                    </div>
                   </div>
-                </div>
-              </div>
+                  <div className="margin-bottom-25">
+                    <div
+                      onClick={ () => this.activateAddcoin('dest') }
+                      className={ 'edit coin' + (!this.state.coinDest ? ' empty' : '') }>
+                      <span className="label">Buy</span>
+                      { this.state.coinDest &&
+                        <span>
+                          <img src={ `/images/cryptologo/${this.state.coinDest.split('|')[1].toLowerCase()}/${this.state.coinDest.split('|')[0].toLowerCase()}.png` } /> <span className="label">{ translate((this.state.coinDest.indexOf('|spv') > -1 ? 'SPV.' : 'ETH.') + this.state.coinDest.split('|')[0].toUpperCase()) }</span>
+                        </span>
+                      }
+                      { !this.state.coinDest &&
+                        <span className="label empty">tap to select a coin</span>
+                      }
+                      { (Object.keys(this.props.coins).length > 2 || (Object.keys(this.props.coins).length === 2 && !this.state.coinDest)) &&
+                        <i className="fa fa-caret-down"></i>
+                      }
+                    </div>
+                  </div>
+                  <div className="margin-bottom-25">
+                    <div className="edit">
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="amount"
+                        onChange={ this.updateInput }
+                        placeholder={ 'Enter an amount' + (this.state.coinDest ? `in ${this.state.coinDest.split('|')[0].toUpperCase()}` : '') }
+                        value={ this.state.amount || '' } />
+                    </div>
+                  </div>
+                  <div
+                    disabled={
+                      !this.state.coinSrc ||
+                      !this.state.coinDest ||
+                      !this.state.amount ||
+                      this.state.processing
+                    }
+                    onClick={ this.nextStep }
+                    className="group3 margin-top-40">
+                    <div className="btn-inner">
+                      <div className="btn">{ this.state.processing ? 'Please wait...' : 'Next' }</div>
+                      <div className="group2">
+                        <div className="rectangle8copy"></div>
+                        <img
+                          className="path6"
+                          src={ `${assetsPath.login}/reset-password-path-6.png` } />
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              }
             </div>
           }
         </div>
