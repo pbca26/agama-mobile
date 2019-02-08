@@ -1001,7 +1001,8 @@ class App extends React.Component {
                 getBalance={ this.props.actions.balance }
                 getPrices={ this.props.actions.getPrices }
                 getRate={ this.props.actions.getRate }
-                getOrder={ this.props.actions.getOrder } />
+                getOrder={ this.props.actions.getOrder }
+                historyBack={ this.historyBack } />
             }
           </div>
         }

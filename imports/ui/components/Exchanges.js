@@ -84,6 +84,7 @@ class Exchanges extends React.Component {
     this.updateDeposit = this.updateDeposit.bind(this);
     this.fetchOrder = this.fetchOrder.bind(this);
     this.updateCacheStorage = this.updateCacheStorage.bind(this);
+    this.menuBack = this.menuBack.bind(this);
     this.loadTestData = this.loadTestData.bind(this);
   }
 
@@ -424,6 +425,16 @@ class Exchanges extends React.Component {
     return _items;
   }
 
+  menuBack() {
+    if (this.state.activeSection === 'order-details') {
+      this.changeActiveSection('history');
+    } else if (this.state.activeSection === 'order' && this.state.step === 1) {
+      this.prevStep();
+    } else {
+      this.props.historyBack();
+    }
+  }
+
   renderOrderHistory() {
     const _cache = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders;
     let _cacheFlat = [];
@@ -441,7 +452,7 @@ class Exchanges extends React.Component {
           <div
             key={ `${this.state.provider}-${i}` }
             className="item"
-            onClick={ () => this._toggleExchangesOrderInfoModal(_cacheFlat[i].orderId) }>
+            onClick={ () => this.openOrderDetails(_cacheFlat[i].orderId) }>
             <div className="src">
               <div className="date">{ secondsToString(_cacheFlat[i].createdAt / 1000) }</div>
               <div className="item-info">
@@ -548,6 +559,10 @@ class Exchanges extends React.Component {
     if (Object.keys(this.props.coins).length > 1) {
       return (
         <div className="form exchanges">
+          <img
+            className="menu-back"
+            src="/images/template/menu/trends-combined-shape.png"
+            onClick={ this.menuBack } />
           <select
             name="activeSection"
             onChange={ this.updateExchangesMenu }
