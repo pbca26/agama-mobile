@@ -124,4 +124,84 @@
       }
     }
   }
+
+  .exchanges-order-history {
+    font-size: 14px;
+    padding: 40px 10px;
+
+    .fa-exchange {
+      position: absolute;
+      margin-top: 38px;
+    }
+    .item {
+      border-bottom: solid 1px rgba(255, 255, 255, 0.5);
+      padding-bottom: 10px;
+
+      &:last-child {
+        border-bottom: none;
+      }
+      .item-info-details,
+      .icon {
+        display: inline-block;
+      }
+      .item-info-details {
+        position: relative;
+        top: -3px;
+      }
+      .date,
+      .status {
+        margin-bottom: 15px;
+        font-size: 13px;
+        letter-spacing: 0.15px;
+      }
+      .src,
+      .dest {
+        display: inline-block;
+        width: 50%;
+      }
+      .dest {
+        float: right;
+        width: inherit;
+
+        .status {
+          text-align: right;
+        }
+      }
+      .icon {
+        height: 30px;
+        width: 30px;
+        border-radius: 50%;
+        border: solid 2px #fff;
+        background: #fff;
+        margin-right: 10px;
+      }
+      .name {
+        font-family: 'Helvetica', Helvetica, Arial, serif;
+        font-size: 14px;
+        color: #fff;
+        text-align: left;
+        letter-spacing: -0.58px;
+        position: relative;
+        top: -3px;
+      }
+      .amount {
+        opacity: 0.65;
+        font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+        font-size: 13px;
+        color: #fff;
+        letter-spacing: -0.1px;
+        line-height: 16px;
+        font-weight: 300;
+        position: relative;
+        top: 1px;
+      }
+    }
+  }
+  .col-warning {
+    color: #fb8c00;
+  }
+  .menu-back {
+    top: -95px;
+    z-index: 200;
+  }
 }
