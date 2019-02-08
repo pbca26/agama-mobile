@@ -15,6 +15,8 @@ import fees from 'agama-wallet-lib/build/fees';
 import {
   fromSats,
   toSats,
+  sort,
+  formatValue,
 } from 'agama-wallet-lib/build/utils';
 import { secondsToString } from 'agama-wallet-lib/src/time';
 
@@ -28,7 +30,7 @@ class Exchanges extends React.Component {
       buyFixedDestCoin: false,
       syncHistoryProgressing: false,
       exchangeCacheUpdateProgress: false,
-      activeSection: 'order',
+      activeSection: 'history',
       //newExchangeOrderDetails: {
       currentBalance: 'none',
       step: 0,
@@ -46,8 +48,6 @@ class Exchanges extends React.Component {
       sendCoinState: null,
       //},
       coinswitchCoins: {},
-      coinswitchOrders: {},
-      deposits: {},
       addcoinActive: false,
       addcoinDirection: 'buy',
     };
@@ -55,6 +55,24 @@ class Exchanges extends React.Component {
     this.coinsListDest = null;
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.exchangesCacheInterval = null;
+    this.exchangesCache = {
+      coinswitch: {
+        deposits: {},
+        orders: {},
+      },
+    };
+    this.coinswitchStatusLookup = [
+      'complete',
+      'failed',
+      'refunded',
+      'timeout',
+    ];
+    this.statusLookup = {
+      coinswitch: {
+        timeout: 'expired',
+        no_deposit: 'awaiting deposit',
+      },
+    };
     this.updateInput = this.updateInput.bind(this);
     this.clearOrder = this.clearOrder.bind(this);
     this.addcoinCB = this.addcoinCB.bind(this);
@@ -63,7 +81,60 @@ class Exchanges extends React.Component {
     this.updateExchangesMenu = this.updateExchangesMenu.bind(this);
     this.nextStep = this.nextStep.bind(this);
     this.prevStep = this.prevStep.bind(this);
+    this.updateDeposit = this.updateDeposit.bind(this);
+    this.fetchOrder = this.fetchOrder.bind(this);
+    this.updateCacheStorage = this.updateCacheStorage.bind(this);
     this.loadTestData = this.loadTestData.bind(this);
+  }
+
+  updateCacheStorage() {
+    setLocalStorageVar('exchanges', this.exchangesCache);
+    console.warn('updateCacheStorage', this.exchangesCache);
+  }
+
+  fetchOrder(orderId) {
+    this.props.getOrder(this.state.provider, orderId)
+    .then((result) => {
+      if (!result ||
+          (result.success && !result.data)) {
+        devlog(`coinswitch request order ${orderId} state update failed`);
+      } else {
+        if (result.data &&
+            result.data.orderId) {
+          this.exchangesCache.coinswitch.orders[result.data.orderId] = result.data;
+          devlog(`coinswitch request order ${orderId} state update success, new state is ${result.data.status}`);
+          this.updateCacheStorage();
+        } else {
+          devlog(`coinswitch request order ${orderId} state update failed`);
+        }
+      }
+    });
+  }
+
+  updateCache() {
+    const provider = this.state.provider;
+
+    if (provider === 'coinswitch') {
+      for (key in this.exchangesCache.coinswitch.orders) {
+        devlog(`coinswitch order ${key} state is ${this.exchangesCache.coinswitch.orders[key].status}`);
+
+        if (this.exchangesCache.coinswitch.orders[key].status &&
+            this.coinswitchStatusLookup.indexOf(this.exchangesCache.coinswitch.orders[key].status) === -1) {
+          devlog(`coinswitch request order ${key} state update`);
+          this.fetchOrder(key);
+        }
+      }
+    }
+  }
+
+  updateDeposit(coin, txid, orderId) {
+    if (!this.exchangesCache[this.state.provider].deposits) {
+      this.exchangesCache[this.state.provider].deposits = {};
+    }
+
+    this.exchangesCache[this.state.provider].deposits[`${coin.toLowerCase()}-${txid}`] = orderId;
+
+    devlog('updateDeposit', this.exchangesCache);
   }
 
   loadTestData() {
@@ -335,6 +406,22 @@ class Exchanges extends React.Component {
         addcoinActive: true,
       });
     }
+  }
+
+  findDeposits(orderId) {
+    const _cache = this.exchangesCache.coinswitch;
+    let _items = [];
+
+    if (_cache &&
+        _cache.deposits) {
+      for (let key in _cache.deposits) {
+        if (_cache.deposits[key] === orderId) {
+          _items.push(_cache.deposits[key]);
+        }
+      }
+    }
+
+    return _items;
   }
 
   componentWillMount() {

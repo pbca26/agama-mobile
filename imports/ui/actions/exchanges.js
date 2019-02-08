@@ -42,3 +42,27 @@ export const getRate = (provider, src, dest) => {
     });
   }
 }
+
+export const getOrder = (provider, orderId) => {
+  return async (dispatch) => {
+    return new Promise((resolve, reject) => {
+      if (provider === 'coinswitch') {
+        HTTP.call(
+          'GET',
+          'https://www.atomicexplorer.com/api/exchanges/coinswitch?method=getOrder', {
+          params: {
+            orderId,
+          },
+        }, (error, result) => {
+          if (!result) {
+            resolve('error');
+          } else {
+            const coinswitchOrder = JSON.parse(JSON.parse(result.content));
+            console.warn('actions getOrder', coinswitchOrder);
+            resolve(coinswitchOrder);
+          }
+        });
+      }
+    });
+  }
+}

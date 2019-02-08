@@ -36,6 +36,7 @@ import {
 import {
   getCoinswitchCoins,
   getRate,
+  getOrder,
 } from './exchanges';
 import getPrices from './prices';
 
@@ -570,7 +571,7 @@ const getOverview = (coins) => {
         
             HTTP.call(
               'GET',
-              'http://${proxyServer.ip}:${proxyServer.port}/api/getbalance', {
+              `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`, {
               params: {
                 port: _electrumServer.port,
                 ip: _electrumServer.ip,
@@ -753,4 +754,5 @@ export default {
   getCoinswitchCoins,
   getPrices,
   getRate,
+  getOrder,
 }
