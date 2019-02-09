@@ -204,4 +204,12 @@
     top: -93px;
     z-index: 200;
   }
+  .exchanges-order-details {
+    max-width: 285px;
+    
+    .edit {
+      font-size: 14px;
+      word-break: break-all;
+    }
+  }
 }

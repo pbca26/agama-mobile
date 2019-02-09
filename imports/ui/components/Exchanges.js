@@ -50,6 +50,7 @@ class Exchanges extends React.Component {
       coinswitchCoins: {},
       addcoinActive: false,
       addcoinDirection: 'buy',
+      activeOrderDetails: null,
     };
     this.coinsListSrc = null;
     this.coinsListDest = null;
@@ -85,7 +86,15 @@ class Exchanges extends React.Component {
     this.fetchOrder = this.fetchOrder.bind(this);
     this.updateCacheStorage = this.updateCacheStorage.bind(this);
     this.menuBack = this.menuBack.bind(this);
+    this.openOrderDetails = this.openOrderDetails.bind(this);
     this.loadTestData = this.loadTestData.bind(this);
+  }
+
+  openOrderDetails(orderId) {
+    this.setState({
+      activeOrderDetails: orderId,
+      activeSection: 'order-details',
+    });
   }
 
   updateCacheStorage() {
@@ -433,6 +442,10 @@ class Exchanges extends React.Component {
     } else {
       this.props.historyBack();
     }
+
+    this.setState({
+      activeOrderDetails: null,
+    });
   }
 
   renderOrderHistory() {
@@ -520,6 +533,81 @@ class Exchanges extends React.Component {
     }
   }
 
+  renderOrderDetails() {
+    const _cache = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders;
+
+    return (
+      <section className="exchanges-order-details">
+        <div className="edit">
+          Date
+          <div className="shade margin-top-5">
+          { secondsToString(_cache[this.state.activeOrderDetails].createdAt / 1000) }
+          </div>
+        </div>
+        <div className="edit">
+          Valid until
+          <div className="shade margin-top-5">
+          { secondsToString(_cache[this.state.activeOrderDetails].validTill / 1000) }
+          </div>
+        </div>
+        <div className="edit">
+          Deposit
+          <div className="shade margin-top-5">
+          { Number(_cache[this.state.activeOrderDetails].expectedDepositCoinAmount).toFixed(8) } { _cache[this.state.activeOrderDetails].depositCoin.toUpperCase() }
+          </div>
+        </div>
+        <div className="edit">
+          Destination
+          <div className="shade margin-top-5">
+          { Number(_cache[this.state.activeOrderDetails].expectedDestinationCoinAmount).toFixed(8) } { _cache[this.state.activeOrderDetails].destinationCoin.toUpperCase() }
+          </div>
+        </div>
+        <div className="edit">
+          Exchange rate
+          <div className="shade margin-top-5">
+          { Number((1 / _cache[this.state.activeOrderDetails].expectedDepositCoinAmount) * _cache[this.state.activeOrderDetails].expectedDestinationCoinAmount).toFixed(8) } { _cache[this.state.activeOrderDetails].destinationCoin.toUpperCase() } for 1 { _cache[this.state.activeOrderDetails].depositCoin.toUpperCase() }
+          </div>
+        </div>
+        <div className="edit">
+          Deposit address
+          <div className="shade margin-top-5">
+          { _cache[this.state.activeOrderDetails].exchangeAddress.address }
+          </div>
+        </div>
+        <div className="edit">
+          Deposit TXID
+          <div className="shade margin-top-5">
+          { _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0] ? _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0] : 'N/A' }
+          </div>
+        </div>
+        <div className="edit">
+          Destination address
+          <div className="shade margin-top-5">
+          { _cache[this.state.activeOrderDetails].destinationAddress.address }
+          </div>
+        </div>
+        <div className="edit">
+          Destination TXID
+          <div className="shade margin-top-5">
+          { _cache[this.state.activeOrderDetails].outputTransactionHash ? _cache[this.state.activeOrderDetails].outputTransactionHash : 'N/A' }
+          </div>
+        </div>
+        <div className="edit">
+          Status
+          <div className="shade margin-top-5">
+          { _cache[this.state.activeOrderDetails].outputTransactionHash ? 'complete' : this.statusLookup.coinswitch[_cache[this.state.activeOrderDetails].status] ? this.statusLookup.coinswitch[_cache[this.state.activeOrderDetails].status] : _cache[this.state.activeOrderDetails].status }
+          </div>
+        </div>
+        <div className="edit">
+          Order ID
+          <div className="shade margin-top-5">
+          { _cache[this.state.activeOrderDetails].orderId }
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   componentWillMount() {
     this.exchangesCache = getLocalStorageVar('exchanges');
     /*Store.dispatch(getExchangesCache(this.state.provider));
@@ -573,7 +661,12 @@ class Exchanges extends React.Component {
               (this.state.step === 0 || this.state.step === 1) &&
               <option value="clear">Clear current order</option>
             }
-            <option value="history">Order history</option>
+            { this.state.activeSection !== 'order-details' &&
+              <option value="history">Order history</option>
+            }
+            { this.state.activeSection === 'order-details' &&
+              <option value="order-details">Order history</option>
+            }
             { (this.state.activeSection === 'history' || this.state.activeSection === 'order-details') &&
               <option value="sync">Sync history</option>
             }
@@ -584,7 +677,8 @@ class Exchanges extends React.Component {
 
           { (this.state.activeSection === 'history' || this.state.activeSection === 'order-details') &&
             <div className="exchanges-order-history margin-top-45">
-            { this.renderOrderHistory() }
+            { !this.state.activeOrderDetails && this.renderOrderHistory() }
+            { this.state.activeOrderDetails && this.renderOrderDetails() }
             </div>
           }
 
