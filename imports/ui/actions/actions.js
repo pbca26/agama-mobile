@@ -742,7 +742,7 @@ const syncExchangesHistory = (provider) => {
     return new Promise((resolve, reject) => {
       syncHistory(provider, keys)
       .then((res) => {
-        //
+        resolve(res);
       });
     });
   }

@@ -87,7 +87,29 @@ class Exchanges extends React.Component {
     this.updateCacheStorage = this.updateCacheStorage.bind(this);
     this.menuBack = this.menuBack.bind(this);
     this.openOrderDetails = this.openOrderDetails.bind(this);
+    this.syncHistory = this.syncHistory.bind(this);
     this.loadTestData = this.loadTestData.bind(this);
+  }
+
+  syncHistory() {
+    this.setState({
+      activeSection: 'history',
+      syncHistoryProgressing: true,
+    });
+    this.props.syncExchangesHistory(this.state.provider)
+    .then((res) => {
+      if (res) {
+        for (let i = 0; i < res.length; i++) {
+          if (!this.exchangesCache.coinswitch.orders[res[i].orderId]) {
+            this.exchangesCache.coinswitch.orders[res[i].orderId] = res[i];
+          }
+        }
+        this.updateCacheStorage();
+      }
+      this.setState({
+        syncHistoryProgressing: false,
+      });
+    });
   }
 
   openOrderDetails(orderId) {
@@ -304,6 +326,8 @@ class Exchanges extends React.Component {
     } else if (e.target.value === 'order') {
       this.coinsListSrc = Object.keys(this.props.coins);
       this.coinsListDest = Object.keys(this.props.coins);
+    } else if (e.target.value === 'sync') {
+      this.syncHistory();
     }
   }  
 
@@ -677,8 +701,11 @@ class Exchanges extends React.Component {
 
           { (this.state.activeSection === 'history' || this.state.activeSection === 'order-details') &&
             <div className="exchanges-order-history margin-top-45">
-            { !this.state.activeOrderDetails && this.renderOrderHistory() }
-            { this.state.activeOrderDetails && this.renderOrderDetails() }
+            { !this.state.activeOrderDetails && !this.state.syncHistoryProgressing && this.renderOrderHistory() }
+            { this.state.activeOrderDetails && !this.state.syncHistoryProgressing && this.renderOrderDetails() }
+            { this.state.syncHistoryProgressing &&
+              <div className="text-center">Synchronizing order history. Please wait...</div>
+            }
             </div>
           }
 
