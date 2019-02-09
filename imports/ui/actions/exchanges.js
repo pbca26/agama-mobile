@@ -1,3 +1,7 @@
+import { Random } from 'meteor/random';
+import signature from 'agama-wallet-lib/src/message';
+import { devlog } from './dev';
+
 export const getCoinswitchCoins = () => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {    
@@ -10,7 +14,7 @@ export const getCoinswitchCoins = () => {
           resolve('error');
         } else {
           const coinswitchCoins = JSON.parse(result.content).result;
-          console.warn('actions getCoinswitchCoins', coinswitchCoins);
+          devlog('actions getCoinswitchCoins', coinswitchCoins);
           resolve(coinswitchCoins);
         }
       });
@@ -24,7 +28,8 @@ export const getRate = (provider, src, dest) => {
       if (provider === 'coinswitch') {
         HTTP.call(
           'GET',
-          'https://www.atomicexplorer.com/api/exchanges/coinswitch?method=getRate', {
+          'https://www.atomicexplorer.com/api/exchanges/coinswitch?method=getRate',
+        {
           params: {
             src,
             dest,
@@ -34,7 +39,7 @@ export const getRate = (provider, src, dest) => {
             resolve('error');
           } else {
             const coinswitchRate = JSON.parse(JSON.parse(result.content));
-            console.warn('actions getRate', coinswitchRate);
+            devlog('actions getRate', coinswitchRate);
             resolve(coinswitchRate);
           }
         });
@@ -49,7 +54,8 @@ export const getOrder = (provider, orderId) => {
       if (provider === 'coinswitch') {
         HTTP.call(
           'GET',
-          'https://www.atomicexplorer.com/api/exchanges/coinswitch?method=getOrder', {
+          'https://www.atomicexplorer.com/api/exchanges/coinswitch?method=getOrder',
+        {
           params: {
             orderId,
           },
@@ -58,11 +64,69 @@ export const getOrder = (provider, orderId) => {
             resolve('error');
           } else {
             const coinswitchOrder = JSON.parse(JSON.parse(result.content));
-            console.warn('actions getOrder', coinswitchOrder);
+            devlog('actions getOrder', coinswitchOrder);
             resolve(coinswitchOrder);
           }
         });
       }
     });
   }
+}
+
+export const syncHistory = (provider, keys) => {
+  return new Promise((resolve, reject) => {
+    let electrumCoinsList = [];
+    let ethereumCoins = [];
+
+    for (let key in keys.spv) {
+      electrumCoinsList.push(key.toUpperCase());
+    }
+
+    for (let key in keys.eth) {
+      ethereumCoins.push(key);
+    }
+
+    devlog(`actions syncHistory spv coins: ${electrumCoinsList.join(',')}${ethereumCoins.length ? ', eth' : ''}`);
+
+    let _addressPayload = [];
+
+    for (let i = 0;  i < electrumCoinsList.length; i++) {
+      const _randomString = Random.hexString(32);
+      const _keys = keys.spv[electrumCoinsList[i].toLowerCase()];
+
+      if (_keys.priv &&
+          _keys.priv !== _keys.pub) {
+        const _sig = signature.btc.sign(_keys.priv, _randomString);
+        
+        devlog(`${electrumCoinsList[i]} ${_keys.pub} sig ${_sig}`);
+        _addressPayload.push({
+          pub: _keys.pub,
+          sig: _sig,
+          message: _randomString,
+        });
+      }
+    }
+    
+    if (provider === 'coinswitch') {
+      HTTP.call(
+        'POST',
+        'https://www.atomicexplorer.com/api/exchanges/coinswitch/history',
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: {
+          address: _addressPayload,
+        },
+      }, (error, result) => {
+        if (!result) {
+          resolve('error');
+        } else {
+          const coinswitchHistory = JSON.parse(result.content);
+          devlog('actions coinswitchHistory', coinswitchHistory);
+          resolve(coinswitchHistory.msg && coinswitchHistory.msg === 'success' ? coinswitchHistory.result : false);
+        }
+      });
+    }
+  });
 }

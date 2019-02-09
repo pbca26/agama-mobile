@@ -1002,7 +1002,8 @@ class App extends React.Component {
                 getPrices={ this.props.actions.getPrices }
                 getRate={ this.props.actions.getRate }
                 getOrder={ this.props.actions.getOrder }
-                historyBack={ this.historyBack } />
+                historyBack={ this.historyBack }
+                syncExchangesHistory={ this.props.actions.syncExchangesHistory } />
             }
           </div>
         }

@@ -37,6 +37,7 @@ import {
   getCoinswitchCoins,
   getRate,
   getOrder,
+  syncHistory,
 } from './exchanges';
 import getPrices from './prices';
 
@@ -736,6 +737,17 @@ const getEthGasPrice = () => {
   }
 }
 
+const syncExchangesHistory = (provider) => {
+  return async (dispatch) => {
+    return new Promise((resolve, reject) => {
+      syncHistory(provider, keys)
+      .then((res) => {
+        //
+      });
+    });
+  }
+};
+
 export default {
   auth,
   getOverview,
@@ -755,4 +767,5 @@ export default {
   getPrices,
   getRate,
   getOrder,
+  syncExchangesHistory,
 }
