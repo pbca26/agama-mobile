@@ -129,6 +129,18 @@
     font-size: 14px;
     padding: 40px 0;
 
+    .deposit {
+      text-align: right;
+      position: relative;
+      top: 7px;
+      right: -2px;
+    }
+    .red {
+      color: rgba(255, 117, 117, 1.0) !important;
+    }
+    .green {
+      color: rgba(142, 204, 96, 1.0) !important;
+    }
     .fa-exchange {
       position: absolute;
       margin-top: 38px;
@@ -139,7 +151,7 @@
       padding-bottom: 25px;
       margin-bottom: 15px;
       background-color: #373A4C;
-      padding: 16px 10px;
+      padding: 16px 10px 30px 10px;
 
       .item-info-details,
       .icon {
@@ -207,7 +219,11 @@
   }
   .exchanges-order-details {
     max-width: 285px;
+    margin: 0 auto;
 
+    .shade {
+      opacity: 0.8;
+    }
     .edit {
       font-size: 14px;
       word-break: break-all;

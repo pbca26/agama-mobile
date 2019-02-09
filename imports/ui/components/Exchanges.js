@@ -474,6 +474,7 @@ class Exchanges extends React.Component {
 
   renderOrderHistory() {
     const _cache = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders;
+    const _deposits = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.deposits;
     let _cacheFlat = [];
     let _items = [];
   
@@ -515,6 +516,9 @@ class Exchanges extends React.Component {
                   <div className="name">{ _cacheFlat[i].destinationCoin.toUpperCase() }</div>
                   <div className="amount">{ formatValue(_cacheFlat[i].expectedDestinationCoinAmount) }</div>
                 </div>
+              </div>
+              <div className="deposit">
+              { this.findDeposits(_cacheFlat[i].orderId).length > 0 || (this.state.provider === 'coinswitch' && _cacheFlat[i].inputTransactionHash) || (this.state.provider === 'coinswitch' && _cacheFlat[i].inputTransactionHash && _deposits && _deposits[`${_cacheFlat[i].depositCoin.toLowerCase()}-${_cacheFlat[i].inputTransactionHash}`]) ? <i className="fa fa-check-circle green"></i> : <i className="fa fa-exclamation-circle"></i> }
               </div>
             </div>
             {/*
