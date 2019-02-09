@@ -101,6 +101,7 @@ class Exchanges extends React.Component {
       if (res) {
         for (let i = 0; i < res.length; i++) {
           if (!this.exchangesCache.coinswitch.orders[res[i].orderId]) {
+            dev.log(`history sync new order ${res[i].orderId}`);
             this.exchangesCache.coinswitch.orders[res[i].orderId] = res[i];
           }
         }
@@ -463,6 +464,12 @@ class Exchanges extends React.Component {
       this.changeActiveSection('history');
     } else if (this.state.activeSection === 'order' && this.state.step === 1) {
       this.prevStep();
+    } else if (this.state.activeSection === 'order' && this.state.step !== 1) {
+      if (Object.keys(this.exchangesCache.coinswitch.orders).length) {
+        this.changeActiveSection('history');
+      } else {
+        this.props.historyBack();
+      }
     } else {
       this.props.historyBack();
     }
@@ -637,7 +644,18 @@ class Exchanges extends React.Component {
   }
 
   componentWillMount() {
-    this.exchangesCache = getLocalStorageVar('exchanges');
+    const _cache = getLocalStorageVar('exchanges');
+
+    if (_cache) {
+      this.exchangesCache = _cache;
+      this.setState({
+        activeSection: 'history',
+      });
+    } else {
+      this.setState({
+        activeSection: 'order',
+      });
+    }
     /*Store.dispatch(getExchangesCache(this.state.provider));
     Store.dispatch(getExchangesCoinswitchCoins());
 
@@ -699,17 +717,18 @@ class Exchanges extends React.Component {
               <option value="sync">Sync history</option>
             }
             { (this.state.activeSection === 'history' || this.state.activeSection === 'order-details') &&
+              Object.keys(this.exchangesCache.coinswitch.orders).length > 0 &&
               <option value="update">Refresh history</option>
             }
           </select>
 
           { (this.state.activeSection === 'history' || this.state.activeSection === 'order-details') &&
             <div className="exchanges-order-history margin-top-45">
-            { !this.state.activeOrderDetails && !this.state.syncHistoryProgressing && this.renderOrderHistory() }
-            { this.state.activeOrderDetails && !this.state.syncHistoryProgressing && this.renderOrderDetails() }
-            { this.state.syncHistoryProgressing &&
-              <div className="text-center">Synchronizing order history. Please wait...</div>
-            }
+              { !this.state.activeOrderDetails && !this.state.syncHistoryProgressing && this.renderOrderHistory() }
+              { this.state.activeOrderDetails && !this.state.syncHistoryProgressing && this.renderOrderDetails() }
+              { this.state.syncHistoryProgressing &&
+                <div className="text-center">Synchronizing order history. Please wait...</div>
+              }
             </div>
           }
 
