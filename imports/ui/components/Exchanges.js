@@ -19,6 +19,10 @@ import {
   formatValue,
 } from 'agama-wallet-lib/build/utils';
 import { secondsToString } from 'agama-wallet-lib/src/time';
+import {
+  explorerList,
+  isKomodoCoin,
+} from 'agama-wallet-lib/build/coin-helpers';
 
 class Exchanges extends React.Component {
   constructor() {
@@ -88,7 +92,33 @@ class Exchanges extends React.Component {
     this.menuBack = this.menuBack.bind(this);
     this.openOrderDetails = this.openOrderDetails.bind(this);
     this.syncHistory = this.syncHistory.bind(this);
+    this.openExplorerUrl = this.openExplorerUrl.bind(this);
+    this.openOrderOnline = this.openOrderOnline.bind(this);
     this.loadTestData = this.loadTestData.bind(this);
+  }
+
+  openOrderOnline() {
+    window.open(`https://coinswitch.co/site/transaction/${this.state.activeOrderDetails}`, '_system');
+  }
+
+  openExplorerUrl(coin, txid) {
+    if (txid) {
+      const _name = coin;
+      let url;
+      
+      if (coin.indexOf('|eth') > -1) {
+        if (_name === 'eth' ||
+            _name === 'eth_ropsten') {
+          url = `${explorerList[_name.toUpperCase()]}${txid}`;
+        } else {
+          url = `${explorerList.ETH}${txid}`;
+        }
+      } else {
+        url = explorerList[_name.toUpperCase()].split('/').length - 1 > 2 ? `${explorerList[_name.toUpperCase()]}${txid}` : `${explorerList[_name.toUpperCase()]}/tx/${txid}`;
+      }
+
+      window.open(url, '_system');
+    }
   }
 
   syncHistory() {
@@ -101,7 +131,7 @@ class Exchanges extends React.Component {
       if (res) {
         for (let i = 0; i < res.length; i++) {
           if (!this.exchangesCache.coinswitch.orders[res[i].orderId]) {
-            dev.log(`history sync new order ${res[i].orderId}`);
+            devlog(`history sync new order ${res[i].orderId}`);
             this.exchangesCache.coinswitch.orders[res[i].orderId] = res[i];
           }
         }
@@ -611,7 +641,9 @@ class Exchanges extends React.Component {
         </div>
         <div className="edit">
           Deposit TXID
-          <div className="shade margin-top-5">
+          <div
+            className="shade margin-top-5"
+            onClick={ () => this.openExplorerUrl(_cache[this.state.activeOrderDetails].depositCoin.toLowerCase(), _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0]) }>
           { _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0] ? _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0] : 'N/A' }
           </div>
         </div>
@@ -623,7 +655,9 @@ class Exchanges extends React.Component {
         </div>
         <div className="edit">
           Destination TXID
-          <div className="shade margin-top-5">
+          <div
+            className="shade margin-top-5"
+            onClick={ () => this.openExplorerUrl(_cache[this.state.activeOrderDetails].destinationCoin.toLowerCase(), _cache[this.state.activeOrderDetails].outputTransactionHash) }>
           { _cache[this.state.activeOrderDetails].outputTransactionHash ? _cache[this.state.activeOrderDetails].outputTransactionHash : 'N/A' }
           </div>
         </div>
@@ -956,7 +990,9 @@ class Exchanges extends React.Component {
                   </div>
                   <div className="edit">
                     Order ID
-                    <div className="shade margin-top-5">
+                    <div
+                      className="shade margin-top-5"
+                      onClick={ this.openOrderOnline }>
                     { this.state.exchangeOrder.orderId }
                     </div>
                   </div>

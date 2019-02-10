@@ -214,8 +214,9 @@
     color: #fb8c00;
   }
   .menu-back {
-    top: -93px;
-    z-index: 200;
+    position: fixed;
+    top: 4px;
+    z-index: 400;
   }
   .exchanges-order-details {
     max-width: 285px;
