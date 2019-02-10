@@ -1053,16 +1053,22 @@ class Exchanges extends React.Component {
             onChange={ this.updateExchangesMenu }
             value={ this.state.activeSection }
             className="exchanges-menu">
-            <option value="order">New order</option>
+            <option
+              disabled={ this.state.activeSection === 'order' }
+              value="order">New order</option>
             { this.state.activeSection === 'order' &&
               (this.state.step === 0 || this.state.step === 1) &&
               <option value="clear">Clear current order</option>
             }
             { this.state.activeSection !== 'order-details' &&
-              <option value="history">Order history</option>
+              <option
+                disabled={ this.state.activeSection === 'history' }
+                value="history">Order history</option>
             }
             { this.state.activeSection === 'order-details' &&
-              <option value="order-details">Order history</option>
+              <option
+                disabled={ this.state.activeSection === 'order-details' }
+                value="order-details">Order history</option>
             }
             { (this.state.activeSection === 'history' || this.state.activeSection === 'order-details') &&
               <option value="sync">Sync history</option>
@@ -1071,9 +1077,13 @@ class Exchanges extends React.Component {
               Object.keys(this.exchangesCache.coinswitch.orders).length > 0 &&
               <option value="update">Refresh history</option>
             }
-            <option value="tos">Terms of Service</option>
+            <option
+              disabled={ this.state.activeSection === 'tos' }
+              value="tos">Terms of Service</option>
             { this.state.coinswitchCoins &&
-              <option value="supported-coins">Supported coins</option>
+              <option
+                disabled={ this.state.activeSection === 'supported-coins' }
+                value="supported-coins">Supported coins</option>
             }
           </select>
 
