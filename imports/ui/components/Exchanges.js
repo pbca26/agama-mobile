@@ -23,6 +23,7 @@ import {
   explorerList,
   isKomodoCoin,
 } from 'agama-wallet-lib/build/coin-helpers';
+import supportedCoinsList from '../actions/coins';
 
 class Exchanges extends React.Component {
   constructor() {
@@ -364,7 +365,7 @@ class Exchanges extends React.Component {
       this.coinsListDest = Object.keys(this.props.coins);
     } else if (e.target.value === 'sync') {
       this.syncHistory();
-    } else if (e.target.value === 'tos') {
+    } else if (e.target.value === 'tos' || e.target.value === 'supported-coins') {
       this.setState({
         prevActiveState: this.state.activeSection,
         [e.target.name]: e.target.value,
@@ -513,7 +514,7 @@ class Exchanges extends React.Component {
       } else {
         this.props.historyBack();
       }
-    } else if (this.state.activeSection === 'tos') {
+    } else if (this.state.activeSection === 'tos' || this.state.activeSection === 'supported-coins') {
       this.setState({
         activeSection: this.state.prevActiveState,
       });
@@ -994,10 +995,48 @@ class Exchanges extends React.Component {
   renderTOS() {
     return (
       <div className="exchanges-tos margin-top-45">
-        <div className="text-center padding-bottom-10">Terms of Service</div>
-        <p>If you continue you agee to use a 3rd party service Coinswitch.co. All your actions with the use of Coinswitch.co API are outside of Komodo Platform control and are subject to Coinswitch.co <a onClick={ this.openCoinswitchTOS } className="pointer">terms of service</a>. Komodo Platform will not disclose any private information to Coinswitch.co. All details that you may provide to Coinswitch.co will be subject to Coinswitch.co <a onClick={ this.openCoinswitchTOS } className="pointer">terms for service</a>.</p>
-        <p>KOMODO PLATFORM ACCEPTS NO RESPONSIBILITY AND WILL NOT BE LIABLE FOR ANY LOSS OR DAMAGE WHATSOEVER SUFFERED AS A RESULT OF ACCESSING, USE OF, OR RELIANCE UPON COINSWITCH.CO INFORMATION AND SERVICES.</p>
+        <div className="exchanges-tos-inner">
+          <div className="text-center padding-bottom-10">Terms of Service</div>
+          <p>If you continue you agee to use a 3rd party service Coinswitch.co. All your actions with the use of Coinswitch.co API are outside of Komodo Platform control and are subject to Coinswitch.co <a onClick={ this.openCoinswitchTOS } className="pointer">terms of service</a>. Komodo Platform will not disclose any private information to Coinswitch.co. All details that you may provide to Coinswitch.co will be subject to Coinswitch.co <a onClick={ this.openCoinswitchTOS } className="pointer">terms for service</a>.</p>
+          <p>KOMODO PLATFORM ACCEPTS NO RESPONSIBILITY AND WILL NOT BE LIABLE FOR ANY LOSS OR DAMAGE WHATSOEVER SUFFERED AS A RESULT OF ACCESSING, USE OF, OR RELIANCE UPON COINSWITCH.CO INFORMATION AND SERVICES.</p>
+        </div>
       </div>
+    );
+  }
+
+  renderSupportedCoins() {
+    // TODO: sort
+    const coins = this.state.coinswitchCoins;
+    let items = [];
+
+    if (coins &&
+        typeof coins === 'object' &&
+        coins.length &&
+        coins[0].symbol) {
+      for (let i = 0; i < coins.length; i++) {
+        if (supportedCoinsList.spv.indexOf(coins[i].symbol.toUpperCase()) > -1) {
+          items.push(
+            <div
+              key={ coins[i].symbol }
+              className="exchanges-supported-coins-tile">
+              <img
+                src={ `/images/cryptologo/spv/${coins[i].symbol.toLowerCase()}.png` }
+                width="30px"
+                height="30px" />
+              <span>{ coins[i].name }</span>
+            </div>
+          );
+        }
+      }
+    }
+
+    return (
+      <div className="exchanges-supported-coins margin-top-45">
+      <div className="exchanges-supported-coins-inner">
+        <div className="text-center padding-bottom-35">Supported coins to exchange</div>
+        { items }
+      </div>
+    </div>
     );
   }
 
@@ -1033,6 +1072,9 @@ class Exchanges extends React.Component {
               <option value="update">Refresh history</option>
             }
             <option value="tos">Terms of Service</option>
+            { this.state.coinswitchCoins &&
+              <option value="supported-coins">Supported coins</option>
+            }
           </select>
 
           { (this.state.activeSection === 'history' || this.state.activeSection === 'order-details') &&
@@ -1047,6 +1089,7 @@ class Exchanges extends React.Component {
 
           { this.state.activeSection === 'order' && this.renderOrderForm() }
           { this.state.activeSection === 'tos' && this.renderTOS() }
+          { this.state.activeSection === 'supported-coins' && this.renderSupportedCoins() }
         </div>
       );
     } else {

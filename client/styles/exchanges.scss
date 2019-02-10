@@ -231,8 +231,36 @@
     }
   }
   .exchanges-tos {
-    padding: 10px;
     padding-top: 45px;
-    line-height: 1.4;
+
+    .exchanges-tos-inner {
+      line-height: 1.4;
+      padding: 25px 10px 10px 10px;
+      background-color: #373A4C;
+    }
+  }
+
+  .exchanges-supported-coins {
+    padding-top: 45px;
+
+    .exchanges-supported-coins-inner {
+      line-height: 1.4;
+      padding: 25px 10px 10px 10px;
+      background-color: #373A4C;
+
+      .exchanges-supported-coins-tile {
+        padding-bottom: 15px;
+        img {
+          border-radius: 50%;
+          background: #fff;
+          border: solid 3px #fff;
+        }
+        span {
+          position: relative;
+          top: -12px;
+          left: 15px;
+        }
+      }
+    }
   }
 }
