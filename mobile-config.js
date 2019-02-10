@@ -123,6 +123,8 @@ App.accessRule('https://api-ropsten.etherscan.io');
 App.accessRule('https://ethgasstation.info');
 App.accessRule('https://mainnet.infura.io');
 App.accessRule('https://ropsten.infura.io');
+// exchanges
+App.accessRule('https://coinswitch.co');
 
 // Set PhoneGap/Cordova preferences.
 App.setPreference('BackgroundColor', '0xffffffff'); // 0x45485FFF

@@ -98,7 +98,7 @@ class Exchanges extends React.Component {
   }
 
   openOrderOnline() {
-    window.open(`https://coinswitch.co/site/transaction/${this.state.activeOrderDetails}`, '_system');
+    window.open(`https://coinswitch.co/app/exchange/transaction/${this.state.activeOrderDetails}`, '_system');
   }
 
   openExplorerUrl(coin, txid) {
@@ -644,7 +644,7 @@ class Exchanges extends React.Component {
           <div
             className="shade margin-top-5"
             onClick={ () => this.openExplorerUrl(_cache[this.state.activeOrderDetails].depositCoin.toLowerCase(), _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0]) }>
-          { _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0] ? _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0] : 'N/A' }
+          { _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0] ? <span>{ _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0] } <i className="fa fa-external-link margin-left-10"></i></span> : 'N/A' }
           </div>
         </div>
         <div className="edit">
@@ -658,7 +658,7 @@ class Exchanges extends React.Component {
           <div
             className="shade margin-top-5"
             onClick={ () => this.openExplorerUrl(_cache[this.state.activeOrderDetails].destinationCoin.toLowerCase(), _cache[this.state.activeOrderDetails].outputTransactionHash) }>
-          { _cache[this.state.activeOrderDetails].outputTransactionHash ? _cache[this.state.activeOrderDetails].outputTransactionHash : 'N/A' }
+          { _cache[this.state.activeOrderDetails].outputTransactionHash ? <span>{ _cache[this.state.activeOrderDetails].outputTransactionHash } <i className="fa fa-external-link margin-left-10"></i></span> : 'N/A' }
           </div>
         </div>
         <div className="edit">
@@ -669,8 +669,11 @@ class Exchanges extends React.Component {
         </div>
         <div className="edit">
           Order ID
-          <div className="shade margin-top-5">
+          <div
+            className="shade margin-top-5"
+            onClick={ this.openOrderOnline }>
           { _cache[this.state.activeOrderDetails].orderId }
+          <i className="fa fa-external-link margin-left-10"></i>
           </div>
         </div>
       </section>
