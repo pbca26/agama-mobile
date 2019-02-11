@@ -60,6 +60,8 @@ class Exchanges extends React.Component {
       addcoinActive: false,
       addcoinDirection: 'buy',
       activeOrderDetails: null,
+      activeOrderTxView: false,
+      activeOrderDetailsDepositTx: null,
       prevActiveState: null,
       cacheUpdated: false,
     };
@@ -103,6 +105,12 @@ class Exchanges extends React.Component {
     this.openOrderOnline = this.openOrderOnline.bind(this);
     this.loadTestData = this.loadTestData.bind(this);
     this.setMaxBuyAmount = this.setMaxBuyAmount.bind(this);
+  }
+
+  orderDetailsTab(val) {
+    this.setState({
+      activeOrderTxView: val,
+    });
   }
 
   setMaxBuyAmount() {
@@ -161,10 +169,31 @@ class Exchanges extends React.Component {
   }
 
   openOrderDetails(orderId) {
+    const _cache = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders;
+
     this.setState({
       activeOrderDetails: orderId,
       activeSection: 'order-details',
+      activeOrderTxView: false,
+      activeOrderDetailsDepositTx: null,
     });
+
+    if (_cache[orderId].inputTransactionHash) {
+      this.props.getTransaction(
+        `${_cache[orderId].depositCoin.toLowerCase()}|spv`,
+        { 
+          txid: _cache[orderId].inputTransactionHash,
+          pub: _cache[orderId].exchangeAddress.address,
+        }
+      )
+      .then((res) => {
+        devlog(`order ${orderId} deposit tx`, res);
+        
+        this.setState({
+          activeOrderDetailsDepositTx: res[0],
+        });
+      });
+    }
   }
 
   updateCacheStorage() {
@@ -360,7 +389,6 @@ class Exchanges extends React.Component {
   }
 
   updateExchangesMenu(e) {
-
     if (e.target.value !== 'tos') {
       this.setState({
         [e.target.name]: e.target.value,
@@ -623,82 +651,153 @@ class Exchanges extends React.Component {
 
   renderOrderDetails() {
     const _cache = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders;
-
+    const _deposits = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders.deposits;
+    
     return (
       <section className="exchanges-order-details">
-        <div className="edit">
-          Date
-          <div className="shade margin-top-5">
-          { secondsToString(_cache[this.state.activeOrderDetails].createdAt / 1000) }
+        { (this.findDeposits(_cache[this.state.activeOrderDetails].orderId).length > 0 || (this.state.provider === 'coinswitch' && _cache[this.state.activeOrderDetails].inputTransactionHash) || (this.state.provider === 'coinswitch' && _cache[this.state.activeOrderDetails].inputTransactionHash && _deposits && _deposits[`${_cache[this.state.activeOrderDetails].depositCoin.toLowerCase()}-${_cache[this.state.activeOrderDetails].inputTransactionHash}`])) &&
+          <div className="tabs">
+            <div
+              onClick={ () => this.orderDetailsTab(false) }
+              className={ 'tab' + (this.state.activeOrderTxView ? ' active' : '') }>Order info</div>
+            <div
+              onClick={ () => this.orderDetailsTab(true) }
+              className={ 'tab' + (!this.state.activeOrderTxView ? ' active' : '') }>Deposit info</div>
           </div>
-        </div>
-        <div className="edit">
-          Valid until
-          <div className="shade margin-top-5">
-          { secondsToString(_cache[this.state.activeOrderDetails].validTill / 1000) }
+        }
+        { !this.state.activeOrderTxView &&
+          <div>
+            <div className="edit">
+              Date
+              <div className="shade margin-top-5">
+              { secondsToString(_cache[this.state.activeOrderDetails].createdAt / 1000) }
+              </div>
+            </div>
+            <div className="edit">
+              Valid until
+              <div className="shade margin-top-5">
+              { secondsToString(_cache[this.state.activeOrderDetails].validTill / 1000) }
+              </div>
+            </div>
+            <div className="edit">
+              Deposit
+              <div className="shade margin-top-5">
+              { Number(_cache[this.state.activeOrderDetails].expectedDepositCoinAmount).toFixed(8) } { _cache[this.state.activeOrderDetails].depositCoin.toUpperCase() }
+              </div>
+            </div>
+            <div className="edit">
+              Destination
+              <div className="shade margin-top-5">
+              { Number(_cache[this.state.activeOrderDetails].expectedDestinationCoinAmount).toFixed(8) } { _cache[this.state.activeOrderDetails].destinationCoin.toUpperCase() }
+              </div>
+            </div>
+            <div className="edit">
+              Exchange rate
+              <div className="shade margin-top-5">
+              { Number((1 / _cache[this.state.activeOrderDetails].expectedDepositCoinAmount) * _cache[this.state.activeOrderDetails].expectedDestinationCoinAmount).toFixed(8) } { _cache[this.state.activeOrderDetails].destinationCoin.toUpperCase() } for 1 { _cache[this.state.activeOrderDetails].depositCoin.toUpperCase() }
+              </div>
+            </div>
+            <div className="edit">
+              Deposit address
+              <div className="shade margin-top-5">
+              { _cache[this.state.activeOrderDetails].exchangeAddress.address }
+              </div>
+            </div>
+            <div className="edit">
+              Deposit Transaction ID
+              <div
+                className="shade margin-top-5"
+                onClick={ () => this.openExplorerUrl(_cache[this.state.activeOrderDetails].depositCoin.toLowerCase(), _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0]) }>
+              { _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0] ? <span>{ _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0] } <i className="fa fa-external-link margin-left-10"></i></span> : 'N/A' }
+              </div>
+            </div>
+            <div className="edit">
+              Destination address
+              <div className="shade margin-top-5">
+              { _cache[this.state.activeOrderDetails].destinationAddress.address }
+              </div>
+            </div>
+            <div className="edit">
+              Destination Transaction ID
+              <div
+                className="shade margin-top-5"
+                onClick={ () => this.openExplorerUrl(_cache[this.state.activeOrderDetails].destinationCoin.toLowerCase(), _cache[this.state.activeOrderDetails].outputTransactionHash) }>
+              { _cache[this.state.activeOrderDetails].outputTransactionHash ? <span>{ _cache[this.state.activeOrderDetails].outputTransactionHash } <i className="fa fa-external-link margin-left-10"></i></span> : 'N/A' }
+              </div>
+            </div>
+            <div className="edit">
+              Status
+              <div className="shade margin-top-5">
+              { _cache[this.state.activeOrderDetails].outputTransactionHash ? 'complete' : this.statusLookup.coinswitch[_cache[this.state.activeOrderDetails].status] ? this.statusLookup.coinswitch[_cache[this.state.activeOrderDetails].status] : _cache[this.state.activeOrderDetails].status }
+              </div>
+            </div>
+            <div className="edit">
+              Order ID
+              <div
+                className="shade margin-top-5"
+                onClick={ this.openOrderOnline }>
+              { _cache[this.state.activeOrderDetails].orderId }
+              <i className="fa fa-external-link margin-left-10"></i>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="edit">
-          Deposit
-          <div className="shade margin-top-5">
-          { Number(_cache[this.state.activeOrderDetails].expectedDepositCoinAmount).toFixed(8) } { _cache[this.state.activeOrderDetails].depositCoin.toUpperCase() }
+        }
+        { this.state.activeOrderTxView &&
+          <div>
+            <div className="edit">
+              Form
+              <div className="shade margin-top-5">
+              { this.state.activeOrderDetailsDepositTx.inputAddresses ? this.state.activeOrderDetailsDepositTx.inputAddresses[0] : 'N/A' }
+              </div>
+            </div>
+            <div className="edit">
+              To
+              <div className="shade margin-top-5">
+              { this.state.activeOrderDetailsDepositTx.address }
+              </div>
+            </div>
+            <div className="edit">
+              Amount
+              <div className="shade margin-top-5">
+              { (Number(this.state.activeOrderDetailsDepositTx.amount) === 0 ? 'unknown' : Number(this.state.activeOrderDetailsDepositTx.amount)) }
+              </div>
+            </div>
+            { this.state.activeOrderDetailsDepositTx.amount !== this.state.activeOrderDetailsDepositTx.fee &&
+              <div className="edit">
+                Fee
+                <div className="shade margin-top-5">
+                { Number(this.state.activeOrderDetailsDepositTx.fee) }
+                </div>
+              </div>
+            }
+            <div className="edit">
+              Confirmations
+              <div className="shade margin-top-5">
+              { this.state.activeOrderDetailsDepositTx.confirmations }
+              </div>
+            </div>
+            <div className="edit">
+              Height
+              <div className="shade margin-top-5">
+              { this.state.activeOrderDetailsDepositTx.height }
+              </div>
+            </div>
+            <div className="edit">
+              Timestamp
+              <div className="shade margin-top-5">
+              { secondsToString(this.state.activeOrderDetailsDepositTx.timestamp) }
+              </div>
+            </div>
+            <div className="edit">
+              Transaction ID
+              <div
+                className="shade margin-top-5"
+                onClick={ () => this.openExplorerUrl(_cache[this.state.activeOrderDetails].depositCoin.toLowerCase(), this.state.activeOrderDetailsDepositTx.txid) }>
+                { this.state.activeOrderDetailsDepositTx.txid } <i className="fa fa-external-link margin-left-10"></i>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="edit">
-          Destination
-          <div className="shade margin-top-5">
-          { Number(_cache[this.state.activeOrderDetails].expectedDestinationCoinAmount).toFixed(8) } { _cache[this.state.activeOrderDetails].destinationCoin.toUpperCase() }
-          </div>
-        </div>
-        <div className="edit">
-          Exchange rate
-          <div className="shade margin-top-5">
-          { Number((1 / _cache[this.state.activeOrderDetails].expectedDepositCoinAmount) * _cache[this.state.activeOrderDetails].expectedDestinationCoinAmount).toFixed(8) } { _cache[this.state.activeOrderDetails].destinationCoin.toUpperCase() } for 1 { _cache[this.state.activeOrderDetails].depositCoin.toUpperCase() }
-          </div>
-        </div>
-        <div className="edit">
-          Deposit address
-          <div className="shade margin-top-5">
-          { _cache[this.state.activeOrderDetails].exchangeAddress.address }
-          </div>
-        </div>
-        <div className="edit">
-          Deposit TXID
-          <div
-            className="shade margin-top-5"
-            onClick={ () => this.openExplorerUrl(_cache[this.state.activeOrderDetails].depositCoin.toLowerCase(), _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0]) }>
-          { _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0] ? <span>{ _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0] } <i className="fa fa-external-link margin-left-10"></i></span> : 'N/A' }
-          </div>
-        </div>
-        <div className="edit">
-          Destination address
-          <div className="shade margin-top-5">
-          { _cache[this.state.activeOrderDetails].destinationAddress.address }
-          </div>
-        </div>
-        <div className="edit">
-          Destination TXID
-          <div
-            className="shade margin-top-5"
-            onClick={ () => this.openExplorerUrl(_cache[this.state.activeOrderDetails].destinationCoin.toLowerCase(), _cache[this.state.activeOrderDetails].outputTransactionHash) }>
-          { _cache[this.state.activeOrderDetails].outputTransactionHash ? <span>{ _cache[this.state.activeOrderDetails].outputTransactionHash } <i className="fa fa-external-link margin-left-10"></i></span> : 'N/A' }
-          </div>
-        </div>
-        <div className="edit">
-          Status
-          <div className="shade margin-top-5">
-          { _cache[this.state.activeOrderDetails].outputTransactionHash ? 'complete' : this.statusLookup.coinswitch[_cache[this.state.activeOrderDetails].status] ? this.statusLookup.coinswitch[_cache[this.state.activeOrderDetails].status] : _cache[this.state.activeOrderDetails].status }
-          </div>
-        </div>
-        <div className="edit">
-          Order ID
-          <div
-            className="shade margin-top-5"
-            onClick={ this.openOrderOnline }>
-          { _cache[this.state.activeOrderDetails].orderId }
-          <i className="fa fa-external-link margin-left-10"></i>
-          </div>
-        </div>
+        }
       </section>
     );
   }

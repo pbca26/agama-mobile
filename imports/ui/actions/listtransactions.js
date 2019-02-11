@@ -53,7 +53,7 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
             let _transactions = [];
 
             // parse listtransactions
-            const json = result.result;
+            let json = result.result;
 
             if (json &&
                 json.length) {
@@ -248,7 +248,13 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
                   result = JSON.parse(result.content);
 
                   if (result.msg !== 'error') {
-                    transaction.raw = result;
+                    for (let i = 0; i < json.length; i++) {
+                      if (json[i].tx_hash === txid) {
+                        json = [json[i]];
+                        json[0].raw = result.result;
+                        break;
+                      }
+                    }
                   }
 
                   fetchTransactions();

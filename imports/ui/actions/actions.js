@@ -313,7 +313,7 @@ const transactions = (network, options) => {
           _electrumServer.serverList = electrumServers[_name].serverList;
         } else {
           address = options.pub;
-          const _randomElectrumServer = electrumServers[_name].serverList[getRandomIntInclusive(0, electrumServers[_name].serverList.length - 1)];
+          const _randomElectrumServer = electrumServers[_name].serverList[getRandomIntInclusive(0, electrumServers[_name].serverList.length - 1)].split(':');
           _electrumServer = {
             ip: _randomElectrumServer[0],
             port: _randomElectrumServer[1],
