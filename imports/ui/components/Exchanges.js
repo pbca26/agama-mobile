@@ -54,6 +54,7 @@ class Exchanges extends React.Component {
       fiatPrices: null,
       exchangeOrder: null,
       sendCoinState: null,
+      maxBuyError: false,
       //},
       coinswitchCoins: {},
       addcoinActive: false,
@@ -101,6 +102,13 @@ class Exchanges extends React.Component {
     this.openExplorerUrl = this.openExplorerUrl.bind(this);
     this.openOrderOnline = this.openOrderOnline.bind(this);
     this.loadTestData = this.loadTestData.bind(this);
+    this.setMaxBuyAmount = this.setMaxBuyAmount.bind(this);
+  }
+
+  setMaxBuyAmount() {
+    this.setState({
+      amount: this.state.maxBuyError,
+    });
   }
 
   openOrderOnline() {
@@ -261,17 +269,10 @@ class Exchanges extends React.Component {
               if (Number(amount) > Number(this.state.currentBalance)) {
                 const _maxBuy = Number(Number((this.state.currentBalance - fromSats(fees[srcCoinSym])) * exchangeRate.data.rate).toFixed(8));
 
-                console.warn('_maxBuy error', _maxBuy);
-                /*Store.dispatch(
-                  triggerToaster(
-                    `${translate('SEND.INSUFFICIENT_FUNDS')} you can buy up to ${_maxBuy} ${destCoinSym.toUpperCase()} max.`,
-                    translate('TOASTR.WALLET_NOTIFICATION'),
-                    'error'
-                  )
-                );*/
                 valid = false;
                 this.setState({
                   processing: false,
+                  maxBuyError: _maxBuy,
                 });
               }
             }
@@ -282,6 +283,7 @@ class Exchanges extends React.Component {
                 step: 1,
                 exchangeRate: exchangeRate.data,
                 amount,
+                maxBuyError: false,
               });
             }
           } else {
@@ -845,6 +847,11 @@ class Exchanges extends React.Component {
                   value={ this.state.amount || '' } />
               </div>
             </div>
+            { this.state.maxBuyError &&
+              <div className="error margin-top-15 sz350">
+                <i className="fa fa-warning"></i> Insufficient funds, you can buy up to { this.state.maxBuyError } { this.state.coinDest.split('|')[0].toUpperCase() } max.
+              </div>
+            }
             <div
               disabled={
                 !this.state.coinSrc ||
@@ -893,6 +900,14 @@ class Exchanges extends React.Component {
                 Error
                 <div className="shade margin-top-5">
                   { this.state.coinSrc.split('|')[0].toUpperCase() } amount exceeds max allowed value { this.state.exchangeRate.limitMaxDepositCoin }
+                </div>
+              </div>
+            }
+            { this.state.amount < this.state.exchangeRate.limitMinDepositCoin &&
+              <div className="edit error">
+                Error
+                <div className="shade margin-top-5">
+                  { this.state.coinSrc.split('|')[0].toUpperCase() } amount is too low, min deposit amount is { this.state.exchangeRate.limitMinDepositCoin }
                 </div>
               </div>
             }
