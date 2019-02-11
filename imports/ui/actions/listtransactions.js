@@ -4,6 +4,7 @@ import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
 import parseTransactionAddresses from 'agama-wallet-lib/build/transaction-type';
 import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 import electrumJSTxDecoder from 'agama-wallet-lib/build/transaction-decoder';
+import { sortTransactions } from './utils';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
@@ -214,6 +215,7 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
                 });
               }))
               .then(promiseResult => {
+                _rawtx = sortTransactions(_rawtx);
                 resolve(_rawtx);
               });
             } else {
