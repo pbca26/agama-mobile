@@ -298,15 +298,30 @@ const sendtxEth = (network, dest, amount, gasPrice, push) => {
   }
 }
 
-const transactions = (network) => {
+const transactions = (network, options) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
       const _name = network.split('|')[0];
       
       if (network.indexOf('|spv') > -1) {
-        const address = keys.spv[_name].pub;
-        let _electrumServer = getLocalStorageVar('coins')[network].server;
-        _electrumServer.serverList = electrumServers[_name].serverList;
+        let address;
+        let _electrumServer;
+        
+        if (!options) {
+          address = keys.spv[_name].pub;
+          _electrumServer = getLocalStorageVar('coins')[network].server;
+          _electrumServer.serverList = electrumServers[_name].serverList;
+        } else {
+          address = options.pub;
+          const _randomElectrumServer = electrumServers[_name].serverList[getRandomIntInclusive(0, electrumServers[_name].serverList.length - 1)];
+          _electrumServer = {
+            ip: _randomElectrumServer[0],
+            port: _randomElectrumServer[1],
+            proto: _randomElectrumServer[2],
+          };
+
+          console.warn(_electrumServer);
+        }
 
         listtransactions(
           proxyServer,
@@ -314,7 +329,8 @@ const transactions = (network) => {
           address,
           _name,
           true,
-          cache
+          cache,
+          options ? options.txid : null
         )
         .then((res) => {
           resolve(res);
