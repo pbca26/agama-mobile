@@ -25,6 +25,9 @@ import {
 } from 'agama-wallet-lib/build/coin-helpers';
 import supportedCoinsList from '../actions/coins';
 
+const EXCHANGES_CACHE_UPDATE_INTERVAL = 60; // sec
+const EXCHANGES_COINSWITCH_COINS_UPDATE_INTERVAL = 120; // sec
+
 class Exchanges extends React.Component {
   constructor() {
     super();
@@ -57,6 +60,7 @@ class Exchanges extends React.Component {
       addcoinDirection: 'buy',
       activeOrderDetails: null,
       prevActiveState: null,
+      cacheUpdated: false,
     };
     this.coinsListSrc = null;
     this.coinsListDest = null;
@@ -157,7 +161,7 @@ class Exchanges extends React.Component {
 
   updateCacheStorage() {
     setLocalStorageVar('exchanges', this.exchangesCache);
-    console.warn('updateCacheStorage', this.exchangesCache);
+    devlog('updateCacheStorage', this.exchangesCache);
   }
 
   fetchOrder(orderId) {
@@ -172,6 +176,9 @@ class Exchanges extends React.Component {
           this.exchangesCache.coinswitch.orders[result.data.orderId] = result.data;
           devlog(`coinswitch request order ${orderId} state update success, new state is ${result.data.status}`);
           this.updateCacheStorage();
+          this.setState({
+            cacheUpdated: !this.state.cacheUpdated,
+          });
         } else {
           devlog(`coinswitch request order ${orderId} state update failed`);
         }
@@ -183,7 +190,7 @@ class Exchanges extends React.Component {
     const provider = this.state.provider;
 
     if (provider === 'coinswitch') {
-      for (key in this.exchangesCache.coinswitch.orders) {
+      for (let key in this.exchangesCache.coinswitch.orders) {
         devlog(`coinswitch order ${key} state is ${this.exchangesCache.coinswitch.orders[key].status}`);
 
         if (this.exchangesCache.coinswitch.orders[key].status &&
@@ -702,31 +709,38 @@ class Exchanges extends React.Component {
       this.setState({
         activeSection: 'history',
       });
+      this.updateCache();
     } else {
       this.setState({
         activeSection: 'order',
       });
     }
-    /*Store.dispatch(getExchangesCache(this.state.provider));
-    Store.dispatch(getExchangesCoinswitchCoins());
+    
+    const fetchCoinswitchCoins = () => {
+      devlog('update coinswitch coins list');
+
+      this.props.getCoinswitchCoins()
+      .then((coins) => {
+        if (coins &&
+            coins.length) {
+          this.setState({
+            coinswitchCoins: coins,
+          });
+        }
+      });
+    };
+    fetchCoinswitchCoins();
+    
+    //Store.dispatch(getExchangesCache(this.state.provider));
+    //Store.dispatch(getExchangesCoinswitchCoins());
 
     this.exchangesCacheInterval = setInterval(() => {
-      Store.dispatch(getExchangesCache(this.state.provider));
+      this.updateCache();
     }, EXCHANGES_CACHE_UPDATE_INTERVAL * 1000);
 
     this.coinswitchCoinsInterval = setInterval(() => {
-      Store.dispatch(getExchangesCoinswitchCoins());
-    }, EXCHANGES_COINSWITCH_COINS_UPDATE_INTERVAL * 1000);*/
-
-    this.props.getCoinswitchCoins()
-    .then((coins) => {
-      if (coins &&
-          coins.length) {
-        this.setState({
-          coinswitchCoins: coins,
-        });
-      }
-    });
+      fetchCoinswitchCoins();
+    }, EXCHANGES_COINSWITCH_COINS_UPDATE_INTERVAL * 1000);
   }
 
   componentWillUnmount() {
