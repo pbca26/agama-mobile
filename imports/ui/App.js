@@ -345,7 +345,7 @@ class App extends React.Component {
     this.scrollToTop();
   }
 
-  switchCoin(coin) {
+  switchCoin(coin, skipRefresh) {
     const _name = coin.split('|')[0];
     const _mode = coin.split('|')[1];
 
@@ -353,17 +353,23 @@ class App extends React.Component {
       coin: coin,
       address: this.state.pubKeys[_mode][_name],
       history: this.state.activeSection,
-      activeSection: 'dashboard',
+      activeSection: skipRefresh ? this.state.activeSection : 'dashboard',
       transactions: this.state.coins[coin] ? this.state.coins[coin].transactions: null,
       balance: this.state.coins[coin] ? this.state.coins[coin].balance: null,
     });
 
     // toggle refresh and update in-mem coins cache obj
-    Meteor.setTimeout(() => {
-      this.toggleMenu();
-      this.dashboardRefresh();
-      this.scrollToTop();
-    }, 10);
+    if (!skipRefresh) {
+      Meteor.setTimeout(() => {
+        this.toggleMenu();
+        this.dashboardRefresh();
+        this.scrollToTop();
+      }, 10);
+    } else {
+      Meteor.setTimeout(() => {
+        this.dashboardRefresh();
+      }, 10);
+    }
   }
 
   toggleAutoRefresh(disable) {
@@ -1004,7 +1010,13 @@ class App extends React.Component {
                 getOrder={ this.props.actions.getOrder }
                 historyBack={ this.historyBack }
                 syncExchangesHistory={ this.props.actions.syncExchangesHistory }
-                getTransaction={ this.props.actions.transactions } />
+                getTransaction={ this.props.actions.transactions }
+                switchCoin={ this.switchCoin }
+                addCoin={ this.addCoin }
+                sendtx={ this.props.actions.sendtx }
+                getEthGasPrice={ this.getEthGasPrice }
+                sendtxEth={ this.props.actions.sendtxEth }
+                getBtcFees={ this.getBtcFees } />
             }
           </div>
         }

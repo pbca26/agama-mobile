@@ -198,6 +198,7 @@ class SendCoin extends React.Component {
 
   componentWillReceiveProps(props) {
     if (props &&
+        !this.props.init &&
         (props.activeSection !== 'send' || this.props.coin !== props.coin)) {
       // reset form state
       this.setState(this.defaultState);
@@ -452,7 +453,7 @@ class SendCoin extends React.Component {
             { translate('SEND.FROM') }
             <strong className="padding-left-5">
               [ <span className="success">
-                { formatValue(this.props.balance.balance) } { _name.toUpperCase() }
+                { typeof this.props.balance === 'string' && this.props.balance === 'loading' ? '...' : formatValue(this.props.balance.balance) } { _name.toUpperCase() }
                 </span> ]
             </strong>
           </label>
@@ -597,7 +598,8 @@ class SendCoin extends React.Component {
   }
 
   render() {
-    if (this.props.activeSection === 'send') {
+    if (this.props.activeSection === 'send' ||
+        this.props.init) {
       const _name = this.props.coin.split('|')[0];
       const _mode = this.props.coin.split('|')[1];
   
@@ -613,11 +615,13 @@ class SendCoin extends React.Component {
             <div className="send-step">
               <div className="margin-bottom-40">
                 <div className="step-title">{ translate('SEND.FILL_IN_DETAILS') }</div>
-                <div
-                  onClick={ this.scanQR }
-                  className="scan-qr">
-                  <i className="fa fa-qrcode"></i>
-                </div>
+                { !this.props.init &&
+                  <div
+                    onClick={ this.scanQR }
+                    className="scan-qr">
+                    <i className="fa fa-qrcode"></i>
+                  </div>
+                }
               </div>
               { this.sendFormRender() }
             </div>

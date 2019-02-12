@@ -11,6 +11,7 @@ import {
   config,
 } from '../actions/dev';
 import AddCoin from './AddCoin';
+import SendCoin from './SendCoin';
 import fees from 'agama-wallet-lib/build/fees';
 import {
   fromSats,
@@ -64,6 +65,10 @@ class Exchanges extends React.Component {
       activeOrderDetailsDepositTx: null,
       prevActiveState: null,
       cacheUpdated: false,
+      sendCoinInit: {
+        pub: null,
+        amount: 0,
+      },
     };
     this.coinsListSrc = null;
     this.coinsListDest = null;
@@ -103,8 +108,26 @@ class Exchanges extends React.Component {
     this.syncHistory = this.syncHistory.bind(this);
     this.openExplorerUrl = this.openExplorerUrl.bind(this);
     this.openOrderOnline = this.openOrderOnline.bind(this);
-    this.loadTestData = this.loadTestData.bind(this);
     this.setMaxBuyAmount = this.setMaxBuyAmount.bind(this);
+    this.makeDeposit = this.makeDeposit.bind(this);
+    // test
+    this.loadTestData = this.loadTestData.bind(this);
+  }
+
+  makeDeposit() {
+    const _cache = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders;
+    this.props.switchCoin(`${_cache[this.state.activeOrderDetails].depositCoin.toLowerCase()}|spv`, true);
+
+    setTimeout(() => {
+      this.setState({
+        activeSection: 'order',
+        step: 3,
+        sendCoinInit: {
+          pub: _cache[this.state.activeOrderDetails].exchangeAddress.address,
+          amount: _cache[this.state.activeOrderDetails].expectedDepositCoinAmount,
+        },
+      });
+    }, 100);
   }
 
   orderDetailsTab(val) {
@@ -538,16 +561,27 @@ class Exchanges extends React.Component {
   }
 
   menuBack() {
-    if (this.state.activeSection === 'order-details') {
+    if (this.state.activeSection === 'history' &&
+        this.state.activeOrderDetails) {
       this.setState({
         activeOrderDetails: null,
+        activeSection: 'history',
       });
-      this.changeActiveSection('history');
     } else if (this.state.activeSection === 'order' && this.state.step === 1) {
       this.prevStep();
     } else if (this.state.activeSection === 'order' && this.state.step !== 1) {
       if (Object.keys(this.exchangesCache.coinswitch.orders).length) {
-        this.changeActiveSection('history');
+        if (this.state.step === 3 &&
+            this.state.activeOrderDetails) {
+          this.setState({
+            activeSection: 'history',
+          });
+        } else {
+          this.setState({
+            activeOrderDetails: null,
+            activeSection: 'history',
+          });
+        }
       } else {
         this.props.historyBack();
       }
@@ -671,7 +705,7 @@ class Exchanges extends React.Component {
               !_cache[this.state.activeOrderDetails].inputTransactionHash &&
               <div className="group3 margin-bottom-30 make-deposit-btn">
                 <div
-                  onClick={ this.preflightClaim }
+                  onClick={ this.makeDeposit }
                   className="btn-inner">
                   <div className="btn">
                     Make a deposit
@@ -875,11 +909,13 @@ class Exchanges extends React.Component {
           filterOut={ [this.state.coinDest, this.state.coinSrc] }
           activate={ this.state.addcoinActive }
           cb={ this.addcoinCB } />
-        <div className="steps margin-top-45 padding-bottom-35">
-          <div className={ 'step' + (this.state.step === 0 ? ' current' : '') }></div>
-          <div className={ 'step' + (this.state.step === 1 ? ' current' : '') }></div>
-          <div className={ 'step' + (this.state.step === 2 ? ' current' : '') }></div>
-        </div>
+        { this.state.step !== 3 &&
+          <div className="steps margin-top-45 padding-bottom-35">
+            <div className={ 'step' + (this.state.step === 0 ? ' current' : '') }></div>
+            <div className={ 'step' + (this.state.step === 1 ? ' current' : '') }></div>
+            <div className={ 'step' + (this.state.step === 2 ? ' current' : '') }></div>
+          </div>
+        }
 
         { this.state.step === 0 &&
           <div className="send-step">
@@ -1127,6 +1163,19 @@ class Exchanges extends React.Component {
               </div>
             </div>
           </section>
+        }
+        { this.state.step === 3 &&
+          <div className="exchanges-send-coin">
+            <SendCoin
+              coin={ this.props.coin }
+              address={ this.props.address }
+              balance={ this.props.balance || 'loading' }
+              sendtx={ this.props.sendtx }
+              getEthGasPrice={ this.props.getEthGasPrice }
+              sendtxEth={ this.props.sendtxEth }
+              getBtcFees={ this.props.getBtcFees }
+              init={ this.state.sendCoinInit } />
+          </div>
         }
       </div>
     );
