@@ -282,4 +282,14 @@
       }
     }
   }
+  .make-deposit-btn {
+    height: inherit;
+    margin-top: 25px;
+
+    .fa {
+      font-size: 20px;
+      position: relative;
+      top: -3px;
+    }
+  }
 }

@@ -667,6 +667,21 @@ class Exchanges extends React.Component {
         }
         { !this.state.activeOrderTxView &&
           <div>
+            { this.findDeposits(_cache[this.state.activeOrderDetails].orderId).length === 0 &&
+              !_cache[this.state.activeOrderDetails].inputTransactionHash &&
+              <div className="group3 margin-bottom-30 make-deposit-btn">
+                <div
+                  onClick={ this.preflightClaim }
+                  className="btn-inner">
+                  <div className="btn">
+                    Make a deposit
+                  </div>
+                  <div className="group2">
+                    <i className="fa fa-money"></i>
+                  </div>
+                </div>
+              </div>
+            }
             <div className="edit">
               Date
               <div className="shade margin-top-5">
@@ -832,9 +847,6 @@ class Exchanges extends React.Component {
     };
     fetchCoinswitchCoins();
     
-    //Store.dispatch(getExchangesCache(this.state.provider));
-    //Store.dispatch(getExchangesCoinswitchCoins());
-
     this.exchangesCacheInterval = setInterval(() => {
       this.updateCache();
     }, EXCHANGES_CACHE_UPDATE_INTERVAL * 1000);
