@@ -200,7 +200,7 @@ class App extends React.Component {
 
       if (res === 'error') {
         Meteor.setTimeout(() => {
-          this.ethGasPrice();
+          this.getEthGasPrice();
         }, 5000);
       }
     });
