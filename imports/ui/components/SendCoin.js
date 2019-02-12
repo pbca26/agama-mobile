@@ -204,6 +204,15 @@ class SendCoin extends React.Component {
     }
   }
 
+  componentWillMount() {
+    if (this.props.init) {
+      this.setState({
+        sendTo: this.props.init.pub,
+        sendAmount: this.props.init.amount,
+      });
+    }
+  }
+
   updateInput(e) {
     this.setState({
       [e.target.name]: e.target.value,
@@ -390,6 +399,10 @@ class SendCoin extends React.Component {
                   sendResult: res,
                   processing: false,
                 });
+
+                if (this.props.init) {
+                  this.props.cb(res);
+                }
               });
             } else if (this.props.coin.indexOf('|eth') > -1) {
               this.props.sendtxEth(
@@ -446,6 +459,7 @@ class SendCoin extends React.Component {
               name="sendTo"
               onChange={ this.updateInput }
               value={ this.state.sendTo }
+              disabled={ this.props.init }
               id="kmdWalletSendTo"
               placeholder={ translate('SEND.ENTER_AN_ADDRESS') }
               autoComplete="off"
@@ -467,6 +481,7 @@ class SendCoin extends React.Component {
               className="form-control"
               name="sendAmount"
               value={ this.state.sendAmount !== 0 ? this.state.sendAmount : '' }
+              disabled={ this.props.init }
               onChange={ this.updateInput }
               id="kmdWalletAmount"
               placeholder="0.000"
@@ -476,9 +491,11 @@ class SendCoin extends React.Component {
                 <i className="fa fa-warning"></i> { translate('SEND.NAN') }
               </div>
             }
-            <div
-              onClick={ this.setSendAmountAll }
-              className="send-use-all-btn">Use all</div>
+            { !this.props.init &&
+              <div
+                onClick={ this.setSendAmountAll }
+                className="send-use-all-btn">Use all</div>
+            }
             { this.state.validTooMuch &&
               <div className="error margin-top-15">
                 <i className="fa fa-warning padding-right-5"></i>
