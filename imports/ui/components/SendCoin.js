@@ -210,6 +210,18 @@ class SendCoin extends React.Component {
         sendTo: this.props.init.pub,
         sendAmount: this.props.init.amount,
       });
+
+      if (this.props.coin === 'btc|spv') {
+        this.props.getBtcFees();
+        this.setState({
+          btcFee: 'halfHourFee',
+        });
+      } else if (this.props.coin.indexOf('|eth') > -1) {
+        this.props.getEthGasPrice();
+        this.setState({
+          ethFee: 'average',
+        });
+      }
     }
   }
 
