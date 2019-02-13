@@ -116,18 +116,39 @@ class Exchanges extends React.Component {
 
   makeDeposit() {
     const _cache = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders;
-    this.props.switchCoin(`${_cache[this.state.activeOrderDetails].depositCoin.toLowerCase()}|spv`, true);
+    const _coin = _cache[this.state.activeOrderDetails].depositCoin.toLowerCase();
 
-    setTimeout(() => {
-      this.setState({
-        activeSection: 'order',
-        step: 3,
-        sendCoinInit: {
-          pub: _cache[this.state.activeOrderDetails].exchangeAddress.address,
-          amount: _cache[this.state.activeOrderDetails].expectedDepositCoinAmount,
-        },
-      });
-    }, 100);
+    if (this.props.coins[`${_coin}|spv`]) {
+      this.props.switchCoin(`${_coin}|spv`, true);
+      
+      setTimeout(() => {
+        this.setState({
+          activeSection: 'order',
+          step: 3,
+          sendCoinInit: {
+            pub: _cache[this.state.activeOrderDetails].exchangeAddress.address,
+            amount: _cache[this.state.activeOrderDetails].expectedDepositCoinAmount,
+          },
+        });
+      }, 100);
+    } else {
+      this.props.addCoin(`${_coin}|spv`, true);
+
+      setTimeout(() => {
+        this.props.switchCoin(`${_coin}|spv`, true);
+
+        setTimeout(() => {
+          this.setState({
+            activeSection: 'order',
+            step: 3,
+            sendCoinInit: {
+              pub: _cache[this.state.activeOrderDetails].exchangeAddress.address,
+              amount: _cache[this.state.activeOrderDetails].expectedDepositCoinAmount,
+            },
+          });
+        }, 100);
+      }, 200);
+    }
   }
 
   orderDetailsTab(val) {
@@ -643,28 +664,6 @@ class Exchanges extends React.Component {
               { this.findDeposits(_cacheFlat[i].orderId).length > 0 || (this.state.provider === 'coinswitch' && _cacheFlat[i].inputTransactionHash) || (this.state.provider === 'coinswitch' && _cacheFlat[i].inputTransactionHash && _deposits && _deposits[`${_cacheFlat[i].depositCoin.toLowerCase()}-${_cacheFlat[i].inputTransactionHash}`]) ? <i className="fa fa-check-circle green"></i> : <i className="fa fa-exclamation-circle"></i> }
               </div>
             </div>
-            {/*
-            <td>
-              { this.findDeposits(_cacheFlat[i].orderId).length > 0 || (this.state.provider === 'coinswitch' && _cacheFlat[i].inputTransactionHash) || (this.state.provider === 'coinswitch' && _cacheFlat[i].inputTransactionHash && _cache.deposits && _cache.deposits[`${_cacheFlat[i].depositCoin.toLowerCase()}-${_cacheFlat[i].inputTransactionHash}`]) ? 'Yes' : 'No' }
-              { ((this.state.provider === 'coinswitch' && this.findDeposits(_cacheFlat[i].orderId).length === 0 && _cacheFlat[i].status === 'no_deposit')) &&
-                <button
-                  type="button"
-                  className="btn btn-xs white btn-success waves-effect waves-lightm margin-left-10"
-                  disabled={ this.state.syncHistoryProgressing }
-                  onClick={ () => this.makeDeposit(_cacheFlat[i].orderId) }>
-                  Send
-                </button>
-              }
-            </td>
-            <td>
-              <button
-                type="button"
-                className="btn btn-xs white btn-info waves-effect waves-light btn-kmdtxid"
-                disabled={ this.state.syncHistoryProgressing }
-                onClick={ () => this._toggleExchangesOrderInfoModal(_cacheFlat[i].orderId) }>
-                <i className="fa fa-search"></i>
-              </button>
-            </td>*/}
           </div>
         );
       }
@@ -1221,11 +1220,11 @@ class Exchanges extends React.Component {
 
     return (
       <div className="exchanges-supported-coins margin-top-45">
-      <div className="exchanges-supported-coins-inner">
-        <div className="text-center padding-bottom-35">Supported coins to exchange</div>
-        { items }
+        <div className="exchanges-supported-coins-inner">
+          <div className="text-center padding-bottom-35">Supported coins to exchange</div>
+          { items }
+        </div>
       </div>
-    </div>
     );
   }
 
