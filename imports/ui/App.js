@@ -239,7 +239,7 @@ class App extends React.Component {
     }
   }
 
-  addCoin(coin) {
+  addCoin(coin, skipRefresh) {
     let coins = this.state.coins;
 
     if (coin.indexOf('|spv') > -1) {
@@ -285,14 +285,15 @@ class App extends React.Component {
         this.setState({
           coins,
           history: null,
-          activeSection: 'dashboard',
+          activeSection: skipRefresh ? this.state.activeSection : 'dashboard',
           coin,
           address: res,
           loading: true,
           transactions: this.state.coins[coin] ? this.state.coins[coin].transactions: null,
           balance: this.state.coins[coin] ? this.state.coins[coin].balance: null,
         });
-        this.scrollToTop();
+
+        if (!skipRefresh) this.scrollToTop();
         this.dashboardRefresh();
       });
     }

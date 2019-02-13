@@ -1169,6 +1169,8 @@ class Exchanges extends React.Component {
               coin={ this.props.coin }
               address={ this.props.address }
               balance={ this.props.balance || 'loading' }
+              btcFees={ this.props.btcFees }
+              ethFees={ this.props.ethFees }
               sendtx={ this.props.sendtx }
               getEthGasPrice={ this.props.getEthGasPrice }
               sendtxEth={ this.props.sendtxEth }
