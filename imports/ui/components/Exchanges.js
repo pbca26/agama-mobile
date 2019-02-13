@@ -582,7 +582,7 @@ class Exchanges extends React.Component {
   }
 
   menuBack() {
-    if (this.state.activeSection === 'history' &&
+    if ((this.state.activeSection === 'order-details' || this.state.activeSection === 'order') &&
         this.state.activeOrderDetails) {
       this.setState({
         activeOrderDetails: null,
@@ -702,6 +702,7 @@ class Exchanges extends React.Component {
           <div>
             { this.findDeposits(_cache[this.state.activeOrderDetails].orderId).length === 0 &&
               !_cache[this.state.activeOrderDetails].inputTransactionHash &&
+              _cache[this.state.activeOrderDetails].status === 'no_deposit' &&
               <div className="group3 margin-bottom-30 make-deposit-btn">
                 <div
                   onClick={ this.makeDeposit }
