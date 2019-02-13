@@ -721,12 +721,14 @@ class Exchanges extends React.Component {
               { secondsToString(_cache[this.state.activeOrderDetails].createdAt / 1000) }
               </div>
             </div>
-            <div className="edit">
-              Valid until
-              <div className="shade margin-top-5">
-              { secondsToString(_cache[this.state.activeOrderDetails].validTill / 1000) }
+            { _cache[this.state.activeOrderDetails].validTill &&
+              <div className="edit">
+                Valid until
+                <div className="shade margin-top-5">
+                { secondsToString(_cache[this.state.activeOrderDetails].validTill / 1000) }
+                </div>
               </div>
-            </div>
+            }
             <div className="edit">
               Deposit
               <div className="shade margin-top-5">
