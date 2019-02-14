@@ -406,7 +406,7 @@ class Exchanges extends React.Component {
         if (order.data) {
           this.exchangesCache.coinswitch.orders[order.data.orderId] = order.data;
           this.exchangesCache.coinswitch.orders[order.data.orderId].depositCoin = srcCoinSym;
-          this.exchangesCache.coinswitch.orders[order.data.orderId].destinationCoin = srcCoinSym;
+          this.exchangesCache.coinswitch.orders[order.data.orderId].destinationCoin = destCoinSym;
           this.exchangesCache.coinswitch.orders[order.data.orderId].status = 'no_deposit';
           this.exchangesCache.coinswitch.orders[order.data.orderId].createdAt = Math.floor(Date.now());
           this.exchangesCache.coinswitch.orders[order.data.orderId].destinationAddress = { address: this.props.pubKeys.spv[destCoinSym.toLowerCase()] };
@@ -428,14 +428,17 @@ class Exchanges extends React.Component {
       });
     } else if (this.state.step === 2) {
       const _cache = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders;
-      
-      this.setState({
-        step: 3,
-        sendCoinInit: {
-          pub: _cache[this.state.activeOrderDetails].exchangeAddress.address,
-          amount: _cache[this.state.activeOrderDetails].expectedDepositCoinAmount,
-        },
-      });
+      this.props.switchCoin(this.state.coinSrc, true);
+
+      setTimeout(() => {
+        this.setState({
+          step: 3,
+          sendCoinInit: {
+            pub:  _cache[this.state.activeOrderDetails].exchangeAddress.address,
+            amount: _cache[this.state.activeOrderDetails].expectedDepositCoinAmount,
+          },
+        });
+      }, 100);
     }
   }
 
@@ -475,9 +478,13 @@ class Exchanges extends React.Component {
   }
 
   changeActiveSection(sectionName) {
-    this.setState({
-      activeSection: sectionName,
-    });
+    if (sectionName === 'order') {
+      this.clearOrder();
+    } else {
+      this.setState({
+        activeSection: sectionName,
+      });
+    }
   }
 
   addcoinCB(coin) {
