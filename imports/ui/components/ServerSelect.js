@@ -2,6 +2,7 @@ import React from 'react';
 import translate from '../translate/translate';
 import electrumServers from 'agama-wallet-lib/build/electrum-servers';
 import { getRandomElectrumServer } from 'agama-wallet-lib/build/utils';
+import { Meteor } from 'meteor/meteor';
 
 const MAX_RETRIES = 3;
 
@@ -78,7 +79,7 @@ class ServerSelect extends React.Component {
             retryCount: this.state.retryCount + 1,
           });
 
-          setTimeout(() => {
+          Meteor.setTimeout(() => {
             this.setElectrumServer();
           }, 100);
         } else {

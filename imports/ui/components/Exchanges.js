@@ -25,6 +25,7 @@ import {
   isKomodoCoin,
 } from 'agama-wallet-lib/build/coin-helpers';
 import supportedCoinsList from '../actions/coins';
+import { Meteor } from 'meteor/meteor';
 
 const EXCHANGES_CACHE_UPDATE_INTERVAL = 60; // sec
 const EXCHANGES_COINSWITCH_COINS_UPDATE_INTERVAL = 120; // sec
@@ -151,7 +152,7 @@ class Exchanges extends React.Component {
     if (this.props.coins[`${_coin}|spv`]) {
       this.props.switchCoin(`${_coin}|spv`, true);
       
-      setTimeout(() => {
+      Meteor.setTimeout(() => {
         this.setState({
           activeSection: 'order',
           step: 3,
@@ -164,10 +165,10 @@ class Exchanges extends React.Component {
     } else {
       this.props.addCoin(`${_coin}|spv`, true);
 
-      setTimeout(() => {
+      Meteor.setTimeout(() => {
         this.props.switchCoin(`${_coin}|spv`, true);
 
-        setTimeout(() => {
+        Meteor.setTimeout(() => {
           this.setState({
             activeSection: 'order',
             step: 3,
@@ -444,7 +445,7 @@ class Exchanges extends React.Component {
       const _cache = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders;
       this.props.switchCoin(this.state.coinSrc, true);
 
-      setTimeout(() => {
+      Meteor.setTimeout(() => {
         this.setState({
           step: 3,
           sendCoinInit: {
@@ -928,11 +929,11 @@ class Exchanges extends React.Component {
     };
     fetchCoinswitchCoins();
     
-    this.exchangesCacheInterval = setInterval(() => {
+    this.exchangesCacheInterval = Meteor.setInterval(() => {
       this.updateCache();
     }, EXCHANGES_CACHE_UPDATE_INTERVAL * 1000);
 
-    this.coinswitchCoinsInterval = setInterval(() => {
+    this.coinswitchCoinsInterval = Meteor.setInterval(() => {
       fetchCoinswitchCoins();
     }, EXCHANGES_COINSWITCH_COINS_UPDATE_INTERVAL * 1000);
   }
@@ -1040,7 +1041,7 @@ class Exchanges extends React.Component {
                   className="form-control"
                   name="amount"
                   onChange={ this.updateInput }
-                  placeholder={ 'Enter an amount' + (this.state.coinDest ? `in ${this.state.coinDest.split('|')[0].toUpperCase()}` : '') }
+                  placeholder={ 'Enter an amount' + (this.state.coinDest ? ` in ${this.state.coinDest.split('|')[0].toUpperCase()}` : '') }
                   value={ this.state.amount || '' } />
               </div>
             </div>
