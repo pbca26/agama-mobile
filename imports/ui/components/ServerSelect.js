@@ -78,6 +78,7 @@ class ServerSelect extends React.Component {
           } 
         );
         this.props.dashboardRefresh();
+        this.props.historyBack();
       }
     });
   }
@@ -105,10 +106,17 @@ class ServerSelect extends React.Component {
 
     return (
       <div className="form server-select">
-        <div className="bold text-center">
-          <i className="fa fa-warning error padding-right-5"></i>
-          <span className="error width-limit">{ translate('DASHBOARD.CON_ERROR', _name.toUpperCase()) }</span>
-        </div>
+        { this.props.activeSection !== 'server-select' &&
+          <div className="bold text-center">
+            <i className="fa fa-warning error padding-right-5"></i>
+            <span className="error width-limit">{ translate('DASHBOARD.CON_ERROR', _name.toUpperCase()) }</span>
+          </div>
+        }
+        { this.props.activeSection === 'server-select' &&
+          <div className="bold text-center">
+            <span className="width-limit">{ translate('SETTINGS.SELECT_SERVER_BELOW') }</span>
+          </div>
+        }
         <div className="server-select-inner">
           <div>
             <select

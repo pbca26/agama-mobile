@@ -126,7 +126,7 @@ class Settings extends React.Component {
             { translate('SETTINGS.REQUIRE_PIN_CONFIRM') }
           </div>
         </div>
-        <div className="item last">
+        <div className="item">
           <label className="switch">
             <input
               type="checkbox"
@@ -148,6 +148,13 @@ class Settings extends React.Component {
             </div>
           }
         </div>
+        { this.props.coin.indexOf('|spv') > -1 &&
+          <div
+            onClick={ () => this.props.changeActiveSection('server-select') }
+            className="item last">
+            Change { this.props.coin.split('|')[0].toUpperCase() } server
+          </div>
+        }
         { this.state.isSaved &&
           <div className="padding-bottom-20 text-center success">{ translate('SETTINGS.SAVED') }</div>
         }

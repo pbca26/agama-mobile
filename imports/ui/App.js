@@ -922,9 +922,9 @@ class App extends React.Component {
             </div>
           </div>
         }
-        { (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
+        { (this.state.activeSection === 'server-select' || !this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
           !this.state.displayMenu &&
-          this.state.conError &&
+          (this.state.conError || this.state.activeSection === 'server-select') &&
           this.state.activeSection !== 'overview' &&
           this.state.activeSection !== 'settings' &&
           this.state.activeSection !== 'recovery' &&
@@ -934,7 +934,8 @@ class App extends React.Component {
             dashboardRefresh={ this.dashboardRefresh }
             getServersList={ this.props.actions.getServersList }
             setDefaultServer={ this.props.actions.setDefaultServer }
-            updateDefaultCoinServer={ this.updateDefaultCoinServer } />
+            updateDefaultCoinServer={ this.updateDefaultCoinServer }
+            historyBack={ this.historyBack } />
         }
         { (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
           !this.state.displayMenu &&
@@ -998,7 +999,10 @@ class App extends React.Component {
               <Overview { ...this.state } />
             }
             { this.state.activeSection === 'settings' &&
-              <Settings globalClick={ this.globalClick } />
+              <Settings
+                coin={ this.state.coin }
+                globalClick={ this.globalClick }
+                changeActiveSection={ this.changeActiveSection } />
             }
             { this.state.auth &&
               this.state.activeSection === 'exchanges' &&
