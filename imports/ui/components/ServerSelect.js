@@ -1,5 +1,9 @@
 import React from 'react';
 import translate from '../translate/translate';
+import electrumServers from 'agama-wallet-lib/build/electrum-servers';
+import { getRandomElectrumServer } from 'agama-wallet-lib/src/utils';
+
+const MAX_RETRIES = 3;
 
 class ServerSelect extends React.Component {
   constructor() {
@@ -11,6 +15,7 @@ class ServerSelect extends React.Component {
       errorTestingServer: false,
       connecting: false,
       spvServerRetryInProgress: false,
+      retryCount: 0,
     };
     this.updateInput = this.updateInput.bind(this);
     this.setElectrumServer = this.setElectrumServer.bind(this);
@@ -45,6 +50,7 @@ class ServerSelect extends React.Component {
 
   setElectrumServer() {
     const _server = this.state.selectedOption.split(':');
+    const _coin = this.props.coin.split('|')[0].toLowerCase();
 
     this.setState({
       spvServerRetryInProgress: true,
@@ -58,11 +64,31 @@ class ServerSelect extends React.Component {
     )
     .then((res) => {
       if (res === 'error') {
-        this.setState({
-          errorTestingServer: true,
-          connecting: false,
-          spvServerRetryInProgress: false,
-        });
+        if (electrumServers[_coin].serverList !== 'none' &&
+            electrumServers[_coin].serverList.length > 1 &&
+            this.state.retryCount <= MAX_RETRIES) {
+          const _spvServers = electrumServers[_coin].serverList;
+          const _randomServer = getRandomElectrumServer(
+            _spvServers,
+            _server
+          );
+
+          this.setState({
+            selectedOption: `${_randomServer.ip}:${_randomServer.port}:${_randomServer.proto}`,
+            retryCount: this.state.retryCount + 1,
+          });
+
+          setTimeout(() => {
+            this.setElectrumServer();
+          }, 100);
+        } else {
+          this.setState({
+            errorTestingServer: true,
+            connecting: false,
+            spvServerRetryInProgress: false,
+            retryCount: 0,
+          });
+        }
       } else {
         this.setState({
           errorTestingServer: false,
@@ -78,7 +104,10 @@ class ServerSelect extends React.Component {
           } 
         );
         this.props.dashboardRefresh();
-        this.props.historyBack();
+
+        if (this.props.activeSection === 'server-select') {
+          this.props.historyBack();
+        }
       }
     });
   }
