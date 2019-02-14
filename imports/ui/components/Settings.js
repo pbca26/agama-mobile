@@ -69,6 +69,12 @@ class Settings extends React.Component {
       });
       setLocalStorageVar('coins', {});
       setLocalStorageVar('seed', null);
+      setLocalStorageVar('exchanges', {
+        coinswitch: {
+          orders: {},
+          deposits: {},
+        },
+      });
     } else {
       setLocalStorageVar('settings', {
         autoLockTimeout: this.state.autoLockTimeout,
