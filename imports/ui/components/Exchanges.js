@@ -1244,6 +1244,12 @@ class Exchanges extends React.Component {
       }
     }
 
+    if (!items.length) {
+      items.push(
+        <div key="exchanges-supported-coins-loading text-center margin-top-15">Loading coins list...</div>
+      );
+    }
+
     return (
       <div className="exchanges-supported-coins margin-top-45">
         <div className="exchanges-supported-coins-inner">
