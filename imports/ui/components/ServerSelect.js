@@ -1,7 +1,7 @@
 import React from 'react';
 import translate from '../translate/translate';
 import electrumServers from 'agama-wallet-lib/build/electrum-servers';
-import { getRandomElectrumServer } from 'agama-wallet-lib/src/utils';
+import { getRandomElectrumServer } from 'agama-wallet-lib/build/utils';
 
 const MAX_RETRIES = 3;
 

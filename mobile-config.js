@@ -1,10 +1,10 @@
 App.info({
   id: 'com.supernet.agama',
-  version: '0.1.4',
-  buildNumber: '780',
+  version: '0.1.5',
+  buildNumber: '781',
   name: 'Agama',
   description: 'Agama Mobile is a lightweight wallet application that allows users to manage multiple crypto currencies. It\'s built on top of SPV technology which provides a quick way to retrieve and push transaction data.',
-  author: 'SuperNET',
+  author: 'Komodo Platform',
   email: 'pbca@komodoplatform.com',
   website: 'http://komodoplatform.com'
 });

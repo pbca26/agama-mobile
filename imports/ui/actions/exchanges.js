@@ -1,5 +1,5 @@
 import { Random } from 'meteor/random';
-import signature from 'agama-wallet-lib/src/message';
+import signature from 'agama-wallet-lib/build/message';
 import { devlog } from './dev';
 
 export const getCoinswitchCoins = () => {

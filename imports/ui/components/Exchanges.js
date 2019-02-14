@@ -19,7 +19,7 @@ import {
   sort,
   formatValue,
 } from 'agama-wallet-lib/build/utils';
-import { secondsToString } from 'agama-wallet-lib/src/time';
+import { secondsToString } from 'agama-wallet-lib/build/time';
 import {
   explorerList,
   isKomodoCoin,
@@ -29,6 +29,18 @@ import supportedCoinsList from '../actions/coins';
 const EXCHANGES_CACHE_UPDATE_INTERVAL = 60; // sec
 const EXCHANGES_COINSWITCH_COINS_UPDATE_INTERVAL = 120; // sec
 const MAX_ORDERS = 30;
+
+const filterOutETH = (coins) => {
+  let _items = JSON.parse(JSON.stringify(coins));
+
+  for (let key in coins) {
+    if (key.indexOf('|spv') === -1) {
+      delete _items[key];
+    }
+  }
+
+  return _items;
+};
 
 class Exchanges extends React.Component {
   constructor() {
@@ -452,8 +464,8 @@ class Exchanges extends React.Component {
     if (e.target.value === 'clear') {
       this.clearOrder();
     } else if (e.target.value === 'order') {
-      this.coinsListSrc = Object.keys(this.props.coins);
-      this.coinsListDest = Object.keys(this.props.coins);
+      this.coinsListSrc = Object.keys(filterOutETH(this.props.coins));
+      this.coinsListDest = Object.keys(filterOutETH(this.props.coins));
     } else if (e.target.value === 'sync') {
       this.syncHistory();
     } else if (e.target.value === 'tos' || e.target.value === 'supported-coins') {
@@ -473,8 +485,8 @@ class Exchanges extends React.Component {
       step: 0,
     });
 
-    this.coinsListSrc = Object.keys(this.props.coins);
-    this.coinsListDest = Object.keys(this.props.coins);
+    this.coinsListSrc = Object.keys(filterOutETH(this.props.coins));
+    this.coinsListDest = Object.keys(filterOutETH(this.props.coins));
   }
 
   changeActiveSection(sectionName) {
@@ -521,8 +533,8 @@ class Exchanges extends React.Component {
         addcoinActive: false,
       };
 
-      if (Object.keys(this.props.coins).length === 2) {
-        const _coins = Object.keys(this.props.coins);
+      if (Object.keys(filterOutETH(this.props.coins)).length === 2) {
+        const _coins = Object.keys(filterOutETH(this.props.coins));
         _newState.coinSrc = _coins[_coins.indexOf(coin) === 0 ? 1 : 0];
         fetchData(_newState.coinSrc, [coin.split('|')[0], _newState.coinSrc.split('|')[0]]);
       } else if (this.state.coinSrc) {
@@ -545,8 +557,8 @@ class Exchanges extends React.Component {
         addcoinActive: false,
       };
       
-      if (Object.keys(this.props.coins).length === 2) {
-        const _coins = Object.keys(this.props.coins);
+      if (Object.keys(filterOutETH(this.props.coins)).length === 2) {
+        const _coins = Object.keys(filterOutETH(this.props.coins));
         _newState.coinDest = _coins[_coins.indexOf(coin) === 0 ? 1 : 0];
         fetchData(coin, [coin.split('|')[0], _newState.coinDest.split('|')[0]]);
       } else if (this.state.coinDest) {
@@ -570,8 +582,8 @@ class Exchanges extends React.Component {
   }
 
   activateAddcoin(direction) {
-    if ((direction === 'src' && (Object.keys(this.props.coins).length > 2 || (Object.keys(this.props.coins).length === 2 && !this.state.coinSrc))) ||
-        (direction === 'dest' && (Object.keys(this.props.coins).length > 2 || (Object.keys(this.props.coins).length === 2 && !this.state.coinDest)))) {
+    if ((direction === 'src' && (Object.keys(filterOutETH(this.props.coins)).length > 2 || (Object.keys(filterOutETH(this.props.coins)).length === 2 && !this.state.coinSrc))) ||
+        (direction === 'dest' && (Object.keys(filterOutETH(this.props.coins)).length > 2 || (Object.keys(filterOutETH(this.props.coins)).length === 2 && !this.state.coinDest)))) {
       this.setState({
         addcoinDirection: direction,
         addcoinActive: true,
@@ -925,11 +937,12 @@ class Exchanges extends React.Component {
     return (
       <div className="exchanges-new-order">
         <AddCoin
-          coins={ Object.keys(this.props.coins) }
+          coins={ Object.keys(filterOutETH(this.props.coins)) }
           filterOut={ [this.state.coinDest, this.state.coinSrc] }
           activate={ this.state.addcoinActive }
           cb={ this.addcoinCB } />
         { this.state.step !== 3 &&
+          !this.state.addcoinActive &&
           <div className="steps margin-top-45 padding-bottom-35">
             <div className={ 'step' + (this.state.step === 0 ? ' current' : '') }></div>
             <div className={ 'step' + (this.state.step === 1 ? ' current' : '') }></div>
@@ -938,6 +951,7 @@ class Exchanges extends React.Component {
         }
 
         { this.state.step === 0 &&
+          !this.state.addcoinActive &&
           <div className="send-step">
             <div className="margin-bottom-40">
               <div className="step-title">Fill in order details</div>
@@ -962,10 +976,11 @@ class Exchanges extends React.Component {
         }
 
         { this.state.step === 0 &&
+          !this.state.addcoinActive &&
           <section>
-            <div
+            {/*<div
               className="padding-bottom-20"
-              onClick={ this.loadTestData }>Test data</div>
+              onClick={ this.loadTestData }>Test data</div>*/}
 
             <div className="margin-bottom-25">
               <div
@@ -980,7 +995,7 @@ class Exchanges extends React.Component {
                 { !this.state.coinSrc &&
                   <span className="label empty">tap to select a coin</span>
                 }
-                { (Object.keys(this.props.coins).length > 2 || (Object.keys(this.props.coins).length === 2 && !this.state.coinSrc)) &&
+                { (Object.keys(filterOutETH(this.props.coins)).length > 2 || (Object.keys(filterOutETH(this.props.coins)).length === 2 && !this.state.coinSrc)) &&
                   <i className="fa fa-caret-down"></i>
                 }
               </div>
@@ -998,7 +1013,7 @@ class Exchanges extends React.Component {
                 { !this.state.coinDest &&
                   <span className="label empty">tap to select a coin</span>
                 }
-                { (Object.keys(this.props.coins).length > 2 || (Object.keys(this.props.coins).length === 2 && !this.state.coinDest)) &&
+                { (Object.keys(filterOutETH(this.props.coins)).length > 2 || (Object.keys(filterOutETH(this.props.coins)).length === 2 && !this.state.coinDest)) &&
                   <i className="fa fa-caret-down"></i>
                 }
               </div>
@@ -1261,7 +1276,7 @@ class Exchanges extends React.Component {
   }
 
   render() {
-    if (Object.keys(this.props.coins).length > 1) {
+    if (Object.keys(filterOutETH(this.props.coins)).length > 1) {
       return (
         <div className="form exchanges">
           <img
