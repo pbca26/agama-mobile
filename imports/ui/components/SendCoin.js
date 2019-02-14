@@ -414,7 +414,7 @@ class SendCoin extends React.Component {
                 });
 
                 if (this.props.init) {
-                  this.props.cb(res);
+                  this.props.cb(res, this.props.coin);
                 }
               });
             } else if (this.props.coin.indexOf('|eth') > -1) {
@@ -915,23 +915,25 @@ class SendCoin extends React.Component {
                   </div>
                 }
               </div>
-              <div
-                disabled={
-                  !this.state.sendResult ||
-                  this.state.processing
-                }
-                onClick={ () => this.changeSendCoinStep(0) }
-                className="group3 margin-top-50">
-                <div className="btn-inner">
-                  <div className="btn">{ translate('SEND.MAKE_ANOTHER_TX') }</div>
-                  <div className="group2">
-                    <div className="rectangle8copy"></div>
-                    <img
-                      className="path6"
-                      src={ `${assetsPath.login}/reset-password-path-6.png` } />
+              { !this.state.init &&
+                <div
+                  disabled={
+                    !this.state.sendResult ||
+                    this.state.processing
+                  }
+                  onClick={ () => this.changeSendCoinStep(0) }
+                  className="group3 margin-top-50">
+                  <div className="btn-inner">
+                    <div className="btn">{ translate('SEND.MAKE_ANOTHER_TX') }</div>
+                    <div className="group2">
+                      <div className="rectangle8copy"></div>
+                      <img
+                        className="path6"
+                        src={ `${assetsPath.login}/reset-password-path-6.png` } />
+                    </div>
                   </div>
                 </div>
-              </div>
+              }
             </div>
           }
         </div>

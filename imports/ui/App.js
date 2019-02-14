@@ -1009,6 +1009,7 @@ class App extends React.Component {
                 getPrices={ this.props.actions.getPrices }
                 getRate={ this.props.actions.getRate }
                 getOrder={ this.props.actions.getOrder }
+                placeOrder={ this.props.actions.placeOrder }
                 historyBack={ this.historyBack }
                 syncExchangesHistory={ this.props.actions.syncExchangesHistory }
                 getTransaction={ this.props.actions.transactions }
@@ -1017,7 +1018,8 @@ class App extends React.Component {
                 sendtx={ this.props.actions.sendtx }
                 getEthGasPrice={ this.getEthGasPrice }
                 sendtxEth={ this.props.actions.sendtxEth }
-                getBtcFees={ this.getBtcFees } />
+                getBtcFees={ this.getBtcFees }
+                pubKeys={ this.state.pubKeys } />
             }
           </div>
         }
