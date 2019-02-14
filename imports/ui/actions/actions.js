@@ -37,6 +37,7 @@ import {
   getCoinswitchCoins,
   getRate,
   getOrder,
+  placeOrder,
   syncHistory,
 } from './exchanges';
 import getPrices from './prices';
@@ -783,5 +784,6 @@ export default {
   getPrices,
   getRate,
   getOrder,
+  placeOrder,
   syncExchangesHistory,
 }

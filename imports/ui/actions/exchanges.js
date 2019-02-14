@@ -73,6 +73,36 @@ export const getOrder = (provider, orderId) => {
   }
 }
 
+export const placeOrder = (provider, src, dest, srcAmount, destAmount, destPub, refundPub) => {
+  return async (dispatch) => {
+    return new Promise((resolve, reject) => {
+      if (provider === 'coinswitch') {
+        HTTP.call(
+          'GET',
+          'https://www.atomicexplorer.com/api/exchanges/coinswitch?method=placeOrder',
+        {
+          params: {
+            src,
+            dest,
+            srcAmount,
+            destAmount,
+            destPub,
+            refundPub,
+          },
+        }, (error, result) => {
+          if (!result) {
+            resolve('error');
+          } else {
+            const coinswitchOrderPlace = JSON.parse(JSON.parse(result.content));
+            devlog('actions coinswitchOrderPlace', coinswitchOrderPlace);
+            resolve(coinswitchOrderPlace);
+          }
+        });
+      }
+    });
+  }
+}
+
 export const syncHistory = (provider, keys) => {
   return new Promise((resolve, reject) => {
     let electrumCoinsList = [];
