@@ -226,6 +226,8 @@
     z-index: 400;
   }
   .exchanges-order-details {
+    overflow-x: hidden;
+
     .tabs {
       background-color: #373A4C;
       padding-bottom: 15px;

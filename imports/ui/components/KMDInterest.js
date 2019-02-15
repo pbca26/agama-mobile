@@ -101,10 +101,10 @@ class KMDInterest extends React.Component {
             { formatValue(_utxo[i].interest) }
           </td>
           <td>
-            { _utxo[i].locktime &&
+            { Number(_utxo[i].locktime) > 0 &&
               <i className="fa fa-check-circle green locktime-icon"></i>
             }
-            { (!_utxo[i].locktime || Number(_utxo[i].locktime) === 0) &&
+            { !_utxo[i].locktime &&
               <i className="fa fa-exclamation-circle red locktime-icon"></i>
             }
           </td>

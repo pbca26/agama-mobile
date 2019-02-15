@@ -227,7 +227,8 @@ class Exchanges extends React.Component {
 
     this.props.syncExchangesHistory(this.state.provider)
     .then((res) => {
-      if (res) {
+      if (res &&
+          typeof res === 'object') {
         for (let i = 0; i < res.length; i++) {
           if (!this.exchangesCache.coinswitch.orders[res[i].orderId]) {
             devlog(`history sync new order ${res[i].orderId}`);

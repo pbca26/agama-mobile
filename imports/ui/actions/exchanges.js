@@ -1,6 +1,7 @@
 import { Random } from 'meteor/random';
 import signature from 'agama-wallet-lib/build/message';
 import { devlog } from './dev';
+import networks from 'agama-wallet-lib/build/bitcoinjs-networks';
 
 export const getCoinswitchCoins = () => {
   return async (dispatch) => {
@@ -116,24 +117,31 @@ export const syncHistory = (provider, keys) => {
       ethereumCoins.push(key);
     }
 
-    devlog(`actions syncHistory spv coins: ${electrumCoinsList.join(',')}${ethereumCoins.length ? ', eth' : ''}`);
-
+    devlog(`actions syncHistory spv coins: ${electrumCoinsList.join(', ')}${ethereumCoins.length ? ', ETH' : ''}`);
     let _addressPayload = [];
+    let _pubKeys = [];
 
     for (let i = 0;  i < electrumCoinsList.length; i++) {
       const _randomString = Random.hexString(32);
       const _keys = keys.spv[electrumCoinsList[i].toLowerCase()];
 
       if (_keys.priv &&
-          _keys.priv !== _keys.pub) {
-        const _sig = signature.btc.sign(_keys.priv, _randomString);
-        
+          _keys.priv !== _keys.pub &&
+          _pubKeys.indexOf(_keys.pub) === -1) {
+        const _sig = signature.btc.sign(_keys.priv, _randomString, networks[electrumCoinsList[i].toLowerCase()].pubKeyHash.toString().length > 3 ? true : false);
         devlog(`${electrumCoinsList[i]} ${_keys.pub} sig ${_sig}`);
-        _addressPayload.push({
+        _addressPayload.push(networks[electrumCoinsList[i].toLowerCase()].pubKeyHash.toString().length > 3 ? 
+        {
+          pub: _keys.pub,
+          sig: _sig,
+          message: _randomString,
+          isZcash: true,
+        } :{
           pub: _keys.pub,
           sig: _sig,
           message: _randomString,
         });
+        _pubKeys.push(_keys.pub);
       }
     }
     
