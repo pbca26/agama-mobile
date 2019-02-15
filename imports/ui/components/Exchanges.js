@@ -18,6 +18,7 @@ import {
   toSats,
   sort,
   formatValue,
+  isNumber,
 } from 'agama-wallet-lib/build/utils';
 import { secondsToString } from 'agama-wallet-lib/build/time';
 import {
@@ -58,6 +59,7 @@ class Exchanges extends React.Component {
       exchangeOrder: null,
       sendCoinState: null,
       maxBuyError: false,
+      orderPlaceError: null,
       //},
       coinswitchCoins: null,
       addcoinActive: false,
@@ -102,7 +104,6 @@ class Exchanges extends React.Component {
     this.updateExchangesMenu = this.updateExchangesMenu.bind(this);
     this.nextStep = this.nextStep.bind(this);
     this.prevStep = this.prevStep.bind(this);
-    this.updateDeposit = this.updateDeposit.bind(this);
     this.fetchOrder = this.fetchOrder.bind(this);
     this.updateCacheStorage = this.updateCacheStorage.bind(this);
     this.menuBack = this.menuBack.bind(this);
@@ -314,16 +315,6 @@ class Exchanges extends React.Component {
     }
   }
 
-  updateDeposit(coin, txid, orderId) {
-    if (!this.exchangesCache[this.state.provider].deposits) {
-      this.exchangesCache[this.state.provider].deposits = {};
-    }
-
-    this.exchangesCache[this.state.provider].deposits[`${coin.toLowerCase()}-${txid}`] = orderId;
-
-    devlog('updateDeposit', this.exchangesCache);
-  }
-
   loadTestData() {
     this.addcoinCB('kmd|spv');
 
@@ -346,58 +337,66 @@ class Exchanges extends React.Component {
 
   nextStep() {
     // TODO: move to backend, account for tx fee
-    if (this.state.step === 0) {      
-      const srcCoinSym = this.state.coinSrc.split('|')[0].toLowerCase();
-      const destCoinSym = this.state.coinDest.split('|')[0].toLowerCase();
+    if (this.state.step === 0) {
+      if (!isNumber(this.state.amount)) {
+        this.setState({
+          orderPlaceError: 'Amount is incorrect',
+        });
+      } else {
+        const srcCoinSym = this.state.coinSrc.split('|')[0].toLowerCase();
+        const destCoinSym = this.state.coinDest.split('|')[0].toLowerCase();
 
-      this.setState({
-        processing: true,
-      });
+        this.setState({
+          processing: true,
+        });
 
-      this.props.getRate(
-        this.state.provider,
-        srcCoinSym,
-        destCoinSym
-      )
-      .then((exchangeRate) => {
-        devlog('rate', exchangeRate);
+        this.props.getRate(
+          this.state.provider,
+          srcCoinSym,
+          destCoinSym
+        )
+        .then((exchangeRate) => {
+          devlog('rate', exchangeRate);
 
-        if (this.state.provider === 'coinswitch') {
-          if (exchangeRate.data) {
-            let valid = true;
-            let amount;
+          if (this.state.provider === 'coinswitch') {
+            if (exchangeRate.data) {
+              let valid = true;
+              let amount;
 
-            if (!this.state.buyFixedDestCoin) {
-              amount = Number(this.state.amount / exchangeRate.data.rate).toFixed(8);
+              if (!this.state.buyFixedDestCoin) {
+                amount = Number(this.state.amount / exchangeRate.data.rate).toFixed(8);
 
-              if (Number(amount) > Number(this.state.currentBalance)) {
-                const _maxBuy = Number(Number((this.state.currentBalance - fromSats(fees[srcCoinSym])) * exchangeRate.data.rate).toFixed(8));
+                if (Number(amount) > Number(this.state.currentBalance)) {
+                  const _maxBuy = Number(Number((this.state.currentBalance - fromSats(fees[srcCoinSym])) * exchangeRate.data.rate).toFixed(8));
 
-                valid = false;
+                  valid = false;
+                  this.setState({
+                    processing: false,
+                    maxBuyError: _maxBuy,
+                  });
+                }
+              }
+
+              if (valid) {
                 this.setState({
                   processing: false,
-                  maxBuyError: _maxBuy,
+                  step: 1,
+                  exchangeRate: exchangeRate.data,
+                  amount,
+                  maxBuyError: false,
+                  orderPlaceError: null,
                 });
               }
-            }
-
-            if (valid) {
+            } else {
               this.setState({
                 processing: false,
-                step: 1,
-                exchangeRate: exchangeRate.data,
-                amount,
-                maxBuyError: false,
+                orderPlaceError: JSON.stringify(order),
               });
+              devlog('This pair is not available for exchange.');
             }
-          } else {
-            this.setState({
-              processing: false,
-            });
-            devlog('This pair is not available for exchange.');
           }
-        }
-      });
+        });
+      }
     } else if (this.state.step === 1) {
       const srcCoinSym = this.state.coinSrc.split('|')[0].toLowerCase();
       const destCoinSym = this.state.coinDest.split('|')[0].toLowerCase();
@@ -432,12 +431,14 @@ class Exchanges extends React.Component {
             exchangeOrder: order.data,
             step: 2,
             activeOrderDetails: order.data.orderId,
+            orderPlaceError: null,
           });
         } else {
           devlog('order place error');
 
           this.setState({
             processing: false,
+            orderPlaceError: JSON.stringify(order),
           });
         }
       });
@@ -766,19 +767,19 @@ class Exchanges extends React.Component {
             <div className="edit">
               Deposit
               <div className="shade margin-top-5">
-              { Number(_cache[this.state.activeOrderDetails].expectedDepositCoinAmount).toFixed(8) } { _cache[this.state.activeOrderDetails].depositCoin.toUpperCase() }
+              { Number(Number(_cache[this.state.activeOrderDetails].expectedDepositCoinAmount).toFixed(8)) } { _cache[this.state.activeOrderDetails].depositCoin.toUpperCase() }
               </div>
             </div>
             <div className="edit">
               Destination
               <div className="shade margin-top-5">
-              { Number(_cache[this.state.activeOrderDetails].expectedDestinationCoinAmount).toFixed(8) } { _cache[this.state.activeOrderDetails].destinationCoin.toUpperCase() }
+              { Number(Number(_cache[this.state.activeOrderDetails].expectedDestinationCoinAmount).toFixed(8)) } { _cache[this.state.activeOrderDetails].destinationCoin.toUpperCase() }
               </div>
             </div>
             <div className="edit">
               Exchange rate
               <div className="shade margin-top-5">
-              { Number((1 / _cache[this.state.activeOrderDetails].expectedDepositCoinAmount) * _cache[this.state.activeOrderDetails].expectedDestinationCoinAmount).toFixed(8) } { _cache[this.state.activeOrderDetails].destinationCoin.toUpperCase() } for 1 { _cache[this.state.activeOrderDetails].depositCoin.toUpperCase() }
+              { Number(Number((1 / _cache[this.state.activeOrderDetails].expectedDepositCoinAmount) * _cache[this.state.activeOrderDetails].expectedDestinationCoinAmount).toFixed(8)) } { _cache[this.state.activeOrderDetails].destinationCoin.toUpperCase() } for 1 { _cache[this.state.activeOrderDetails].depositCoin.toUpperCase() }
               </div>
             </div>
             <div className="edit">
@@ -1050,6 +1051,11 @@ class Exchanges extends React.Component {
                 <i className="fa fa-warning"></i> Insufficient funds, you can buy up to { this.state.maxBuyError } { this.state.coinDest.split('|')[0].toUpperCase() } max.
               </div>
             }
+            { this.state.orderPlaceError &&
+              <div className="error margin-top-15 sz350">
+                <i className="fa fa-warning"></i> Error: { this.state.orderPlaceError }.
+              </div>
+            }
             <div
               disabled={
                 !this.state.coinSrc ||
@@ -1076,21 +1082,21 @@ class Exchanges extends React.Component {
             <div className="edit">
               You pay
               <div className="shade margin-top-5">
-              { this.state.amount } { this.state.coinSrc.split('|')[0].toUpperCase() }
-              <span className="padding-left-30">{ Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()].USD).toFixed(8) } USD</span>
+                <span className="one-size">{ Number(this.state.amount) } { this.state.coinSrc.split('|')[0].toUpperCase() }</span>
+                <span className="padding-left-30">{ Number(Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()].USD).toFixed(8)) } USD</span>
               </div>
             </div>
             <div className="edit">
               You receive
               <div className="shade margin-top-5">
-              { Number(this.state.amount * this.state.exchangeRate.rate).toFixed(8) } { this.state.coinDest.split('|')[0].toUpperCase() }
-              <span className="padding-left-30">{ Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()].USD).toFixed(8) } USD</span>
+                <span className="one-size">{ Number(Number(this.state.amount * this.state.exchangeRate.rate).toFixed(8)) } { this.state.coinDest.split('|')[0].toUpperCase() }</span>
+                <span className="padding-left-30">{ Number(Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()].USD).toFixed(8)) } USD</span>
               </div>
             </div>
             <div className="edit">
               Exchange rate
               <div className="shade margin-top-5">
-              { this.state.exchangeRate.rate } { this.state.coinDest.split('|')[0].toUpperCase() } for 1 { this.state.coinSrc.split('|')[0].toUpperCase() }
+              { Number(this.state.exchangeRate.rate) } { this.state.coinDest.split('|')[0].toUpperCase() } for 1 { this.state.coinSrc.split('|')[0].toUpperCase() }
               </div>
             </div>
             { this.state.amount > this.state.exchangeRate.limitMaxDepositCoin &&
@@ -1115,6 +1121,11 @@ class Exchanges extends React.Component {
                 <div className="shade margin-top-5">
                   { this.state.coinSrc.split('|')[0].toUpperCase() } amount is too low, min deposit amount is { this.state.exchangeRate.limitMinDepositCoin }
                 </div>
+              </div>
+            }
+            { this.state.orderPlaceError &&
+              <div className="error margin-top-15 sz350">
+                <i className="fa fa-warning"></i> Error: { this.state.orderPlaceError }.
               </div>
             }
             <div className="widget-body-footer">
@@ -1165,19 +1176,19 @@ class Exchanges extends React.Component {
             <div className="edit">
               You pay
               <div className="shade margin-top-5">
-              { Number(this.state.exchangeOrder.expectedDepositCoinAmount).toFixed(8) } { this.state.exchangeOrder.depositCoin.toUpperCase() }
+                <span className="one-size">{ Number(Number(this.state.exchangeOrder.expectedDepositCoinAmount).toFixed(8)) }</span> { this.state.exchangeOrder.depositCoin.toUpperCase() }
               </div>
             </div>
             <div className="edit">
               You receive
               <div className="shade margin-top-5">
-              { Number(this.state.exchangeOrder.expectedDestinationCoinAmount).toFixed(8) } { this.state.exchangeOrder.destinationCoin.toUpperCase() }
+                <span className="one-size">{ Number(Number(this.state.exchangeOrder.expectedDestinationCoinAmount).toFixed(8)) }</span> { this.state.exchangeOrder.destinationCoin.toUpperCase() }
               </div>
             </div>
             <div className="edit">
               Exchange rate
               <div className="shade margin-top-5">
-              { Number((1 / this.state.exchangeOrder.expectedDepositCoinAmount) * this.state.exchangeOrder.expectedDestinationCoinAmount).toFixed(8) } { this.state.exchangeOrder.destinationCoin.toUpperCase() } for 1 { this.state.exchangeOrder.depositCoin.toUpperCase() }
+              { Number(Number((1 / this.state.exchangeOrder.expectedDepositCoinAmount) * this.state.exchangeOrder.expectedDestinationCoinAmount).toFixed(8)) } { this.state.exchangeOrder.destinationCoin.toUpperCase() } for 1 { this.state.exchangeOrder.depositCoin.toUpperCase() }
               </div>
             </div>
             <div className="edit">
