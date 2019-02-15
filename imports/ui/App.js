@@ -282,6 +282,11 @@ class App extends React.Component {
 
       actions.addKeyPair(coin)
       .then((res) => {
+        let _pubKeys = JSON.parse(JSON.stringify(this.state.pubKeys));
+        const _coin = coin.split('|');
+
+        _pubKeys[_coin[1]][_coin[0]] = res;
+
         this.setState({
           coins,
           history: null,
@@ -291,6 +296,7 @@ class App extends React.Component {
           loading: true,
           transactions: this.state.coins[coin] ? this.state.coins[coin].transactions: null,
           balance: this.state.coins[coin] ? this.state.coins[coin].balance: null,
+          pubKeys: _pubKeys,
         });
 
         if (!skipRefresh) this.scrollToTop();

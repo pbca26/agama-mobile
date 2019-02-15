@@ -415,7 +415,7 @@ class Exchanges extends React.Component {
         this.props.pubKeys.spv[srcCoinSym.toLowerCase()],
       )
       .then((order) => {
-        console.warn('order place', order);
+        devlog('order place', order);
 
         if (order.data) {
           this.exchangesCache.coinswitch.orders[order.data.orderId] = order.data;
@@ -1115,14 +1115,6 @@ class Exchanges extends React.Component {
                 </div>
               </div>
             }
-            { this.state.amount < this.state.exchangeRate.limitMinDepositCoin &&
-              <div className="edit error">
-                Error
-                <div className="shade margin-top-5">
-                  { this.state.coinSrc.split('|')[0].toUpperCase() } amount is too low, min deposit amount is { this.state.exchangeRate.limitMinDepositCoin }
-                </div>
-              </div>
-            }
             { this.state.orderPlaceError &&
               <div className="error margin-top-15 sz350">
                 <i className="fa fa-warning"></i> Error: { this.state.orderPlaceError }.
@@ -1176,13 +1168,15 @@ class Exchanges extends React.Component {
             <div className="edit">
               You pay
               <div className="shade margin-top-5">
-                <span className="one-size">{ Number(Number(this.state.exchangeOrder.expectedDepositCoinAmount).toFixed(8)) }</span> { this.state.exchangeOrder.depositCoin.toUpperCase() }
+                <span className="one-size">{ Number(Number(this.state.exchangeOrder.expectedDepositCoinAmount).toFixed(8)) } { this.state.exchangeOrder.depositCoin.toUpperCase() }</span>
+                <span className="padding-left-30">{ Number(Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()].USD).toFixed(8)) } USD</span>
               </div>
             </div>
             <div className="edit">
               You receive
               <div className="shade margin-top-5">
-                <span className="one-size">{ Number(Number(this.state.exchangeOrder.expectedDestinationCoinAmount).toFixed(8)) }</span> { this.state.exchangeOrder.destinationCoin.toUpperCase() }
+                <span className="one-size">{ Number(Number(this.state.exchangeOrder.expectedDestinationCoinAmount).toFixed(8)) } { this.state.exchangeOrder.destinationCoin.toUpperCase() }</span>
+                <span className="padding-left-30">{ Number(Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()].USD).toFixed(8)) } USD</span>
               </div>
             </div>
             <div className="edit">
