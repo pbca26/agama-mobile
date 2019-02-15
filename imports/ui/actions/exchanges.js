@@ -118,6 +118,7 @@ export const syncHistory = (provider, keys) => {
     }
 
     devlog(`actions syncHistory spv coins: ${electrumCoinsList.join(', ')}${ethereumCoins.length ? ', ETH' : ''}`);
+    
     let _addressPayload = [];
     let _pubKeys = [];
 

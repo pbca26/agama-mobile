@@ -43,24 +43,20 @@ class Exchanges extends React.Component {
       syncHistoryProgressing: false,
       exchangeCacheUpdateProgress: false,
       activeSection: 'history',
-      //newExchangeOrderDetails: {
       currentBalance: 'none',
       step: 0,
       orderStep: 0,
-      depositStep: 0,
       orderId: null,
       amount: 0,
       coinSrc: null,
       coinDest: null,
       rate: null,
-      minAmount: null,
       exchangeRate: null,
       fiatPrices: null,
       exchangeOrder: null,
       sendCoinState: null,
       maxBuyError: false,
       orderPlaceError: null,
-      //},
       coinswitchCoins: null,
       addcoinActive: false,
       addcoinDirection: 'buy',
@@ -140,9 +136,16 @@ class Exchanges extends React.Component {
       this.exchangesCache.coinswitch.deposits[`${coin.toLowerCase()}-${sendResult.result.txid}`] = sendResult.result.txid;
       this.updateCacheStorage();
       this.setState({
+        step: 0,
+        activeSection: 'history',
         cacheUpdated: !this.state.cacheUpdated,
+        activeOrderDetails: null,
+        activeOrderTxView: false,
       });
-      this.updateCache();
+
+      Meteor.setTimeout(() => {
+        this.updateCache();
+      }, 2000);
     }
   }
 
@@ -497,6 +500,8 @@ class Exchanges extends React.Component {
   changeActiveSection(sectionName) {
     if (sectionName === 'order') {
       this.clearOrder();
+    } else if (sectionName === 'update') {
+      this.updateCache();
     } else {
       this.setState({
         activeSection: sectionName,
@@ -1048,12 +1053,12 @@ class Exchanges extends React.Component {
               </div>
             </div>
             { this.state.maxBuyError &&
-              <div className="error margin-top-15 sz350">
+              <div className="error margin-top-15 sz350 text-center">
                 <i className="fa fa-warning"></i> Insufficient funds, you can buy up to { this.state.maxBuyError } { this.state.coinDest.split('|')[0].toUpperCase() } max.
               </div>
             }
             { this.state.orderPlaceError &&
-              <div className="error margin-top-15 sz350">
+              <div className="error margin-top-15 sz350 text-center">
                 <i className="fa fa-warning"></i> Error: { this.state.orderPlaceError }.
               </div>
             }
@@ -1117,7 +1122,7 @@ class Exchanges extends React.Component {
               </div>
             }
             { this.state.orderPlaceError &&
-              <div className="error margin-top-15 sz350">
+              <div className="error margin-top-15 sz350 text-center">
                 <i className="fa fa-warning"></i> Error: { this.state.orderPlaceError }.
               </div>
             }
