@@ -129,12 +129,22 @@ class Exchanges extends React.Component {
     return _items;
   }
 
-  sendCoinCB(sendResult, coin) {
+  sendCoinCB(sendResult, coin) {    
     if (sendResult &&
         sendResult.msg === 'success' &&
         sendResult.result &&
         sendResult.result.txid) {
-      this.exchangesCache.coinswitch.deposits[`${coin.toLowerCase()}-${sendResult.result.txid}`] = sendResult.result.txid;
+          exchangeOrder
+      let orderId;
+
+      if (this.state.activeOrderDetails) {
+        const _cache = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders;
+        orderId = _cache[this.state.activeOrderDetails].orderId;
+      } else {
+        orderId = this.state.exchangeOrder.orderId;
+      }
+
+      this.exchangesCache.coinswitch.deposits[`${coin.split('|')[0].toLowerCase()}-${sendResult.result.txid}`] = orderId;
       this.updateCacheStorage();
 
       Meteor.setTimeout(() => {
@@ -149,7 +159,7 @@ class Exchanges extends React.Component {
         Meteor.setTimeout(() => {
           this.updateCache();
         }, 2000);
-      }, 2000);
+      }, 10000);
     }
   }
 
