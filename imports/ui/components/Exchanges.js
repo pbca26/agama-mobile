@@ -1272,7 +1272,7 @@ class Exchanges extends React.Component {
       <div className="exchanges-tos margin-top-45">
         <div className="exchanges-tos-inner">
           <div className="text-center padding-bottom-10">Terms of Service</div>
-          <p>If you continue you agee to use a 3rd party service Coinswitch.co. All your actions with the use of Coinswitch.co API are outside of Komodo Platform control and are subject to Coinswitch.co <a onClick={ this.openCoinswitchTOS } className="pointer">terms of service</a>. Komodo Platform will not disclose any private information to Coinswitch.co. All details that you may provide to Coinswitch.co will be subject to Coinswitch.co <a onClick={ this.openCoinswitchTOS } className="pointer">terms for service</a>.</p>
+          <p>If you continue you agree to use a 3rd party service Coinswitch.co. All your actions with the use of Coinswitch.co API are outside of Komodo Platform's control and are subject to Coinswitch.co <a onClick={ this.openCoinswitchTOS } className="pointer">terms of service</a>. Komodo Platform will not disclose any private information to Coinswitch.co. All details that you may provide to Coinswitch.co will be subject to Coinswitch.co <a onClick={ this.openCoinswitchTOS } className="pointer">terms for service</a>.</p>
           <p>KOMODO PLATFORM ACCEPTS NO RESPONSIBILITY AND WILL NOT BE LIABLE FOR ANY LOSS OR DAMAGE WHATSOEVER SUFFERED AS A RESULT OF ACCESSING, USE OF, OR RELIANCE UPON COINSWITCH.CO INFORMATION AND SERVICES.</p>
         </div>
       </div>
