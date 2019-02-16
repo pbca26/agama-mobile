@@ -915,7 +915,7 @@ class SendCoin extends React.Component {
                   </div>
                 }
               </div>
-              { !this.state.init &&
+              { !this.props.init &&
                 <div
                   disabled={
                     !this.state.sendResult ||

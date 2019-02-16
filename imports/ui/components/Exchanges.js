@@ -58,6 +58,7 @@ class Exchanges extends React.Component {
       maxBuyError: false,
       orderPlaceError: null,
       coinswitchCoins: null,
+      coinswitchCoinsObj: null,
       addcoinActive: false,
       addcoinDirection: 'buy',
       activeOrderDetails: null,
@@ -135,16 +136,19 @@ class Exchanges extends React.Component {
         sendResult.result.txid) {
       this.exchangesCache.coinswitch.deposits[`${coin.toLowerCase()}-${sendResult.result.txid}`] = sendResult.result.txid;
       this.updateCacheStorage();
-      this.setState({
-        step: 0,
-        activeSection: 'history',
-        cacheUpdated: !this.state.cacheUpdated,
-        activeOrderDetails: null,
-        activeOrderTxView: false,
-      });
 
       Meteor.setTimeout(() => {
-        this.updateCache();
+        this.setState({
+          step: 0,
+          activeSection: 'history',
+          cacheUpdated: !this.state.cacheUpdated,
+          activeOrderDetails: null,
+          activeOrderTxView: false,
+        });
+
+        Meteor.setTimeout(() => {
+          this.updateCache();
+        }, 2000);
       }, 2000);
     }
   }
@@ -240,6 +244,7 @@ class Exchanges extends React.Component {
         }
 
         this.updateCacheStorage();
+        this.updateCache();
       }
 
       this.setState({
@@ -481,6 +486,11 @@ class Exchanges extends React.Component {
         prevActiveState: this.state.activeSection,
         [e.target.name]: e.target.value,
       });
+    } else if (e.target.value === 'update') {
+      this.updateCache();
+      this.setState({
+        activeSection: 'history',
+      });
     }
   }  
 
@@ -500,8 +510,6 @@ class Exchanges extends React.Component {
   changeActiveSection(sectionName) {
     if (sectionName === 'order') {
       this.clearOrder();
-    } else if (sectionName === 'update') {
-      this.updateCache();
     } else {
       this.setState({
         activeSection: sectionName,
@@ -928,6 +936,7 @@ class Exchanges extends React.Component {
             }
             
             this.setState({
+              coinswitchCoinsObj: coins,
               coinswitchCoins: coinswitchCoinsFlat,
             });
           }
@@ -1262,7 +1271,7 @@ class Exchanges extends React.Component {
 
   renderSupportedCoins() {
     // TODO: sort
-    const coins = this.state.coinswitchCoins;
+    const coins = this.state.coinswitchCoinsObj;
     let items = [];
 
     if (coins &&
