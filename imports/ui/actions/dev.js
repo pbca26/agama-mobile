@@ -1,13 +1,14 @@
 export const config = {
-  dev: false,
-  debug: false,
+  dev: true,
+  debug: true,
+  debugStringify: false,
 };
 
 export const devlog = (msg, data) => {
   if (config.dev ||
       config.debug) {
     if (data) {
-      console.warn(msg, data);
+      console.warn(msg, config.debugStringify ? JSON.stringify(data) : data);
     } else {
       console.warn(msg);
     }
