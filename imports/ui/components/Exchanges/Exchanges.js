@@ -12,6 +12,7 @@ import {
 } from '../../actions/dev';
 import AddCoin from '../AddCoin';
 import SendCoin from '../SendCoin';
+import ExchangesSupportedCoins from './Coins';
 import fees from 'agama-wallet-lib/build/fees';
 import {
   fromSats,
@@ -25,7 +26,6 @@ import {
   explorerList,
   isKomodoCoin,
 } from 'agama-wallet-lib/build/coin-helpers';
-import supportedCoinsList from '../../actions/coins';
 import { Meteor } from 'meteor/meteor';
 
 const EXCHANGES_CACHE_UPDATE_INTERVAL = 60; // sec
@@ -1284,52 +1284,6 @@ class Exchanges extends React.Component {
     );
   }
 
-  renderSupportedCoins() {
-    // TODO: sort
-    const coins = this.state.coinswitchCoinsObj;
-    let items = [];
-
-    if (coins &&
-        typeof coins === 'object' &&
-        coins.length &&
-        coins[0].symbol) {
-      for (let i = 0; i < coins.length; i++) {
-        if (supportedCoinsList.spv.indexOf(coins[i].symbol.toUpperCase()) > -1) {
-          items.push(
-            <div
-              key={ coins[i].symbol }
-              className="exchanges-supported-coins-tile">
-              <img
-                src={ `/images/cryptologo/spv/${coins[i].symbol.toLowerCase()}.png` }
-                width="30px"
-                height="30px" />
-              <span>{ coins[i].name }</span>
-            </div>
-          );
-        }
-      }
-    }
-
-    if (!items.length) {
-      items.push(
-        <div key="exchanges-supported-coins-loading text-center margin-top-15">
-          { translate('EXCHANGES.LOADING_COINS_LIST') }...
-        </div>
-      );
-    }
-
-    return (
-      <div className="exchanges-supported-coins margin-top-45">
-        <div className="exchanges-supported-coins-inner">
-          <div className="text-center padding-bottom-35">
-            { translate('EXCHANGES.SUPPORTED_COINS_TO_EXCHANGES') }
-          </div>
-          { items }
-        </div>
-      </div>
-    );
-  }
-
   render() {
     if (Object.keys(this.filterOutETH(this.props.coins)).length > 1) {
       return (
@@ -1389,7 +1343,7 @@ class Exchanges extends React.Component {
 
           { this.state.activeSection === 'order' && this.renderOrderForm() }
           { this.state.activeSection === 'tos' && this.renderTOS() }
-          { this.state.activeSection === 'supported-coins' && this.renderSupportedCoins() }
+          { this.state.activeSection === 'supported-coins' && <ExchangesSupportedCoins coins={ this.state.coinswitchCoinsObj } /> }
         </div>
       );
     } else {
