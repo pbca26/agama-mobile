@@ -1021,6 +1021,7 @@ class App extends React.Component {
                 getOrder={ this.props.actions.getOrder }
                 placeOrder={ this.props.actions.placeOrder }
                 historyBack={ this.historyBack }
+                changeActiveSection={ this.changeActiveSection }
                 syncExchangesHistory={ this.props.actions.syncExchangesHistory }
                 getTransaction={ this.props.actions.transactions }
                 switchCoin={ this.switchCoin }

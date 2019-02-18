@@ -139,7 +139,6 @@ class Exchanges extends React.Component {
         sendResult.msg === 'success' &&
         sendResult.result &&
         sendResult.result.txid) {
-          exchangeOrder
       let orderId;
 
       if (this.state.activeOrderDetails) {
@@ -163,6 +162,7 @@ class Exchanges extends React.Component {
 
         Meteor.setTimeout(() => {
           this.updateCache();
+          console.warn(this.state);
         }, 2000);
       }, 10000);
     }
@@ -658,6 +658,7 @@ class Exchanges extends React.Component {
         this.setState({
           activeSection: 'history',
         });
+        this.updateCache();
       } else {
         this.setState({
           activeSection: 'history',
@@ -666,7 +667,9 @@ class Exchanges extends React.Component {
       }
     } else if (this.state.activeSection === 'order' && this.state.step === 0) {
       if (Object.keys(this.exchangesCache.coinswitch.orders).length) {
-
+        this.setState({
+          activeSection: 'history',
+        });
       } else {
         this.props.historyBack();
       }
@@ -675,7 +678,11 @@ class Exchanges extends React.Component {
         activeSection: this.state.prevActiveState,
       });
     } else {
-      this.props.historyBack();
+      if (this.props.history === 'exchanges') {
+        this.props.changeActiveSection('dashboard');
+      } else {
+        this.props.historyBack();
+      }
     }
   }
 
@@ -765,8 +772,8 @@ class Exchanges extends React.Component {
         { !this.state.activeOrderTxView &&
           <div>
             { this.findDeposits(_cache[this.state.activeOrderDetails].orderId).length === 0 &&
-              !_cache[this.state.activeOrderDetails].inputTransactionHash &&
-              _cache[this.state.activeOrderDetails].status === 'no_deposit' &&
+              /*!_cache[this.state.activeOrderDetails].inputTransactionHash &&
+              _cache[this.state.activeOrderDetails].status === 'no_deposit' &&*/
               <div className="group3 margin-bottom-30 make-deposit-btn">
                 <div
                   onClick={ this.makeDeposit }
