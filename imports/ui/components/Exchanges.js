@@ -735,7 +735,7 @@ class Exchanges extends React.Component {
       );
     } else {
       return (
-        <div className="margin-left-10">No history</div>
+        <div className="margin-left-10">{ translate('EXCHANGES.NO_HISTORY') }</div>
       );
     }
   }
@@ -750,10 +750,10 @@ class Exchanges extends React.Component {
           <div className="tabs">
             <div
               onClick={ () => this.orderDetailsTab(false) }
-              className={ 'tab' + (this.state.activeOrderTxView ? ' active' : '') }>Order info</div>
+              className={ 'tab' + (this.state.activeOrderTxView ? ' active' : '') }>{ translate('EXCHANGES.ORDER_INFO') }</div>
             <div
               onClick={ () => this.orderDetailsTab(true) }
-              className={ 'tab' + (!this.state.activeOrderTxView ? ' active' : '') }>Deposit info</div>
+              className={ 'tab' + (!this.state.activeOrderTxView ? ' active' : '') }>{ translate('EXCHANGES.DEPOSIT_INFO') }</div>
           </div>
         }
         { !this.state.activeOrderTxView &&
@@ -766,7 +766,7 @@ class Exchanges extends React.Component {
                   onClick={ this.makeDeposit }
                   className="btn-inner">
                   <div className="btn">
-                    Make a deposit
+                    { translate('EXCHANGES.MAKE_A_DEPOSIT') }
                   </div>
                   <div className="group2">
                     <i className="fa fa-money"></i>
@@ -775,73 +775,73 @@ class Exchanges extends React.Component {
               </div>
             }
             <div className="edit">
-              Date
+              { translate('EXCHANGES.DATE') }
               <div className="shade margin-top-5">
               { secondsToString(_cache[this.state.activeOrderDetails].createdAt / 1000) }
               </div>
             </div>
             { _cache[this.state.activeOrderDetails].validTill &&
               <div className="edit">
-                Valid until
+                { translate('EXCHANGES.VALID_UNTIL') }
                 <div className="shade margin-top-5">
                 { secondsToString(_cache[this.state.activeOrderDetails].validTill / 1000) }
                 </div>
               </div>
             }
             <div className="edit">
-              Deposit
+              { translate('EXCHANGES.DEPOSIT') }
               <div className="shade margin-top-5">
               { Number(Number(_cache[this.state.activeOrderDetails].expectedDepositCoinAmount).toFixed(8)) } { _cache[this.state.activeOrderDetails].depositCoin.toUpperCase() }
               </div>
             </div>
             <div className="edit">
-              Destination
+              { translate('EXCHANGES.DESTINATION') }
               <div className="shade margin-top-5">
               { Number(Number(_cache[this.state.activeOrderDetails].expectedDestinationCoinAmount).toFixed(8)) } { _cache[this.state.activeOrderDetails].destinationCoin.toUpperCase() }
               </div>
             </div>
             <div className="edit">
-              Exchange rate
+              { translate('EXCHANGES.EXCHANGE_RATE') }
               <div className="shade margin-top-5">
               { Number(Number((1 / _cache[this.state.activeOrderDetails].expectedDepositCoinAmount) * _cache[this.state.activeOrderDetails].expectedDestinationCoinAmount).toFixed(8)) } { _cache[this.state.activeOrderDetails].destinationCoin.toUpperCase() } for 1 { _cache[this.state.activeOrderDetails].depositCoin.toUpperCase() }
               </div>
             </div>
             <div className="edit">
-              Deposit address
+              { translate('EXCHANGES.DEPOSIT_ADDRESS') }
               <div className="shade margin-top-5">
               { _cache[this.state.activeOrderDetails].exchangeAddress.address }
               </div>
             </div>
             <div className="edit">
-              Deposit Transaction ID
+              { translate('EXCHANGES.DEPOSIT_TX_ID') }
               <div
                 className="shade margin-top-5"
                 onClick={ () => this.openExplorerUrl(_cache[this.state.activeOrderDetails].depositCoin.toLowerCase(), _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0]) }>
-              { _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0] ? <span>{ _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0] } <i className="fa fa-external-link margin-left-10"></i></span> : 'N/A' }
+              { _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0] ? <span>{ _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0] } <i className="fa fa-external-link margin-left-10"></i></span> : translate('EXCHANGES.NA') }
               </div>
             </div>
             <div className="edit">
-              Destination address
+              { translate('EXCHANGES.DEST_ADDRESS') }
               <div className="shade margin-top-5">
               { _cache[this.state.activeOrderDetails].destinationAddress.address }
               </div>
             </div>
             <div className="edit">
-              Destination Transaction ID
+              { translate('EXCHANGES.DEST_TX_ID') }
               <div
                 className="shade margin-top-5"
                 onClick={ () => this.openExplorerUrl(_cache[this.state.activeOrderDetails].destinationCoin.toLowerCase(), _cache[this.state.activeOrderDetails].outputTransactionHash) }>
-              { _cache[this.state.activeOrderDetails].outputTransactionHash ? <span>{ _cache[this.state.activeOrderDetails].outputTransactionHash } <i className="fa fa-external-link margin-left-10"></i></span> : 'N/A' }
+              { _cache[this.state.activeOrderDetails].outputTransactionHash ? <span>{ _cache[this.state.activeOrderDetails].outputTransactionHash } <i className="fa fa-external-link margin-left-10"></i></span> : translate('EXCHANGES.NA') }
               </div>
             </div>
             <div className="edit">
-              Status
+              { translate('EXCHANGES.STATUS') }
               <div className="shade margin-top-5">
               { _cache[this.state.activeOrderDetails].outputTransactionHash ? 'complete' : this.statusLookup.coinswitch[_cache[this.state.activeOrderDetails].status] ? this.statusLookup.coinswitch[_cache[this.state.activeOrderDetails].status] : _cache[this.state.activeOrderDetails].status }
               </div>
             </div>
             <div className="edit">
-              Order ID
+              { translate('EXCHANGES.ORDER_ID') }
               <div
                 className="shade margin-top-5"
                 onClick={ this.openOrderOnline }>
@@ -854,51 +854,51 @@ class Exchanges extends React.Component {
         { this.state.activeOrderTxView &&
           <div>
             <div className="edit">
-              Form
+              { translate('EXCHANGES.FROM') }
               <div className="shade margin-top-5">
-              { this.state.activeOrderDetailsDepositTx.inputAddresses ? this.state.activeOrderDetailsDepositTx.inputAddresses[0] : 'N/A' }
+              { this.state.activeOrderDetailsDepositTx.inputAddresses ? this.state.activeOrderDetailsDepositTx.inputAddresses[0] : translate('EXCHANGES.NA') }
               </div>
             </div>
             <div className="edit">
-              To
+              { translate('EXCHANGES.TO') }
               <div className="shade margin-top-5">
               { this.state.activeOrderDetailsDepositTx.address }
               </div>
             </div>
             <div className="edit">
-              Amount
+              { translate('EXCHANGES.AMOUNT') }
               <div className="shade margin-top-5">
               { (Number(this.state.activeOrderDetailsDepositTx.amount) === 0 ? 'unknown' : Number(this.state.activeOrderDetailsDepositTx.amount)) }
               </div>
             </div>
             { this.state.activeOrderDetailsDepositTx.amount !== this.state.activeOrderDetailsDepositTx.fee &&
               <div className="edit">
-                Fee
+                { translate('EXCHANGES.FEE') }
                 <div className="shade margin-top-5">
                 { Number(this.state.activeOrderDetailsDepositTx.fee) }
                 </div>
               </div>
             }
             <div className="edit">
-              Confirmations
+              { translate('EXCHANGES.CONFIRMATIONS') }
               <div className="shade margin-top-5">
               { this.state.activeOrderDetailsDepositTx.confirmations }
               </div>
             </div>
             <div className="edit">
-              Height
+              { translate('EXCHANGES.HEIGHT') }
               <div className="shade margin-top-5">
               { this.state.activeOrderDetailsDepositTx.height }
               </div>
             </div>
             <div className="edit">
-              Timestamp
+              { translate('EXCHANGES.TIMESTAMP') }
               <div className="shade margin-top-5">
               { secondsToString(this.state.activeOrderDetailsDepositTx.timestamp) }
               </div>
             </div>
             <div className="edit">
-              Transaction ID
+              { translate('EXCHANGES.TX_ID') }
               <div
                 className="shade margin-top-5"
                 onClick={ () => this.openExplorerUrl(_cache[this.state.activeOrderDetails].depositCoin.toLowerCase(), this.state.activeOrderDetailsDepositTx.txid) }>
@@ -936,8 +936,8 @@ class Exchanges extends React.Component {
           let coinswitchCoinsFlat = [];
 
           if (coins &&
-            typeof coins === 'object' &&
-            coins[0].symbol) {
+              typeof coins === 'object' &&
+              coins[0].symbol) {
   
             for (let i = 0; i < coins.length; i++) {
               if (coins[i].isActive) {
@@ -996,7 +996,7 @@ class Exchanges extends React.Component {
           !this.state.addcoinActive &&
           <div className="send-step">
             <div className="margin-bottom-40">
-              <div className="step-title">Fill in order details</div>
+              <div className="step-title">{ translate('EXCHANGES.FILL_IN_ORDER_DETAILS') }</div>
             </div>
           </div>
         }
@@ -1004,7 +1004,7 @@ class Exchanges extends React.Component {
         { this.state.step === 1 &&
           <div className="send-step">
             <div className="margin-bottom-40">
-              <div className="step-title">Confirm order details</div>
+              <div className="step-title">{ translate('EXCHANGES.CONFIRM_ORDER_DETAILS') }</div>
             </div>
           </div>
         }
@@ -1012,7 +1012,7 @@ class Exchanges extends React.Component {
         { this.state.step === 2 &&
           <div className="send-step">
             <div className="margin-bottom-40">
-              <div className="step-title">Review order details</div>
+              <div className="step-title">{ translate('EXCHANGES.REVIEW_ORDER_DETAILS') }</div>
             </div>
           </div>
         }
@@ -1028,14 +1028,14 @@ class Exchanges extends React.Component {
               <div
                 onClick={ () => this.activateAddcoin('src') }
                 className={ 'edit coin' + (!this.state.coinSrc ? ' empty' : '') }>
-                <span className="label">Pay</span>
+                <span className="label">{ translate('EXCHANGES.PAY') }</span>
                 { this.state.coinSrc &&
                   <span>
                     <img src={ `/images/cryptologo/${this.state.coinSrc.split('|')[1].toLowerCase()}/${this.state.coinSrc.split('|')[0].toLowerCase()}.png` } /> <span className="label">{ translate((this.state.coinSrc.indexOf('|spv') > -1 ? 'SPV.' : 'ETH.') + this.state.coinSrc.split('|')[0].toUpperCase()) }</span>
                   </span>
                 }
                 { !this.state.coinSrc &&
-                  <span className="label empty">tap to select a coin</span>
+                  <span className="label empty">{ translate('EXCHANGES.TAP_TO_SELECT_COIN') }</span>
                 }
                 { (Object.keys(this.filterOutETH(this.props.coins)).length > 2 || (Object.keys(this.filterOutETH(this.props.coins)).length === 2 && !this.state.coinSrc)) &&
                   <i className="fa fa-caret-down"></i>
@@ -1046,14 +1046,14 @@ class Exchanges extends React.Component {
               <div
                 onClick={ () => this.activateAddcoin('dest') }
                 className={ 'edit coin' + (!this.state.coinDest ? ' empty' : '') }>
-                <span className="label">Buy</span>
+                <span className="label">{ translate('EXCHANGES.BUY') }</span>
                 { this.state.coinDest &&
                   <span>
                     <img src={ `/images/cryptologo/${this.state.coinDest.split('|')[1].toLowerCase()}/${this.state.coinDest.split('|')[0].toLowerCase()}.png` } /> <span className="label">{ translate((this.state.coinDest.indexOf('|spv') > -1 ? 'SPV.' : 'ETH.') + this.state.coinDest.split('|')[0].toUpperCase()) }</span>
                   </span>
                 }
                 { !this.state.coinDest &&
-                  <span className="label empty">tap to select a coin</span>
+                  <span className="label empty">{ translate('EXCHANGES.TAP_TO_SELECT_COIN') }</span>
                 }
                 { (Object.keys(this.filterOutETH(this.props.coins)).length > 2 || (Object.keys(this.filterOutETH(this.props.coins)).length === 2 && !this.state.coinDest)) &&
                   <i className="fa fa-caret-down"></i>
@@ -1067,18 +1067,18 @@ class Exchanges extends React.Component {
                   className="form-control"
                   name="amount"
                   onChange={ this.updateInput }
-                  placeholder={ 'Enter an amount' + (this.state.coinDest ? ` in ${this.state.coinDest.split('|')[0].toUpperCase()}` : '') }
+                  placeholder={ translate('EXCHANGES.ENTER_AN_MOUNT') + (this.state.coinDest ? ` in ${this.state.coinDest.split('|')[0].toUpperCase()}` : '') }
                   value={ this.state.amount || '' } />
               </div>
             </div>
             { this.state.maxBuyError &&
               <div className="error margin-top-15 sz350 text-center">
-                <i className="fa fa-warning"></i> Insufficient funds, you can buy up to { this.state.maxBuyError } { this.state.coinDest.split('|')[0].toUpperCase() } max.
+                <i className="fa fa-warning"></i> { translate('EXCHANGES.INSUFFICIENT_FUNDS', this.state.maxBuyError + ' ' + this.state.coinDest.split('|')[0].toUpperCase()) }.
               </div>
             }
             { this.state.orderPlaceError &&
               <div className="error margin-top-15 sz350 text-center">
-                <i className="fa fa-warning"></i> Error: { this.state.orderPlaceError }.
+                <i className="fa fa-warning"></i> { translate('EXCHANGES.ERROR') }: { this.state.orderPlaceError }.
               </div>
             }
             <div
@@ -1091,7 +1091,7 @@ class Exchanges extends React.Component {
               onClick={ this.nextStep }
               className="group3 margin-top-40">
               <div className="btn-inner">
-                <div className="btn">{ this.state.processing ? 'Please wait...' : 'Next' }</div>
+                <div className="btn">{ this.state.processing ? translate('EXCHANGES.PLEASE_WAIT') + '...' : translate('EXCHANGES.NEXT') }</div>
                 <div className="group2">
                   <div className="rectangle8copy"></div>
                   <img
@@ -1105,44 +1105,44 @@ class Exchanges extends React.Component {
         { this.state.step === 1 &&
           <section className="exchanges-order-confirm-step">
             <div className="edit">
-              You pay
+              { translate('EXCHANGES.YOU_PAY') }
               <div className="shade margin-top-5">
                 <span className="one-size">{ Number(this.state.amount) } { this.state.coinSrc.split('|')[0].toUpperCase() }</span>
                 <span className="padding-left-30">{ Number(Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()].USD).toFixed(8)) } USD</span>
               </div>
             </div>
             <div className="edit">
-              You receive
+              { translate('EXCHANGES.YOU_RECEIVE') }
               <div className="shade margin-top-5">
                 <span className="one-size">{ Number(Number(this.state.amount * this.state.exchangeRate.rate).toFixed(8)) } { this.state.coinDest.split('|')[0].toUpperCase() }</span>
                 <span className="padding-left-30">{ Number(Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()].USD).toFixed(8)) } USD</span>
               </div>
             </div>
             <div className="edit">
-              Exchange rate
+              { translate('EXCHANGES.EXCHANGE_RATE') }
               <div className="shade margin-top-5">
-              { Number(this.state.exchangeRate.rate) } { this.state.coinDest.split('|')[0].toUpperCase() } for 1 { this.state.coinSrc.split('|')[0].toUpperCase() }
+              { Number(this.state.exchangeRate.rate) } { this.state.coinDest.split('|')[0].toUpperCase() } { translate('EXCHANGES.FOR_SM') } 1 { this.state.coinSrc.split('|')[0].toUpperCase() }
               </div>
             </div>
             { this.state.amount > this.state.exchangeRate.limitMaxDepositCoin &&
               <div className="edit error">
-                Error
+                { translate('EXCHANGES.ERROR') }
                 <div className="shade margin-top-5">
-                  { this.state.coinSrc.split('|')[0].toUpperCase() } amount exceeds max allowed value { this.state.exchangeRate.limitMaxDepositCoin }
+                  { this.state.coinSrc.split('|')[0].toUpperCase() } { translate('EXCHANGES.AMOUNT_EXCEEDS_MAX_ALLOWED_VAL') } { this.state.exchangeRate.limitMaxDepositCoin }
                 </div>
               </div>
             }
             { this.state.amount < this.state.exchangeRate.limitMinDepositCoin &&
               <div className="edit error">
-                Error
+                { translate('EXCHANGES.ERROR') }
                 <div className="shade margin-top-5">
-                  { this.state.coinSrc.split('|')[0].toUpperCase() } amount is too low, min deposit amount is { this.state.exchangeRate.limitMinDepositCoin }
+                  { this.state.coinSrc.split('|')[0].toUpperCase() } { translate('EXCHANGES.AMOUNT_IS_TOO_LOW') } { this.state.exchangeRate.limitMinDepositCoin }
                 </div>
               </div>
             }
             { this.state.orderPlaceError &&
               <div className="error margin-top-15 sz350 text-center">
-                <i className="fa fa-warning"></i> Error: { this.state.orderPlaceError }.
+                <i className="fa fa-warning"></i> { translate('EXCHANGES.ERROR') }: { this.state.orderPlaceError }.
               </div>
             }
             <div className="widget-body-footer">
@@ -1162,7 +1162,7 @@ class Exchanges extends React.Component {
                   onClick={ this.nextStep }
                   className="btn-inner pull-right margin-right-15"
                   disabled={ this.state.processing }>
-                  <div className="btn">{ this.state.processing ? 'Please wait...' : 'Next' }</div>
+                  <div className="btn">{ this.state.processing ? translate('EXCHANGES.PLEASE_WAIT') + '...' : translate('EXCHANGES.NEXT') }</div>
                   <div className="group2">
                     <div className="rectangle8copy"></div>
                     <img
@@ -1177,53 +1177,53 @@ class Exchanges extends React.Component {
         { this.state.step === 2 &&
           <section className="exchanges-order-confirm-step">
             <div className="edit">
-              Date
+              { translate('EXCHANGES.DATE') }
               <div className="shade margin-top-5">
               { secondsToString(this.state.exchangeOrder.createdAt / 1000) }
               </div>
             </div>
             { this.state.exchangeOrder.validTill &&
               <div className="edit">
-                Valid until
+                { translate('EXCHANGES.VALID_UNTIL') }
                 <div className="shade margin-top-5">
                 { secondsToString(this.state.exchangeOrder.validTill / 1000) }
                 </div>
               </div>
             }
             <div className="edit">
-              You pay
+              { translate('EXCHANGES.YOU_PAY') }
               <div className="shade margin-top-5">
                 <span className="one-size">{ Number(Number(this.state.exchangeOrder.expectedDepositCoinAmount).toFixed(8)) } { this.state.exchangeOrder.depositCoin.toUpperCase() }</span>
                 <span className="padding-left-30">{ Number(Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()].USD).toFixed(8)) } USD</span>
               </div>
             </div>
             <div className="edit">
-              You receive
+              { translate('EXCHANGES.YOU_RECEIVE') }
               <div className="shade margin-top-5">
                 <span className="one-size">{ Number(Number(this.state.exchangeOrder.expectedDestinationCoinAmount).toFixed(8)) } { this.state.exchangeOrder.destinationCoin.toUpperCase() }</span>
                 <span className="padding-left-30">{ Number(Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()].USD).toFixed(8)) } USD</span>
               </div>
             </div>
             <div className="edit">
-              Exchange rate
+              { translate('EXCHANGES.EXCHANGE_RATE') }
               <div className="shade margin-top-5">
-              { Number(Number((1 / this.state.exchangeOrder.expectedDepositCoinAmount) * this.state.exchangeOrder.expectedDestinationCoinAmount).toFixed(8)) } { this.state.exchangeOrder.destinationCoin.toUpperCase() } for 1 { this.state.exchangeOrder.depositCoin.toUpperCase() }
+              { Number(Number((1 / this.state.exchangeOrder.expectedDepositCoinAmount) * this.state.exchangeOrder.expectedDestinationCoinAmount).toFixed(8)) } { this.state.exchangeOrder.destinationCoin.toUpperCase() } { translate('EXCHANGES.FOR_SM') } 1 { this.state.exchangeOrder.depositCoin.toUpperCase() }
               </div>
             </div>
             <div className="edit">
-              Deposit address
+              { translate('EXCHANGES.DEPOSIT_ADDRESS') }
               <div className="shade margin-top-5">
               { this.state.exchangeOrder.exchangeAddress.address }
               </div>
             </div>
             <div className="edit">
-              Receive address
+              { translate('EXCHANGES.DEST_ADDRESS') }
               <div className="shade margin-top-5">
               { this.state.exchangeOrder.destinationAddress.address }
               </div>
             </div>
             <div className="edit">
-              Order ID
+              { translate('EXCHANGES.ORDER_ID') }
               <div
                 className="shade margin-top-5"
                 onClick={ this.openOrderOnline }>
@@ -1235,7 +1235,7 @@ class Exchanges extends React.Component {
                 <div
                   onClick={ this.nextStep }
                   className="btn-inner">
-                  <div className="btn">{ this.state.processing ? 'Please wait...' : 'Proceed to deposit' }</div>
+                  <div className="btn">{ this.state.processing ? translate('EXCHANGES.PLEASE_WAIT') + '...' : translate('EXCHANGES.PROCEED_TO_DEPOSIT') }</div>
                   <div className="group2">
                     <div className="rectangle8copy"></div>
                     <img
@@ -1271,9 +1271,9 @@ class Exchanges extends React.Component {
     return (
       <div className="exchanges-tos margin-top-45">
         <div className="exchanges-tos-inner">
-          <div className="text-center padding-bottom-10">Terms of Service</div>
-          <p>If you continue you agree to use a 3rd party service Coinswitch.co. All your actions with the use of Coinswitch.co API are outside of Komodo Platform's control and are subject to Coinswitch.co <a onClick={ this.openCoinswitchTOS } className="pointer">terms of service</a>. Komodo Platform will not disclose any private information to Coinswitch.co. All details that you may provide to Coinswitch.co will be subject to Coinswitch.co <a onClick={ this.openCoinswitchTOS } className="pointer">terms for service</a>.</p>
-          <p>KOMODO PLATFORM ACCEPTS NO RESPONSIBILITY AND WILL NOT BE LIABLE FOR ANY LOSS OR DAMAGE WHATSOEVER SUFFERED AS A RESULT OF ACCESSING, USE OF, OR RELIANCE UPON COINSWITCH.CO INFORMATION AND SERVICES.</p>
+          <div className="text-center padding-bottom-10">{ translate('EXCHANGES.TOS') }</div>
+          <p>{ translate('EXCHANGES.TOS_P1') } <a onClick={ this.openCoinswitchTOS } className="pointer">{ translate('EXCHANGES.TOS_SM') }</a>. { translate('EXCHANGES.TOS_P2') } <a onClick={ this.openCoinswitchTOS } className="pointer">{ translate('EXCHANGES.TOS_SM') }</a>.</p>
+          <p>{ translate('EXCHANGES.TOS_P3') }</p>
         </div>
       </div>
     );
@@ -1307,14 +1307,18 @@ class Exchanges extends React.Component {
 
     if (!items.length) {
       items.push(
-        <div key="exchanges-supported-coins-loading text-center margin-top-15">Loading coins list...</div>
+        <div key="exchanges-supported-coins-loading text-center margin-top-15">
+          { translate('EXCHANGES.LOADING_COINS_LIST') }...
+        </div>
       );
     }
 
     return (
       <div className="exchanges-supported-coins margin-top-45">
         <div className="exchanges-supported-coins-inner">
-          <div className="text-center padding-bottom-35">Supported coins to exchange</div>
+          <div className="text-center padding-bottom-35">
+            { translate('EXCHANGES.SUPPORTED_COINS_TO_EXCHANGES') }
+          </div>
           { items }
         </div>
       </div>
@@ -1336,35 +1340,35 @@ class Exchanges extends React.Component {
             className="exchanges-menu">
             <option
               disabled={ this.state.activeSection === 'order' }
-              value="order">New order</option>
+              value="order">{ translate('EXCHANGES.NEW_ORDER') }</option>
             { this.state.activeSection === 'order' &&
               (this.state.step === 0 || this.state.step === 1) &&
-              <option value="clear">Clear current order</option>
+              <option value="clear">{ translate('EXCHANGES.CLEAR_CURRENT_ORDER') }</option>
             }
             { this.state.activeSection !== 'order-details' &&
               <option
                 disabled={ this.state.activeSection === 'history' }
-                value="history">Order history</option>
+                value="history">{ translate('EXCHANGES.ORDER_HISTORY') }</option>
             }
             { this.state.activeSection === 'order-details' &&
               <option
                 disabled={ this.state.activeSection === 'order-details' }
-                value="order-details">Order history</option>
+                value="order-details">{ translate('EXCHANGES.ORDER_HISTORY') }</option>
             }
             { (this.state.activeSection === 'history' || this.state.activeSection === 'order-details') &&
-              <option value="sync">Sync history</option>
+              <option value="sync">{ translate('EXCHANGES.SYNC_HISTORY') }</option>
             }
             { (this.state.activeSection === 'history' || this.state.activeSection === 'order-details') &&
               Object.keys(this.exchangesCache.coinswitch.orders).length > 0 &&
-              <option value="update">Refresh history</option>
+              <option value="update">{ translate('EXCHANGES.REFRESH_HISTORY') }</option>
             }
             <option
               disabled={ this.state.activeSection === 'tos' }
-              value="tos">Terms of Service</option>
+              value="tos">{ translate('EXCHANGES.TOS') }</option>
             { this.state.coinswitchCoins &&
               <option
                 disabled={ this.state.activeSection === 'supported-coins' }
-                value="supported-coins">Supported coins</option>
+                value="supported-coins">{ translate('EXCHANGES.SUPPORTED_COINS') }</option>
             }
           </select>
 
@@ -1373,7 +1377,7 @@ class Exchanges extends React.Component {
               { !this.state.activeOrderDetails && !this.state.syncHistoryProgressing && this.renderOrderHistory() }
               { this.state.activeOrderDetails && !this.state.syncHistoryProgressing && this.renderOrderDetails() }
               { this.state.syncHistoryProgressing &&
-                <div className="text-center">Synchronizing order history. Please wait...</div>
+                <div className="text-center">{ translate('EXCHANGES.SYNCING_HISTORY') }...</div>
               }
             </div>
           }
@@ -1386,7 +1390,7 @@ class Exchanges extends React.Component {
     } else {
       return (
         <div className="form exchanges text-center margin-top-45">
-          Please add one more coin to exchange
+          { translate('EXCHANGES.PLEASE_ADD_ONE_MORE_COIN') }
         </div>
       );
     }
