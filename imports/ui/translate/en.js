@@ -58,6 +58,7 @@ const lang = {
       SYNCING_HISTORY: 'Synchronizing order history. Please wait',
       PLEASE_ADD_ONE_MORE_COIN: 'Please add one more coin to exchange',
       NA: 'N/A',
+      AMOUNT_IS_INCORRECT: 'Amount is incorrect',
     },
     API: {
       NO_UTXO_ERR: 'No available UTXO(s) or connection error',

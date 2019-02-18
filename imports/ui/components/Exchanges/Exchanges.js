@@ -4,14 +4,14 @@ import {
   setLocalStorageVar,
   getLocalStorageVar,
   assetsPath,
-} from '../actions/utils';
-import translate from '../translate/translate';
+} from '../../actions/utils';
+import translate from '../../translate/translate';
 import {
   devlog,
   config,
-} from '../actions/dev';
-import AddCoin from './AddCoin';
-import SendCoin from './SendCoin';
+} from '../../actions/dev';
+import AddCoin from '../AddCoin';
+import SendCoin from '../SendCoin';
 import fees from 'agama-wallet-lib/build/fees';
 import {
   fromSats,
@@ -25,7 +25,7 @@ import {
   explorerList,
   isKomodoCoin,
 } from 'agama-wallet-lib/build/coin-helpers';
-import supportedCoinsList from '../actions/coins';
+import supportedCoinsList from '../../actions/coins';
 import { Meteor } from 'meteor/meteor';
 
 const EXCHANGES_CACHE_UPDATE_INTERVAL = 60; // sec
@@ -73,7 +73,6 @@ class Exchanges extends React.Component {
     };
     this.coinsListSrc = null;
     this.coinsListDest = null;
-    this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.exchangesCacheInterval = null;
     this.exchangesCache = {
       coinswitch: {
@@ -364,7 +363,7 @@ class Exchanges extends React.Component {
     if (this.state.step === 0) {
       if (!isNumber(this.state.amount)) {
         this.setState({
-          orderPlaceError: 'Amount is incorrect',
+          orderPlaceError: translate('EXCHANGES.AMOUNT_IS_INCORRECT'),
         });
       } else {
         const srcCoinSym = this.state.coinSrc.split('|')[0].toLowerCase();
@@ -653,19 +652,20 @@ class Exchanges extends React.Component {
       });
     } else if (this.state.activeSection === 'order' && this.state.step === 1) {
       this.prevStep();
-    } else if (this.state.activeSection === 'order' && this.state.step !== 1) {
+    } else if (this.state.activeSection === 'order' && this.state.step === 3) {
+      if (this.state.activeOrderDetails) {
+        this.setState({
+          activeSection: 'history',
+        });
+      } else {
+        this.setState({
+          activeSection: 'history',
+        });
+        this.updateCache();
+      }
+    } else if (this.state.activeSection === 'order' && this.state.step === 0) {
       if (Object.keys(this.exchangesCache.coinswitch.orders).length) {
-        if (this.state.step === 3 &&
-            this.state.activeOrderDetails) {
-          this.setState({
-            activeSection: 'history',
-          });
-        } else if (this.state.step === 3 && !this.state.activeOrderDetails) {
-          this.setState({
-            activeSection: 'history',
-          });
-          this.updateCache();
-        }
+
       } else {
         this.props.historyBack();
       }

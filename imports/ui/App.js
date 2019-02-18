@@ -34,7 +34,7 @@ import Pin from './components/Pin';
 import Recovery from './components/Recovery';
 import Overview  from './components/Overview';
 import Settings  from './components/Settings';
-import Exchanges  from './components/Exchanges';
+import Exchanges  from './components/Exchanges/Exchanges';
 
 const DASHBOARD_UPDATE_INTERVAL = 120000; // 2m
 const PROXY_RETRY_COUNT = 2;
