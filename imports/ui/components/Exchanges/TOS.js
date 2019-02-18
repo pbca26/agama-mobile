@@ -7,6 +7,11 @@ class ExchangesTOS extends React.Component {
   constructor() {
     super();
     this.state = {};
+    this.openCoinswitchTOS = this.openCoinswitchTOS.bind(this);
+  }
+
+  openCoinswitchTOS() {
+    window.open('https://coinswitch.co/terms', '_system');
   }
 
   render() {

@@ -75,14 +75,14 @@ let _coins = {
 
 for (let key in _coins) {
   for (let i = 0; i < _coinsList[key].length; i++) {
-    _coins[key][translate(`${key.toUpperCase()}.` + _coinsList[key][i].toUpperCase())] = _coinsList[key][i];
+    _coins[key][translate(`${key.toUpperCase()}.${_coinsList[key][i].toUpperCase()}`)] = _coinsList[key][i];
   }
   
   _coins[key] = sortObject(_coins[key]);
 
   for (let _key in _coins[key]) {
     coinsList.push({
-      name: (_coins[key][_key] + '|' + key).toLowerCase(),
+      name: (`${_coins[key][_key]}|${key}`).toLowerCase(),
       title: _key,
       mode: key,
     });

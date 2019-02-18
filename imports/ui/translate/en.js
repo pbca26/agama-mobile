@@ -59,6 +59,7 @@ const lang = {
       PLEASE_ADD_ONE_MORE_COIN: 'Please add one more coin to exchange',
       NA: 'N/A',
       AMOUNT_IS_INCORRECT: 'Amount is incorrect',
+      IN_SM: 'in',
     },
     API: {
       NO_UTXO_ERR: 'No available UTXO(s) or connection error',
