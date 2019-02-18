@@ -13,6 +13,7 @@ import {
 import AddCoin from '../AddCoin';
 import SendCoin from '../SendCoin';
 import ExchangesSupportedCoins from './Coins';
+import ExchangesTOS from './TOS';
 import fees from 'agama-wallet-lib/build/fees';
 import {
   fromSats,
@@ -1272,18 +1273,6 @@ class Exchanges extends React.Component {
     );
   }
 
-  renderTOS() {
-    return (
-      <div className="exchanges-tos margin-top-45">
-        <div className="exchanges-tos-inner">
-          <div className="text-center padding-bottom-10">{ translate('EXCHANGES.TOS') }</div>
-          <p>{ translate('EXCHANGES.TOS_P1') } <a onClick={ this.openCoinswitchTOS } className="pointer">{ translate('EXCHANGES.TOS_SM') }</a>. { translate('EXCHANGES.TOS_P2') } <a onClick={ this.openCoinswitchTOS } className="pointer">{ translate('EXCHANGES.TOS_SM') }</a>.</p>
-          <p>{ translate('EXCHANGES.TOS_P3') }</p>
-        </div>
-      </div>
-    );
-  }
-
   render() {
     if (Object.keys(this.filterOutETH(this.props.coins)).length > 1) {
       return (
@@ -1342,7 +1331,7 @@ class Exchanges extends React.Component {
           }
 
           { this.state.activeSection === 'order' && this.renderOrderForm() }
-          { this.state.activeSection === 'tos' && this.renderTOS() }
+          { this.state.activeSection === 'tos' && <ExchangesTOS /> }
           { this.state.activeSection === 'supported-coins' && <ExchangesSupportedCoins coins={ this.state.coinswitchCoinsObj } /> }
         </div>
       );
