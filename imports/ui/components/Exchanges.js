@@ -112,8 +112,13 @@ class Exchanges extends React.Component {
     this.makeDeposit = this.makeDeposit.bind(this);
     this.sendCoinCB = this.sendCoinCB.bind(this);
     this.filterOutETH = this.filterOutETH.bind();
+    this.openCoinswitchTOS = this.openCoinswitchTOS.bind(this);
     // test
     this.loadTestData = this.loadTestData.bind(this);
+  }
+
+  openCoinswitchTOS() {
+    window.open('https://coinswitch.co/terms', '_system');
   }
 
   filterOutETH = (coins) => {
