@@ -28,6 +28,10 @@ import {
   isKomodoCoin,
 } from 'agama-wallet-lib/build/coin-helpers';
 import { Meteor } from 'meteor/meteor';
+import {
+  coinswitchStatusLookup,
+  statusLookup,
+} from './utils';
 
 const EXCHANGES_CACHE_UPDATE_INTERVAL = 60; // sec
 const EXCHANGES_COINSWITCH_COINS_UPDATE_INTERVAL = 120; // sec
@@ -81,18 +85,8 @@ class Exchanges extends React.Component {
         orders: {},
       },
     };
-    this.coinswitchStatusLookup = [
-      'complete',
-      'failed',
-      'refunded',
-      'timeout',
-    ];
-    this.statusLookup = {
-      coinswitch: {
-        timeout: 'expired',
-        no_deposit: 'awaiting deposit',
-      },
-    };
+    this.coinswitchStatusLookup = coinswitchStatusLookup;
+    this.statusLookup = statusLookup;
     this.updateInput = this.updateInput.bind(this);
     this.clearOrder = this.clearOrder.bind(this);
     this.addcoinCB = this.addcoinCB.bind(this);
