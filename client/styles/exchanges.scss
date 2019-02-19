@@ -245,6 +245,10 @@
         &.active {
           border-bottom: solid 1px #4c4f69;
         }
+        &.disabled {
+          opacity: 0.2;
+          pointer-events: none;
+        }
       }
     }
     .shade {
@@ -298,7 +302,7 @@
   }
   .make-deposit-btn {
     height: inherit;
-    margin-top: 25px;
+    margin-top: 10px;
 
     .fa {
       font-size: 20px;
