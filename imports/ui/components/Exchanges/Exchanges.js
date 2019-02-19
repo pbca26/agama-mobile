@@ -132,8 +132,7 @@ class Exchanges extends React.Component {
       let orderId;
 
       if (this.state.activeOrderDetails) {
-        const _cache = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders;
-        orderId = _cache[this.state.activeOrderDetails].orderId;
+        orderId = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders[this.state.activeOrderDetails].orderId;
       } else {
         orderId = this.state.exchangeOrder.orderId;
       }
@@ -152,15 +151,14 @@ class Exchanges extends React.Component {
 
         Meteor.setTimeout(() => {
           this.updateCache();
-          console.warn(this.state);
         }, 2000);
       }, 10000);
     }
   }
 
   makeDeposit() {
-    const _cache = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders;
-    const _coin = _cache[this.state.activeOrderDetails].depositCoin.toLowerCase();
+    const _cache = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders[this.state.activeOrderDetails];
+    const _coin = _cache.depositCoin.toLowerCase();
 
     if (this.props.coins[`${_coin}|spv`]) {
       this.props.switchCoin(`${_coin}|spv`, true);
@@ -170,8 +168,8 @@ class Exchanges extends React.Component {
           activeSection: 'order',
           step: 3,
           sendCoinInit: {
-            pub: _cache[this.state.activeOrderDetails].exchangeAddress.address,
-            amount: _cache[this.state.activeOrderDetails].expectedDepositCoinAmount,
+            pub: _cache.exchangeAddress.address,
+            amount: _cache.expectedDepositCoinAmount,
           },
         });
       }, 100);
@@ -186,8 +184,8 @@ class Exchanges extends React.Component {
             activeSection: 'order',
             step: 3,
             sendCoinInit: {
-              pub: _cache[this.state.activeOrderDetails].exchangeAddress.address,
-              amount: _cache[this.state.activeOrderDetails].expectedDepositCoinAmount,
+              pub: _cache.exchangeAddress.address,
+              amount: _cache.expectedDepositCoinAmount,
             },
           });
         }, 100);
@@ -244,6 +242,7 @@ class Exchanges extends React.Component {
         for (let i = 0; i < res.length; i++) {
           if (!this.exchangesCache.coinswitch.orders[res[i].orderId]) {
             devlog(`history sync new order ${res[i].orderId}`);
+
             this.exchangesCache.coinswitch.orders[res[i].orderId] = res[i];
           }
         }
@@ -259,7 +258,7 @@ class Exchanges extends React.Component {
   }
 
   openOrderDetails(orderId) {
-    const _cache = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders;
+    const _cache = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders[orderId];
 
     this.setState({
       activeOrderDetails: orderId,
@@ -268,12 +267,12 @@ class Exchanges extends React.Component {
       activeOrderDetailsDepositTx: null,
     });
 
-    if (_cache[orderId].inputTransactionHash) {
+    if (_cache.inputTransactionHash) {
       this.props.getTransaction(
-        `${_cache[orderId].depositCoin.toLowerCase()}|spv`,
+        `${_cache.depositCoin.toLowerCase()}|spv`,
         { 
-          txid: _cache[orderId].inputTransactionHash,
-          pub: _cache[orderId].exchangeAddress.address,
+          txid: _cache.inputTransactionHash,
+          pub: _cache.exchangeAddress.address,
         }
       )
       .then((res) => {
@@ -301,8 +300,11 @@ class Exchanges extends React.Component {
         if (result.data &&
             result.data.orderId) {
           this.exchangesCache.coinswitch.orders[result.data.orderId] = result.data;
+
           devlog(`coinswitch request order ${orderId} state update success, new state is ${result.data.status}`);
+          
           this.updateCacheStorage();
+          
           this.setState({
             cacheUpdated: !this.state.cacheUpdated,
           });
@@ -318,11 +320,14 @@ class Exchanges extends React.Component {
 
     if (provider === 'coinswitch') {
       for (let key in this.exchangesCache.coinswitch.orders) {
-        devlog(`coinswitch order ${key} state is ${this.exchangesCache.coinswitch.orders[key].status}`);
+        const order = this.exchangesCache.coinswitch.orders[key];
 
-        if (this.exchangesCache.coinswitch.orders[key].status &&
-            this.coinswitchStatusLookup.indexOf(this.exchangesCache.coinswitch.orders[key].status) === -1) {
+        devlog(`coinswitch order ${key} state is ${order.status}`);
+
+        if (order.status &&
+            this.coinswitchStatusLookup.indexOf(order.status) === -1) {
           devlog(`coinswitch request order ${key} state update`);
+          
           this.fetchOrder(key);
         }
       }
@@ -384,6 +389,7 @@ class Exchanges extends React.Component {
                   const _maxBuy = Number(Number((this.state.currentBalance - fromSats(fees[srcCoinSym])) * exchangeRate.data.rate).toFixed(8));
 
                   valid = false;
+                  
                   this.setState({
                     processing: false,
                     maxBuyError: _maxBuy,
@@ -406,6 +412,7 @@ class Exchanges extends React.Component {
                 processing: false,
                 orderPlaceError: JSON.stringify(order),
               });
+              
               devlog('This pair is not available for exchange.');
             }
           }
@@ -438,6 +445,7 @@ class Exchanges extends React.Component {
           this.exchangesCache.coinswitch.orders[order.data.orderId].status = 'no_deposit';
           this.exchangesCache.coinswitch.orders[order.data.orderId].createdAt = Math.floor(Date.now());
           this.exchangesCache.coinswitch.orders[order.data.orderId].destinationAddress = { address: this.props.pubKeys.spv[destCoinSym.toLowerCase()] };
+          
           this.updateCacheStorage();
           
           this.setState({
@@ -457,15 +465,16 @@ class Exchanges extends React.Component {
         }
       });
     } else if (this.state.step === 2) {
-      const _cache = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders;
+      const _cache = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders[this.state.activeOrderDetails];
+      
       this.props.switchCoin(this.state.coinSrc, true);
 
       Meteor.setTimeout(() => {
         this.setState({
           step: 3,
           sendCoinInit: {
-            pub:  _cache[this.state.activeOrderDetails].exchangeAddress.address,
-            amount: _cache[this.state.activeOrderDetails].expectedDepositCoinAmount,
+            pub:  _cache.exchangeAddress.address,
+            amount: _cache.expectedDepositCoinAmount,
           },
         });
       }, 100);
@@ -488,13 +497,17 @@ class Exchanges extends React.Component {
       this.coinsListDest = coins;
     } else if (e.target.value === 'sync') {
       this.syncHistory();
-    } else if (e.target.value === 'tos' || e.target.value === 'supported-coins') {
+    } else if (
+      e.target.value === 'tos' ||
+      e.target.value === 'supported-coins'
+    ) {
       this.setState({
         prevActiveState: this.state.activeSection,
         [e.target.name]: e.target.value,
       });
     } else if (e.target.value === 'update') {
       this.updateCache();
+
       this.setState({
         activeSection: 'history',
       });
@@ -533,6 +546,7 @@ class Exchanges extends React.Component {
             res.hasOwnProperty('balance') &&
             JSON.stringify(res).indexOf('error') === -1) {
           devlog(`${_coin} balance`, res);
+
           this.setState({
             currentBalance: res.balance,
           });
@@ -544,6 +558,7 @@ class Exchanges extends React.Component {
       this.props.getPrices(pricesCoins)
       .then((res) => {
         devlog('coin prices', res);
+
         if (res &&
             res !== 'error') {
           this.setState({
@@ -728,7 +743,10 @@ class Exchanges extends React.Component {
             </div>
             <i className="fa fa-exchange"></i>
             <div className="dest">
-              <div className={ _cacheFlat[i].status === 'confirming' || _cacheFlat[i].status === 'exchanging' || (_cacheFlat[i].status === 'sending' && !_cacheFlat[i].outputTransactionHash) ? 'status col-warning' : 'status' }>
+              <div className={
+                _cacheFlat[i].status === 'confirming' ||
+                _cacheFlat[i].status === 'exchanging' ||
+                (_cacheFlat[i].status === 'sending' && !_cacheFlat[i].outputTransactionHash) ? 'status col-warning' : 'status' }>
                 { _cacheFlat[i].outputTransactionHash ? 'complete' : this.statusLookup.coinswitch[_cacheFlat[i].status] ? this.statusLookup.coinswitch[_cacheFlat[i].status] : _cacheFlat[i].status }
               </div>
               <div className="item-info">
@@ -741,7 +759,10 @@ class Exchanges extends React.Component {
                 </div>
               </div>
               <div className="deposit">
-                { this.findDeposits(_cacheFlat[i].orderId).length > 0 || (this.state.provider === 'coinswitch' && _cacheFlat[i].inputTransactionHash) || (this.state.provider === 'coinswitch' && _cacheFlat[i].inputTransactionHash && _deposits && _deposits[`${_cacheFlat[i].depositCoin.toLowerCase()}-${_cacheFlat[i].inputTransactionHash}`]) ? <i className="fa fa-check-circle green"></i> : <i className="fa fa-exclamation-circle"></i> }
+                { this.findDeposits(_cacheFlat[i].orderId).length > 0 ||
+                  (this.state.provider === 'coinswitch' && _cacheFlat[i].inputTransactionHash) ||
+                  (this.state.provider === 'coinswitch' && _cacheFlat[i].inputTransactionHash && _deposits && _deposits[`${_cacheFlat[i].depositCoin.toLowerCase()}-${_cacheFlat[i].inputTransactionHash}`]) ? <i className="fa fa-check-circle green"></i> : <i className="fa fa-exclamation-circle"></i>
+                }
               </div>
             </div>
           </div>
@@ -763,12 +784,15 @@ class Exchanges extends React.Component {
   }
 
   renderOrderDetails() {
-    const _cache = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders;
+    const _cache = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders[this.state.activeOrderDetails];
     const _deposits = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders.deposits;
-    
+    const renderTabs = this.findDeposits(_cache.orderId).length > 0 ||
+      (this.state.provider === 'coinswitch' && _cache.inputTransactionHash) ||
+      (this.state.provider === 'coinswitch' && _cache.inputTransactionHash && _deposits && _deposits[`${_cache.depositCoin.toLowerCase()}-${_cache.inputTransactionHash}`]);
+
     return (
       <section className="exchanges-order-details">
-        { (this.findDeposits(_cache[this.state.activeOrderDetails].orderId).length > 0 || (this.state.provider === 'coinswitch' && _cache[this.state.activeOrderDetails].inputTransactionHash) || (this.state.provider === 'coinswitch' && _cache[this.state.activeOrderDetails].inputTransactionHash && _deposits && _deposits[`${_cache[this.state.activeOrderDetails].depositCoin.toLowerCase()}-${_cache[this.state.activeOrderDetails].inputTransactionHash}`])) &&
+        { renderTabs &&
           <div className="tabs">
             <div
               onClick={ () => this.orderDetailsTab(false) }
@@ -784,9 +808,9 @@ class Exchanges extends React.Component {
         }
         { !this.state.activeOrderTxView &&
           <div>
-            { this.findDeposits(_cache[this.state.activeOrderDetails].orderId).length === 0 &&
-              !_cache[this.state.activeOrderDetails].inputTransactionHash &&
-              _cache[this.state.activeOrderDetails].status === 'no_deposit' &&
+            { this.findDeposits(_cache.orderId).length === 0 &&
+              !_cache.inputTransactionHash &&
+              _cache.status === 'no_deposit' &&
               <div className="group3 margin-bottom-30 make-deposit-btn">
                 <div
                   onClick={ this.makeDeposit }
@@ -803,67 +827,67 @@ class Exchanges extends React.Component {
             <div className="edit">
               { translate('EXCHANGES.DATE') }
               <div className="shade margin-top-5">
-                { secondsToString(_cache[this.state.activeOrderDetails].createdAt / 1000) }
+                { secondsToString(_cache.createdAt / 1000) }
               </div>
             </div>
-            { _cache[this.state.activeOrderDetails].validTill &&
+            { _cache.validTill &&
               <div className="edit">
                 { translate('EXCHANGES.VALID_UNTIL') }
                 <div className="shade margin-top-5">
-                  { secondsToString(_cache[this.state.activeOrderDetails].validTill / 1000) }
+                  { secondsToString(_cache.validTill / 1000) }
                 </div>
               </div>
             }
             <div className="edit">
               { translate('EXCHANGES.DEPOSIT') }
               <div className="shade margin-top-5">
-                { Number(Number(_cache[this.state.activeOrderDetails].expectedDepositCoinAmount).toFixed(8)) } { _cache[this.state.activeOrderDetails].depositCoin.toUpperCase() }
+                { Number(Number(_cache.expectedDepositCoinAmount).toFixed(8)) } { _cache.depositCoin.toUpperCase() }
               </div>
             </div>
             <div className="edit">
               { translate('EXCHANGES.DESTINATION') }
               <div className="shade margin-top-5">
-                { Number(Number(_cache[this.state.activeOrderDetails].expectedDestinationCoinAmount).toFixed(8)) } { _cache[this.state.activeOrderDetails].destinationCoin.toUpperCase() }
+                { Number(Number(_cache.expectedDestinationCoinAmount).toFixed(8)) } { _cache.destinationCoin.toUpperCase() }
               </div>
             </div>
             <div className="edit">
               { translate('EXCHANGES.EXCHANGE_RATE') }
               <div className="shade margin-top-5">
-                { Number(Number((1 / _cache[this.state.activeOrderDetails].expectedDepositCoinAmount) * _cache[this.state.activeOrderDetails].expectedDestinationCoinAmount).toFixed(8)) } { _cache[this.state.activeOrderDetails].destinationCoin.toUpperCase() } for 1 { _cache[this.state.activeOrderDetails].depositCoin.toUpperCase() }
+                { Number(Number((1 / _cache.expectedDepositCoinAmount) * _cache.expectedDestinationCoinAmount).toFixed(8)) } { _cache.destinationCoin.toUpperCase() } { translate('EXCHANGES.FOR_SM') } 1 { _cache.depositCoin.toUpperCase() }
               </div>
             </div>
             <div className="edit">
               { translate('EXCHANGES.DEPOSIT_ADDRESS') }
               <div className="shade margin-top-5">
-                { _cache[this.state.activeOrderDetails].exchangeAddress.address }
+                { _cache.exchangeAddress.address }
               </div>
             </div>
             <div className="edit">
               { translate('EXCHANGES.DEPOSIT_TX_ID') }
               <div
                 className="shade margin-top-5"
-                onClick={ () => this.openExplorerUrl(_cache[this.state.activeOrderDetails].depositCoin.toLowerCase(), _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0]) }>
-                { _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0] ? <span>{ _cache[this.state.activeOrderDetails].inputTransactionHash || this.findDeposits(_cache[this.state.activeOrderDetails].orderId)[0] } <i className="fa fa-external-link margin-left-10"></i></span> : translate('EXCHANGES.NA') }
+                onClick={ () => this.openExplorerUrl(_cache.depositCoin.toLowerCase(), _cache.inputTransactionHash || this.findDeposits(_cache.orderId)[0]) }>
+                { _cache.inputTransactionHash || this.findDeposits(_cache.orderId)[0] ? <span>{ _cache.inputTransactionHash || this.findDeposits(_cache.orderId)[0] } <i className="fa fa-external-link margin-left-10"></i></span> : translate('EXCHANGES.NA') }
               </div>
             </div>
             <div className="edit">
               { translate('EXCHANGES.DEST_ADDRESS') }
               <div className="shade margin-top-5">
-                { _cache[this.state.activeOrderDetails].destinationAddress.address }
+                { _cache.destinationAddress.address }
               </div>
             </div>
             <div className="edit">
               { translate('EXCHANGES.DEST_TX_ID') }
               <div
                 className="shade margin-top-5"
-                onClick={ () => this.openExplorerUrl(_cache[this.state.activeOrderDetails].destinationCoin.toLowerCase(), _cache[this.state.activeOrderDetails].outputTransactionHash) }>
-                { _cache[this.state.activeOrderDetails].outputTransactionHash ? <span>{ _cache[this.state.activeOrderDetails].outputTransactionHash } <i className="fa fa-external-link margin-left-10"></i></span> : translate('EXCHANGES.NA') }
+                onClick={ () => this.openExplorerUrl(_cache.destinationCoin.toLowerCase(), _cache.outputTransactionHash) }>
+                { _cache.outputTransactionHash ? <span>{ _cache.outputTransactionHash } <i className="fa fa-external-link margin-left-10"></i></span> : translate('EXCHANGES.NA') }
               </div>
             </div>
             <div className="edit">
               { translate('EXCHANGES.STATUS') }
               <div className="shade margin-top-5">
-                { _cache[this.state.activeOrderDetails].outputTransactionHash ? 'complete' : this.statusLookup.coinswitch[_cache[this.state.activeOrderDetails].status] ? this.statusLookup.coinswitch[_cache[this.state.activeOrderDetails].status] : _cache[this.state.activeOrderDetails].status }
+                { _cache.outputTransactionHash ? translate('EXCHANGES.COMPLETE_SM') : this.statusLookup.coinswitch[_cache.status] ? this.statusLookup.coinswitch[_cache.status] : _cache.status }
               </div>
             </div>
             <div className="edit">
@@ -871,7 +895,7 @@ class Exchanges extends React.Component {
               <div
                 className="shade margin-top-5"
                 onClick={ this.openOrderOnline }>
-                { _cache[this.state.activeOrderDetails].orderId }
+                { _cache.orderId }
                 <i className="fa fa-external-link margin-left-10"></i>
               </div>
             </div>
@@ -894,7 +918,7 @@ class Exchanges extends React.Component {
             <div className="edit">
               { translate('EXCHANGES.AMOUNT') }
               <div className="shade margin-top-5">
-                { (Number(this.state.activeOrderDetailsDepositTx.amount) === 0 ? 'unknown' : Number(this.state.activeOrderDetailsDepositTx.amount)) }
+                { (Number(this.state.activeOrderDetailsDepositTx.amount) === 0 ? translate('TRANSACTIONS.UNKNOWN') : Number(this.state.activeOrderDetailsDepositTx.amount)) }
               </div>
             </div>
             { this.state.activeOrderDetailsDepositTx.amount !== this.state.activeOrderDetailsDepositTx.fee &&
@@ -927,7 +951,7 @@ class Exchanges extends React.Component {
               { translate('EXCHANGES.TX_ID') }
               <div
                 className="shade margin-top-5"
-                onClick={ () => this.openExplorerUrl(_cache[this.state.activeOrderDetails].depositCoin.toLowerCase(), this.state.activeOrderDetailsDepositTx.txid) }>
+                onClick={ () => this.openExplorerUrl(_cache.depositCoin.toLowerCase(), this.state.activeOrderDetailsDepositTx.txid) }>
                 { this.state.activeOrderDetailsDepositTx.txid } <i className="fa fa-external-link margin-left-10"></i>
               </div>
             </div>
@@ -1003,10 +1027,12 @@ class Exchanges extends React.Component {
   }
 
   renderOrderForm() {
+    const coins = Object.keys(this.filterOutETH(this.props.coins));
+
     return (
       <div className="exchanges-new-order">
         <AddCoin
-          coins={ Object.keys(this.filterOutETH(this.props.coins)) }
+          coins={ coins }
           filterOut={ [this.state.coinDest, this.state.coinSrc] }
           activate={ this.state.addcoinActive }
           cb={ this.addcoinCB } />
@@ -1064,7 +1090,7 @@ class Exchanges extends React.Component {
                 { !this.state.coinSrc &&
                   <span className="label empty">{ translate('EXCHANGES.TAP_TO_SELECT_COIN') }</span>
                 }
-                { (Object.keys(this.filterOutETH(this.props.coins)).length > 2 || (Object.keys(this.filterOutETH(this.props.coins)).length === 2 && !this.state.coinSrc)) &&
+                { (coins.length > 2 || (coins.length === 2 && !this.state.coinSrc)) &&
                   <i className="fa fa-caret-down"></i>
                 }
               </div>
@@ -1082,7 +1108,7 @@ class Exchanges extends React.Component {
                 { !this.state.coinDest &&
                   <span className="label empty">{ translate('EXCHANGES.TAP_TO_SELECT_COIN') }</span>
                 }
-                { (Object.keys(this.filterOutETH(this.props.coins)).length > 2 || (Object.keys(this.filterOutETH(this.props.coins)).length === 2 && !this.state.coinDest)) &&
+                { (coins.length > 2 || (coins.length === 2 && !this.state.coinDest)) &&
                   <i className="fa fa-caret-down"></i>
                 }
               </div>
@@ -1119,7 +1145,7 @@ class Exchanges extends React.Component {
               className="group3 margin-top-40">
               <div className="btn-inner">
                 <div className="btn">
-                  { this.state.processing ? translate('EXCHANGES.PLEASE_WAIT') + '...' : translate('EXCHANGES.NEXT') }
+                  { this.state.processing ? `${translate('EXCHANGES.PLEASE_WAIT')}...` : translate('EXCHANGES.NEXT') }
                 </div>
                 <div className="group2">
                   <div className="rectangle8copy"></div>
@@ -1200,7 +1226,7 @@ class Exchanges extends React.Component {
                   className="btn-inner pull-right margin-right-15"
                   disabled={ this.state.processing }>
                   <div className="btn">
-                    { this.state.processing ? translate('EXCHANGES.PLEASE_WAIT') + '...' : translate('EXCHANGES.NEXT') }
+                    { this.state.processing ? `${translate('EXCHANGES.PLEASE_WAIT')}...` : translate('EXCHANGES.NEXT') }
                   </div>
                   <div className="group2">
                     <div className="rectangle8copy"></div>
@@ -1283,7 +1309,7 @@ class Exchanges extends React.Component {
                   onClick={ this.nextStep }
                   className="btn-inner">
                   <div className="btn">
-                    { this.state.processing ? translate('EXCHANGES.PLEASE_WAIT') + '...' : translate('EXCHANGES.PROCEED_TO_DEPOSIT') }
+                    { this.state.processing ? `${translate('EXCHANGES.PLEASE_WAIT')}...` : translate('EXCHANGES.PROCEED_TO_DEPOSIT') }
                   </div>
                   <div className="group2">
                     <div className="rectangle8copy"></div>

@@ -60,6 +60,7 @@ const lang = {
       NA: 'N/A',
       AMOUNT_IS_INCORRECT: 'Amount is incorrect',
       IN_SM: 'in',
+      COMPLETE_SM: 'complete',
     },
     API: {
       NO_UTXO_ERR: 'No available UTXO(s) or connection error',
