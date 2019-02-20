@@ -41,10 +41,17 @@ const DASHBOARD_UPDATE_INTERVAL = 120000; // 2m
 const PROXY_RETRY_COUNT = 2;
 const PROXY_RETRY_TIMEOUT = 5000;
 
-const _settings = getLocalStorageVar('settings');
+let _settings = getLocalStorageVar('settings');
 
 if (!_settings) {
   setLocalStorageVar('settings', settingsDefaults);
+} else {
+  for (let key in settingsDefaults) {
+    if (!_settings[key]) {
+      _settings[key] = settingsDefaults[key];
+      setLocalStorageVar('settings', _settings);
+    }
+  }
 }
 
 class App extends React.Component {
