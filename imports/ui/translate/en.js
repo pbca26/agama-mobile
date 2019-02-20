@@ -77,6 +77,7 @@ const lang = {
       PURGE_ALL_DATA: 'Purge all data',
       PURGE_ALL_DATA_WARNING: 'Warning! This is going to destroy all data on this device including your encrypted seed.',
       SELECT_SERVER_BELOW: 'Select another server from the list below',
+      CURRENCY: 'Currency',
     },
     RECOVERY: {
       PROVIDE_YOUR_PIN: 'Provide your PIN number to unlock seed/WIF.',

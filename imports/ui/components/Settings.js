@@ -10,6 +10,8 @@ import {
 } from '../actions/seedCrypt';
 import translate from '../translate/translate';
 import { Meteor } from 'meteor/meteor';
+import fiatList from './fiatList';
+import settingsDefaults from './settingsDefaults';
 
 // TODO: reset settings/purge seed and pin
 
@@ -24,6 +26,7 @@ class Settings extends React.Component {
       requirePin: false,
       isSaved: false,
       purgeData: false,
+      fiat: 'usd',
     };
     this.updateInput = this.updateInput.bind(this);
     this.toggleConfirmPin = this.toggleConfirmPin.bind(this);
@@ -38,6 +41,7 @@ class Settings extends React.Component {
       this.setState({
         autoLockTimeout: _settings.autoLockTimeout,
         requirePin: _settings.requirePin,
+        fiat: _settings.fiat,
         purgeData: false,
       });
     }
@@ -63,10 +67,7 @@ class Settings extends React.Component {
 
   save() {
     if (this.state.purgeData) {
-      setLocalStorageVar('settings', {
-        autoLockTimeout: 600000,
-        requirePin: false,
-      });
+      setLocalStorageVar('settings', settingsDefaults);
       setLocalStorageVar('coins', {});
       setLocalStorageVar('seed', null);
       setLocalStorageVar('exchanges', {
@@ -79,6 +80,7 @@ class Settings extends React.Component {
       setLocalStorageVar('settings', {
         autoLockTimeout: this.state.autoLockTimeout,
         requirePin: this.state.requirePin,
+        fiat: this.state.fiat,
       });
     }
 
@@ -99,6 +101,22 @@ class Settings extends React.Component {
     this.props.globalClick();
   }
 
+  renderFiatOptions() {
+    let items = [];
+
+    for (let i = 0; i < fiatList.length; i++) {
+      items.push(
+        <option
+          key={ `settings-fiat-${fiatList[i]}` }
+          value={ fiatList[i] }>
+          { translate('FIAT_CURRENCIES.' + fiatList[i].toUpperCase()) }
+        </option>
+      );
+    }
+
+    return items;
+  }
+
   render() {
     return (
       <div className="form settings">
@@ -113,6 +131,17 @@ class Settings extends React.Component {
             <option value="600000">10 { translate('SETTINGS.MINUTES') }</option>
             <option value="1200000">20 { translate('SETTINGS.MINUTES') }</option>
             <option value="1800000">30 { translate('SETTINGS.MINUTES') }</option>
+          </select>
+        </div>
+        <div className="margin-top-10 item">
+          <div className="padding-bottom-20">{ translate('SETTINGS.CURRENCY') }</div>
+          <select
+            className="form-control form-material"
+            name="fiat"
+            value={ this.state.fiat }
+            onChange={ (event) => this.updateInput(event) }
+            autoFocus>
+            { this.renderFiatOptions() }
           </select>
         </div>
         <div className="item">
