@@ -665,12 +665,14 @@ const getOverview = (coins) => {
           _coins.push(promiseResult[i].coin.split('|')[0]);
         }
 
+        const settingsCurrency = getLocalStorageVar('settings').fiat;
+
         HTTP.call(
           'GET',
           'https://www.atomicexplorer.com/api/mm/prices/v2', {
           params: {
             coins: _coins.length > 1 ? _coins.join(',') : _coins,
-            currency: 'usd',
+            currency: settingsCurrency,
             pricechange: true,
           },
         }, (error, result) => {
@@ -685,7 +687,7 @@ const getOverview = (coins) => {
               devlog('unable to get https://www.atomicexplorer.com/api/mm/prices/v2');
               devlog(JSON.stringify({
                 coins: _coins.length > 1 ? _coins.join(',') : _coins,
-                currency: 'usd',
+                currency: settingsCurrency,
                 pricechange: true,
               }));
               devlog(JSON.stringify(result));
@@ -699,8 +701,8 @@ const getOverview = (coins) => {
               _overviewItems.push({
                 coin: promiseResult[i].coin,
                 balanceNative: promiseResult[i].balance,
-                balanceUSD: _prices[_coin.toUpperCase()] && _prices[_coin.toUpperCase()].USD && Number(promiseResult[i].balance) ? Number(_prices[_coin.toUpperCase()].USD) * Number(promiseResult[i].balance) : 0,
-                usdPricePerItem: _prices[_coin.toUpperCase()] && _prices[_coin.toUpperCase()].USD ? Number(_prices[_coin.toUpperCase()].USD) : 0,
+                balanceFiat: _prices[_coin.toUpperCase()] && _prices[_coin.toUpperCase()][settingsCurrency.toUpperCase()] && Number(promiseResult[i].balance) ? Number(_prices[_coin.toUpperCase()][settingsCurrency.toUpperCase()]) * Number(promiseResult[i].balance) : 0,
+                fiatPricePerItem: _prices[_coin.toUpperCase()] && _prices[_coin.toUpperCase()][settingsCurrency.toUpperCase()] ? Number(_prices[_coin.toUpperCase()][settingsCurrency.toUpperCase()]) : 0,
                 priceChange: _prices[_coin.toUpperCase()] && _prices[_coin.toUpperCase()].priceChange ? _prices[_coin.toUpperCase()].priceChange : null,
               });
             }

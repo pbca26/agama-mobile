@@ -1,9 +1,13 @@
 import React from 'react';
 import Spinner from './Spinner';
+import FiatSymbol from './FiatSymbol';
 
 import { formatValue } from 'agama-wallet-lib/build/utils';
 import translate from '../translate/translate';
-import { assetsPath } from '../actions/utils';
+import {
+  assetsPath,
+  getLocalStorageVar,
+} from '../actions/utils';
 
 class Overview extends React.Component {
   constructor() {
@@ -14,26 +18,29 @@ class Overview extends React.Component {
 
   renderOverview() {
     if (this.props.overview) {
+      const settingsCurrency = getLocalStorageVar('settings').fiat;
       const _overview = this.props.overview;
       let _items = [];
-      let _totalUSDBalance = 0;
+      let _totalFiatBalance = 0;
 
       for (let i = 0; i < _overview.length; i++) {
-        _totalUSDBalance += _overview[i].balanceUSD;
+        _totalFiatBalance += _overview[i].balanceFiat;
       }
 
       _items.push(
         <div
           className="group7"
-          key="overview-coins-usd-balance">
+          key="overview-coins-fiat-balance">
           <div className="cryptocardbg">
             <img
               className="rectangle5"
               src={ `${assetsPath.home}/home-rectangle-5.png` } />
           </div>
           <div className="totalvalue">{ translate('OVERVIEW.TOTAL_VALUE') }</div>
-          <div className="a3467812">{ formatValue(_totalUSDBalance) }</div>
-          <div className="label1">$</div>
+          <div className="a3467812">{ formatValue(_totalFiatBalance) }</div>
+          <div className="label1">
+            <FiatSymbol symbol={ settingsCurrency } />
+          </div>
           <div className="cryptocardgraph">
             <div className="group4">
               <div className="group2">
@@ -100,9 +107,9 @@ class Overview extends React.Component {
             <img
               className="div1"
               src={ `${assetsPath.home}/trends-rectangle-7.png` } />
-            { _overview[i].usdPricePerItem > 0 &&
+            { _overview[i].fiatPricePerItem > 0 &&
               <div className="a1241">
-                ~ $ { Number(Number(_overview[i].usdPricePerItem).toFixed(4)) } { translate('OVERVIEW.PER_COIN') }
+                ~ <FiatSymbol symbol={ settingsCurrency } /> { Number(Number(_overview[i].fiatPricePerItem).toFixed(4)) } { translate('OVERVIEW.PER_COIN') }
               </div>
             }
             { /*<img className="path5" src={ `${assetsPath.home}/home-path-5.png` } />*/ }
@@ -111,11 +118,11 @@ class Overview extends React.Component {
                 className="oval4"
                 src={ `${assetsPath.coinLogo}/${_mode}/${_name.toLowerCase()}.png` } />
             </div>
-            <div className="bitcoin">{ translate(_mode.toUpperCase() + '.' + _name.toUpperCase()) }</div>
+            <div className="bitcoin">{ translate(`${_mode.toUpperCase()}.${_name.toUpperCase()}`) }</div>
             <div className="a0000041">{ formatValue(_overview[i].balanceNative) }</div>
-            { _overview[i].balanceUSD > 0 &&
+            { _overview[i].balanceFiat > 0 &&
               <div className="a123345">
-              ${ Number(Number(_overview[i].balanceUSD).toFixed(4)) }
+              <FiatSymbol symbol={ settingsCurrency } />{ Number(Number(_overview[i].balanceFiat).toFixed(4)) }
               { _overview[i].priceChange &&
                 _overview[i].priceChange.data &&
                 <i className={ `fa fa-arrow-${_priceChangeColor === 'red' ? 'down' : 'up'} icon-price-change ${_priceChangeColor}` }></i>
@@ -148,7 +155,7 @@ class Overview extends React.Component {
             <div className="home-inner">
               { this.renderOverview() }
               <div className="yourcoins">
-              { translate('OVERVIEW.' + (this.props.overview && this.props.overview.length ? 'YOUR_COINS' : 'LOADING')) }
+                { translate('OVERVIEW.' + (this.props.overview && this.props.overview.length ? 'YOUR_COINS' : 'LOADING')) }
               </div>
               { this.props.overview &&
                 !this.props.overview.length &&
