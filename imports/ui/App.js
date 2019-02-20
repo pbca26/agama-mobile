@@ -32,13 +32,20 @@ import KMDInterest from './components/KMDInterest';
 import OfflineSigning from './components/OfflineSigning';
 import Pin from './components/Pin';
 import Recovery from './components/Recovery';
-import Overview  from './components/Overview';
-import Settings  from './components/Settings';
-import Exchanges  from './components/Exchanges/Exchanges';
+import Overview from './components/Overview';
+import Settings from './components/Settings';
+import Exchanges from './components/Exchanges/Exchanges';
+import settingsDefaults from './components/settingsDefaults';
 
 const DASHBOARD_UPDATE_INTERVAL = 120000; // 2m
 const PROXY_RETRY_COUNT = 2;
 const PROXY_RETRY_TIMEOUT = 5000;
+
+const _settings = getLocalStorageVar('settings');
+
+if (!_settings) {
+  setLocalStorageVar('settings', settingsDefaults);
+}
 
 class App extends React.Component {
   constructor() {
@@ -148,7 +155,7 @@ class App extends React.Component {
     const { actions } = this.props;
 
     if (!disableAnimation ||
-       typeof disableAnimation === 'object') {
+        typeof disableAnimation === 'object') {
       this.setState({
         proxyRetryInProgress: true,
       });
