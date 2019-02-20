@@ -15,11 +15,11 @@ import SendCoin from '../SendCoin';
 import ExchangesSupportedCoins from './Coins';
 import ExchangesTOS from './TOS';
 import ExchangesOrderDetails from './OrderDetails';
+import ExchangesHistory from './History';
 import fees from 'agama-wallet-lib/build/fees';
 import {
   fromSats,
   toSats,
-  sort,
   formatValue,
   isNumber,
 } from 'agama-wallet-lib/build/utils';
@@ -32,7 +32,6 @@ import {
 
 const EXCHANGES_CACHE_UPDATE_INTERVAL = 60; // sec
 const EXCHANGES_COINSWITCH_COINS_UPDATE_INTERVAL = 120; // sec
-const MAX_ORDERS = 30;
 
 class Exchanges extends React.Component {
   constructor() {
@@ -70,7 +69,12 @@ class Exchanges extends React.Component {
         pub: null,
         amount: 0,
       },
-      exchangesCache: {},
+      exchangesCache: {
+        coinswitch: {
+          deposits: {},
+          orders: {},
+        },
+      },
     };
     this.coinsListSrc = null;
     this.coinsListDest = null;
@@ -235,7 +239,7 @@ class Exchanges extends React.Component {
   }
 
   openOrderDetails(orderId) {
-    const _cache = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders[orderId];
+    const _cache = this.exchangesCache ? this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders[orderId] : this.state.exchangesCache.coinswitch && this.state.exchangesCache.coinswitch.orders[orderId];
 
     this.setState({
       activeOrderDetails: orderId,
@@ -612,7 +616,7 @@ class Exchanges extends React.Component {
   }
 
   findDeposits(orderId) {
-    const _cache = this.exchangesCache ? this.exchangesCache.coinswitch : this.state.exchangesCache.coinswitch;
+    const _cache = this.exchangesCache ? this.exchangesCache.coinswitch : this.state && this.state.exchangesCache && this.state.exchangesCache.coinswitch;
     let _items = [];
 
     if (_cache &&
@@ -689,79 +693,6 @@ class Exchanges extends React.Component {
     }
   }
 
-  renderOrderHistory() {
-    const _cache = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.orders;
-    const _deposits = this.exchangesCache.coinswitch && this.exchangesCache.coinswitch.deposits;
-    let _cacheFlat = [];
-    let _items = [];
-  
-    for (let key in _cache) {
-      _cacheFlat.push(_cache[key]);
-    }
-  
-    _cacheFlat = sort(_cacheFlat, 'createdAt', true);
-  
-    for (let i = 0; i < _cacheFlat.length && i < MAX_ORDERS; i++) {
-      if (this.state.provider === 'coinswitch') {
-        _items.push(
-          <div
-            key={ `${this.state.provider}-${i}` }
-            className="item"
-            onClick={ () => this.openOrderDetails(_cacheFlat[i].orderId) }>
-            <div className="src">
-              <div className="date">{ secondsToString(_cacheFlat[i].createdAt / 1000) }</div>
-              <div className="item-info">
-                <img
-                  className="icon"
-                  src={ `${assetsPath.coinLogo}/spv/${_cacheFlat[i].depositCoin}.png` } />
-                <div className="item-info-details">
-                  <div className="name">{ _cacheFlat[i].depositCoin.toUpperCase() }</div>
-                  <div className="amount">{ formatValue(_cacheFlat[i].expectedDepositCoinAmount) }</div>
-                </div>
-              </div>
-            </div>
-            <i className="fa fa-exchange"></i>
-            <div className="dest">
-              <div className={
-                _cacheFlat[i].status === 'confirming' ||
-                _cacheFlat[i].status === 'exchanging' ||
-                (_cacheFlat[i].status === 'sending' && !_cacheFlat[i].outputTransactionHash) ? 'status col-warning' : 'status' }>
-                { _cacheFlat[i].outputTransactionHash ? 'complete' : this.statusLookup.coinswitch[_cacheFlat[i].status] ? this.statusLookup.coinswitch[_cacheFlat[i].status] : _cacheFlat[i].status }
-              </div>
-              <div className="item-info">
-                <img
-                  className="icon"
-                  src={ `${assetsPath.coinLogo}/spv/${_cacheFlat[i].destinationCoin}.png` } />
-                <div className="item-info-details">
-                  <div className="name">{ _cacheFlat[i].destinationCoin.toUpperCase() }</div>
-                  <div className="amount">{ formatValue(_cacheFlat[i].expectedDestinationCoinAmount) }</div>
-                </div>
-              </div>
-              <div className="deposit">
-                { this.findDeposits(_cacheFlat[i].orderId).length > 0 ||
-                  (this.state.provider === 'coinswitch' && _cacheFlat[i].inputTransactionHash) ||
-                  (this.state.provider === 'coinswitch' && _cacheFlat[i].inputTransactionHash && _deposits && _deposits[`${_cacheFlat[i].depositCoin.toLowerCase()}-${_cacheFlat[i].inputTransactionHash}`]) ? <i className="fa fa-check-circle green"></i> : <i className="fa fa-exclamation-circle"></i>
-                }
-              </div>
-            </div>
-          </div>
-        );
-      }
-    }
-  
-    if (_items.length) {
-      return (
-        <div className="exchanges-history-inner-block">
-        { _items }
-        </div>
-      );
-    } else {
-      return (
-        <div className="margin-left-10">{ translate('EXCHANGES.NO_HISTORY') }</div>
-      );
-    }
-  }
-
   componentWillMount() {
     const _cache = getLocalStorageVar('exchanges');
 
@@ -769,6 +700,7 @@ class Exchanges extends React.Component {
       this.exchangesCache = _cache;
       this.setState({
         activeSection: 'history',
+        exchangesCache: _cache,
       });
       this.updateCache();
     } else {
@@ -1208,7 +1140,21 @@ class Exchanges extends React.Component {
 
           { (this.state.activeSection === 'history' || this.state.activeSection === 'order-details') &&
             <div className="exchanges-order-history margin-top-45">
-              { !this.state.activeOrderDetails && !this.state.syncHistoryProgressing && this.renderOrderHistory() }
+              { !this.state.activeOrderDetails &&
+                !this.state.syncHistoryProgressing &&
+                <ExchangesHistory
+                  provider={ this.state.provider }
+                  orders={
+                    this.exchangesCache.coinswitch &&
+                    this.exchangesCache.coinswitch.orders
+                  }
+                  deposits={
+                    this.exchangesCache.coinswitch &&
+                    this.exchangesCache.coinswitch.orders.deposits
+                  }
+                  openOrderDetails={ this.openOrderDetails }
+                  findDeposits={ this.findDeposits } />
+              }
               { this.state.activeOrderDetails &&
                 !this.state.syncHistoryProgressing &&
                 <ExchangesOrderDetails
@@ -1223,8 +1169,7 @@ class Exchanges extends React.Component {
                   }
                   findDeposits={ this.findDeposits }
                   openOrderOnline={ this.openOrderOnline }
-                  makeDeposit={ this.makeDeposit }
-                  cache={ this.exchangesCache } />
+                  makeDeposit={ this.makeDeposit } />
               }
               { this.state.syncHistoryProgressing &&
                 <div className="text-center">
