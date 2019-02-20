@@ -5,6 +5,8 @@ import {
   assetsPath,
 } from '../actions/utils';
 import translate from '../translate/translate';
+import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
+import erc20ContractId from 'agama-wallet-lib/build/eth-erc20-contract-id';
 
 class AddCoin extends React.Component {
   constructor() {
@@ -57,7 +59,7 @@ class AddCoin extends React.Component {
       const _mode = _coin.name.split('|')[1];
 
       if (!this.state.searchTerm ||
-          (this.state.searchTerm && (_name.indexOf(this.state.searchTerm.toLowerCase()) > -1 || _mode.indexOf(this.state.searchTerm.toLowerCase()) > -1 || _coin.title.toLowerCase().indexOf(this.state.searchTerm.toLowerCase()) > -1))) {
+          (this.state.searchTerm && ((this.state.searchTerm.toLowerCase() === 'kmd' && isKomodoCoin(_name.toLowerCase()) && !erc20ContractId[_name.toLowerCase()]) || _name.indexOf(this.state.searchTerm.toLowerCase()) > -1 || _mode.indexOf(this.state.searchTerm.toLowerCase()) > -1 || _coin.title.toLowerCase().indexOf(this.state.searchTerm.toLowerCase()) > -1))) {
         _items.push(
           <div
             onClick={ () => this.addCoin(_coin.name) }
@@ -68,7 +70,7 @@ class AddCoin extends React.Component {
                 className="oval4"
                 src={ `${assetsPath.coinLogo}/${_mode}/${_name}.png` } />
             </div>
-            <div className="bitcoin">{ translate(_mode.toUpperCase() + '.' + _name.toUpperCase()) }</div>
+            <div className="bitcoin">{ translate(`${_mode.toUpperCase()}.${_name.toUpperCase()}`) }</div>
           </div>
         );
 
