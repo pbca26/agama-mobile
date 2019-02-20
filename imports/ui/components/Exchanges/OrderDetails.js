@@ -53,13 +53,13 @@ class ExchangesOrderDetails extends React.Component {
   render() {
     const _cache = this.props.order;
     const _deposits = this.props.deposit;
-    const renderDepositTab = this.findDeposits(_cache.orderId).length > 0 ||
+    const renderDepositTab = this.props.findDeposits(_cache.orderId).length > 0 ||
       (this.props.provider === 'coinswitch' && _cache.inputTransactionHash) ||
       (this.props.provider === 'coinswitch' && _cache.inputTransactionHash && _deposits && _deposits[`${_cache.depositCoin.toLowerCase()}-${_cache.inputTransactionHash}`]);
 
     return (
       <section className="exchanges-order-details">
-        { this.findDeposits(_cache.orderId).length === 0 &&
+        { this.props.findDeposits(_cache.orderId).length === 0 &&
           !_cache.inputTransactionHash &&
           _cache.status === 'no_deposit' &&
           <div className="group3 margin-bottom-50 make-deposit-btn">
@@ -131,8 +131,8 @@ class ExchangesOrderDetails extends React.Component {
               { translate('EXCHANGES.DEPOSIT_TX_ID') }
               <div
                 className="shade margin-top-5"
-                onClick={ () => this.openExplorerUrl(_cache.depositCoin.toLowerCase(), _cache.inputTransactionHash || this.findDeposits(_cache.orderId)[0]) }>
-                { _cache.inputTransactionHash || this.findDeposits(_cache.orderId)[0] ? <span>{ _cache.inputTransactionHash || this.findDeposits(_cache.orderId)[0] } <i className="fa fa-external-link margin-left-10"></i></span> : translate('EXCHANGES.NA') }
+                onClick={ () => this.openExplorerUrl(_cache.depositCoin.toLowerCase(), _cache.inputTransactionHash || this.props.findDeposits(_cache.orderId)[0]) }>
+                { _cache.inputTransactionHash || this.props.findDeposits(_cache.orderId)[0] ? <span>{ _cache.inputTransactionHash || this.props.findDeposits(_cache.orderId)[0] } <i className="fa fa-external-link margin-left-10"></i></span> : translate('EXCHANGES.NA') }
               </div>
             </div>
             <div className="edit">
