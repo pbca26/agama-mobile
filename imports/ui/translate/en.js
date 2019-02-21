@@ -31,7 +31,8 @@ const lang = {
       TAP_TO_SELECT_COIN: 'tap to select a coin',
       BUY: 'Buy',
       ENTER_AN_AMOUNT: 'Enter an amount',
-      INSUFFICIENT_FUNDS: 'Insufficient funds, you can buy up to @template@ max',
+      INSUFFICIENT_FUNDS_SRC: 'Insufficient funds, you can buy up to @template@ max',
+      INSUFFICIENT_FUNDS_DESC: 'Insufficient funds, you can sell up to @template@ max',
       ERROR: 'Error',
       PLEASE_WAIT: 'Please wait',
       NEXT: 'Next',
@@ -61,6 +62,8 @@ const lang = {
       AMOUNT_IS_INCORRECT: 'Amount is incorrect',
       IN_SM: 'in',
       COMPLETE_SM: 'complete',
+      SWITCH_AMOUNT_CURRENCY: 'Switch amount currency',
+      CURRENT_BALANCE: 'Current @template@ balance',
     },
     API: {
       NO_UTXO_ERR: 'No available UTXO(s) or connection error',

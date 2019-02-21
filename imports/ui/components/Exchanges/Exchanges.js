@@ -45,7 +45,8 @@ class Exchanges extends React.Component {
       syncHistoryProgressing: false,
       exchangeCacheUpdateProgress: false,
       activeSection: 'history',
-      currentBalance: 'none',
+      currentBalanceSrc: 'none',
+      currentBalanceDest: 'none',
       step: 0,
       orderId: null,
       amount: 0,
@@ -106,8 +107,15 @@ class Exchanges extends React.Component {
     this.makeDeposit = this.makeDeposit.bind(this);
     this.sendCoinCB = this.sendCoinCB.bind(this);
     this.filterOutETH = this.filterOutETH.bind();
+    this.toggleBuyFixedDestCoin = this.toggleBuyFixedDestCoin.bind(this);
     // test
     this.loadTestData = this.loadTestData.bind(this);
+  }
+
+  toggleBuyFixedDestCoin() {
+    this.setState({
+      buyFixedDestCoin: !this.state.buyFixedDestCoin,
+    });
   }
 
   filterOutETH = (coins) => {
@@ -202,9 +210,17 @@ class Exchanges extends React.Component {
   }
 
   setMaxBuyAmount() {
-    this.setState({
-      amount: this.state.maxBuyError,
-    });
+    if (this.state.buyFixedDestCoin) {
+      this.setState({
+        amount: this.state.currentBalanceSrc,
+        maxBuyError: null,
+      });
+    } else {
+      this.setState({
+        amount: this.state.maxBuyError,
+        maxBuyError: null,
+      });
+    }
   }
 
   openOrderOnline() {
@@ -363,21 +379,21 @@ class Exchanges extends React.Component {
           if (this.state.provider === 'coinswitch') {
             if (exchangeRate.data) {
               let valid = true;
-              let amount;
+              let amount = this.state.amount;
 
               if (!this.state.buyFixedDestCoin) {
                 amount = Number(this.state.amount / exchangeRate.data.rate).toFixed(8);
+              }
 
-                if (Number(amount) > Number(this.state.currentBalance)) {
-                  const _maxBuy = Number(Number((this.state.currentBalance - fromSats(fees[srcCoinSym])) * exchangeRate.data.rate).toFixed(8));
+              if (Number(amount) > Number(this.state.currentBalanceSrc)) {
+                const _maxBuy = this.state.buyFixedDestCoin ? Number(Number((this.state.currentBalanceSrc - fromSats(fees[srcCoinSym]))).toFixed(8)) : Number(Number((this.state.currentBalanceSrc - fromSats(fees[srcCoinSym])) * exchangeRate.data.rate).toFixed(8));
 
-                  valid = false;
-                  
-                  this.setState({
-                    processing: false,
-                    maxBuyError: _maxBuy,
-                  });
-                }
+                valid = false;
+                
+                this.setState({
+                  processing: false,
+                  maxBuyError: _maxBuy,
+                });
               }
 
               if (valid) {
@@ -531,25 +547,33 @@ class Exchanges extends React.Component {
             JSON.stringify(res).indexOf('error') === -1) {
           devlog(`${_coin} balance`, res);
 
-          this.setState({
-            currentBalance: res.balance,
-          });
+          if (this.state.addcoinDirection === 'src') {
+            this.setState({
+              currentBalanceSrc: res.balance,
+            });
+          } else {
+            this.setState({
+              currentBalanceDest: res.balance,
+            });
+          }
         } else {
           devlog(`error getting ${_coin} balance`);
         }
       });
 
-      this.props.getPrices(pricesCoins)
-      .then((res) => {
-        devlog('coin prices', res);
+      if (pricesCoins) {
+        this.props.getPrices(pricesCoins)
+        .then((res) => {
+          devlog('coin prices', res);
 
-        if (res &&
-            res !== 'error') {
-          this.setState({
-            fiatPrices: res,
-          });
-        }
-      });
+          if (res &&
+              res !== 'error') {
+            this.setState({
+              fiatPrices: res,
+            });
+          }
+        });
+      }
     }
     
     if (this.state.addcoinDirection === 'dest') {
@@ -560,19 +584,10 @@ class Exchanges extends React.Component {
 
       if (propsCoins.length === 2) {
         _newState.coinSrc = propsCoins[propsCoins.indexOf(coin) === 0 ? 1 : 0];
+        fetchData(coin);
         fetchData(_newState.coinSrc, [coin.split('|')[0], _newState.coinSrc.split('|')[0]]);
       } else if (this.state.coinSrc) {
-        this.props.getPrices([coin.split('|')[0], this.state.coinSrc.split('|')[0]])
-        .then((res) => {
-          devlog('coin prices', res);
-          
-          if (res &&
-              res !== 'error') {
-            this.setState({
-              fiatPrices: res,
-            });
-          }
-        });
+        fetchData(coin, [coin.split('|')[0], this.state.coinSrc.split('|')[0]]);
       }
       this.setState(_newState);
     } else {
@@ -583,19 +598,10 @@ class Exchanges extends React.Component {
       
       if (propsCoins.length === 2) {
         _newState.coinDest = propsCoins[propsCoins.indexOf(coin) === 0 ? 1 : 0];
+        fetchData(_newState.coinDest.split('|')[0]);
         fetchData(coin, [coin.split('|')[0], _newState.coinDest.split('|')[0]]);
       } else if (this.state.coinDest) {
-        this.props.getPrices([coin.split('|')[0], this.state.coinDest.split('|')[0]])
-        .then((res) => {
-          devlog('coin prices', res);
-          
-          if (res &&
-              res !== 'error') {
-            this.setState({
-              fiatPrices: res,
-            });
-          }
-        });
+        fetchData(coin, [coin.split('|')[0], this.state.coinDest.split('|')[0]]);
       } else {
         fetchData(coin, coin.split('|')[0]);
       }
@@ -848,6 +854,36 @@ class Exchanges extends React.Component {
                 }
               </div>
             </div>
+            <div className="margin-bottom-25 toggle-buy-coin">
+              <div className={ 'edit' + (!this.state.coinDest || !this.state.coinSrc ? ' disabled' : '') }>
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    value="on"
+                    checked={ this.state.buyFixedDestCoin }
+                    readOnly />
+                  <div
+                    className="slider"
+                    onClick={ this.toggleBuyFixedDestCoin }></div>
+                </label>
+                <div
+                  className="toggle-label"
+                  onClick={ this.toggleBuyFixedDestCoin }>
+                  { translate('EXCHANGES.SWITCH_AMOUNT_CURRENCY') }
+                </div>
+              </div>
+            </div>
+            { this.state.buyFixedDestCoin &&
+              <div className="margin-bottom-25 toggle-buy-coin">
+                <div
+                  className="edit fs14"
+                  onClick={ this.setMaxBuyAmount }>
+                  <label>
+                    { translate('EXCHANGES.CURRENT_BALANCE', this.state.coinSrc.split('|')[0].toUpperCase()) }: <span className="success">{ this.state.currentBalanceSrc }</span>
+                  </label>
+                </div>
+              </div>
+            }
             <div className="margin-bottom-25">
               <div className="edit">
                 <input
@@ -855,13 +891,15 @@ class Exchanges extends React.Component {
                   className="form-control"
                   name="amount"
                   onChange={ this.updateInput }
-                  placeholder={ translate('EXCHANGES.ENTER_AN_AMOUNT') + (this.state.coinDest ? ` ${translate('EXCHANGES.IN_SM')} ${this.state.coinDest.split('|')[0].toUpperCase()}` : '') }
+                  placeholder={ translate('EXCHANGES.ENTER_AN_AMOUNT') + (this.state.coinDest && this.state.coinSrc ? ` ${translate('EXCHANGES.IN_SM')} ${this.state.buyFixedDestCoin ? this.state.coinSrc.split('|')[0].toUpperCase() : this.state.coinDest.split('|')[0].toUpperCase()}` : '') }
                   value={ this.state.amount || '' } />
               </div>
             </div>
             { this.state.maxBuyError &&
-              <div className="error margin-top-15 sz350 text-center">
-                <i className="fa fa-warning"></i> { translate('EXCHANGES.INSUFFICIENT_FUNDS', `${this.state.maxBuyError} ${this.state.coinDest.split('|')[0].toUpperCase()}`) }.
+              <div
+                onClick={ this.setMaxBuyAmount }
+                className="error margin-top-15 sz350 text-center">
+                <i className="fa fa-warning"></i> { translate('EXCHANGES.' + (!this.state.buyFixedDestCoin ? 'INSUFFICIENT_FUNDS_SRC' : 'INSUFFICIENT_FUNDS_DESC'), `${this.state.maxBuyError} ${this.state.buyFixedDestCoin ? this.state.coinSrc.split('|')[0].toUpperCase() : this.state.coinDest.split('|')[0].toUpperCase()}`) }.
               </div>
             }
             { this.state.orderPlaceError &&
@@ -874,11 +912,14 @@ class Exchanges extends React.Component {
                 !this.state.coinSrc ||
                 !this.state.coinDest ||
                 !this.state.amount ||
-                this.state.processing
+                this.state.processing ||
+                (this.state.buyFixedDestCoin && this.state.currentBalanceSrc === 'none') ||
+                (!this.state.buyFixedDestCoin && this.state.currentBalanceDest === 'none')
               }
-              onClick={ this.nextStep }
               className="group3 margin-top-40">
-              <div className="btn-inner">
+              <div
+                className="btn-inner"
+                onClick={ this.nextStep }>
                 <div className="btn">
                   { this.state.processing ? `${translate('EXCHANGES.PLEASE_WAIT')}...` : translate('EXCHANGES.NEXT') }
                 </div>

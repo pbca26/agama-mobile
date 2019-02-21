@@ -314,4 +314,21 @@
     margin-top: 45px;
     padding-top: 20px;
   }
+  .toggle-buy-coin {
+
+    .toggle-label {
+      font-size: 14px;
+      top: -4px;
+    }
+    .switch {
+      position: relative;
+      top: 3px;
+    }
+  }
+  .edit {
+    &.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
 }
