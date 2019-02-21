@@ -16,6 +16,7 @@ import ExchangesSupportedCoins from './Coins';
 import ExchangesTOS from './TOS';
 import ExchangesOrderDetails from './OrderDetails';
 import ExchangesHistory from './History';
+import FiatSymbol from '../FiatSymbol';
 import fees from 'agama-wallet-lib/build/fees';
 import {
   fromSats,
@@ -761,6 +762,7 @@ class Exchanges extends React.Component {
 
   renderOrderForm() {
     const coins = Object.keys(this.filterOutETH(this.props.coins));
+    const settingsCurrency = getLocalStorageVar('settings').fiat;
 
     return (
       <div className="exchanges-new-order">
@@ -853,7 +855,7 @@ class Exchanges extends React.Component {
                   className="form-control"
                   name="amount"
                   onChange={ this.updateInput }
-                  placeholder={ translate('EXCHANGES.ENTER_AN_MOUNT') + (this.state.coinDest ? ` ${translate('EXCHANGES.IN_SM')} ${this.state.coinDest.split('|')[0].toUpperCase()}` : '') }
+                  placeholder={ translate('EXCHANGES.ENTER_AN_AMOUNT') + (this.state.coinDest ? ` ${translate('EXCHANGES.IN_SM')} ${this.state.coinDest.split('|')[0].toUpperCase()}` : '') }
                   value={ this.state.amount || '' } />
               </div>
             </div>
@@ -899,7 +901,7 @@ class Exchanges extends React.Component {
                   { Number(this.state.amount) } { this.state.coinSrc.split('|')[0].toUpperCase() }
                 </span>
                 <span className="padding-left-30">
-                  { Number(Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()].USD).toFixed(8)) } USD
+                  <FiatSymbol symbol={ settingsCurrency } /> { Number(Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()][settingsCurrency.toUpperCase()]).toFixed(8)) }
                 </span>
               </div>
             </div>
@@ -910,7 +912,7 @@ class Exchanges extends React.Component {
                   { Number(Number(this.state.amount * this.state.exchangeRate.rate).toFixed(8)) } { this.state.coinDest.split('|')[0].toUpperCase() }
                 </span>
                 <span className="padding-left-30">
-                  { Number(Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()].USD).toFixed(8)) } USD
+                  <FiatSymbol symbol={ settingsCurrency } /> { Number(Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()][settingsCurrency.toUpperCase()]).toFixed(8)) }
                 </span>
               </div>
             </div>
@@ -995,7 +997,7 @@ class Exchanges extends React.Component {
                   { Number(Number(this.state.exchangeOrder.expectedDepositCoinAmount).toFixed(8)) } { this.state.exchangeOrder.depositCoin.toUpperCase() }
                 </span>
                 <span className="padding-left-30">
-                  { Number(Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()].USD).toFixed(8)) } USD
+                  <FiatSymbol symbol={ settingsCurrency } /> { Number(Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()][settingsCurrency.toUpperCase()]).toFixed(8)) }
                 </span>
               </div>
             </div>
@@ -1006,7 +1008,7 @@ class Exchanges extends React.Component {
                   { Number(Number(this.state.exchangeOrder.expectedDestinationCoinAmount).toFixed(8)) } { this.state.exchangeOrder.destinationCoin.toUpperCase() }
                 </span>
                 <span className="padding-left-30">
-                  { Number(Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()].USD).toFixed(8)) } USD
+                  <FiatSymbol symbol={ settingsCurrency } /> { Number(Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()][settingsCurrency.toUpperCase()]).toFixed(8)) }
                 </span>
               </div>
             </div>

@@ -1,15 +1,18 @@
 import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
+import { getLocalStorageVar } from '../actions/utils';
 
 const getPrices = (coins, priceChange) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
+      const settingsCurrency = getLocalStorageVar('settings').fiat;
+
       HTTP.call(
         'GET',
         'https://www.atomicexplorer.com/api/mm/prices/v2', {
         params: {
           coins: typeof coins === 'object' ? coins.join(',') : coins,
-          currency: 'usd',
+          currency: settingsCurrency,
           pricechange: true,
         },
       }, (error, result) => {
@@ -22,7 +25,7 @@ const getPrices = (coins, priceChange) => {
             devlog('unable to get https://www.atomicexplorer.com/api/mm/prices/v2');
             devlog(JSON.stringify({
               coins: typeof coins === 'object' ? coins.join(',') : coins,
-              currency: 'usd',
+              currency: settingsCurrency,
               pricechange: true,
             }));
             devlog(JSON.stringify(result));
