@@ -25,7 +25,7 @@ import {
 import SendCoin from './components/SendCoin';
 import AddCoin from './components/AddCoin';
 import Login from './components/Login';
-import Transactions from './components/Transactions';
+import Transactions from './components/Transactions/Transactions';
 import ServerSelect from './components/ServerSelect';
 import CreateSeed from './components/CreateSeed';
 import KMDInterest from './components/KMDInterest';

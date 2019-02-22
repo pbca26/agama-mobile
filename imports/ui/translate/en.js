@@ -227,6 +227,7 @@ const lang = {
       TX_HASH: 'Tx hash',
       AMOUNT: 'Amount',
       TIME: 'Time',
+      TRANSACTION_DETAILS: 'Transaction details',
     },
     CLAIM: {
       WARNING: 'Warning',

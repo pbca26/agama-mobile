@@ -5,16 +5,17 @@ import {
   explorerList,
   isKomodoCoin,
 } from 'agama-wallet-lib/build/coin-helpers';
-import translate from '../translate/translate';
-import Spinner from './Spinner';
+import translate from '../../translate/translate';
+import Spinner from '../Spinner';
+import TransactionDetails from './TransactionDetails';
 import QRCode from 'qrcode.react';
-import { assetsPath } from '../actions/utils';
+import { assetsPath } from '../../actions/utils';
 
 class Transactions extends React.Component {
   constructor() {
     super();
     this.state = {
-      toggledTxDetails: null,
+      toggledTxDetails: 'none',
       showQR: false,
     };
     this.toggleTxDetails = this.toggleTxDetails.bind(this);
@@ -22,6 +23,13 @@ class Transactions extends React.Component {
     this.isInterestDefined = this.isInterestDefined.bind(this);
     this.toggleQR = this.toggleQR.bind(this);
     this.showClaimButton = this.showClaimButton.bind(this);
+    this.closeTransactionDetails = this.closeTransactionDetails.bind(this);
+  }
+
+  closeTransactionDetails() {
+    this.setState({
+      toggledTxDetails: 'none',
+    });
   }
 
   toggleQR() {
@@ -64,14 +72,14 @@ class Transactions extends React.Component {
   componentWillReceiveProps(props) {
     if (props.coin !== this.props.coin) {
       this.setState({
-        toggledTxDetails: null,
+        toggledTxDetails: 'none',
       });
     }
   }
 
   toggleTxDetails(index) {
     this.setState({
-      toggledTxDetails: index === this.state.toggledTxDetails ? null : index,
+      toggledTxDetails: index === this.state.toggledTxDetails ? 'none' : index,
     });
   }
 
@@ -168,7 +176,8 @@ class Transactions extends React.Component {
           _items.push(
             <div
               className={ `item ${_transactions[i].interest && Math.abs(_transactions[i].interest) > 0 ? 'received' : _transactions[i].type}` }
-              key={ `transaction-${i}` }>
+              key={ `transaction-${i}` }
+              onClick={ () => this.toggleTxDetails(i) }>
               <div className="direction">{ _transactions[i].type }</div>
               <div className="date">{ secondsToString(_transactions[i].timestamp) }</div>
               { /*<div className="amount-fiat">$0</div> */ }
@@ -189,57 +198,65 @@ class Transactions extends React.Component {
 
       return (
         <div className="transactions-ui">
-          <div className="individualportfolio">
-            <div className="individualportfolio-inner">
-              { this.props.loading &&
-                !this.props.transactions &&
-                <div className="lasttransactions">{ translate('TRANSACTIONS.LOADING_HISTORY') }...</div>                  
-              }
-              { this.props.transactions &&
-                <div className="lasttransactions">
-                  { translate('TRANSACTIONS.' + (!_items.length ? 'NO_HISTORY' : 'LAST_TX')) }
-                </div>
-              }
-              <div className="cryptocardbtc-block">
-                <div className="cryptocardbtc">
-                  <img
-                    className="coin-icon"
-                    src={ `${assetsPath.coinLogo}/${_mode}/${_name.toLowerCase()}.png` } />
-                  <div className="coin-title">
-                  { translate(_mode.toUpperCase() + '.' + _name.toUpperCase()).length > 18 ? _name.toUpperCase() :  translate(_mode.toUpperCase() + '.' + _name.toUpperCase()) }
+          { this.state.toggledTxDetails !== 'none' &&
+            <TransactionDetails
+              coin={ this.props.coin }
+              tx={ this.props.transactions[this.state.toggledTxDetails] }
+              cb={ this.closeTransactionDetails } />
+          }
+          { this.state.toggledTxDetails === 'none' &&
+            <div className="individualportfolio">
+              <div className="individualportfolio-inner">
+                { this.props.loading &&
+                  !this.props.transactions &&
+                  <div className="lasttransactions">{ translate('TRANSACTIONS.LOADING_HISTORY') }...</div>                  
+                }
+                { this.props.transactions &&
+                  <div className="lasttransactions">
+                    { translate('TRANSACTIONS.' + (!_items.length ? 'NO_HISTORY' : 'LAST_TX')) }
                   </div>
-                  <div className="coin-balance">
-                    <div className="balance">
-                    { translate('BALANCE.BALANCE') }: { _balance ? formatValue(_balance.balance) : 0 } { _name.toUpperCase() }
+                }
+                <div className="cryptocardbtc-block">
+                  <div className="cryptocardbtc">
+                    <img
+                      className="coin-icon"
+                      src={ `${assetsPath.coinLogo}/${_mode}/${_name.toLowerCase()}.png` } />
+                    <div className="coin-title">
+                    { translate(_mode.toUpperCase() + '.' + _name.toUpperCase()).length > 18 ? _name.toUpperCase() :  translate(_mode.toUpperCase() + '.' + _name.toUpperCase()) }
                     </div>
-                    { this.isInterestDefined() &&
-                      <div className="interest">
-                      { translate('BALANCE.INTEREST') }: { _balance ? formatValue(_balance.interest) : 0 } { _name.toUpperCase() }
+                    <div className="coin-balance">
+                      <div className="balance">
+                      { translate('BALANCE.BALANCE') }: { _balance ? formatValue(_balance.balance) : 0 } { _name.toUpperCase() }
                       </div>
-                    }
-                  </div>
-                  { !this.props.loading &&
-                    this.props.auth &&
-                    this.props.activeSection === 'dashboard' &&
-                    (_items && _items.length > 0) &&
-                    <i
-                      onClick={ this.props.dashboardRefresh }
-                      className="fa fa-refresh dashboard-refresh"></i>
-                    }
-                    { this.props.loading &&
+                      { this.isInterestDefined() &&
+                        <div className="interest">
+                        { translate('BALANCE.INTEREST') }: { _balance ? formatValue(_balance.interest) : 0 } { _name.toUpperCase() }
+                        </div>
+                      }
+                    </div>
+                    { !this.props.loading &&
+                      this.props.auth &&
                       this.props.activeSection === 'dashboard' &&
-                      <Spinner />
-                    }
+                      (_items && _items.length > 0) &&
+                      <i
+                        onClick={ this.props.dashboardRefresh }
+                        className="fa fa-refresh dashboard-refresh"></i>
+                      }
+                      { this.props.loading &&
+                        this.props.activeSection === 'dashboard' &&
+                        <Spinner />
+                      }
+                  </div>
                 </div>
+                { this.renderSendReceiveBtn() }
+                { (_items && _items.length > 0 && !this.state.showQR) &&
+                  <div className="transactions-list">
+                  { _items }
+                  </div>
+                }
               </div>
-              { this.renderSendReceiveBtn() }
-              { (_items && _items.length > 0 && !this.state.showQR) &&
-                <div className="transactions-list">
-                { _items }
-                </div>
-              }
             </div>
-          </div>
+          }
         </div>
       );
     }
