@@ -45,6 +45,7 @@ class TransactionDetails extends React.Component {
 
   render() {
     const tx = this.props.tx;
+    console.warn(tx);
 
     return (
       <section className="transaction-details">
@@ -54,9 +55,15 @@ class TransactionDetails extends React.Component {
           onClick={ this.menuBack } />
         <div className="title">{ translate('TRANSACTIONS.TRANSACTION_DETAILS') }</div>
         <div className="edit">
+          { translate('TRANSACTIONS.DIRECTION') }
+          <div className="shade margin-top-5 uc-first">
+            { tx.type }
+          </div>
+        </div>
+        <div className="edit">
           { translate('EXCHANGES.FROM') }
           <div className="shade margin-top-5">
-            { tx.inputAddresses ? tx.inputAddresses[0] : translate('EXCHANGES.NA') }
+            { tx.from ? tx.from[0] : translate('EXCHANGES.NA') }
           </div>
         </div>
         <div className="edit">
@@ -65,6 +72,15 @@ class TransactionDetails extends React.Component {
             { tx.address }
           </div>
         </div>
+        { this.props.coin === 'kmd|spv' &&
+          Math.abs(tx.interest) > 0 &&
+          <div className="edit">
+            { translate('TRANSACTIONS.INTEREST') }
+            <div className="shade margin-top-5">
+              { Math.abs(tx.interest) }
+            </div>
+          </div>
+        }
         <div className="edit">
           { translate('EXCHANGES.AMOUNT') }
           <div className="shade margin-top-5">
@@ -97,6 +113,14 @@ class TransactionDetails extends React.Component {
             { secondsToString(tx.timestamp) }
           </div>
         </div>
+        { this.props.coin === 'kmd|spv' &&
+          <div className="edit">
+            { translate('TRANSACTIONS.LOCKTIME') }
+            <div className="shade margin-top-5">
+              { tx.locktime }
+            </div>
+          </div>
+        }
         <div className="edit">
           { translate('EXCHANGES.TX_ID') }
           <div

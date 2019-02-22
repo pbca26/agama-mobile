@@ -269,9 +269,11 @@
     position: absolute;
     top: 80px;
     left: 0;
-    z-index: 400;
     padding: 0 10px;
 
+    .uc-first {
+      text-transform: capitalize;
+    }
     .title {
       text-align: center;
       padding: 20px 0 25px 0;
