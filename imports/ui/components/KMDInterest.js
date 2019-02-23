@@ -124,6 +124,11 @@ class KMDInterest extends React.Component {
               <strong className="green">{ translate('CLAIM.REQ_TO_CLAIM_P1') }:</strong> { translate('CLAIM.REQ_TO_CLAIM_P2') }.
             </p>
           </div>
+          <div className="margin-top-40">
+            <p>
+              <strong>{ translate('CLAIM.TIP') }:</strong> { translate('CLAIM.TIP_DESC') }
+            </p>
+          </div>
           <div className="text-center margin-top-35">
             <div className="group3 margin-bottom-30 claim-btn">
               <div

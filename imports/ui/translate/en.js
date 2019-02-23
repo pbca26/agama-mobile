@@ -229,6 +229,7 @@ const lang = {
       TIME: 'Time',
       LOCKTIME: 'Locktime',
       TRANSACTION_DETAILS: 'Transaction details',
+      LOCKTIME_IS_NOT_SET: 'KMD locktime is unset! This transaction is not accruing rewards.',
     },
     CLAIM: {
       WARNING: 'Warning',
@@ -246,6 +247,8 @@ const lang = {
       REQ_TO_CLAIM_P1: 'Requirements to accrue rewards',
       REQ_TO_CLAIM_P2: 'spend transaction was made at least 1 hour ago, locktime field is set and amount is greater than 10 KMD',
       CLAIM: 'Claim',
+      TIP: 'Tip',
+      TIP_DESC: 'If one of your UTXOs has locktime field set improperly try to claim rewards to reset it.',
     },
     APP_TITLE: {
       MENU: 'Menu',
