@@ -6,6 +6,16 @@ const getPrices = (coins, priceChange) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
       const settingsCurrency = getLocalStorageVar('settings').fiat;
+      let params = {
+        coins: typeof coins === 'object' ? coins.join(',') : coins,
+        currency: settingsCurrency,
+        pricechange: true,
+      };
+      devlog('req', {
+        method: 'GET',
+        url: 'https://www.atomicexplorer.com/api/mm/prices/v2',
+        params,
+      });
 
       HTTP.call(
         'GET',

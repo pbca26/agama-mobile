@@ -14,16 +14,22 @@ const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data
 
 const listunspent = (proxyServer, electrumServer, address, network, full, verify, cache) => {
   let _atLeastOneDecodeTxFailed = false;
+  let params = {
+    port: electrumServer.port,
+    ip: electrumServer.ip,
+    proto: electrumServer.proto,
+    address,
+  };
+  devlog('req', {
+    method: 'GET',
+    url: `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent`,
+    params,
+  });
 
   if (full) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {      
       HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent`, {
-        params: {
-          port: electrumServer.port,
-          ip: electrumServer.ip,
-          proto: electrumServer.proto,
-          address,
-        },
+        params,
       }, (error, result) => {
         result = JSON.parse(result.content);
 
@@ -36,14 +42,21 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
               _utxoJSON.length) {
             let formattedUtxoList = [];
             let _utxo = [];
-
+            
+            params = {
+              port: electrumServer.port,
+              ip: electrumServer.ip,
+              proto: electrumServer.proto,
+            };
+            devlog('req', {
+              method: 'GET',
+              url: `http://${proxyServer.ip}:${proxyServer.port}/api/getcurrentblock`,
+              params,
+            });
+                      
             // get current height
             HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getcurrentblock`, {
-              params: {
-                port: electrumServer.port,
-                ip: electrumServer.ip,
-                proto: electrumServer.proto,
-              },
+              params,
             }, (error, result) => {
               result = JSON.parse(result.content);
 
@@ -222,12 +235,7 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
         'GET',
         `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent`,
       {
-        params: {
-          port: electrumServer.port,
-          ip: electrumServer.ip,
-          proto: electrumServer.proto,
-          address,
-        },
+        params,
       }, (error, result) => {
         result = JSON.parse(result.content);
 

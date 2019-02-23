@@ -1,16 +1,27 @@
+import { joinPropsUrl } from './utils';
+
 export const config = {
   dev: true,
   debug: true,
-  debugStringify: false,
+  debugOptions: {
+    req: false,
+    stringify: false,
+  },
 };
 
 export const devlog = (msg, data) => {
   if (config.dev ||
       config.debug) {
-    if (data) {
-      console.warn(msg, config.debugStringify ? JSON.stringify(data) : data);
-    } else {
-      console.warn(msg);
+    if (config.debugOptions &&
+        config.debugOptions.req &&
+        msg === 'req') {
+      console.warn(msg, `method: ${data.method}, url: ${data.url}?${joinPropsUrl(data.params)}`);
+    } else if (msg !== 'req') {
+      if (data) {
+        console.warn(msg, config.debugOptions && config.debugOptions.stringify ? JSON.stringify(data) : data);
+      } else {
+        console.warn(msg);
+      }
     }
   }
 };

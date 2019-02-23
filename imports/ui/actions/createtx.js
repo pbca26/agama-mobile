@@ -79,6 +79,18 @@ const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, val
 
         // push to network
         if (push) {
+          let data = {
+            port: electrumServer.port,
+            ip: electrumServer.ip,
+            proto: electrumServer.proto,
+            rawtx: _tx,
+          };
+          devlog('req', {
+            method: 'POST',
+            url: `http://${proxyServer.ip}:${proxyServer.port}/api/pushtx`,
+            params: data,
+          });
+      
           HTTP.call(
             'POST',
             `http://${proxyServer.ip}:${proxyServer.port}/api/pushtx`,
@@ -86,12 +98,7 @@ const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, val
             headers: {
               'Content-Type': 'application/json',
             },
-            data: {
-              rawtx: _tx,
-              port: electrumServer.port,
-              ip: electrumServer.ip,
-              proto: electrumServer.proto,
-            },
+            data,
           }, (error, result) => {
             result = JSON.parse(result.content);
 

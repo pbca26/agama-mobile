@@ -72,7 +72,12 @@ const getTransaction = (txid, coin, httpParams) => {
 
     if (!_cache[coin].tx[txid]) {
       devlog(`raw input tx ${txid}`);
-
+      devlog('req', {
+        method: 'GET',
+        url: httpParams.url,
+        params: httpParams.params,
+      });
+  
       HTTP.call(
         'GET',
         httpParams.url, {
@@ -104,7 +109,12 @@ const getBlockheader = (height, coin, httpParams) => {
 
     if (!_cache[coin].blockheader[height]) {
       devlog(`blockheader ${height}`);
-
+      devlog('req', {
+        method: 'GET',
+        url: httpParams.url,
+        params: httpParams.params,
+      });
+      
       HTTP.call('GET', httpParams.url, {
         params: httpParams.params,
       }, (error, result) => {
@@ -188,14 +198,21 @@ const getServersList = () => {
 const setDefaultServer = (network, port, ip, proto) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
+      let params = {
+        port,
+        ip,
+        proto,
+      };
+      devlog('req', {
+        method: 'GET',
+        url: `http://${proxyServer.ip}:${proxyServer.port}/api/server/version`,
+        params,
+      });
+    
       HTTP.call(
         'GET',
         `http://${proxyServer.ip}:${proxyServer.port}/api/server/version`, {
-        params: {
-          port,
-          ip,
-          proto,
-        },
+        params,
       }, (error, result) => {
         result = JSON.parse(result.content);
 
@@ -368,16 +385,22 @@ const balance = (network) => {
         const address = keys.spv[_name].pub;
         let _electrumServer = getLocalStorageVar('coins')[network].server;
         _electrumServer.serverList = electrumServers[_name].serverList;
-
+        let params = {
+          port: _electrumServer.port,
+          ip: _electrumServer.ip,
+          proto: _electrumServer.proto,
+          address,
+        };
+        devlog('req', {
+          method: 'GET',
+          url: `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`,
+          params,
+        });
+  
         HTTP.call(
           'GET',
           `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`, {
-          params: {
-            port: _electrumServer.port,
-            ip: _electrumServer.ip,
-            proto: _electrumServer.proto,
-            address,
-          },
+          params,
         }, (error, result) => {
           if (!result) {
             resolve('proxy-error');
@@ -586,16 +609,22 @@ const getOverview = (coins) => {
         return new Promise((resolve, reject) => {
           if (pair.coin.indexOf('|spv') > -1) {
             const _electrumServer = getLocalStorageVar('coins')[pair.coin].server;
-        
+            let params = {
+              port: _electrumServer.port,
+              ip: _electrumServer.ip,
+              proto: _electrumServer.proto,
+              address: pair.pub,
+            };
+            devlog('req', {
+              method: 'GET',
+              url: `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`,
+              params,
+            });
+    
             HTTP.call(
               'GET',
               `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`, {
-              params: {
-                port: _electrumServer.port,
-                ip: _electrumServer.ip,
-                proto: _electrumServer.proto,
-                address: pair.pub,
-              },
+              params,
             }, (error, result) => {
               if (!result) {
                 resolve('proxy-error');
@@ -666,15 +695,22 @@ const getOverview = (coins) => {
         }
 
         const settingsCurrency = getLocalStorageVar('settings').fiat;
+        let params = {
+          coins: _coins.length > 1 ? _coins.join(',') : _coins,
+          currency: settingsCurrency,
+          pricechange: true,
+        };
+
+        devlog('req', {
+          method: 'GET',
+          url: 'https://www.atomicexplorer.com/api/mm/prices/v2',
+          params,
+        });
 
         HTTP.call(
           'GET',
           'https://www.atomicexplorer.com/api/mm/prices/v2', {
-          params: {
-            coins: _coins.length > 1 ? _coins.join(',') : _coins,
-            currency: settingsCurrency,
-            pricechange: true,
-          },
+          params,
         }, (error, result) => {
           if (!result) {
             resolve('error');
@@ -717,7 +753,12 @@ const getOverview = (coins) => {
 
 const getBtcFees = () => {
   return async (dispatch) => {
-    return new Promise((resolve, reject) => {    
+    return new Promise((resolve, reject) => {
+      devlog('req', {
+        method: 'GET',
+        url: 'https://www.atomicexplorer.com/api/btc/fees',
+      });
+  
       HTTP.call(
         'GET',
         'https://www.atomicexplorer.com/api/btc/fees', {

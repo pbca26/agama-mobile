@@ -5,7 +5,12 @@ import networks from 'agama-wallet-lib/build/bitcoinjs-networks';
 
 export const getCoinswitchCoins = () => {
   return async (dispatch) => {
-    return new Promise((resolve, reject) => {    
+    return new Promise((resolve, reject) => {
+      devlog('req', {
+        method: 'GET',
+        url: 'https://www.atomicexplorer.com/api/exchanges/coinswitch/coins/cached',
+      });
+  
       HTTP.call(
         'GET',
         'https://www.atomicexplorer.com/api/exchanges/coinswitch/coins/cached', {
@@ -26,15 +31,22 @@ export const getCoinswitchCoins = () => {
 export const getRate = (provider, src, dest) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
+      let params = {
+        src,
+        dest,
+      };
+      devlog('req', {
+        method: 'GET',
+        url: 'https://www.atomicexplorer.com/api/exchanges/coinswitch?method=getRate',
+        params,
+      });
+  
       if (provider === 'coinswitch') {
         HTTP.call(
           'GET',
           'https://www.atomicexplorer.com/api/exchanges/coinswitch?method=getRate',
         {
-          params: {
-            src,
-            dest,
-          },
+          params,
         }, (error, result) => {
           if (!result) {
             resolve('error');
@@ -53,13 +65,20 @@ export const getOrder = (provider, orderId) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
       if (provider === 'coinswitch') {
+        let params = {
+          orderId,
+        };
+        devlog('req', {
+          method: 'GET',
+          url: 'https://www.atomicexplorer.com/api/exchanges/coinswitch?method=getOrder',
+          params,
+        });
+  
         HTTP.call(
           'GET',
           'https://www.atomicexplorer.com/api/exchanges/coinswitch?method=getOrder',
         {
-          params: {
-            orderId,
-          },
+          params,
         }, (error, result) => {
           if (!result) {
             resolve('error');
@@ -78,18 +97,25 @@ export const placeOrder = (provider, src, dest, srcAmount, destAmount, destPub, 
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
       if (provider === 'coinswitch') {
+        let params = {
+          src,
+          dest,
+          srcAmount,
+          destAmount,
+          destPub,
+          refundPub,
+        };
+        devlog('req', {
+          method: 'GET',
+          url: 'https://www.atomicexplorer.com/api/exchanges/coinswitch?method=placeOrder',
+          params,
+        });
+
         HTTP.call(
           'GET',
           'https://www.atomicexplorer.com/api/exchanges/coinswitch?method=placeOrder',
         {
-          params: {
-            src,
-            dest,
-            srcAmount,
-            destAmount,
-            destPub,
-            refundPub,
-          },
+          params,
         }, (error, result) => {
           if (!result) {
             resolve('error');
@@ -147,6 +173,11 @@ export const syncHistory = (provider, keys) => {
     }
     
     if (provider === 'coinswitch') {
+      devlog('req', {
+        method: 'POST',
+        url: 'https://www.atomicexplorer.com/api/exchanges/coinswitch/history',
+      });
+
       HTTP.call(
         'POST',
         'https://www.atomicexplorer.com/api/exchanges/coinswitch/history',

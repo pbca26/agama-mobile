@@ -128,3 +128,14 @@ export const sortTransactions = (transactions, sortBy) => {
     return 0;
   });
 }
+
+// single level
+export const joinPropsUrl = (obj) => {
+  let out = [];
+  
+  for (let key in obj) {
+    out.push(`${key}=${obj[key]}`);
+  }
+
+  return out.join('&');
+};

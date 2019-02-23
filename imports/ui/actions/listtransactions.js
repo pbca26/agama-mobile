@@ -11,12 +11,19 @@ const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data
 const listtransactions = (proxyServer, electrumServer, address, network, full, cache, txid) => {
   return new Promise((resolve, reject) => {
     // get current height
+    let params = {
+      port: electrumServer.port,
+      ip: electrumServer.ip,
+      proto: electrumServer.proto,
+    };
+    devlog('req', {
+      method: 'GET',
+      url: `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent`,
+      params,
+    });
+    
     HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getcurrentblock`, {
-      params: {
-        port: electrumServer.port,
-        ip: electrumServer.ip,
-        proto: electrumServer.proto,
-      },
+      params,
     }, (error, result) => {
       result = JSON.parse(result.content);
 
@@ -41,6 +48,12 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
           delete params.raw;
         }
 
+        devlog('req', {
+          method: 'GET',
+          url: `http://${proxyServer.ip}:${proxyServer.port}/api/listtransactions`,
+          params,
+        });
+        
         HTTP.call(
           'GET',
           `http://${proxyServer.ip}:${proxyServer.port}/api/listtransactions`,

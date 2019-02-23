@@ -12,16 +12,23 @@ const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data
 
 export const getKMDBalance = (address, json, proxyServer, electrumServer, cache) => {
   return new Promise((resolve, reject) => {
+    let params = {
+      port: electrumServer.port,
+      ip: electrumServer.ip,
+      proto: electrumServer.proto,
+      address,
+    };
+    devlog('req', {
+      method: 'GET',
+      url: `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent`,
+      params,
+    });
+
     HTTP.call(
       'GET',
       `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent`,
     {
-      params: {
-        port: electrumServer.port,
-        ip: electrumServer.ip,
-        proto: electrumServer.proto,
-        address,
-      },
+      params,
     }, (error, result) => {
       result = JSON.parse(result.content);
 
@@ -52,7 +59,7 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer, cache)
             let utxoIssues = false;
 
             Promise.all(_utxo.map((_utxoItem, index) => {
-              return new Promise((resolve, reject) => {
+              return new Promise((resolve, reject) => {                
                 cache.getTransaction(
                   _utxoItem.tx_hash,
                   'kmd',

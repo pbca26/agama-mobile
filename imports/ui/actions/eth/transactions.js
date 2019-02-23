@@ -25,20 +25,26 @@ const transactions = (address, options) => {
 const transactionsEtherscan = (address, network = 'homestead', sort = 'asc') => {
   return new Promise((resolve, reject) => {
     const _etherscanEndPoint = network === 'homestead' ? 'https://api.etherscan.io/api' : `https://api-${network}.etherscan.io/api`;
+    let params = {
+      module: 'account',
+      action: 'txlist',
+      address,
+      startblock: '0',
+      endblock: '99999999',
+      sort,
+      apikey: 'YourApiKeyToken',
+    };
+    devlog('req', {
+      method: 'GET',
+      url: _etherscanEndPoint, 
+      params,
+    });
 
     HTTP.call(
       'GET',
       _etherscanEndPoint,
     {
-      params: {
-        module: 'account',
-        action: 'txlist',
-        address,
-        startblock: '0',
-        endblock: '99999999',
-        sort,
-        apikey: 'YourApiKeyToken',
-      },
+      params,
     }, (error, result) => {    
       const _json = JSON.parse(result.content);
 
@@ -55,17 +61,24 @@ const transactionsEtherscan = (address, network = 'homestead', sort = 'asc') => 
 
 const transactionsERC20 = (address, symbol) => {
   return new Promise((resolve, reject) => {
+    let params = {
+      module: 'account',
+      action: 'tokentx',
+      address,
+      contractaddress: erc20ContractId[symbol],
+      apikey: 'YourApiKeyToken',
+    };
+    devlog('req', {
+      method: 'GET',
+      url: 'https://api.etherscan.io/api',
+      params,
+    });
+
     HTTP.call(
       'GET',
       'https://api.etherscan.io/api',
     {
-      params: {
-        module: 'account',
-        action: 'tokentx',
-        address,
-        contractaddress: erc20ContractId[symbol],
-        apikey: 'YourApiKeyToken',
-      },
+      params,
     }, (error, result) => {
       const _json = JSON.parse(result.content);
     

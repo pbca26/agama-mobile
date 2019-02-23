@@ -52,17 +52,24 @@ const verifyMerkle = (txid, height, serverList, electrumServer, proxyServer, cac
     devlog(`verification server: ${randomServer}`);
 
     return new Promise((resolve, reject) => {
+      let params = {
+        port: electrumServer.port,
+        ip: electrumServer.ip,
+        proto: electrumServer.proto,
+        txid,
+        height,
+      };
+      devlog('req', {
+        method: 'GET',
+        url: `http://${proxyServer.ip}:${proxyServer.port}/api/getmerkle`,
+        params,
+      });
+
       HTTP.call(
         'GET',
         `http://${proxyServer.ip}:${proxyServer.port}/api/getmerkle`,
       {
-        params: {
-          port: electrumServer.port,
-          ip: electrumServer.ip,
-          proto: electrumServer.proto,
-          txid,
-          height,
-        },
+        params,
       }, (error, result) => {
         result = JSON.parse(result.content);
 
@@ -134,7 +141,7 @@ const verifyMerkle = (txid, height, serverList, electrumServer, proxyServer, cac
 const verifyMerkleByCoin = (txid, height, electrumServer, proxyServer, cache, network) => {
   const _serverList = electrumServer.serverList;
 
-  devlog(`verifyMerkleByCoin`);
+  devlog('verifyMerkleByCoin');
   devlog(`server ip ${electrumServer.ip}`);
   devlog(`server port ${electrumServer.port}`);
   devlog(electrumServer.serverList);

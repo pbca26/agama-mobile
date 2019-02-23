@@ -5,6 +5,11 @@ import { ethGasStationRateToWei } from 'agama-wallet-lib/build/eth';
 
 const ethGasPrice = () => {
   return new Promise((resolve, reject) => {
+    devlog('req', {
+      method: 'GET',
+      url: 'https://ethgasstation.info/json/ethgasAPI.json',
+    });
+
     HTTP.call(
       'GET',
       'https://ethgasstation.info/json/ethgasAPI.json',
