@@ -41,8 +41,7 @@ class Transactions extends React.Component {
   showClaimButton() {
     const _props = this.props;
 
-    if (_props.coin === 'kmd|spv' &&
-        _props.balance &&
+    if (_props.balance &&
         _props.balance.interest &&
         _props.balance.interest > 0) {
       return true;
@@ -124,7 +123,7 @@ class Transactions extends React.Component {
 
   renderSendReceiveBtn() {
     return (
-      <div className={ 'send-receive-block' + (this.showClaimButton() ? ' three-btn' : '') }>
+      <div className={ 'send-receive-block' + (this.props.coin === 'kmd|spv' ? ' three-btn' : '') }>
         <div className="send-receive-block-inner">
           <button
             disabled={ !this.showSendButton() }
@@ -151,15 +150,20 @@ class Transactions extends React.Component {
               }
             </div>
           }
-          { this.showClaimButton() &&
-            <button
-              type="button"
-              className="btn btn-info waves-effect waves-light margin-left-20 btn-claim"
-              disabled={ this.props.balance.interest < 0.0002 }
-              onClick={ this.props.toggleKMDInterest }>
-              <i className="fa fa-dollar"></i> { translate('DASHBOARD.CLAIM') }
-            </button>
-          }
+          <button
+            type="button"
+            className="btn btn-info waves-effect waves-light margin-left-20 btn-claim"
+            disabled={
+              (this.props.balance && this.props.balance.interest && this.props.balance.interest < 0.0002) ||
+              !this.showClaimButton()
+            }
+            onClick={ this.props.toggleKMDInterest }>
+            <i className="fa fa-dollar"></i> { translate('DASHBOARD.CLAIM') }
+            { this.props.balance &&
+              this.props.balance.utxoIssues &&
+              <i className="fa fa-exclamation"></i>
+            }
+          </button>
         </div>
       </div>
     );

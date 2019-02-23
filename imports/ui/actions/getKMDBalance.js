@@ -49,6 +49,7 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer, cache)
           if (_utxo &&
               _utxo.length) {
             let interestTotal = 0;
+            let utxoIssues = false;
 
             Promise.all(_utxo.map((_utxoItem, index) => {
               return new Promise((resolve, reject) => {
@@ -93,6 +94,8 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer, cache)
                         decodedTx.format &&
                         decodedTx.format.locktime > 0) {
                       interestTotal += Number(kmdCalcInterest(decodedTx.format.locktime, _utxoItem.value, _utxoItem.height));
+                    } else {
+                      utxoIssues = true;
                     }
 
                     devlog('decoded tx =>');
@@ -113,6 +116,7 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer, cache)
                 interestSats: Math.floor(toSats(interestTotal)),
                 total: interestTotal > 0 ? Number((fromSats(json.confirmed) + interestTotal).toFixed(8)) : 0,
                 totalSats: interestTotal > 0 ? json.confirmed + Math.floor(toSats(interestTotal)) : 0,
+                utxoIssues,
               });
             });
           } else {
@@ -125,6 +129,7 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer, cache)
               interestSats: 0,
               total: 0,
               totalSats: 0,
+              utxoIssues,
             });
           }
         } else {
@@ -137,6 +142,7 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer, cache)
             interestSats: 0,
             total: 0,
             totalSats: 0,
+            utxoIssues,
           });
         }
       }

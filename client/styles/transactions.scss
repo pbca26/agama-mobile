@@ -357,4 +357,16 @@
       }
     }
   }
+  .btn-claim {
+    .fa.fa-exclamation {
+      position: absolute;
+      border-radius: 50%;
+      background-color: #373A4C;
+      color: #ff7575;
+      padding: 4px 8px;
+      top: -10px;
+      right: 21px;
+      border: solid 1px rgba(255, 255, 255, 0.5);
+    }
+  }
 }
