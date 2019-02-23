@@ -45,7 +45,6 @@ class TransactionDetails extends React.Component {
 
   render() {
     const tx = this.props.tx;
-    console.warn(tx);
 
     return (
       <section className="transaction-details">
@@ -116,8 +115,13 @@ class TransactionDetails extends React.Component {
         { this.props.coin === 'kmd|spv' &&
           <div className="edit">
             { translate('TRANSACTIONS.LOCKTIME') }
-            <div className="shade margin-top-5">
-              { tx.locktime }
+            <div className={ 'shade margin-top-5' + (!tx.locktime ? ' error' : '')}>
+              { Number(tx.locktime) > 0 &&
+                <span>{ tx.locktime }</span>
+              }
+              { (!Number(tx.locktime) || Number(tx.locktime) === 0) &&
+                <span>{ translate('TRANSACTIONS.LOCKTIME_IS_NOT_SET') }</span>
+              }
             </div>
           </div>
         }

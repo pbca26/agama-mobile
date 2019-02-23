@@ -1053,13 +1053,13 @@ class App extends React.Component {
   }
 }
 
-function mapStateToProps(state) {
+mapStateToProps = (state) => {
   return {
     keys: state.keys,
   }
 }
 
-function mapDispatchToProps(dispatch) {
+mapDispatchToProps = (dispatch) => {
   return {
     actions: bindActionCreators(actions, dispatch),
   }
