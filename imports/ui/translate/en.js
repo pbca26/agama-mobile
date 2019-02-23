@@ -82,6 +82,7 @@ const lang = {
       SELECT_SERVER_BELOW: 'Select another server from the list below',
       CURRENCY: 'Currency',
       DEBUG: 'Debug',
+      CHANGE_SERVER: 'Change @template@ server',
     },
     RECOVERY: {
       PROVIDE_YOUR_PIN: 'Provide your PIN number to unlock seed/WIF.',

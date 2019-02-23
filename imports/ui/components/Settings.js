@@ -154,7 +154,7 @@ class Settings extends React.Component {
             { this.renderFiatOptions() }
           </select>
         </div>
-        <div className="item">
+        <div className="item item--sm">
           <label className="switch">
             <input
               type="checkbox"
@@ -171,7 +171,7 @@ class Settings extends React.Component {
             { translate('SETTINGS.REQUIRE_PIN_CONFIRM') }
           </div>
         </div>
-        <div className="item">
+        <div className="item item--sm">
           <label className="switch">
             <input
               type="checkbox"
@@ -196,11 +196,11 @@ class Settings extends React.Component {
         { this.props.coin.indexOf('|spv') > -1 &&
           <div
             onClick={ () => this.props.changeActiveSection('server-select') }
-            className="item">
-            Change { this.props.coin.split('|')[0].toUpperCase() } server
+            className="item item--sm">
+            { translate('SETTINGS.CHANGE_SERVER', this.props.coin.split('|')[0].toUpperCase()) }
           </div>
         }
-        <div className="item last">
+        <div className="item last item--sm">
           <label className="switch">
             <input
               type="checkbox"
