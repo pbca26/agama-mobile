@@ -27,10 +27,12 @@ class Settings extends React.Component {
       isSaved: false,
       purgeData: false,
       fiat: 'usd',
+      debug: false,
     };
     this.updateInput = this.updateInput.bind(this);
     this.toggleConfirmPin = this.toggleConfirmPin.bind(this);
     this.togglePurgeData = this.togglePurgeData.bind(this);
+    this.toggleDebug = this.toggleDebug.bind(this);
     this.save = this.save.bind(this);
   }
 
@@ -42,6 +44,7 @@ class Settings extends React.Component {
         autoLockTimeout: _settings.autoLockTimeout,
         requirePin: _settings.requirePin,
         fiat: _settings.fiat,
+        debug: _settings.debug,
         purgeData: false,
       });
     }
@@ -65,6 +68,12 @@ class Settings extends React.Component {
     });
   }
 
+  toggleDebug() {
+    this.setState({
+      debug: !this.state.debug,
+    });
+  }
+
   save() {
     if (this.state.purgeData) {
       setLocalStorageVar('settings', settingsDefaults);
@@ -81,6 +90,7 @@ class Settings extends React.Component {
         autoLockTimeout: this.state.autoLockTimeout,
         requirePin: this.state.requirePin,
         fiat: this.state.fiat,
+        debug: this.state.debug,
       });
     }
 
@@ -186,10 +196,27 @@ class Settings extends React.Component {
         { this.props.coin.indexOf('|spv') > -1 &&
           <div
             onClick={ () => this.props.changeActiveSection('server-select') }
-            className="item last">
+            className="item">
             Change { this.props.coin.split('|')[0].toUpperCase() } server
           </div>
         }
+        <div className="item last">
+          <label className="switch">
+            <input
+              type="checkbox"
+              value="on"
+              checked={ this.state.debug }
+              readOnly />
+            <div
+              className="slider"
+              onClick={ this.toggleDebug }></div>
+          </label>
+          <div
+            className="toggle-label"
+            onClick={ this.toggleDebug }>
+            { translate('SETTINGS.DEBUG') }
+          </div>
+        </div>
         { this.state.isSaved &&
           <div className="padding-bottom-20 text-center success">{ translate('SETTINGS.SAVED') }</div>
         }

@@ -1,11 +1,16 @@
-import { joinPropsUrl } from './utils';
+import {
+  joinPropsUrl,
+  getLocalStorageVar,
+} from './utils';
+
+const _settings = getLocalStorageVar('settings');
 
 export const config = {
-  dev: true,
-  debug: true,
+  dev: _settings && _settings.debug ? true : false,
+  debug: _settings && _settings.debug ? true : false,
   debugOptions: {
-    req: false,
-    stringify: false,
+    req: _settings && _settings.debug ? true : false,
+    stringify: _settings && _settings.debug ? true : false,
   },
 };
 
