@@ -45,6 +45,7 @@ class TransactionDetails extends React.Component {
 
   render() {
     const tx = this.props.tx;
+    console.warn(tx);
 
     return (
       <section className="transaction-details">
@@ -62,7 +63,7 @@ class TransactionDetails extends React.Component {
         <div className="edit">
           { translate('EXCHANGES.FROM') }
           <div className="shade margin-top-5">
-            { tx.from ? tx.from[0] : translate('EXCHANGES.NA') }
+            { tx.from ? tx.from[0] : tx.inputAddresses ? tx.inputAddresses[0] : translate('EXCHANGES.NA') }
           </div>
         </div>
         <div className="edit">

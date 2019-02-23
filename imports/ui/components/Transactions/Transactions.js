@@ -150,20 +150,22 @@ class Transactions extends React.Component {
               }
             </div>
           }
-          <button
-            type="button"
-            className="btn btn-info waves-effect waves-light margin-left-20 btn-claim"
-            disabled={
-              (this.props.balance && this.props.balance.interest && this.props.balance.interest < 0.0002) ||
-              !this.showClaimButton()
-            }
-            onClick={ this.props.toggleKMDInterest }>
-            <i className="fa fa-dollar"></i> { translate('DASHBOARD.CLAIM') }
-            { this.props.balance &&
-              this.props.balance.utxoIssues &&
-              <i className="fa fa-exclamation"></i>
-            }
-          </button>
+          { this.props.coin === 'kmd|spv' &&
+            <button
+              type="button"
+              className="btn btn-info waves-effect waves-light margin-left-20 btn-claim"
+              disabled={
+                (this.props.balance && this.props.balance.interest && this.props.balance.interest < 0.0002) ||
+                !this.showClaimButton()
+              }
+              onClick={ this.props.toggleKMDInterest }>
+              <i className="fa fa-dollar"></i> { translate('DASHBOARD.CLAIM') }
+              { this.props.balance &&
+                this.props.balance.utxoIssues &&
+                <i className="fa fa-exclamation"></i>
+              }
+            </button>
+          }
         </div>
       </div>
     );
