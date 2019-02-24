@@ -59,7 +59,7 @@ class AddCoin extends React.Component {
       const _mode = _coin.name.split('|')[1];
 
       if (!this.state.searchTerm ||
-          (this.state.searchTerm && ((this.state.searchTerm.toLowerCase() === 'kmd' && isKomodoCoin(_name.toLowerCase()) && !erc20ContractId[_name.toLowerCase()]) || _name.indexOf(this.state.searchTerm.toLowerCase()) > -1 || _mode.indexOf(this.state.searchTerm.toLowerCase()) > -1 || _coin.title.toLowerCase().indexOf(this.state.searchTerm.toLowerCase()) > -1))) {
+          (this.state.searchTerm && ((this.state.searchTerm.toLowerCase() === 'kmd' && isKomodoCoin(_name.toLowerCase()) && !erc20ContractId[_name.toLowerCase()]) || _name.substring(0, this.state.searchTerm.length).toLowerCase() === this.state.searchTerm.toLowerCase() || _mode.substring(0, this.state.searchTerm.length).toLowerCase() === this.state.searchTerm.toLowerCase() || _coin.title.substring(0, this.state.searchTerm.length).toLowerCase() === this.state.searchTerm.toLowerCase()))) {
         _items.push(
           <div
             onClick={ () => this.addCoin(_coin.name) }
