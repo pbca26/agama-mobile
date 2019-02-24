@@ -155,9 +155,10 @@ export const syncHistory = (provider, keys) => {
       if (_keys.priv &&
           _keys.priv !== _keys.pub &&
           _pubKeys.indexOf(_keys.pub) === -1) {
-        const _sig = signature.btc.sign(_keys.priv, _randomString, networks[electrumCoinsList[i].toLowerCase()].pubKeyHash.toString().length > 3 ? true : false);
+        const pkh = networks[electrumCoinsList[i].toLowerCase()] && networks[electrumCoinsList[i].toLowerCase()].pubKeyHash || networks.kmd.pubKeyHash;
+        const _sig = signature.btc.sign(_keys.priv, _randomString, pkh.toString().length > 3 ? true : false);
         devlog(`${electrumCoinsList[i]} ${_keys.pub} sig ${_sig}`);
-        _addressPayload.push(networks[electrumCoinsList[i].toLowerCase()].pubKeyHash.toString().length > 3 ? 
+        _addressPayload.push(pkh.toString().length > 3 ? 
         {
           pub: _keys.pub,
           sig: _sig,
