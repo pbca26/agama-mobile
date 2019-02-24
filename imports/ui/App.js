@@ -81,6 +81,7 @@ class App extends React.Component {
       history: null,
       btcFees: null,
       ethGasPrice: null,
+      settingsUpdated: false,
     };
     this.globalClickTimeout = null;
     this.overviewInterval = null;
@@ -1022,7 +1023,8 @@ class App extends React.Component {
               <Settings
                 coin={ this.state.coin }
                 globalClick={ this.globalClick }
-                changeActiveSection={ this.changeActiveSection } />
+                changeActiveSection={ this.changeActiveSection }
+                logout={ this.logout } />
             }
             { this.state.auth &&
               this.state.activeSection === 'exchanges' &&

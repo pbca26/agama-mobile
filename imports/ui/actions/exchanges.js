@@ -164,7 +164,7 @@ export const syncHistory = (provider, keys) => {
           sig: _sig,
           message: _randomString,
           isZcash: true,
-        } :{
+        } : {
           pub: _keys.pub,
           sig: _sig,
           message: _randomString,

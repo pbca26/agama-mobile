@@ -104,7 +104,7 @@ class Settings extends React.Component {
       });
 
       if (this.state.purgeData) {
-        location.reload();
+        this.props.logout();
       }
     }, this.state.purgeData ? SETTINGS_SAVED_PURGE_MSG_TIMEOUT : SETTINGS_SAVED_MSG_TIMEOUT);
 
