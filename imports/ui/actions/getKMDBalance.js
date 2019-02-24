@@ -36,7 +36,8 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer, cache)
         resolve('error');
       } else {
         const utxoList = result.result;
-
+        let utxoIssues = false;
+        
         if (utxoList &&
             utxoList.length) {
           // filter out < 10 KMD amounts
@@ -56,7 +57,6 @@ export const getKMDBalance = (address, json, proxyServer, electrumServer, cache)
           if (_utxo &&
               _utxo.length) {
             let interestTotal = 0;
-            let utxoIssues = false;
 
             Promise.all(_utxo.map((_utxoItem, index) => {
               return new Promise((resolve, reject) => {                
