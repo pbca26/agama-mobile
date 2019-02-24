@@ -3,11 +3,11 @@ import React from 'react';
 import {
   setLocalStorageVar,
   getLocalStorageVar,
-} from '../actions/utils';
+} from '../../actions/utils';
 import {
   encryptkey,
   decryptkey,
-} from '../actions/seedCrypt';
+} from '../../actions/seedCrypt';
 import translate from '../../translate/translate';
 import { Meteor } from 'meteor/meteor';
 import fiatList from './fiatList';

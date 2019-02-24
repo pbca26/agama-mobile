@@ -313,6 +313,9 @@ const lang = {
       MGNX: 'MagnaX',
       PTX: 'PatentTX',
       SPLTEST: 'Sapling Test Chain',
+      KOIN: 'Koinon Coin',
+      KSB: 'KSB',
+      OUR: 'ØUR',
       // crypto
       SUQA: 'SUQA',
       BZC: 'Bitzec',
@@ -442,7 +445,6 @@ const lang = {
       PPC: 'Peercoin',
       MZC: 'Mazacoin',
       SDC: 'ShadowCash',
-      KOIN: 'Koinon Coin',
     },
     ETH: {
       // eth
@@ -619,7 +621,6 @@ const lang = {
       EOS: 'EOS',
       ZIL: 'Zilliqa',
       OCALL: 'Old Capital',
-      CALLG: 'Capital GAS',
     },
     FIAT_CURRENCIES: {
       AUD: 'Australian Dollar',

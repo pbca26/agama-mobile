@@ -36,6 +36,8 @@ const _coinsList = {
     'PGT',
     'KOIN',
     'PTX',
+    'KSB',
+    'OUR',
     // other coins
     'BTC',
     'DOGE',
