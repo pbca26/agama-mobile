@@ -1119,124 +1119,125 @@ class Exchanges extends React.Component {
   }
 
   render() {
-    if (Object.keys(this.filterOutETH(this.props.coins)).length > 1) {
-      return (
-        <div className="form exchanges">
-          <img
-            className="menu-back"
-            src={ `${assetsPath.menu}/trends-combined-shape.png` }
-            onClick={ this.menuBack } />
-          <select
-            name="activeSection"
-            onChange={ this.updateExchangesMenu }
-            value={ this.state.activeSection }
-            className="exchanges-menu">
-            <option
-              disabled={ this.state.activeSection === 'order' }
-              value="order">
-              { translate('EXCHANGES.NEW_ORDER') }
-            </option>
-            { this.state.activeSection === 'order' &&
-              (this.state.step === 0 || this.state.step === 1) &&
-              <option value="clear">
-                { translate('EXCHANGES.CLEAR_CURRENT_ORDER') }
-              </option>
-            }
-            { this.state.activeSection !== 'order-details' &&
-              <option
-                disabled={ this.state.activeSection === 'history' }
-                value="history">
-                { translate('EXCHANGES.ORDER_HISTORY') }
-              </option>
-            }
-            { this.state.activeSection === 'order-details' &&
-              <option
-                disabled={ this.state.activeSection === 'order-details' }
-                value="order-details">
-                { translate('EXCHANGES.ORDER_HISTORY') }
-              </option>
-            }
-            { (this.state.activeSection === 'history' || this.state.activeSection === 'order-details') &&
-              <option value="sync">
-                { translate('EXCHANGES.SYNC_HISTORY') }
-              </option>
-            }
-            { (this.state.activeSection === 'history' || this.state.activeSection === 'order-details') &&
-              Object.keys(this.exchangesCache.coinswitch.orders).length > 0 &&
-              <option value="update">
-                { translate('EXCHANGES.REFRESH_HISTORY') }
-              </option>
-            }
-            <option
-              disabled={ this.state.activeSection === 'tos' }
-              value="tos">
-              { translate('EXCHANGES.TOS') }
-            </option>
-            { this.state.coinswitchCoins &&
-              <option
-                disabled={ this.state.activeSection === 'supported-coins' }
-                value="supported-coins">
-                { translate('EXCHANGES.SUPPORTED_COINS') }
-              </option>
-            }
-          </select>
-
-          { (this.state.activeSection === 'history' || this.state.activeSection === 'order-details') &&
-            <div className="exchanges-order-history margin-top-45">
-              { !this.state.activeOrderDetails &&
-                !this.state.syncHistoryProgressing &&
-                <ExchangesHistory
-                  provider={ this.state.provider }
-                  orders={
-                    this.exchangesCache.coinswitch &&
-                    this.exchangesCache.coinswitch.orders
-                  }
-                  deposits={
-                    this.exchangesCache.coinswitch &&
-                    this.exchangesCache.coinswitch.orders.deposits
-                  }
-                  openOrderDetails={ this.openOrderDetails }
-                  findDeposits={ this.findDeposits } />
-              }
-              { this.state.activeOrderDetails &&
-                !this.state.syncHistoryProgressing &&
-                <ExchangesOrderDetails
-                  { ...this.state }
-                  order={
-                    this.exchangesCache.coinswitch &&
-                    this.exchangesCache.coinswitch.orders[this.state.activeOrderDetails]
-                  }
-                  deposit={
-                    this.exchangesCache.coinswitch &&
-                    this.exchangesCache.coinswitch.orders.deposits
-                  }
-                  findDeposits={ this.findDeposits }
-                  openOrderOnline={ this.openOrderOnline }
-                  makeDeposit={ this.makeDeposit } />
-              }
-              { this.state.syncHistoryProgressing &&
-                <div className="text-center">
-                  { translate('EXCHANGES.SYNCING_HISTORY') }...
-                </div>
-              }
-            </div>
-          }
-
+    return (
+      <div className="form exchanges">
+        <img
+          className="menu-back"
+          src={ `${assetsPath.menu}/trends-combined-shape.png` }
+          onClick={ this.menuBack } />
+        <select
+          name="activeSection"
+          onChange={ this.updateExchangesMenu }
+          value={ this.state.activeSection }
+          className="exchanges-menu">
+          <option
+            disabled={ this.state.activeSection === 'order' }
+            value="order">
+            { translate('EXCHANGES.NEW_ORDER') }
+          </option>
           { this.state.activeSection === 'order' &&
-            this.renderOrderForm() }
-          { this.state.activeSection === 'tos' &&
-            <ExchangesTOS /> }
-          { this.state.activeSection === 'supported-coins' &&
-            <ExchangesSupportedCoins coins={ this.state.coinswitchCoinsObj } /> }
-        </div>
-      );
-    } else {
-      return (
-        <div className="form exchanges text-center margin-top-45">
-          { translate('EXCHANGES.PLEASE_ADD_ONE_MORE_COIN') }
-        </div>
-      );
-    }
+            (this.state.step === 0 || this.state.step === 1) &&
+            <option
+              disabled={ Object.keys(this.filterOutETH(this.props.coins)).length < 2 }
+              value="clear">
+              { translate('EXCHANGES.CLEAR_CURRENT_ORDER') }
+            </option>
+          }
+          { this.state.activeSection !== 'order-details' &&
+            <option
+              disabled={ this.state.activeSection === 'history' }
+              value="history">
+              { translate('EXCHANGES.ORDER_HISTORY') }
+            </option>
+          }
+          { this.state.activeSection === 'order-details' &&
+            <option
+              disabled={ this.state.activeSection === 'order-details' }
+              value="order-details">
+              { translate('EXCHANGES.ORDER_HISTORY') }
+            </option>
+          }
+          { (this.state.activeSection === 'history' || this.state.activeSection === 'order-details') &&
+            <option value="sync">
+              { translate('EXCHANGES.SYNC_HISTORY') }
+            </option>
+          }
+          { (this.state.activeSection === 'history' || this.state.activeSection === 'order-details') &&
+            Object.keys(this.exchangesCache.coinswitch.orders).length > 0 &&
+            <option value="update">
+              { translate('EXCHANGES.REFRESH_HISTORY') }
+            </option>
+          }
+          <option
+            disabled={ this.state.activeSection === 'tos' }
+            value="tos">
+            { translate('EXCHANGES.TOS') }
+          </option>
+          { this.state.coinswitchCoins &&
+            <option
+              disabled={ this.state.activeSection === 'supported-coins' }
+              value="supported-coins">
+              { translate('EXCHANGES.SUPPORTED_COINS') }
+            </option>
+          }
+        </select>
+
+        { (this.state.activeSection === 'history' || this.state.activeSection === 'order-details') &&
+          <div className="exchanges-order-history margin-top-45">
+            { !this.state.activeOrderDetails &&
+              !this.state.syncHistoryProgressing &&
+              <ExchangesHistory
+                provider={ this.state.provider }
+                orders={
+                  this.exchangesCache.coinswitch &&
+                  this.exchangesCache.coinswitch.orders
+                }
+                deposits={
+                  this.exchangesCache.coinswitch &&
+                  this.exchangesCache.coinswitch.orders.deposits
+                }
+                openOrderDetails={ this.openOrderDetails }
+                findDeposits={ this.findDeposits } />
+            }
+            { this.state.activeOrderDetails &&
+              !this.state.syncHistoryProgressing &&
+              <ExchangesOrderDetails
+                { ...this.state }
+                order={
+                  this.exchangesCache.coinswitch &&
+                  this.exchangesCache.coinswitch.orders[this.state.activeOrderDetails]
+                }
+                deposit={
+                  this.exchangesCache.coinswitch &&
+                  this.exchangesCache.coinswitch.orders.deposits
+                }
+                findDeposits={ this.findDeposits }
+                openOrderOnline={ this.openOrderOnline }
+                makeDeposit={ this.makeDeposit } />
+            }
+            { this.state.syncHistoryProgressing &&
+              <div className="text-center">
+                { translate('EXCHANGES.SYNCING_HISTORY') }...
+              </div>
+            }
+          </div>
+        }
+
+        { this.state.activeSection === 'order' &&
+          Object.keys(this.filterOutETH(this.props.coins)).length > 1 &&
+          this.renderOrderForm() }
+        { this.state.activeSection === 'order' &&
+          Object.keys(this.filterOutETH(this.props.coins)).length < 2 &&
+          <div className="form exchanges text-center margin-top-45 padding-top-55">
+            { translate('EXCHANGES.PLEASE_ADD_ONE_MORE_COIN') }
+          </div>
+        }
+        { this.state.activeSection === 'tos' &&
+          <ExchangesTOS /> }
+        { this.state.activeSection === 'supported-coins' &&
+          <ExchangesSupportedCoins coins={ this.state.coinswitchCoinsObj } /> }
+      </div>
+    );
   }
 }
 
