@@ -33,9 +33,9 @@ import OfflineSigning from './components/OfflineSigning';
 import Pin from './components/Pin';
 import Recovery from './components/Recovery';
 import Overview from './components/Overview';
-import Settings from './components/Settings';
+import Settings from './components/Settings/Settings';
 import Exchanges from './components/Exchanges/Exchanges';
-import settingsDefaults from './components/settingsDefaults';
+import settingsDefaults from './components/Settings/settingsDefaults';
 
 const DASHBOARD_UPDATE_INTERVAL = 120000; // 2m
 const PROXY_RETRY_COUNT = 2;

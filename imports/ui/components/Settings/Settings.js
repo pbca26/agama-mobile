@@ -8,7 +8,7 @@ import {
   encryptkey,
   decryptkey,
 } from '../actions/seedCrypt';
-import translate from '../translate/translate';
+import translate from '../../translate/translate';
 import { Meteor } from 'meteor/meteor';
 import fiatList from './fiatList';
 import settingsDefaults from './settingsDefaults';
