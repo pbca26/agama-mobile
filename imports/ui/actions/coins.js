@@ -19,7 +19,6 @@ const _coinsList = {
     'BTCH',
     'KV',
     'WLC',
-    'MNZ',
     'BNTN',
     'CHAIN',
     'GLXT',
