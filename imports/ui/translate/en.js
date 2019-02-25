@@ -83,6 +83,7 @@ const lang = {
       CURRENCY: 'Currency',
       DEBUG: 'Debug',
       CHANGE_SERVER: 'Change @template@ server',
+      REMOVE_COIN: 'Remove coin',
     },
     RECOVERY: {
       PROVIDE_YOUR_PIN: 'Provide your PIN number to unlock seed/WIF.',

@@ -66,7 +66,6 @@ class App extends React.Component {
       displayMenu: false,
       loading: false,
       coin: null,
-      mode: null,
       coins: {},
       pubKeys: {},
       activeSection: 'login',
@@ -109,6 +108,7 @@ class App extends React.Component {
     this.retryProxy = this.retryProxy.bind(this);
     this.updateDefaultCoinServer = this.updateDefaultCoinServer.bind(this);
     this.toggleExchanges = this.toggleExchanges.bind(this);
+    this.updateCoinsList = this.updateCoinsList.bind(this);
   }
 
   componentWillMount() {
@@ -147,6 +147,44 @@ class App extends React.Component {
         overview: res,
       });
     });
+  }
+
+  updateCoinsList() {
+    const { actions } = this.props;
+    let localStorageCoins = getLocalStorageVar('coins');
+    const localStorageCoinsKeys = Object.keys(localStorageCoins);
+
+    actions.getOverview(localStorageCoins)
+    .then((res) => {
+      this.setState({
+        overview: res,
+      });
+    });
+
+    if (localStorageCoinsKeys.length) {
+      this.setState({
+        coins: localStorageCoins,
+      });
+
+      if (localStorageCoinsKeys.indexOf(this.state.coin) === -1) {
+        if (localStorageCoinsKeys.indexOf('kmd|spv') > -1) {
+          this.switchCoin('kmd|spv');
+        } else {
+          this.switchCoin(localStorageCoinsKeys[0]);
+        }
+      }
+    } else {
+      this.setState({
+        coins: {},
+        address: null,
+        balance: null,
+        transactions: null,
+        utxo: null,
+        coin: null,
+        activeSection: 'addcoin',
+        history: null,  
+      });
+    }
   }
 
   updateDefaultCoinServer(coin, server) {
@@ -1022,9 +1060,11 @@ class App extends React.Component {
             { this.state.activeSection === 'settings' &&
               <Settings
                 coin={ this.state.coin }
+                coins={ this.state.coins }
                 globalClick={ this.globalClick }
                 changeActiveSection={ this.changeActiveSection }
-                logout={ this.logout } />
+                logout={ this.logout }
+                updateCoinsList={ this.updateCoinsList } />
             }
             { this.state.auth &&
               this.state.activeSection === 'exchanges' &&

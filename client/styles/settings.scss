@@ -24,3 +24,25 @@
     }
   }
 }
+
+.addcoin-ui {
+  &.settings-coins {
+    .home {
+      .overview-coins {
+        top: 0;
+
+        .switch-block {
+          position: absolute;
+          display: inline-block;
+          right: 20px;
+          margin-top: 30px;
+        }
+      }
+    }
+    .menu-back {
+      position: fixed;
+      top: 4px;
+      z-index: 400;
+    }
+  }
+}
