@@ -48,7 +48,6 @@ const _coinsList = {
     'MONA',
     'ZEC',
     'HUSH',
-    'ARG',
     'DASH',
     'CRW',
     'VTC',
