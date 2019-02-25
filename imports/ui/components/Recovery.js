@@ -16,10 +16,13 @@ class Recovery extends React.Component {
       passphrase: config.preload ? config.preload.seed : null,
       pin: config.preload ? config.preload.pin : null,
       wrongPin: false,
+      showPrivKeys: false,
+      privKeys: [],
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.updateInput = this.updateInput.bind(this);
     this.decodeSeed = this.decodeSeed.bind(this);
+    this.toggleShowPrivKeys = this.toggleShowPrivKeys.bind(this);
   }
 
   componentWillReceiveProps(props) {
@@ -27,6 +30,12 @@ class Recovery extends React.Component {
         this.state.passphrase) {
       this.setState(this.defaultState);
     }
+  }
+
+  toggleShowPrivKeys() {
+    this.setState({
+      showPrivKeys: !this.state.showPrivKeys,
+    });
   }
 
   updateInput(e) {
@@ -41,16 +50,53 @@ class Recovery extends React.Component {
     const _decryptedKey = decryptkey(this.state.pin, _encryptedKey.encryptedKey);
 
     if (_decryptedKey) {
-      this.setState({
+      let newState = {
         wrongPin: false,
         pin: null,
         passphrase: _decryptedKey,
-      });
+      };
+
+      if (this.state.showPrivKeys) {
+        this.props.getKeys()
+        .then((res) => {
+          const _keys = res.spv;
+          let keys = [];
+
+          for (let key in _keys) {
+            keys.push({
+              name: key.toUpperCase(),
+              value: _keys[key].priv,
+            });
+          }
+
+          newState.privKeys = keys;
+          this.setState(newState);
+        });
+      } else {
+        this.setState(newState);
+      }
     } else {
       this.setState({
         wrongPin: true,
       });
     }
+  }
+
+  renderPrivKeys() {
+    const keys = this.state.privKeys;
+    let items = [];
+
+    for (let i = 0; i < keys.length; i++) {
+      items.push(
+        <div
+          key={ `recovery-priv-keys-${i}` }
+          className="seed-gen-box">
+          <strong>{ keys[i].name }:</strong> { keys[i].value }
+        </div>
+      );
+    }
+
+    return items;
   }
 
   render() {
@@ -75,6 +121,23 @@ class Recovery extends React.Component {
             </div>
           }
         </div>
+        <div className={ 'margin-left-10 switch-block margin-bottom-25' + (!this.state.pin ? ' disabled' : '') }>
+          <label className="switch">
+            <input
+              type="checkbox"
+              value="on"
+              checked={ this.state.showPrivKeys }
+              readOnly />
+            <div
+              className="slider"
+              onClick={ this.toggleShowPrivKeys }></div>
+          </label>
+          <div
+            className="toggle-label pointer"
+            onClick={ this.toggleShowPrivKeys }>
+            { translate('RECOVERY.SHOW_PRIV_KEYS') }
+          </div>
+        </div>
         <div
           disabled={ !this.state.pin }
           onClick={ this.decodeSeed }
@@ -87,9 +150,17 @@ class Recovery extends React.Component {
           </div>
         </div>
         { this.state.passphrase &&
-          <div className="margin-bottom-25 margin-top-50 decoded-seed">
-            <div className="seed-gen-box margin-bottom-30">{ this.state.passphrase }</div>
-            <div className="text-center">
+          <div className="margin-bottom-25 margin-top-30 decoded-seed">
+            <div className="title margin-bottom-10">{ translate('RECOVERY.SEED') }</div>
+            <div className="seed-gen-box margin-bottom-10">{ this.state.passphrase }</div>
+            { this.state.showPrivKeys &&
+              <div className="recovery-priv-keys">
+                <div className="title margin-bottom-10">{ translate('RECOVERY.PRIV_KEYS') }</div>
+                { this.renderPrivKeys() }
+              </div>
+            }
+            <div className="text-center margin-top-35">
+              <div className="title margin-bottom-10">{ translate('RECOVERY.SEED_QR') }</div>
               <QRCode
                 value={ this.state.passphrase }
                 size={ 320 } />

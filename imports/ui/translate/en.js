@@ -88,6 +88,10 @@ const lang = {
     RECOVERY: {
       PROVIDE_YOUR_PIN: 'Provide your PIN number to unlock seed/WIF.',
       SHOW: 'Show',
+      SHOW_PRIV_KEYS: 'Show private key(s)',
+      SEED: 'Seed',
+      PRIV_KEYS: 'Private keys',
+      SEED_QR: 'Seed QR code',
     },
     PIN: {
       SAVE: 'Save',

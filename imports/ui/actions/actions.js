@@ -808,8 +808,15 @@ const syncExchangesHistory = (provider) => {
   }
 };
 
+const getKeys = () => {
+  return async (dispatch) => {
+    return keys;
+  };
+};
+
 export default {
   auth,
+  getKeys,
   getOverview,
   clearKeys,
   balance,

@@ -88,7 +88,6 @@ class App extends React.Component {
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
     this.lock = this.lock.bind(this);
-    // this.getKeys = this.getKeys.bind(this);
     this.getBalance = this.getBalance.bind(this);
     this.getTransactions = this.getTransactions.bind(this);
     this.toggleMenu = this.toggleMenu.bind(this);
@@ -264,6 +263,8 @@ class App extends React.Component {
       activeSection: this.state.history,
       history: null,
     });
+    
+    this.scrollToTop();
   }
 
   scrollToTop() {
@@ -457,15 +458,6 @@ class App extends React.Component {
     this.getBalance();
     this.getTransactions();
   }
-
-  /*getKeys() {
-    const { actions } = this.props;
-
-    actions.getKeys()
-    .then((res) => {
-      console.warn(res);
-    });
-  }*/
 
   getBalance() {
     const { actions } = this.props;
@@ -1051,7 +1043,9 @@ class App extends React.Component {
             }
             { this.state.auth &&
               this.state.activeSection === 'recovery' &&
-              <Recovery { ...this.state } />
+              <Recovery
+                activeSection={ this.state.activeSection }
+                getKeys={ this.props.actions.getKeys } />
             }
             { this.state.auth &&
               this.state.activeSection === 'overview' &&
