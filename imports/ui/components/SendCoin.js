@@ -345,9 +345,12 @@ class SendCoin extends React.Component {
                 this.props.coin === 'btc' ? this.props.btcFees[this.state.btcFee] : null
               )
               .then((sendPreflight) => {
-                console.warn('sendPreflight', sendPreflight);
                 if (sendPreflight &&
                     sendPreflight.msg === 'success') {
+                  if (fromSats(sendPreflight.result.value) > this.state.sendAmount) {
+                    sendPreflight.result.value = sendPreflight.result.inputValue;
+                  }
+
                   this.setState({
                     spvVerificationWarning: !sendPreflight.result.utxoVerified,
                     spvPreflightSendInProgress: false,
@@ -659,19 +662,6 @@ class SendCoin extends React.Component {
                       { Number(fromSats(this.state.spvPreflightResult.result.fee)) } { _name.toUpperCase() }
                       </span>
                     </div>
-                    { this.state.spvPreflightResult.result.change === 0 &&
-                      (formatValue((fromSats(this.state.spvPreflightResult.result.value)) - (fromSats(this.state.spvPreflightResult.result.fee))) > 0) &&
-                      <div>
-                        <div className="padding-top-15 edit">
-                          <strong>{ translate('SEND.ADJUSTED_AMOUNT') }</strong>
-                        </div>
-                        <div className="edit">
-                          <span className="shade">
-                          { Number(formatValue((fromSats(this.state.spvPreflightResult.result.value)) - (fromSats(this.state.spvPreflightResult.result.fee)))) }
-                          </span>
-                        </div>
-                      </div>
-                    }
                     { this.state.spvPreflightResult.result.estimatedFee < 0 &&
                       _name.toLowerCase() === 'kmd' &&
                       <div>
@@ -705,7 +695,7 @@ class SendCoin extends React.Component {
                         </div>
                         <div className="edit">
                           <span className="shade">
-                          { formatValue(Number(fromSats(this.state.spvPreflightResult.result.value)) + Number(fromSats(this.state.spvPreflightResult.result.fee))) } { _name.toUpperCase() }
+                          { formatValue(Number(fromSats(this.state.spvPreflightResult.result.value)) + Number(fromSats(fromSats(this.state.sendAmount) === this.state.spvPreflightResult.result.balance ? -1 * this.state.spvPreflightResult.result.fee : this.state.spvPreflightResult.result.fee))) } { _name.toUpperCase() }
                           </span>
                         </div>
                       </div>
@@ -792,6 +782,14 @@ class SendCoin extends React.Component {
                   </div>
                 }
               </div>
+              { this.state.spvPreflightResult &&
+                this.state.spvPreflightResult.msg === 'success' &&
+                this.state.spvPreflightResult.result.hasOwnProperty('dpowSecured') &&
+                this.state.spvPreflightResult.result.dpowSecured &&
+                <div className="padding-top-20 fs-15 edit send-dpow-flag">
+                  <i className="fa fa-shield success"></i> { translate('SEND.DPOW_SECURED') }
+                </div>
+              }
               { ((getLocalStorageVar('settings') && getLocalStorageVar('settings').requirePin) ||
                 (config.preload && config.enablePinConfirm)) &&
                 <div>
@@ -827,14 +825,6 @@ class SendCoin extends React.Component {
                 !this.state.spvPreflightResult.result.dpowSecured &&
                 <div className="padding-top-20 fs-15 edit">
                   <strong>{ translate('SEND.NOTICE') }:</strong> { translate('SEND.DPOW_UNSECURE') }.
-                </div>
-              }
-              { this.state.spvPreflightResult &&
-                this.state.spvPreflightResult.msg === 'success' &&
-                this.state.spvPreflightResult.result.hasOwnProperty('dpowSecured') &&
-                this.state.spvPreflightResult.result.dpowSecured &&
-                <div className="padding-top-20 fs-15 edit send-dpow-flag">
-                  <i className="fa fa-shield success"></i> { translate('SEND.DPOW_SECURED') }
                 </div>
               }
               <div className="widget-body-footer">
