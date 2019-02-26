@@ -345,6 +345,7 @@ class SendCoin extends React.Component {
                 this.props.coin === 'btc' ? this.props.btcFees[this.state.btcFee] : null
               )
               .then((sendPreflight) => {
+                console.warn('sendPreflight', sendPreflight);
                 if (sendPreflight &&
                     sendPreflight.msg === 'success') {
                   this.setState({
@@ -818,6 +819,22 @@ class SendCoin extends React.Component {
                 <div className="padding-top-20 fs14 lh25 padding-left-15">
                   <i className="fa fa-warning warning"></i> <strong className="warning">{ translate('SEND.WARNING') }:</strong> { translate('SEND.WARNING_SPV_P1') }
                   <div>{ translate('SEND.WARNING_SPV_P2') }</div>
+                </div>
+              }
+              { this.state.spvPreflightResult &&
+                this.state.spvPreflightResult.msg === 'success' &&
+                this.state.spvPreflightResult.result.hasOwnProperty('dpowSecured') &&
+                !this.state.spvPreflightResult.result.dpowSecured &&
+                <div className="padding-top-20 fs-15 edit">
+                  <strong>{ translate('SEND.NOTICE') }:</strong> { translate('SEND.DPOW_UNSECURE') }.
+                </div>
+              }
+              { this.state.spvPreflightResult &&
+                this.state.spvPreflightResult.msg === 'success' &&
+                this.state.spvPreflightResult.result.hasOwnProperty('dpowSecured') &&
+                this.state.spvPreflightResult.result.dpowSecured &&
+                <div className="padding-top-20 fs-15 edit send-dpow-flag">
+                  <i className="fa fa-shield success"></i> { translate('SEND.DPOW_SECURED') }
                 </div>
               }
               <div className="widget-body-footer">

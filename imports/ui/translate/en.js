@@ -185,6 +185,9 @@ const lang = {
       ADDRESS_IS_INCORECT: 'Address is incorrect',
       QR_SCAN_ERR: 'Unable to decode QR image. Please retry.',
       SCAN_QR: 'Scan QR code',
+      NOTICE: 'Notice',
+      DPOW_UNSECURE: 'One ore more of your UTXO(s) are not dPoW secured',
+      DPOW_SECURED: 'Your funds are dPoW secured',
     },
     ADD_COIN: {
       NO_MATCHING_RESULTS: 'No matching results',

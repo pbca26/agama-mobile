@@ -152,4 +152,14 @@
     margin-top: 6px;
     opacity: 0.8;
   }
+  .send-dpow-flag {
+    .fa {
+      &:before {
+        font-size: 16px;
+        margin-right: 5px;
+        position: relative;
+        top: 1px;
+      }
+    }
+  }
 }
