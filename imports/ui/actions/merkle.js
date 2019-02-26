@@ -48,7 +48,7 @@ const verifyMerkle = (txid, height, serverList, electrumServer, proxyServer, cac
     const _randomServer = randomServer.split(':');
     const _currentServer = electrumServer;
 
-    devlog(`current server: ${_currentServer}`);
+    devlog(`current server: ${JSON.stringify(_currentServer)}`);
     devlog(`verification server: ${randomServer}`);
 
     return new Promise((resolve, reject) => {

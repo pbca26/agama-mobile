@@ -240,7 +240,7 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
                     }))
                     .then(promiseResult => {
                       if (!_atLeastOneDecodeTxFailed) {
-                        devlog(promiseResult);
+                        devlog(`${network} listunspent`, promiseResult);
                         resolve(promiseResult);
                       } else {
                         devlog('listunspent error, cant decode tx(s)');

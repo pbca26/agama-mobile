@@ -6,6 +6,7 @@ import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
 import electrumServers from 'agama-wallet-lib/build/electrum-servers';
 import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 import transactionBuilder from 'agama-wallet-lib/build/transaction-builder';
+import dpowCoins from 'agama-wallet-lib/build/electrum-servers-dpow';
 import translate from '../translate/translate';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
@@ -35,7 +36,8 @@ const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, val
           changeAddress,
           utxoList
         );
-
+        let dpowSecured = true;
+        
         devlog('send data', _data);
 
         if (network.toLowerCase() === 'kmd' &&
@@ -51,6 +53,21 @@ const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, val
             changeAddress,
             utxoList
           );
+        }
+
+        if (dpowCoins.indexOf(network.toUpperCase()) > -1) {
+          let dpowSecured = true;
+          devlog(`${network} spv dpow enabled create tx, verify if all utxo are dpow secured`);
+          
+          for (let i = 0; i < _data.inputs.length; i++) {
+            if (_data.inputs[i].hasOwnProperty('dpowSecured') &&
+                !_data.inputs[i].dpowSecured) {
+              dpowSecured = false;
+              break;
+            }
+          }
+
+          _data.dpowSecured = dpowSecured;
         }
 
         if (_data.balance) {
