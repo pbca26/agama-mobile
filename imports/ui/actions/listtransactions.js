@@ -4,7 +4,10 @@ import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
 import parseTransactionAddresses from 'agama-wallet-lib/build/transaction-type';
 import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 import electrumJSTxDecoder from 'agama-wallet-lib/build/transaction-decoder';
+import dpowCoins from 'agama-wallet-lib/build/electrum-servers-dpow';
 import { sortTransactions } from './utils';
+
+console.warn('dpowCoins', dpowCoins);
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
@@ -46,6 +49,11 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
 
         if (txid) {
           delete params.raw;
+        }
+
+        if (dpowCoins.indexOf(network.toUpperCase()) > -1) {
+          devlog(`${network} spv dpow enabled, req verbose tx data`);
+          params.verbose = true;
         }
 
         devlog('req', {
@@ -181,6 +189,21 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
                               formattedTx.inputs = decodedTx.inputs;
                               formattedTx.outputs = decodedTx.outputs;
                               formattedTx.locktime = decodedTx.format.locktime;
+
+                              if (transaction.hasOwnProperty('verbose')) {
+                                formattedTx.dpowSecured = false;
+  
+                                if (transaction.verbose.hasOwnProperty('confirmations')) {
+                                  if (transaction.verbose.confirmations >= 2) {
+                                    formattedTx.dpowSecured = true;
+                                    formattedTx.rawconfirmations = formattedTx.confirmations;
+                                  } else {
+                                    formattedTx.confirmations = transaction.verbose.confirmations;
+                                    formattedTx.rawconfirmations = transaction.verbose.rawconfirmations;
+                                  }             
+                                }
+                              }
+
                               _rawtx.push(formattedTx);
                             } else {
                               formattedTx[0].height = transaction.height;
@@ -197,9 +220,30 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
                               formattedTx[1].inputs = decodedTx.inputs;
                               formattedTx[1].outputs = decodedTx.outputs;
                               formattedTx[1].locktime = decodedTx.format.locktime;
+
+                              if (transaction.hasOwnProperty('verbose')) {
+                                formattedTx[0].dpowSecured = false;
+                                formattedTx[1].dpowSecured = false;
+  
+                                if (transaction.verbose.hasOwnProperty('confirmations')) {
+                                  if (transaction.verbose.confirmations >= 2) {
+                                    formattedTx[0].dpowSecured = true;
+                                    formattedTx[0].rawconfirmations = formattedTx[0].confirmations;
+                                    formattedTx[1].dpowSecured = true;
+                                    formattedTx[1].rawconfirmations = formattedTx[1].confirmations;
+                                  } else {
+                                    formattedTx[0].confirmations = transaction.verbose.confirmations;
+                                    formattedTx[0].rawconfirmations = transaction.verbose.rawconfirmations;
+                                    formattedTx[1].confirmations = transaction.verbose.confirmations;
+                                    formattedTx[1].rawconfirmations = transaction.verbose.rawconfirmations;
+                                  }
+                                }
+                              }
+
                               _rawtx.push(formattedTx[0]);
                               _rawtx.push(formattedTx[1]);
                             }
+
                             resolve(true);
                           });
                         } else {
@@ -237,6 +281,7 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
                 .then(promiseResult => {
                   _rawtx = sortTransactions(_rawtx);
                   resolve(_rawtx);
+                  console.warn('listtransactions final', _rawtx);
                 });
               };
 
