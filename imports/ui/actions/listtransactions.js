@@ -7,8 +7,6 @@ import electrumJSTxDecoder from 'agama-wallet-lib/build/transaction-decoder';
 import dpowCoins from 'agama-wallet-lib/build/electrum-servers-dpow';
 import { sortTransactions } from './utils';
 
-console.warn('dpowCoins', dpowCoins);
-
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
 const listtransactions = (proxyServer, electrumServer, address, network, full, cache, txid) => {
@@ -52,7 +50,7 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
         }
 
         if (dpowCoins.indexOf(network.toUpperCase()) > -1) {
-          devlog(`${network} spv dpow enabled, req verbose tx data`);
+          devlog(`${network} spv dpow enabled listtransactions, req verbose tx data`);
           params.verbose = true;
         }
 
@@ -190,7 +188,8 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
                               formattedTx.outputs = decodedTx.outputs;
                               formattedTx.locktime = decodedTx.format.locktime;
 
-                              if (transaction.hasOwnProperty('verbose')) {
+                              if (dpowCoins.indexOf(network.toUpperCase()) > -1 &&
+                                  transaction.hasOwnProperty('verbose')) {
                                 formattedTx.dpowSecured = false;
   
                                 if (transaction.verbose.hasOwnProperty('confirmations')) {
@@ -221,7 +220,8 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
                               formattedTx[1].outputs = decodedTx.outputs;
                               formattedTx[1].locktime = decodedTx.format.locktime;
 
-                              if (transaction.hasOwnProperty('verbose')) {
+                              if (dpowCoins.indexOf(network.toUpperCase()) > -1 &&
+                                  transaction.hasOwnProperty('verbose')) {
                                 formattedTx[0].dpowSecured = false;
                                 formattedTx[1].dpowSecured = false;
   

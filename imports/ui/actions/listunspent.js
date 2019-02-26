@@ -9,6 +9,7 @@ import {
 } from 'agama-wallet-lib/build/utils';
 import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 import electrumJSTxDecoder from 'agama-wallet-lib/build/transaction-decoder';
+import dpowCoins from 'agama-wallet-lib/build/electrum-servers-dpow';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
@@ -20,6 +21,12 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
     proto: electrumServer.proto,
     address,
   };
+
+  if (dpowCoins.indexOf(network.toUpperCase()) > -1) {
+    devlog(`${network} spv dpow enabled listunspent, req verbose tx data`);
+    params.verbose = true;
+  }
+
   devlog('req', {
     method: 'GET',
     url: `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent`,
@@ -48,6 +55,7 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
               ip: electrumServer.ip,
               proto: electrumServer.proto,
             };
+            
             devlog('req', {
               method: 'GET',
               url: `http://${proxyServer.ip}:${proxyServer.port}/api/getcurrentblock`,
@@ -145,6 +153,17 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
                                   locktime: decodedTx.format.locktime,
                                 };
 
+                                if (dpowCoins.indexOf(network.toUpperCase()) > -1 &&
+                                    _utxoItem.hasOwnProperty('verbose')) {
+                                  _resolveObj.dpowSecured = false;
+    
+                                  if (_utxoItem.verbose.hasOwnProperty('confirmations')) {
+                                    if (_utxoItem.verbose.confirmations >= 2) {
+                                      _resolveObj.dpowSecured = true;
+                                    } 
+                                  }
+                                }
+
                                 // merkle root verification agains another electrum server
                                 if (verify) {
                                   verifyMerkleByCoin(
@@ -180,6 +199,17 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
                                   verified: false,
                                 };
 
+                                if (dpowCoins.indexOf(network.toUpperCase()) > -1 &&
+                                    _utxoItem.hasOwnProperty('verbose')) {
+                                  _resolveObj.dpowSecured = false;
+
+                                  if (_utxoItem.verbose.hasOwnProperty('confirmations')) {
+                                    if (_utxoItem.verbose.confirmations >= 2) {
+                                      _resolveObj.dpowSecured = true;
+                                    } 
+                                  }
+                                }
+                                
                                 // merkle root verification agains another electrum server
                                 if (verify) {
                                   verifyMerkleByCoin(
