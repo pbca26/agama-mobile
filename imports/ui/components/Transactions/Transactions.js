@@ -192,6 +192,10 @@ class Transactions extends React.Component {
               <img
                 className="line"
                 src={ `${assetsPath.txs}/trends-rectangle-7.png` } />
+              { _transactions[i].hasOwnProperty('dpowSecured') &&
+                _transactions[i].dpowSecured &&
+                <i className="fa fa-shield success transactions-dpow-flag"></i>
+              }
             </div>
           );
         }

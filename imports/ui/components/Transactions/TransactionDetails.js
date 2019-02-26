@@ -45,7 +45,6 @@ class TransactionDetails extends React.Component {
 
   render() {
     const tx = this.props.tx;
-    console.warn(tx);
 
     return (
       <section className="transaction-details">
@@ -101,6 +100,15 @@ class TransactionDetails extends React.Component {
             { tx.confirmations }
           </div>
         </div>
+        { tx.hasOwnProperty('rawconfirmations') &&
+          tx.rawconfirmations !== tx.confirmations &&
+          <div className="edit">
+            { translate('TRANSACTIONS.RAWCONFS') }
+            <div className="shade margin-top-5">
+              { tx.rawconfirmations }
+            </div>
+          </div>
+        }
         <div className="edit">
           { translate('EXCHANGES.HEIGHT') }
           <div className="shade margin-top-5">
@@ -123,6 +131,14 @@ class TransactionDetails extends React.Component {
               { (!Number(tx.locktime) || Number(tx.locktime) === 0) &&
                 <span>{ translate('TRANSACTIONS.LOCKTIME_IS_NOT_SET') }</span>
               }
+            </div>
+          </div>
+        }
+        { tx.hasOwnProperty('dpowSecured') &&
+          <div className="edit">
+            { translate('TRANSACTIONS.DPOW_SECURED') }
+            <div className="shade margin-top-5">
+              { translate('TRANSACTIONS.' + (tx.dpowSecured ? 'YES' : 'NO')) }
             </div>
           </div>
         }

@@ -240,6 +240,10 @@ const lang = {
       LOCKTIME: 'Locktime',
       TRANSACTION_DETAILS: 'Transaction details',
       LOCKTIME_IS_NOT_SET: 'KMD locktime is unset! This transaction is not accruing rewards. To reset locktime send the whole balance to yourself.',
+      RAWCONFS: 'Raw confirmations',
+      DPOW_SECURED: 'dPoW secured',
+      YES: 'Yes',
+      NO: 'No',
     },
     CLAIM: {
       WARNING: 'Warning',
