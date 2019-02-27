@@ -281,7 +281,6 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
                 .then(promiseResult => {
                   _rawtx = sortTransactions(_rawtx);
                   resolve(_rawtx);
-                  console.warn('listtransactions final', _rawtx);
                 });
               };
 

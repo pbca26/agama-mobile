@@ -337,8 +337,6 @@ const transactions = (network, options) => {
             port: _randomElectrumServer[1],
             proto: _randomElectrumServer[2],
           };
-
-          console.warn(_electrumServer);
         }
 
         listtransactions(
