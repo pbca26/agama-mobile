@@ -20,12 +20,12 @@ export const devlog = (msg, data) => {
     if (config.debugOptions &&
         config.debugOptions.req &&
         msg === 'req') {
-      console.warn(msg, `method: ${data.method}, url: ${data.url}?${joinPropsUrl(data.params)}`);
+      console.warn(`req method: ${data.method}, url: ${data.url}?${joinPropsUrl(data.params)}`);
     } else if (msg !== 'req') {
       if (data) {
         console.warn(msg, config.debugOptions && config.debugOptions.stringify ? JSON.stringify(data) : data);
       } else {
-        console.warn(msg);
+        console.warn(config.debugOptions && config.debugOptions.stringify ? JSON.stringify(msg) : msg);
       }
     }
   }
