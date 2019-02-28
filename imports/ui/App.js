@@ -793,7 +793,7 @@ class App extends React.Component {
                       className="line"
                       src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                   </div>
-                  <div className="item">
+                  <div className="item hide">
                     <div
                       className="title"
                       onClick={ this.logout }>
@@ -807,7 +807,7 @@ class App extends React.Component {
                     <div
                       className="title"
                       onClick={ this.lock }>
-                      { translate('DASHBOARD.LOCK') }
+                      { translate('DASHBOARD.LOGOUT') }
                     </div>
                     <img
                       className="line"
