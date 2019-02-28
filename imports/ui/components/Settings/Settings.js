@@ -13,6 +13,7 @@ import { Meteor } from 'meteor/meteor';
 import fiatList from './fiatList';
 import settingsDefaults from './settingsDefaults';
 import SettingsCoins from './Coins';
+import btcFeesSource from './btcFees';
 
 // TODO: reset settings/purge seed and pin
 
@@ -29,6 +30,7 @@ class Settings extends React.Component {
       purgeData: false,
       fiat: 'usd',
       debug: false,
+      btcFeesSource: btcFeesSource[0].name,
       activeView: null,
       removeCoins: null,
     };
@@ -50,6 +52,7 @@ class Settings extends React.Component {
         requirePin: _settings.requirePin,
         fiat: _settings.fiat,
         debug: _settings.debug,
+        btcFeesSource: _settings.btcFeesSource,
         purgeData: false,
         removeCoins: null,
       });
@@ -112,6 +115,7 @@ class Settings extends React.Component {
         requirePin: this.state.requirePin,
         fiat: this.state.fiat,
         debug: this.state.debug,
+        btcFeesSource: this.state.btcFeesSource,
       });
 
       if (this.state.removeCoins) {
@@ -161,6 +165,22 @@ class Settings extends React.Component {
     return items;
   }
 
+  renderBTCFeesOptions() {
+    let items = [];
+
+    for (let i = 0; i < btcFeesSource.length; i++) {
+      items.push(
+        <option
+          key={ `settings-btc-fees-source-${btcFeesSource[i].name}` }
+          value={ btcFeesSource[i].name }>
+          { translate('SETTINGS.' + btcFeesSource[i].title) }
+        </option>
+      ); 
+    }
+
+    return items;
+  }
+
   render() {
     if (!this.state.activeView) {
       return (
@@ -187,6 +207,17 @@ class Settings extends React.Component {
               onChange={ (event) => this.updateInput(event) }
               autoFocus>
               { this.renderFiatOptions() }
+            </select>
+          </div>
+          <div className="margin-top-10 item">
+            <div className="padding-bottom-20">{ translate('SETTINGS.BTC_FEES_SOURCE') }</div>
+            <select
+              className="form-control form-material"
+              name="btcFeesSource"
+              value={ this.state.btcFeesSource }
+              onChange={ (event) => this.updateInput(event) }
+              autoFocus>
+              { this.renderBTCFeesOptions() }
             </select>
           </div>
           <div className="item item--sm">

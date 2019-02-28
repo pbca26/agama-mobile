@@ -85,6 +85,9 @@ const lang = {
       DEBUG: 'Debug',
       CHANGE_SERVER: 'Change @template@ server',
       REMOVE_COIN: 'Remove coin',
+      BTC_FEES_SOURCE: 'Bitcoin fees source',
+      BTC_FEES_SOURCE1: 'atomicexplorer.com',
+      BTC_FEES_SOURCE2: 'bitcoinfees.earn.com',
     },
     RECOVERY: {
       PROVIDE_YOUR_PIN: 'Provide your PIN number to unlock seed/WIF.',

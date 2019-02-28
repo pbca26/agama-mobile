@@ -752,28 +752,38 @@ const getOverview = (coins) => {
 const getBtcFees = () => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
+      const btcFeesSource = getLocalStorageVar('settings').btcFeesSource;
+
       devlog('req', {
         method: 'GET',
-        url: 'https://www.atomicexplorer.com/api/btc/fees',
+        url: btcFeesSource === 'bitcoinfees_earn_com' ? 'https://bitcoinfees.earn.com/api/v1/fees/recommended' : 'https://www.atomicexplorer.com/api/btc/fees',
       });
   
       HTTP.call(
         'GET',
-        'https://www.atomicexplorer.com/api/btc/fees', {
+        btcFeesSource === 'bitcoinfees_earn_com' ? 'https://bitcoinfees.earn.com/api/v1/fees/recommended' : 'https://www.atomicexplorer.com/api/btc/fees', {
         params: {},
       }, (error, result) => {
         if (!result) {
           resolve('error');
         } else {
-          const _btcFees = JSON.parse(result.content).result;
+          const _btcFees = btcFeesSource === 'bitcoinfees_earn_com' ? JSON.parse(result.content) : JSON.parse(result.content).result;
 
           devlog('btc fees');
           devlog(_btcFees);
 
-          if (_btcFees.recommended &&
-              _btcFees.recommended.fastestFee,
-              _btcFees.recommended.halfHourFee,
-              _btcFees.recommended.hourFee) {
+          if (btcFeesSource === 'bitcoinfees_earn_com' &&
+              _btcFees &&
+              _btcFees.fastestFee,
+              _btcFees.halfHourFee,
+              _btcFees.hourFee) {
+            resolve(_btcFees);
+          } else if (
+            _btcFees.recommended &&
+            _btcFees.recommended.fastestFee,
+            _btcFees.recommended.halfHourFee,
+            _btcFees.recommended.hourFee
+          ) {
             resolve(_btcFees.recommended);
           } else {
             resolve('error');
