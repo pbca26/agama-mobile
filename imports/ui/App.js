@@ -596,6 +596,20 @@ class App extends React.Component {
 
   login(passphrase) {
     const { actions } = this.props;
+    let overviewCoinsInit = [];
+
+    for (let key in this.state.coins) {
+      overviewCoinsInit.push({
+        balanceFiat: 'loading',
+        balanceNative: 'loading',
+        coin: key,
+        fiatPricePerItem: 'loading',
+      });
+    }
+
+    this.setState({
+      overview: overviewCoinsInit,
+    });
 
     const _login = () => {
       actions.auth(passphrase, this.state.coins)
@@ -607,8 +621,6 @@ class App extends React.Component {
 
         actions.getOverview(this.state.coins)
         .then((res) => {
-          console.warn('post login overview', res);
-
           this.setState({
             overview: res,
           });

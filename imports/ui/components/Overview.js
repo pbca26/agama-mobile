@@ -23,8 +23,10 @@ class Overview extends React.Component {
       let _items = [];
       let _totalFiatBalance = 0;
 
-      for (let i = 0; i < _overview.length; i++) {
-        _totalFiatBalance += _overview[i].balanceFiat;
+      if (_overview[0].balanceFiat !== 'loading') {
+        for (let i = 0; i < _overview.length; i++) {
+          _totalFiatBalance += _overview[i].balanceFiat;
+        }
       }
 
       _items.push(
@@ -36,11 +38,15 @@ class Overview extends React.Component {
               className="rectangle5"
               src={ `${assetsPath.home}/home-rectangle-5.png` } />
           </div>
-          <div className="totalvalue">{ translate('OVERVIEW.TOTAL_VALUE') }</div>
-          <div className="a3467812">{ formatValue(_totalFiatBalance) }</div>
-          <div className="label1">
-            <FiatSymbol symbol={ settingsCurrency } />
-          </div>
+          { _overview[0].balanceFiat !== 'loading' &&
+            <div className="totalvalue">{ translate('OVERVIEW.TOTAL_VALUE') }</div>
+          }
+          <div className="a3467812">{ _overview[0].balanceFiat !== 'loading' ? formatValue(_totalFiatBalance) : translate('OVERVIEW.PLEASE_WAIT') }</div>
+          { _overview[0].balanceFiat !== 'loading' &&
+            <div className="label1">
+              <FiatSymbol symbol={ settingsCurrency } />
+            </div>
+          }
           <div className="cryptocardgraph">
             <div className="group4">
               <div className="group2">
@@ -158,7 +164,7 @@ class Overview extends React.Component {
                 { translate('OVERVIEW.' + (this.props.overview && this.props.overview.length ? 'YOUR_COINS' : 'LOADING')) }
               </div>
               { this.props.overview &&
-                !this.props.overview.length &&
+                this.props.overview[0].balanceNative === 'loading' &&
                 <Spinner />
               }
               { /*<img

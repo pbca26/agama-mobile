@@ -109,6 +109,7 @@ const lang = {
       PER_COIN: 'per coin',
       YOUR_COINS: 'Your Coins',
       LOADING: 'Loading...',
+      PLEASE_WAIT: 'Please wait',
     },
     OFFLINE: {
       TX_SIG_FAIL: 'failed to sign transaction',
