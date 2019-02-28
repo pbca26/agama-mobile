@@ -694,7 +694,7 @@ const getOverview = (coins) => {
 
         const settingsCurrency = getLocalStorageVar('settings').fiat;
         let params = {
-          coins: _coins.length > 1 ? _coins.join(',') : _coins,
+          coins: _coins.length > 1 ? _coins.join(',') : _coins[0],
           currency: settingsCurrency,
           pricechange: true,
         };
