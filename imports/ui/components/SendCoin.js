@@ -841,7 +841,11 @@ class SendCoin extends React.Component {
                   </div>
                   <div
                     onClick={ () => this.changeSendCoinStep(2) }
-                    className="btn-inner pull-right">
+                    className="btn-inner pull-right"
+                    disabled={
+                      (this.state.spvPreflightResult && this.state.spvPreflightResult.result && !this.state.spvPreflightResult.result.fee) ||
+                      (this.state.spvPreflightResult && this.state.spvPreflightResult.result && !this.state.spvPreflightResult.result.value)
+                    }>
                     <div className="btn">{ translate('SEND.CONFIRM') }</div>
                     <div className="group2">
                     <div className="rectangle8copy"></div>

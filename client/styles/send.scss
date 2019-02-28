@@ -165,4 +165,10 @@
   .send-result {
     word-break: break-all;
   }
+  .btn-inner {
+    &:disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
 }
