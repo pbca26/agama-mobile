@@ -40,6 +40,7 @@ import settingsDefaults from './components/Settings/settingsDefaults';
 const DASHBOARD_UPDATE_INTERVAL = 120000; // 2m
 const PROXY_RETRY_COUNT = 2;
 const PROXY_RETRY_TIMEOUT = 5000;
+const PRICES_UPDATE_INTERVAL = 300000; // 5m
 
 let _settings = getLocalStorageVar('settings');
 
@@ -81,9 +82,11 @@ class App extends React.Component {
       btcFees: null,
       ethGasPrice: null,
       settingsUpdated: false,
+      prices: null,
     };
     this.globalClickTimeout = null;
     this.overviewInterval = null;
+    this.pricesUpdateInterval = null;
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
@@ -108,6 +111,7 @@ class App extends React.Component {
     this.updateDefaultCoinServer = this.updateDefaultCoinServer.bind(this);
     this.toggleExchanges = this.toggleExchanges.bind(this);
     this.updateCoinsList = this.updateCoinsList.bind(this);
+    this.updatePrices = this.updatePrices.bind(this);
   }
 
   componentWillMount() {
@@ -146,6 +150,33 @@ class App extends React.Component {
         overview: res,
       });
     });
+
+    this.updatePrices();
+    Meteor.setInterval(() => {
+      this.updatePrices();
+    }, PRICES_UPDATE_INTERVAL);
+  }
+
+  updatePrices() {
+    const _coins = getLocalStorageVar('coins');
+
+    if (_coins &&
+        Object.keys(_coins).length) {
+      const { actions } = this.props;
+      const coins = Object.keys(_coins);
+      let coinsPrices = [];
+
+      for (let i = 0; i < coins.length; i++) {
+        coinsPrices.push(coins[i].split('|')[0]);
+      }
+
+      actions.getPrices(coinsPrices)
+      .then((res) => {
+        this.setState({
+          prices: res,
+        });
+      });
+    }
   }
 
   updateCoinsList() {
@@ -436,11 +467,14 @@ class App extends React.Component {
   toggleAutoRefresh(disable) {
     if (disable) {
       Meteor.clearInterval(this.state.updateInterval);
-      Meteor.clearInterval(this.state.overviewInterval);
+      Meteor.clearInterval(this.overviewInterval);
+      Meteor.clearInterval(this.pricesUpdateInterval);
 
       this.setState({
         updateInterval: null,
       });
+      this.overviewInterval = null;
+      this.pricesUpdateInterval = null;
     } else {
       const _updateInterval = Meteor.setInterval(() => {
         if (this.state.activeSection === 'dashboard') {
@@ -652,7 +686,7 @@ class App extends React.Component {
       });
     });
 
-    if (!this.state.overviewInterval) {
+    if (!this.overviewInterval) {
       const _updateInterval = Meteor.setInterval(() => {
         if (this.state.activeSection === 'overview') {
           actions.getOverview(this.state.coins)
@@ -664,9 +698,7 @@ class App extends React.Component {
         }
       }, DASHBOARD_UPDATE_INTERVAL);
 
-      this.setState({
-        overviewInterval: _updateInterval,
-      });
+      this.overviewInterval = _updateInterval;
     }
 
     this.toggleMenuOption('overview');
