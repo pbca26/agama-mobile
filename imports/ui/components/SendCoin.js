@@ -342,7 +342,7 @@ class SendCoin extends React.Component {
                 Math.abs(toSats(this.state.sendAmount)),
                 true,
                 false,
-                this.props.coin === 'btc' ? this.props.btcFees[this.state.btcFee] : null
+                this.props.coin === 'btc|spv' ? this.props.btcFees[this.state.btcFee] : null
               )
               .then((sendPreflight) => {
                 if (sendPreflight &&
@@ -406,7 +406,7 @@ class SendCoin extends React.Component {
                 Math.abs(toSats(this.state.sendAmount)),
                 null,
                 true,
-                this.props.coin === 'btc' ? this.props.btcFees[this.state.btcFee] : null
+                this.props.coin === 'btc|spv' ? this.props.btcFees[this.state.btcFee] : null
               )
               .then((res) => {
                 devlog('spv sendtx result');

@@ -28,6 +28,7 @@ const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, val
       if (utxoList &&
           utxoList.length) {
         const _network = electrumJSNetworks[network.toLowerCase()] || electrumJSNetworks[isKomodoCoin(network) ? 'kmd' : network];    
+
         let _data = transactionBuilder.data(
           _network,
           value,
