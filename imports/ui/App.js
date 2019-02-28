@@ -572,9 +572,6 @@ class App extends React.Component {
 
       this.toggleAutoRefresh(true);
       Meteor.setTimeout(() => {
-        this.toggleMenu();
-      }, 10);
-      Meteor.setTimeout(() => {
         this.setState(lockState);
       }, 20);
       this.scrollToTop();
