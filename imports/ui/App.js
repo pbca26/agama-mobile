@@ -81,7 +81,6 @@ class App extends React.Component {
       history: null,
       btcFees: null,
       ethGasPrice: null,
-      settingsUpdated: false,
       prices: null,
     };
     this.globalClickTimeout = null;
@@ -143,40 +142,23 @@ class App extends React.Component {
         coins: _localStorageCoins,
       });
     }
-  
-    actions.getOverview(this.state.coins)
-    .then((res) => {
-      this.setState({
-        overview: res,
-      });
-    });
-
-    this.updatePrices();
-    Meteor.setInterval(() => {
-      this.updatePrices();
-    }, PRICES_UPDATE_INTERVAL);
   }
 
   updatePrices() {
-    const _coins = getLocalStorageVar('coins');
+    const { actions } = this.props;
+    const coins = Object.keys(getLocalStorageVar('coins'));
+    let coinsPrices = [];
 
-    if (_coins &&
-        Object.keys(_coins).length) {
-      const { actions } = this.props;
-      const coins = Object.keys(_coins);
-      let coinsPrices = [];
-
-      for (let i = 0; i < coins.length; i++) {
-        coinsPrices.push(coins[i].split('|')[0]);
-      }
-
-      actions.getPrices(coinsPrices)
-      .then((res) => {
-        this.setState({
-          prices: res,
-        });
-      });
+    for (let i = 0; i < coins.length; i++) {
+      coinsPrices.push(coins[i].split('|')[0]);
     }
+
+    actions.getPrices(coinsPrices)
+    .then((res) => {
+      this.setState({
+        prices: res,
+      });
+    });
   }
 
   updateCoinsList() {
@@ -618,6 +600,20 @@ class App extends React.Component {
     const _login = () => {
       actions.auth(passphrase, this.state.coins)
       .then((res) => {
+        this.updatePrices();
+        Meteor.setInterval(() => {
+          this.updatePrices();
+        }, PRICES_UPDATE_INTERVAL);
+
+        actions.getOverview(this.state.coins)
+        .then((res) => {
+          console.warn('post login overview', res);
+
+          this.setState({
+            overview: res,
+          });
+        });
+
         // select a coin and an address
         let coin;
         let address;
