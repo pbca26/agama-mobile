@@ -70,6 +70,7 @@ const lang = {
       CANT_BROADCAST_TX_ERR: 'Can\'t broadcast transaction',
       BAD_TX_INPUTS_SPENT_ERR: 'Bad transaction inputs spent',
       CON_ERROR: 'Connection error. Please retry.',
+      PUSH_ERROR: 'Transaction broadcast error:',
     },
     SETTINGS: {
       SAVED: 'Settings are saved',

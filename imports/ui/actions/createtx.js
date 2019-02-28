@@ -122,7 +122,7 @@ const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, val
             if (result.msg === 'error') {
               resolve({
                 msg: 'error',
-                result: translate('API.CON_ERROR'),
+                result: JSON.stringify(result.result).indexOf('code') > -1 ? `${translate('API.PUSH_ERROR')} ${JSON.stringify(result.result)}` : translate('API.CON_ERROR'),
               });
             } else {
               const txid = result.result;
