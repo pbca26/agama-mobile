@@ -580,6 +580,7 @@ class SendCoin extends React.Component {
               disabled={
                 !this.state.sendTo ||
                 !this.state.sendAmount ||
+                Number(this.state.sendAmount) < 0 ||
                 (this.props.coin === 'btc|spv' && (!this.props.btcFees || this.props.btcFees === 'error')) ||
                 (this.props.coin.indexOf('|eth') > -1 && (!this.props.ethGasPrice || this.props.ethGasPrice === 'error'))
               }
