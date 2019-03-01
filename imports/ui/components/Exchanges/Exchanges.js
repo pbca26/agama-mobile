@@ -348,7 +348,7 @@ class Exchanges extends React.Component {
     };
 
     if (!this.state.buyFixedDestCoin) {
-      _newState.amount = Number(Number(this.state.amount * this.state.exchangeRate.rate).toFixed(8)); 
+      _newState.amount = this.state.amountInput; 
     }
 
     this.setState(_newState);
@@ -367,6 +367,7 @@ class Exchanges extends React.Component {
 
         this.setState({
           processing: true,
+          amountInput: this.state.amount,
         });
 
         this.props.getRate(
