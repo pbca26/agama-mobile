@@ -168,10 +168,10 @@ class CreateSeed extends React.Component {
               </div>
             }
           </div>
-          <div
-            onClick={ this.login }
-            className="group3">
-            <div className="btn-inner">
+          <div className="group3">
+            <div
+              onClick={ this.login }
+              className="btn-inner">
               <div className="btn">{ translate('LOGIN.SIGN_IN') }</div>
               <div className="group2">
                 <img
