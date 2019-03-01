@@ -50,6 +50,7 @@ class Exchanges extends React.Component {
       step: 0,
       orderId: null,
       amount: 0,
+      amountInput: 0,
       coinSrc: null,
       coinDest: null,
       rate: null,
@@ -523,8 +524,8 @@ class Exchanges extends React.Component {
       step: 0,
     });
 
-    this.coinsListSrc = coins;
-    this.coinsListDest = coins;
+    this.coinsListSrc = Object.keys(this.filterOutETH(this.props.coins));
+    this.coinsListDest = this.coinsListSrc;
   }
 
   changeActiveSection(sectionName) {
@@ -540,6 +541,14 @@ class Exchanges extends React.Component {
   addcoinCB(coin) {
     const propsCoins = Object.keys(this.filterOutETH(this.props.coins));
     const fetchData = (_coin, pricesCoins) => {
+      let direction = this.state.addcoinDirection;
+      
+      if (_coin.match(/\|/g).length === 2) {
+        const _coinSplit = _coin.split('|');
+        _coin = `${_coinSplit[0]}|${_coinSplit[1]}`;
+        direction = _coinSplit[2];
+      }
+
       this.props.getBalance(_coin)
       .then((res) => {
         if (res &&
@@ -547,7 +556,7 @@ class Exchanges extends React.Component {
             JSON.stringify(res).indexOf('error') === -1) {
           devlog(`${_coin} balance`, res);
 
-          if (this.state.addcoinDirection === 'src') {
+          if (direction === 'src') {
             this.setState({
               currentBalanceSrc: res.balance,
             });
@@ -556,6 +565,10 @@ class Exchanges extends React.Component {
               currentBalanceDest: res.balance,
             });
           }
+
+          setTimeout(() => {
+            console.warn(this.state);
+          }, 1000);
         } else {
           devlog(`error getting ${_coin} balance`);
         }
@@ -584,8 +597,8 @@ class Exchanges extends React.Component {
 
       if (propsCoins.length === 2) {
         _newState.coinSrc = propsCoins[propsCoins.indexOf(coin) === 0 ? 1 : 0];
-        fetchData(coin);
-        fetchData(_newState.coinSrc, [coin.split('|')[0], _newState.coinSrc.split('|')[0]]);
+        fetchData(`${coin}|dest`);
+        fetchData(`${_newState.coinSrc}|src`, [coin.split('|')[0], _newState.coinSrc.split('|')[0]]);
       } else if (this.state.coinSrc) {
         fetchData(coin, [coin.split('|')[0], this.state.coinSrc.split('|')[0]]);
       }
@@ -598,8 +611,8 @@ class Exchanges extends React.Component {
       
       if (propsCoins.length === 2) {
         _newState.coinDest = propsCoins[propsCoins.indexOf(coin) === 0 ? 1 : 0];
-        fetchData(_newState.coinDest.split('|')[0]);
-        fetchData(coin, [coin.split('|')[0], _newState.coinDest.split('|')[0]]);
+        fetchData(`${_newState.coinDest}|dest`);
+        fetchData(`${coin}|src`, [coin.split('|')[0], _newState.coinDest.split('|')[0]]);
       } else if (this.state.coinDest) {
         fetchData(coin, [coin.split('|')[0], this.state.coinDest.split('|')[0]]);
       } else {
