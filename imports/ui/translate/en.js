@@ -96,6 +96,7 @@ const lang = {
       SEED: 'Seed',
       PRIV_KEYS: 'Private keys',
       SEED_QR: 'Seed QR code',
+      PRIV_KEY: 'Private key',
     },
     PIN: {
       SAVE: 'Save',

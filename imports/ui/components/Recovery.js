@@ -8,6 +8,7 @@ import {
   devlog,
   config,
 } from '../actions/dev';
+import { isPrivKey } from 'agama-wallet-lib/build/keys';
 
 class Recovery extends React.Component {
   constructor() {
@@ -17,6 +18,7 @@ class Recovery extends React.Component {
       pin: config.preload ? config.preload.pin : null,
       wrongPin: false,
       showPrivKeys: false,
+      isPrivKey: false,
       privKeys: [],
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
@@ -54,6 +56,7 @@ class Recovery extends React.Component {
         wrongPin: false,
         pin: null,
         passphrase: _decryptedKey,
+        isPrivKey: isPrivKey(_decryptedKey),
       };
 
       if (this.state.showPrivKeys) {
@@ -121,7 +124,7 @@ class Recovery extends React.Component {
             </div>
           }
         </div>
-        <div className={ 'margin-left-10 switch-block margin-bottom-25' + (!this.state.pin ? ' disabled' : '') }>
+        <div className={ 'switch-block margin-bottom-25 width-limit' + (!this.state.pin ? ' disabled' : '') }>
           <label className="switch">
             <input
               type="checkbox"
@@ -151,7 +154,9 @@ class Recovery extends React.Component {
         </div>
         { this.state.passphrase &&
           <div className="margin-bottom-25 margin-top-30 decoded-seed">
-            <div className="title margin-bottom-10">{ translate('RECOVERY.SEED') }</div>
+            <div className="title margin-bottom-10">
+              { translate('RECOVERY.' + (this.state.isPrivKey ? 'PRIV_KEY' : 'SEED')) }
+            </div>
             <div className="seed-gen-box margin-bottom-10">{ this.state.passphrase }</div>
             { this.state.showPrivKeys &&
               <div className="recovery-priv-keys">
