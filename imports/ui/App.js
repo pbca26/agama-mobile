@@ -21,6 +21,7 @@ import {
   getRandomIntInclusive,
   sort,
 } from 'agama-wallet-lib/build/utils';
+import supportedCoinsList from './actions/coins';
 
 import SendCoin from './components/SendCoin';
 import AddCoin from './components/AddCoin';
@@ -123,12 +124,18 @@ class App extends React.Component {
       setLocalStorageVar('coins', _localStorageCoins);
 
       // convert coins obj to 0.1.4, applicable to any version below 0.1.4
+      // remove coins that are no longer supported
       for (let key in _localStorageCoins) {
         let _diffFound = false;
 
         if (key.indexOf('|spv') === -1 &&
             key.indexOf('|eth') === -1) {
           _localStorageCoins[`${key}|spv`] = _localStorageCoins[key];
+          delete _localStorageCoins[key];
+          _diffFound = true;
+        } else if (
+          (key.indexOf('|spv') > -1 && supportedCoinsList.spv.indexOf(key.split('|')[0].toUpperCase()) === -1) ||
+          (key.indexOf('|eth') > -1 && supportedCoinsList.eth.indexOf(key.split('|')[0].toUpperCase()) === -1)) {
           delete _localStorageCoins[key];
           _diffFound = true;
         }
