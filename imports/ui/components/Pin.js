@@ -61,8 +61,8 @@ class Pin extends React.Component {
 
         Meteor.setTimeout(() => {
           this.setState(this.defaultState);
-          this.props.changeActiveSection('login');
-        }, 500);
+          this.props.lock(true);
+        }, 3000);
       } else {
         if (!pinBruteforceProtection) {
           this.setState({
