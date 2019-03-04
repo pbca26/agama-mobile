@@ -101,9 +101,10 @@ const lang = {
     },
     PIN: {
       SAVE: 'Save',
-      SEED_IS_ENCRYPTED: 'Seed is encrypted with provided PIN. Use the PIN to login or sign a transaction.',
-      PROVIDE_A_PASSPHRASE: 'Provide seed or WIF',
-      PROVIDE_A_SEED: 'Provide a seed and enter 6 digit PIN number in the form below',
+      SEED_IS_ENCRYPTED: 'PIN is changed. Use new PIN to login or sign a transaction.',
+      ENTER_OLD_PIN: 'Enter old PIN',
+      ENTER_NEW_PIN: 'Enter new PIN',
+      PROVIDE_PIN: 'Provide an old PIN and new PIN (no less than 6 digits/characters) in the form below',
     },
     OVERVIEW: {
       PRICES_ERROR: 'Atomicexplorer.com is unreachable!',
