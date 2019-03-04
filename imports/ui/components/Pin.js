@@ -19,7 +19,7 @@ class Pin extends React.Component {
     super();
     this.state = {
       oldPing: null,
-      wrongOldPin: false,
+      wrongPin: false,
       wrongPinRetries: 0,
       pinOverride: config.preload ? config.preload.pin : null,
       pinOverrideTooShort: false,
@@ -55,6 +55,7 @@ class Pin extends React.Component {
           wrongPinRetries: 0,
           pinSet: true,
           pinOverrideTooShort: false,
+          wrongPin: false,
         });
 
         Meteor.setTimeout(() => {

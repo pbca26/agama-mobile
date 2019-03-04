@@ -89,6 +89,7 @@ const lang = {
       BTC_FEES_SOURCE1: 'atomicexplorer.com',
       BTC_FEES_SOURCE2: 'bitcoinfees.earn.com',
       PURGE_SEED_AFTER_3_PIN_ATTEMPTS: 'Purge seed after 3 failed PIN attempts',
+      CHANGE_PIN: 'Change PIN',
     },
     RECOVERY: {
       PROVIDE_YOUR_PIN: 'Provide your PIN number to unlock seed/WIF.',
@@ -135,7 +136,7 @@ const lang = {
       LOGIN: 'Login',
       PASSPHRASE_ACCESS: 'Seed access',
       ENTER_PASSPHRASE: 'Enter a seed',
-      OVERRIDE_PIN: 'Create / Override PIN',
+      OVERRIDE_PIN: 'Create / Change PIN',
       ENTER_6_DIGIT_PIN: 'Enter a PIN (min. 6 digits)',
       PIN_TOO_SHORT: 'PIN is too short!',
       I_CONFIRM_I_SAVED_SEED: 'I confirm that I saved the seed',
@@ -275,7 +276,7 @@ const lang = {
     },
     APP_TITLE: {
       MENU: 'Menu',
-      PIN: 'Override PIN',
+      PIN: 'Change PIN',
       LOGIN: 'Sign in',
       DASHBOARD: 'Dashboard',
       OVERVIEW: 'Overview',

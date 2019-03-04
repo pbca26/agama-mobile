@@ -1112,6 +1112,7 @@ class App extends React.Component {
                 globalClick={ this.globalClick }
                 changeActiveSection={ this.changeActiveSection }
                 logout={ this.logout }
+                lock={ this.lock }
                 updateCoinsList={ this.updateCoinsList } />
             }
             { this.state.auth &&

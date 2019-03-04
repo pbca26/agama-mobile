@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {
+  assetsPath,
   setLocalStorageVar,
   getLocalStorageVar,
 } from '../../actions/utils';
@@ -14,6 +15,7 @@ import fiatList from './fiatList';
 import settingsDefaults from './settingsDefaults';
 import SettingsCoins from './Coins';
 import btcFeesSource from './btcFees';
+import Pin from '../Pin';
 
 // TODO: reset settings/purge seed and pin
 
@@ -55,6 +57,7 @@ class Settings extends React.Component {
         fiat: _settings.fiat,
         debug: _settings.debug,
         btcFeesSource: _settings.btcFeesSource,
+        pinBruteforceProtection: _settings.pinBruteforceProtection,
         purgeData: false,
         removeCoins: null,
       });
@@ -311,6 +314,11 @@ class Settings extends React.Component {
               { translate('SETTINGS.DEBUG') }
             </div>
           </div>
+          <div
+            onClick={ () => this.toggleActiveView('pin') }
+            className="item item--sm">
+            { translate('SETTINGS.CHANGE_PIN') }
+          </div>
           { this.props.coin.indexOf('|spv') > -1 &&
             <div
               onClick={ () => this.props.changeActiveSection('server-select') }
@@ -345,6 +353,18 @@ class Settings extends React.Component {
           coins={ this.props.coins }
           removeCoins={ this.state.removeCoins }
           cb={ this.updateCoinsCB } />
+      );
+    } else if (this.state.activeView === 'pin') {
+      return (
+        <div className="settings-pin">
+          <img
+            className="menu-back"
+            src={ `${assetsPath.menu}/trends-combined-shape.png` }
+            onClick={ () => this.toggleActiveView() } />
+          <Pin
+            changeActiveSection={ this.changeActiveSection }
+            lock={ this.props.lock } />
+        </div>
       );
     }
   }
