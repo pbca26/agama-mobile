@@ -391,18 +391,12 @@ class Exchanges extends React.Component {
               if (Number(amount) > Number(this.state.currentBalanceSrc)) {
                 const _maxBuy = this.state.buyFixedDestCoin ? Number(Number((this.state.currentBalanceSrc - fromSats(fees[srcCoinSym] || 0))).toFixed(8)) : Number(Number((this.state.currentBalanceSrc - fromSats(fees[srcCoinSym] || 0)) * exchangeRate.data.rate).toFixed(8));
                 valid = false;
-
-                console.warn('_maxBuy', _maxBuy);
                 
                 this.setState({
                   processing: false,
                   maxBuyError: Number(_maxBuy) > 0 ? _maxBuy : 'noBalance',
                 });
               }
-
-              setTimeout(() => {
-                console.warn(this.state);
-              }, 500);
 
               if (valid) {
                 this.setState({
@@ -532,6 +526,9 @@ class Exchanges extends React.Component {
       maxBuyError: null,
       processing: false,
       orderPlaceError: null,
+      buyFixedDestCoin: false,
+      currentBalanceDest: 'none',
+      currentBalanceSrc: 'none',
     });
 
     this.coinsListSrc = Object.keys(this.filterOutETH(this.props.coins));
@@ -932,27 +929,34 @@ class Exchanges extends React.Component {
                 <i className="fa fa-warning"></i> { translate('EXCHANGES.ERROR') }: { this.state.orderPlaceError }.
               </div>
             }
-            <div
-              disabled={
-                !this.state.coinSrc ||
-                !this.state.coinDest ||
-                !this.state.amount ||
-                this.state.processing ||
-                (this.state.buyFixedDestCoin && this.state.currentBalanceSrc === 'none') ||
-                (!this.state.buyFixedDestCoin && this.state.currentBalanceDest === 'none')
-              }
-              className="group3 margin-top-40">
-              <div
-                className="btn-inner"
-                onClick={ this.nextStep }>
-                <div className="btn">
-                  { this.state.processing ? `${translate('EXCHANGES.PLEASE_WAIT')}...` : translate('EXCHANGES.NEXT') }
+            <div className="widget-body-footer step-1-footer">
+              <div className="group3 margin-top-40">
+                <div
+                  onClick={ this.clearOrder }
+                  className="btn-inner pull-left btn-back margin-left-15"
+                  disabled={ this.state.processing }>
+                  <div className="btn">{ translate('EXCHANGES.CLEAR') }</div>
                 </div>
-                <div className="group2">
-                  <div className="rectangle8copy"></div>
-                  <img
-                    className="path6"
-                    src={ `${assetsPath.login}/reset-password-path-6.png` } />
+                <div
+                  className="btn-inner pull-right margin-right-15"
+                  onClick={ this.nextStep }
+                  disabled={
+                    !this.state.coinSrc ||
+                    !this.state.coinDest ||
+                    !this.state.amount ||
+                    this.state.processing ||
+                    (this.state.buyFixedDestCoin && this.state.currentBalanceSrc === 'none') ||
+                    (!this.state.buyFixedDestCoin && this.state.currentBalanceDest === 'none')
+                  }>
+                  <div className="btn">
+                    { this.state.processing ? `${translate('EXCHANGES.PLEASE_WAIT')}...` : translate('EXCHANGES.NEXT') }
+                  </div>
+                  <div className="group2">
+                    <div className="rectangle8copy"></div>
+                    <img
+                      className="path6"
+                      src={ `${assetsPath.login}/reset-password-path-6.png` } />
+                  </div>
                 </div>
               </div>
             </div>
@@ -1165,14 +1169,6 @@ class Exchanges extends React.Component {
             value="order">
             { translate('EXCHANGES.NEW_ORDER') }
           </option>
-          { this.state.activeSection === 'order' &&
-            (this.state.step === 0 || this.state.step === 1) &&
-            <option
-              disabled={ Object.keys(this.filterOutETH(this.props.coins)).length < 2 }
-              value="clear">
-              { translate('EXCHANGES.CLEAR_CURRENT_ORDER') }
-            </option>
-          }
           { this.state.activeSection !== 'order-details' &&
             <option
               disabled={ this.state.activeSection === 'history' }

@@ -52,7 +52,7 @@ const lang = {
       LOADING_COINS_LIST: 'Loading coins list',
       SUPPORTED_COINS_TO_EXCHANGES: 'Supported coins to exchange',
       NEW_ORDER: 'New order',
-      CLEAR_CURRENT_ORDER: 'Clear current order',
+      CLEAR: 'Clear',
       ORDER_HISTORY: 'Order history',
       SYNC_HISTORY: 'Sync history',
       REFRESH_HISTORY: 'Refresh history',

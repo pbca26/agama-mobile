@@ -1,4 +1,13 @@
 .form.exchanges {
+  .step-1-footer {
+    max-width: 350px;
+    margin: 0 auto;
+
+    .btn-inner.pull-left .btn {
+      left: 26px;
+    }
+  }
+
   .exchanges-menu {
     position: absolute;
     top: -13px;
