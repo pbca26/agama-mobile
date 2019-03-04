@@ -389,12 +389,11 @@ class Exchanges extends React.Component {
 
               if (Number(amount) > Number(this.state.currentBalanceSrc)) {
                 const _maxBuy = this.state.buyFixedDestCoin ? Number(Number((this.state.currentBalanceSrc - fromSats(fees[srcCoinSym]))).toFixed(8)) : Number(Number((this.state.currentBalanceSrc - fromSats(fees[srcCoinSym])) * exchangeRate.data.rate).toFixed(8));
-
                 valid = false;
                 
                 this.setState({
                   processing: false,
-                  maxBuyError: _maxBuy,
+                  maxBuyError: Number(_maxBuy) > 0 ? _maxBuy : 'noBalance',
                 });
               }
 
@@ -404,7 +403,7 @@ class Exchanges extends React.Component {
                   step: 1,
                   exchangeRate: exchangeRate.data,
                   amount,
-                  maxBuyError: false,
+                  maxBuyError: null,
                   orderPlaceError: null,
                 });
               }
@@ -909,11 +908,16 @@ class Exchanges extends React.Component {
                   value={ this.state.amount || '' } />
               </div>
             </div>
-            { this.state.maxBuyError &&
+            { (this.state.maxBuyError && this.state.maxBuyError !== 'noBalance') &&
               <div
                 onClick={ this.setMaxBuyAmount }
                 className="error margin-top-15 sz350 text-center">
                 <i className="fa fa-warning"></i> { translate('EXCHANGES.' + (!this.state.buyFixedDestCoin ? 'INSUFFICIENT_FUNDS_SRC' : 'INSUFFICIENT_FUNDS_DESC'), `${this.state.maxBuyError} ${this.state.buyFixedDestCoin ? this.state.coinSrc.split('|')[0].toUpperCase() : this.state.coinDest.split('|')[0].toUpperCase()}`) }.
+              </div>
+            }
+            { (this.state.maxBuyError && this.state.maxBuyError === 'noBalance') &&
+              <div className="error margin-top-15 sz350 text-center">
+                <i className="fa fa-warning"></i> { translate('EXCHANGES.INSUFFICIENT_FUNDS', `${!this.state.buyFixedDestCoin ? this.state.coinSrc.split('|')[0].toUpperCase() : this.state.coinDest.split('|')[0].toUpperCase()}`) }.
               </div>
             }
             { this.state.orderPlaceError &&

@@ -32,6 +32,7 @@ const lang = {
       BUY: 'Buy',
       ENTER_AN_AMOUNT: 'Enter an amount',
       INSUFFICIENT_FUNDS_SRC: 'Insufficient funds, you can buy up to @template@ max',
+      INSUFFICIENT_FUNDS: 'Insufficient funds, your @template@ balance is empty',
       INSUFFICIENT_FUNDS_DESC: 'Insufficient funds, you can sell up to @template@ max',
       ERROR: 'Error',
       PLEASE_WAIT: 'Please wait',
