@@ -528,6 +528,9 @@ class Exchanges extends React.Component {
       coinSrc: null,
       coinDest: null,
       step: 0,
+      maxBuyError: null,
+      processing: false,
+      orderPlaceError: null,
     });
 
     this.coinsListSrc = Object.keys(this.filterOutETH(this.props.coins));
