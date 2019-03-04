@@ -627,7 +627,7 @@ class App extends React.Component {
       actions.auth(passphrase, this.state.coins)
       .then((res) => {
         this.updatePrices();
-        Meteor.setInterval(() => {
+        this.pricesUpdateInterval = Meteor.setInterval(() => {
           this.updatePrices();
         }, PRICES_UPDATE_INTERVAL);
 
