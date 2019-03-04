@@ -130,6 +130,7 @@ const lang = {
       SIGN_IN: 'Sign In',
       PIN_ACCESS: 'PIN access',
       WRONG_PIN: 'Wrong PIN!',
+      WRONG_PIN_ATTEMPTS: 'Wrong PIN! You have @template@ attempt(s) left.',
       LOGIN: 'Login',
       PASSPHRASE_ACCESS: 'Seed access',
       ENTER_PASSPHRASE: 'Enter a seed',

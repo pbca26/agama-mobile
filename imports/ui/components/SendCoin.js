@@ -3,6 +3,7 @@ import translate from '../translate/translate';
 import {
   convertURIToImageData,
   getLocalStorageVar,
+  setLocalStorageVar,
   assetsPath,
 } from '../actions/utils';
 import { decryptkey } from '../actions/seedCrypt';
@@ -44,6 +45,7 @@ class SendCoin extends React.Component {
       validIncorrectAddress: false,
       qrScanError: false,
       wrongPin: false,
+      wrongPinRetries: 0,
       pin: config.preload ? config.preload.pin : '',
       processing: false,
       btcFee: 'halfHourFee',
@@ -83,17 +85,39 @@ class SendCoin extends React.Component {
   decodeSeed() {
     const _encryptedKey = getLocalStorageVar('seed');
     const _decryptedKey = decryptkey(this.state.pin, _encryptedKey.encryptedKey);
+    const pinBruteforceProtection = getLocalStorageVar('settings').pinBruteforceProtection;
+    const pinBruteforceProtectionRetries = getLocalStorageVar('seed').pinRetries;
 
     if (_decryptedKey) {
+      if (pinBruteforceProtection) {
+        let _seedStorage = getLocalStorageVar('seed');
+        _seedStorage.pinRetries = 0;
+        setLocalStorageVar('seed', _seedStorage);
+      }
+
       this.setState({
         wrongPin: false,
+        wrongPinRetries: 0,
       });
 
       return true;
     } else {
-      this.setState({
-        wrongPin: true,
-      });
+      if (!pinBruteforceProtection) {
+        this.setState({
+          wrongPin: true,
+        });
+      } else if (pinBruteforceProtectionRetries < 3) {
+        let _seedStorage = getLocalStorageVar('seed');
+        _seedStorage.pinRetries += 1;
+        setLocalStorageVar('seed', _seedStorage);
+
+        this.setState({
+          wrongPin: true,
+          wrongPinRetries: _seedStorage.pinRetries,
+        });
+      } else {
+        this.props.lock(true);
+      }
 
       return false;
     }
@@ -808,7 +832,7 @@ class SendCoin extends React.Component {
               }
               { this.state.wrongPin &&
                 <div className="error margin-top-15 margin-bottom-25 fs14">
-                  <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
+                  <i className="fa fa-warning"></i> { this.state.wrongPinRetries === 0 ? translate('LOGIN.WRONG_PIN') : translate('LOGIN.WRONG_PIN_ATTEMPTS', 3 - this.state.wrongPinRetries) }
                 </div>
               }
               { (this.state.spvPreflightSendInProgress || this.state.ethPreflightSendInProgress) &&

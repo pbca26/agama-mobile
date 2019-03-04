@@ -1,6 +1,9 @@
 import React from 'react';
 
-import { getLocalStorageVar } from '../actions/utils';
+import {
+  getLocalStorageVar,
+  setLocalStorageVar,
+} from '../actions/utils';
 import { decryptkey } from '../actions/seedCrypt';
 import translate from '../translate/translate';
 import QRCode from 'qrcode.react';
@@ -17,6 +20,7 @@ class Recovery extends React.Component {
       passphrase: config.preload ? config.preload.seed : null,
       pin: config.preload ? config.preload.pin : null,
       wrongPin: false,
+      wrongPinRetries: 0,
       showPrivKeys: false,
       isPrivKey: false,
       privKeys: [],
@@ -50,10 +54,19 @@ class Recovery extends React.Component {
   decodeSeed() {
     const _encryptedKey = getLocalStorageVar('seed');
     const _decryptedKey = decryptkey(this.state.pin, _encryptedKey.encryptedKey);
+    const pinBruteforceProtection = getLocalStorageVar('settings').pinBruteforceProtection;
+    const pinBruteforceProtectionRetries = getLocalStorageVar('seed').pinRetries;
 
     if (_decryptedKey) {
+      if (pinBruteforceProtection) {
+        let _seedStorage = getLocalStorageVar('seed');
+        _seedStorage.pinRetries = 0;
+        setLocalStorageVar('seed', _seedStorage);
+      }
+
       let newState = {
         wrongPin: false,
+        wrongPinRetries: 0,
         pin: null,
         passphrase: _decryptedKey,
         isPrivKey: isPrivKey(_decryptedKey),
@@ -79,9 +92,22 @@ class Recovery extends React.Component {
         this.setState(newState);
       }
     } else {
-      this.setState({
-        wrongPin: true,
-      });
+      if (!pinBruteforceProtection) {
+        this.setState({
+          wrongPin: true,
+        });
+      } else if (pinBruteforceProtectionRetries < 3) {
+        let _seedStorage = getLocalStorageVar('seed');
+        _seedStorage.pinRetries += 1;
+        setLocalStorageVar('seed', _seedStorage);
+
+        this.setState({
+          wrongPin: true,
+          wrongPinRetries: _seedStorage.pinRetries,
+        });
+      } else {
+        this.props.lock(true);
+      }
     }
   }
 
@@ -120,7 +146,7 @@ class Recovery extends React.Component {
           </div>
           { this.state.wrongPin &&
             <div className="error margin-top-15 sz350">
-              <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
+              <i className="fa fa-warning"></i> { this.state.wrongPinRetries === 0 ? translate('LOGIN.WRONG_PIN') : translate('LOGIN.WRONG_PIN_ATTEMPTS', 3 - this.state.wrongPinRetries) }
             </div>
           }
         </div>

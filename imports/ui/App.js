@@ -581,8 +581,12 @@ class App extends React.Component {
   }
 
   // lock is logout when list of added coins is persistent
-  lock() {
+  lock(purgeSeed) {
     const { actions } = this.props;
+
+    if (purgeSeed) {
+      setLocalStorageVar('seed', null);
+    }
 
     if (this.globalClickTimeout) {
       Meteor.clearTimeout(this.globalClickTimeout);
@@ -590,7 +594,7 @@ class App extends React.Component {
 
     actions.clearKeys()
     .then((res) => {
-      const lockState = Object.assign({}, this.defaultState);
+      let lockState = Object.assign({}, this.defaultState);
       lockState.coins = this.state.coins;
 
       this.toggleAutoRefresh(true);
@@ -1038,7 +1042,8 @@ class App extends React.Component {
             { (this.state.activeSection !== 'pin' || this.state.activeSection !== 'offlinesig') &&
               <Login
                 { ...this.state }
-                login={ this.login } />
+                login={ this.login }
+                lock={ this.lock } />
             }
             { this.state.activeSection === 'create-seed' &&
               <CreateSeed
@@ -1053,7 +1058,8 @@ class App extends React.Component {
                 getEthGasPrice={ this.getEthGasPrice }
                 sendtxEth={ this.props.actions.sendtxEth }
                 changeActiveSection={ this.changeActiveSection }
-                getBtcFees={ this.getBtcFees } />
+                getBtcFees={ this.getBtcFees }
+                lock={ this.lock } />
             }
             { this.state.activeSection !== 'exchanges' &&
               <AddCoin
@@ -1083,13 +1089,16 @@ class App extends React.Component {
             }
             { !this.state.auth &&
               this.state.activeSection === 'pin' &&
-              <Pin changeActiveSection={ this.changeActiveSection } />
+              <Pin
+                changeActiveSection={ this.changeActiveSection }
+                lock={ this.lock } />
             }
             { this.state.auth &&
               this.state.activeSection === 'recovery' &&
               <Recovery
                 activeSection={ this.state.activeSection }
-                getKeys={ this.props.actions.getKeys } />
+                getKeys={ this.props.actions.getKeys }
+                lock={ this.lock } />
             }
             { this.state.auth &&
               this.state.activeSection === 'overview' &&
@@ -1124,7 +1133,8 @@ class App extends React.Component {
                 getEthGasPrice={ this.getEthGasPrice }
                 sendtxEth={ this.props.actions.sendtxEth }
                 getBtcFees={ this.getBtcFees }
-                pubKeys={ this.state.pubKeys } />
+                pubKeys={ this.state.pubKeys }
+                lock={ this.lock } />
             }
           </div>
         }

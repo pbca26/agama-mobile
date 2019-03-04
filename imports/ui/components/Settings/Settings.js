@@ -31,6 +31,7 @@ class Settings extends React.Component {
       fiat: 'usd',
       debug: false,
       btcFeesSource: btcFeesSource[0].name,
+      pinBruteforceProtection: false,
       activeView: null,
       removeCoins: null,
     };
@@ -38,6 +39,7 @@ class Settings extends React.Component {
     this.toggleConfirmPin = this.toggleConfirmPin.bind(this);
     this.togglePurgeData = this.togglePurgeData.bind(this);
     this.toggleDebug = this.toggleDebug.bind(this);
+    this.togglePinBruteforceProtection = this.togglePinBruteforceProtection.bind(this);
     this.toggleActiveView = this.toggleActiveView.bind(this);
     this.updateCoinsCB = this.updateCoinsCB.bind(this);
     this.save = this.save.bind(this);
@@ -98,7 +100,22 @@ class Settings extends React.Component {
     });
   }
 
+  togglePinBruteforceProtection() {
+    this.setState({
+      pinBruteforceProtection: !this.state.pinBruteforceProtection,
+    })
+  }
+
   save() {
+    if (this.state.pinBruteforceProtection) {
+      let _seedStorage = getLocalStorageVar('seed');
+
+      if (!_seedStorage.hasOwnProperty('pinRetries')) {
+        _seedStorage.pinRetries = 0;
+        setLocalStorageVar('seed', _seedStorage);
+      }
+    }
+
     if (this.state.purgeData) {
       setLocalStorageVar('settings', settingsDefaults);
       setLocalStorageVar('coins', {});
@@ -116,6 +133,7 @@ class Settings extends React.Component {
         fiat: this.state.fiat,
         debug: this.state.debug,
         btcFeesSource: this.state.btcFeesSource,
+        pinBruteforceProtection: this.state.pinBruteforceProtection,
       });
 
       if (this.state.removeCoins) {
@@ -235,6 +253,23 @@ class Settings extends React.Component {
               className="toggle-label"
               onClick={ this.toggleConfirmPin }>
               { translate('SETTINGS.REQUIRE_PIN_CONFIRM') }
+            </div>
+          </div>
+          <div className="item item--sm">
+            <label className="switch">
+              <input
+                type="checkbox"
+                value="on"
+                checked={ this.state.pinBruteforceProtection }
+                readOnly />
+              <div
+                className="slider"
+                onClick={ this.togglePinBruteforceProtection }></div>
+            </label>
+            <div
+              className="toggle-label"
+              onClick={ this.togglePinBruteforceProtection }>
+              { translate('SETTINGS.PURGE_SEED_AFTER_3_PIN_ATTEMPTS') }
             </div>
           </div>
           <div className="item item--sm">

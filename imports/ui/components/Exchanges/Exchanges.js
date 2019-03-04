@@ -1125,7 +1125,8 @@ class Exchanges extends React.Component {
               getEthGasPrice={ this.props.getEthGasPrice }
               sendtxEth={ this.props.sendtxEth }
               getBtcFees={ this.props.getBtcFees }
-              init={ this.state.sendCoinInit } />
+              init={ this.state.sendCoinInit }
+              lock={ this.props.lock } />
           </div>
         }
       </div>

@@ -6,6 +6,7 @@ const settingsDefaults = {
   fiat: 'usd',
   debug: false,
   btcFeesSource: btcFeesSource[0].name,
+  pinBruteforceProtection: false,
 };
 
 export default settingsDefaults;
