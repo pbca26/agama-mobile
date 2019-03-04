@@ -388,14 +388,20 @@ class Exchanges extends React.Component {
               }
 
               if (Number(amount) > Number(this.state.currentBalanceSrc)) {
-                const _maxBuy = this.state.buyFixedDestCoin ? Number(Number((this.state.currentBalanceSrc - fromSats(fees[srcCoinSym]))).toFixed(8)) : Number(Number((this.state.currentBalanceSrc - fromSats(fees[srcCoinSym])) * exchangeRate.data.rate).toFixed(8));
+                const _maxBuy = this.state.buyFixedDestCoin ? Number(Number((this.state.currentBalanceSrc - fromSats(fees[srcCoinSym] || 0))).toFixed(8)) : Number(Number((this.state.currentBalanceDest - fromSats(fees[destCoinSym] || 0)) * exchangeRate.data.rate).toFixed(8));
                 valid = false;
+
+                console.warn('_maxBuy', _maxBuy);
                 
                 this.setState({
                   processing: false,
                   maxBuyError: Number(_maxBuy) > 0 ? _maxBuy : 'noBalance',
                 });
               }
+
+              setTimeout(() => {
+                console.warn(this.state);
+              }, 500);
 
               if (valid) {
                 this.setState({
@@ -558,17 +564,13 @@ class Exchanges extends React.Component {
 
           if (direction === 'src') {
             this.setState({
-              currentBalanceSrc: res.balance,
+              currentBalanceSrc: Number(res.balance),
             });
           } else {
             this.setState({
-              currentBalanceDest: res.balance,
+              currentBalanceDest: Number(res.balance),
             });
           }
-
-          setTimeout(() => {
-            console.warn(this.state);
-          }, 1000);
         } else {
           devlog(`error getting ${_coin} balance`);
         }
@@ -917,7 +919,7 @@ class Exchanges extends React.Component {
             }
             { (this.state.maxBuyError && this.state.maxBuyError === 'noBalance') &&
               <div className="error margin-top-15 sz350 text-center">
-                <i className="fa fa-warning"></i> { translate('EXCHANGES.INSUFFICIENT_FUNDS', `${!this.state.buyFixedDestCoin ? this.state.coinSrc.split('|')[0].toUpperCase() : this.state.coinDest.split('|')[0].toUpperCase()}`) }.
+                <i className="fa fa-warning"></i> { translate('EXCHANGES.INSUFFICIENT_FUNDS', `${this.state.coinSrc.split('|')[0].toUpperCase()}`) }.
               </div>
             }
             { this.state.orderPlaceError &&
@@ -1018,7 +1020,11 @@ class Exchanges extends React.Component {
                 <div
                   onClick={ this.nextStep }
                   className="btn-inner pull-right margin-right-15"
-                  disabled={ this.state.processing }>
+                  disabled={
+                    this.state.processing ||
+                    this.state.amount < this.state.exchangeRate.limitMinDepositCoin ||
+                    this.state.amount > this.state.exchangeRate.limitMaxDepositCoin
+                  }>
                   <div className="btn">
                     { this.state.processing ? `${translate('EXCHANGES.PLEASE_WAIT')}...` : translate('EXCHANGES.NEXT') }
                   </div>
