@@ -116,6 +116,7 @@ class Exchanges extends React.Component {
   toggleBuyFixedDestCoin() {
     this.setState({
       buyFixedDestCoin: !this.state.buyFixedDestCoin,
+      maxBuyError: null,
     });
   }
 
@@ -388,7 +389,7 @@ class Exchanges extends React.Component {
               }
 
               if (Number(amount) > Number(this.state.currentBalanceSrc)) {
-                const _maxBuy = this.state.buyFixedDestCoin ? Number(Number((this.state.currentBalanceSrc - fromSats(fees[srcCoinSym] || 0))).toFixed(8)) : Number(Number((this.state.currentBalanceDest - fromSats(fees[destCoinSym] || 0)) * exchangeRate.data.rate).toFixed(8));
+                const _maxBuy = this.state.buyFixedDestCoin ? Number(Number((this.state.currentBalanceSrc - fromSats(fees[srcCoinSym] || 0))).toFixed(8)) : Number(Number((this.state.currentBalanceSrc - fromSats(fees[srcCoinSym] || 0)) * exchangeRate.data.rate).toFixed(8));
                 valid = false;
 
                 console.warn('_maxBuy', _maxBuy);
@@ -781,6 +782,7 @@ class Exchanges extends React.Component {
   updateInput(e) {
     this.setState({
       [e.target.name]: e.target.value,
+      maxBuyError: null,
     });
   }
 
