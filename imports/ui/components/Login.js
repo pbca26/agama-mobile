@@ -39,6 +39,14 @@ class Login extends React.Component {
     this.scanQR = this.scanQR.bind(this);    
   }
 
+  componentWillMount() {
+    if (getLocalStorageVar('seed')) {
+      this.setState({
+        createPin: true,
+      });
+    }
+  } 
+
   updateInput(e) {
     this.setState({
       [e.target.name]: e.target.value,

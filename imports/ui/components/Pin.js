@@ -46,14 +46,12 @@ class Pin extends React.Component {
       const pinBruteforceProtectionRetries = getLocalStorageVar('seed').pinRetries;
       
       if (_decryptedKey) {
-        if (pinBruteforceProtection) {
-          let _seedStorage = getLocalStorageVar('seed');
-          _seedStorage.pinRetries = 0;
-          setLocalStorageVar('seed', _seedStorage);
-        }
+        const encryptedKey = encryptkey(this.state.pinOverride, _decryptedKey);
+        setLocalStorageVar('seed', pinBruteforceProtection ? { encryptedKey, pinRetries: 0 } : { encryptedKey });
 
         this.setState({
           oldPin: null,
+          pinOverride: null,
           wrongPinRetries: 0,
           pinSet: true,
           pinOverrideTooShort: false,
@@ -61,7 +59,7 @@ class Pin extends React.Component {
 
         Meteor.setTimeout(() => {
           this.setState(this.defaultState);
-          this.props.lock(true);
+          this.props.lock();
         }, 3000);
       } else {
         if (!pinBruteforceProtection) {
@@ -103,6 +101,7 @@ class Pin extends React.Component {
             name="oldPin"
             onChange={ this.updateInput }
             placeholder={ translate('PIN.ENTER_OLD_PIN') }
+            disabled={ this.state.pinSet }
             value={ this.state.oldPin || '' } />
         </div>
         { this.state.wrongPin &&
@@ -116,6 +115,7 @@ class Pin extends React.Component {
             name="pinOverride"
             onChange={ this.updateInput }
             placeholder={ translate('PIN.ENTER_NEW_PIN') }
+            disabled={ this.state.pinSet }
             value={ this.state.pinOverride || '' } />
         </div>
         { this.state.pinOverrideTooShort &&
@@ -124,14 +124,15 @@ class Pin extends React.Component {
           </div>
         }
         { this.state.pinSet &&
-          <div className="margin-bottom-15 margin-top-15 sz350">{ translate('PIN.SEED_IS_ENCRYPTED') }</div>
+          <div className="margin-bottom-15 margin-top-15 sz350 success">{ translate('PIN.PIN_CHANGED') }</div>
         }
         <div
           onClick={ this.save }
           className="group3 margin-top-40"
           disabled={
             !this.state.oldPin ||
-            !this.state.pinOverride
+            !this.state.pinOverride ||
+            this.state.pinSet
           }>
           <div className="btn-inner">
             <div className="btn">{ translate('PIN.SAVE') }</div>

@@ -584,7 +584,8 @@ class App extends React.Component {
   lock(purgeSeed) {
     const { actions } = this.props;
 
-    if (purgeSeed) {
+    if (typeof purgeSeed === 'boolean' &&
+        purgeSeed === true) {
       setLocalStorageVar('seed', null);
     }
 

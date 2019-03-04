@@ -101,7 +101,7 @@ const lang = {
     },
     PIN: {
       SAVE: 'Save',
-      SEED_IS_ENCRYPTED: 'PIN is changed. Use new PIN to login or sign a transaction.',
+      PIN_CHANGED: 'PIN is changed. Use new PIN to login or sign a transaction.',
       ENTER_OLD_PIN: 'Enter old PIN',
       ENTER_NEW_PIN: 'Enter new PIN',
       PROVIDE_PIN: 'Provide an old PIN and new PIN (no less than 6 digits/characters) in the form below',
