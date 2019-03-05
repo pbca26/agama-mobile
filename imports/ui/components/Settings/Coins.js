@@ -2,16 +2,47 @@ import React from 'react';
 
 import translate from '../../translate/translate';
 import { Meteor } from 'meteor/meteor';
-import { assetsPath } from '../../actions/utils';
+import {
+  assetsPath,
+  getLocalStorageVar,
+  setLocalStorageVar,
+} from '../../actions/utils';
+
+const SETTINGS_SAVED_MSG_TIMEOUT = 5000;
 
 class SettingsCoins extends React.Component {
   constructor() {
     super();
     this.state = {
       removeCoinsToggle: {},
+      isSaved: false,
     };
     this.toggleRemoveCoin = this.toggleRemoveCoin.bind(this);
+    this.updateCoinsList = this.updateCoinsList.bind(this);
     this.menuBack = this.menuBack.bind(this);
+  }
+
+  updateCoinsList() {
+    let localStorageCoins = getLocalStorageVar('coins');
+
+    for (let key in this.state.removeCoinsToggle) {
+      if (!this.state.removeCoinsToggle[key]) {
+        delete localStorageCoins[key];
+      }
+    }
+
+    this.setState({
+      isSaved: true,
+    });
+
+    Meteor.setTimeout(() => {
+      this.setState({
+        isSaved: false,
+      });
+    }, SETTINGS_SAVED_MSG_TIMEOUT);
+
+    setLocalStorageVar('coins', localStorageCoins);
+    this.props.updateCoinsList();
   }
 
   menuBack() {
@@ -105,6 +136,19 @@ class SettingsCoins extends React.Component {
           <div className="home-inner">
             <div className="overview-coins">
               { this.renderCoins() }
+            </div>
+            { this.state.isSaved &&
+              <div className="padding-bottom-20 text-center success">{ translate('SETTINGS.COINS_SAVED') }</div>
+            }
+            <div
+              onClick={ this.updateCoinsList }
+              className="group3 margin-top-25">
+              <div className="btn-inner">
+                <div className="btn">{ translate('SETTINGS.SAVE') }</div>
+                <div className="group2">
+                  <i className="fa fa-save"></i>
+                </div>
+              </div>
             </div>
           </div>
         </div>

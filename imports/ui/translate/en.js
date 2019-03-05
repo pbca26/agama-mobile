@@ -91,6 +91,7 @@ const lang = {
       BTC_FEES_SOURCE2: 'bitcoinfees.earn.com',
       PURGE_SEED_AFTER_3_PIN_ATTEMPTS: 'Purge seed after 3 failed PIN attempts',
       CHANGE_PIN: 'Change PIN',
+      COINS_SAVED: 'Coins selection saved',
     },
     RECOVERY: {
       PROVIDE_YOUR_PIN: 'Provide your PIN number to unlock seed/WIF.',
@@ -291,6 +292,7 @@ const lang = {
       CLAIM: 'Claim rewards',
       EXCHANGES: 'Exchange',
       'SERVER-SELECT': 'Settings',
+      'REMOVE-COIN': 'Remove coin',
     },
     SPV: {
       // asset chains

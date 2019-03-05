@@ -1,4 +1,5 @@
 import React from 'react';
+import { Meteor } from 'meteor/meteor';
 
 import {
   assetsPath,
@@ -10,7 +11,6 @@ import {
   decryptkey,
 } from '../../actions/seedCrypt';
 import translate from '../../translate/translate';
-import { Meteor } from 'meteor/meteor';
 import fiatList from './fiatList';
 import settingsDefaults from './settingsDefaults';
 import SettingsCoins from './Coins';
@@ -69,12 +69,22 @@ class Settings extends React.Component {
       activeView: null,
       removeCoins,
     });
+    this.props.changeTitle('settings');
   }
 
   toggleActiveView(name) {
-    this.setState({
-      activeView: name,
-    });
+    if (name === 'coins') {
+      this.setState({
+        activeView: name,
+      });
+      this.props.changeTitle('remove-coin');
+    } else if (this.state.activeView === 'coins') {
+      this.props.changeTitle('settings');
+    } else {
+      this.setState({
+        activeView: name,
+      });
+    }
 
     window.scrollTo(0, 0);
   }
@@ -352,7 +362,8 @@ class Settings extends React.Component {
           coin={ this.props.coin }
           coins={ this.props.coins }
           removeCoins={ this.state.removeCoins }
-          cb={ this.updateCoinsCB } />
+          cb={ this.updateCoinsCB }
+          updateCoinsList={ this.props.updateCoinsList } />
       );
     } else if (this.state.activeView === 'pin') {
       return (

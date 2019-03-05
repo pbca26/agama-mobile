@@ -83,6 +83,7 @@ class App extends React.Component {
       btcFees: null,
       ethGasPrice: null,
       prices: null,
+      title: null,
     };
     this.globalClickTimeout = null;
     this.overviewInterval = null;
@@ -112,6 +113,13 @@ class App extends React.Component {
     this.toggleExchanges = this.toggleExchanges.bind(this);
     this.updateCoinsList = this.updateCoinsList.bind(this);
     this.updatePrices = this.updatePrices.bind(this);
+    this.changeTitle = this.changeTitle.bind(this)
+  }
+
+  changeTitle(title) { // too dirty :(
+    this.setState({
+      title,
+    });
   }
 
   componentWillMount() {
@@ -403,11 +411,13 @@ class App extends React.Component {
         displayMenu: false,
         history: this.state.activeSection,
         activeSection: section,
+        title: null,
       });
     } else {
       this.setState({
         history: this.state.activeSection,        
         activeSection: section,
+        title: null,
       });
     }
 
@@ -989,7 +999,7 @@ class App extends React.Component {
               src={ `${assetsPath.home}/home-combined-shape.png` } />
           }
           <div className="ui-title">
-            { translate('APP_TITLE.' + (this.state.displayMenu ? 'MENU' : this.state.activeSection.toUpperCase())) }
+            { translate('APP_TITLE.' + (this.state.displayMenu ? 'MENU' : this.state.title && this.state.title.toUpperCase() || this.state.activeSection.toUpperCase())) }
           </div>
         </div>
         { this.state.displayMenu &&
@@ -1113,7 +1123,8 @@ class App extends React.Component {
                 changeActiveSection={ this.changeActiveSection }
                 logout={ this.logout }
                 lock={ this.lock }
-                updateCoinsList={ this.updateCoinsList } />
+                updateCoinsList={ this.updateCoinsList }
+                changeTitle={ this.changeTitle } />
             }
             { this.state.auth &&
               this.state.activeSection === 'exchanges' &&
