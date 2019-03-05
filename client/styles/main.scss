@@ -138,3 +138,12 @@ div {
 .wb--all {
   word-break: break-all;
 }
+
+.app-container {
+  &.unselectable {
+    user-select: none;
+  }
+  .selectable {
+    user-select: text;
+  }
+}

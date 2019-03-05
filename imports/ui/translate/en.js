@@ -199,6 +199,7 @@ const lang = {
       NOTICE: 'Notice',
       DPOW_UNSECURE: 'One ore more of your UTXO(s) are not dPoW secured',
       DPOW_SECURED: 'Your funds are dPoW secured',
+      USE_ALL: 'Use all',
     },
     ADD_COIN: {
       NO_MATCHING_RESULTS: 'No matching results',

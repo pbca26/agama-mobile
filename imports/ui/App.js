@@ -969,7 +969,7 @@ class App extends React.Component {
   render() {
     return (
       <div
-        className="app-container"
+        className={ 'app-container' + (config.dev ? '' : ' unselectable') }
         onClick={ this.globalClick }>
         <div className="app-header">
           { this.state.history &&

@@ -485,29 +485,30 @@ class Exchanges extends React.Component {
 
   updateExchangesMenu(e) {
     const coins = Object.keys(this.filterOutETH(this.props.coins));
+    const _value = e.target.value;
 
-    if (e.target.value !== 'tos') {
+    if (_value !== 'tos') {
       this.setState({
-        [e.target.name]: e.target.value,
+        [e.target.name]: _value,
       });
     }
 
-    if (e.target.value === 'clear') {
+    if (_value === 'clear') {
       this.clearOrder();
-    } else if (e.target.value === 'order') {
+    } else if (_value === 'order') {
       this.coinsListSrc = coins;
       this.coinsListDest = coins;
-    } else if (e.target.value === 'sync') {
+    } else if (_value === 'sync') {
       this.syncHistory();
     } else if (
-      e.target.value === 'tos' ||
-      e.target.value === 'supported-coins'
+      _value === 'tos' ||
+      _value === 'supported-coins'
     ) {
       this.setState({
         prevActiveState: this.state.activeSection,
-        [e.target.name]: e.target.value,
+        [e.target.name]: _value,
       });
-    } else if (e.target.value === 'update') {
+    } else if (_value === 'update') {
       this.updateCache();
 
       this.setState({

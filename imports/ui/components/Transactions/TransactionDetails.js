@@ -61,13 +61,13 @@ class TransactionDetails extends React.Component {
         </div>
         <div className="edit">
           { translate('EXCHANGES.FROM') }
-          <div className="shade margin-top-5">
+          <div className="shade margin-top-5 selectable">
             { tx.from ? tx.from[0] : tx.inputAddresses ? tx.inputAddresses[0] : translate('EXCHANGES.NA') }
           </div>
         </div>
         <div className="edit">
           { translate('EXCHANGES.TO') }
-          <div className="shade margin-top-5">
+          <div className="shade margin-top-5 selectable">
             { tx.address }
           </div>
         </div>
@@ -147,7 +147,7 @@ class TransactionDetails extends React.Component {
           <div
             className="shade margin-top-5"
             onClick={ this.openExplorerUrl }>
-            { tx.txid } <i className="fa fa-external-link margin-left-10"></i>
+            <span className="selectable">{ tx.txid }</span> <i className="fa fa-external-link margin-left-10"></i>
           </div>
         </div>
       </section>

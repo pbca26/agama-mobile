@@ -480,12 +480,12 @@ class SendCoin extends React.Component {
           <label className="control-label padding-bottom-10">
             { translate('SEND.FROM') }
             <strong className="padding-left-5">
-              [ <span className="success">
+              [ <span className="success selectable">
                 { typeof this.props.balance === 'string' && this.props.balance === 'loading' ? '...' : formatValue(this.props.balance.balance) } { _name.toUpperCase() }
                 </span> ]
             </strong>
           </label>
-          <div className="shade wb--all">{ this.props.address }</div>
+          <div className="shade wb--all selectable">{ this.props.address }</div>
         </div>
         <div className="row">
           <div className="edit">
@@ -535,11 +535,11 @@ class SendCoin extends React.Component {
             { !this.props.init &&
               <div
                 onClick={ this.setSendAmountAll }
-                className="send-use-all-btn">Use all</div>
+                className="send-use-all-btn">{ translate('SEND.USE_ALL') }</div>
             }
             { this.state.validTooMuch &&
               <div className="error margin-top-15">
-                <i className="fa fa-warning padding-right-5"></i>
+                <i className="fa fa-warning padding-right-5 selectable"></i>
                 { translate('SEND.TOO_MUCH', `${this.props.balance.balance} ${_name.toUpperCase()}`) }
               </div>
             }
@@ -666,7 +666,7 @@ class SendCoin extends React.Component {
                   <strong>{ translate('SEND.TO') }</strong>
                 </div>
                 <div className="edit">
-                  <span className="shade">{ this.state.sendTo }</span>
+                  <span className="shade selectable">{ this.state.sendTo }</span>
                 </div>
                 <div className="padding-top-15 edit">
                   <strong>{ translate('SEND.AMOUNT') }</strong>
@@ -749,7 +749,7 @@ class SendCoin extends React.Component {
                         { translate('SEND.ERROR') } <i className="fa fa-close"></i>
                         </div>
                         <div className="edit padding-bottom-15">
-                          <div className="shade">{ typeof this.state.sendResult.result === 'object' ? JSON.stringify(this.state.sendResult.result) : this.state.sendResult.result }</div>
+                          <div className="shade selectable">{ typeof this.state.sendResult.result === 'object' ? JSON.stringify(this.state.sendResult.result) : this.state.sendResult.result }</div>
                         </div>
                       </div>
                     }
@@ -775,7 +775,7 @@ class SendCoin extends React.Component {
                             <strong>{ translate('SEND.CURRENT_BALANCE') }</strong>
                           </div>
                           <div className="edit">
-                            <span className="shade padding-bottom-15">
+                            <span className="shade padding-bottom-15 selectable">
                             { this.state.ethPreflightResult.result.maxBalance.balance }
                             </span>
                           </div>
@@ -785,7 +785,7 @@ class SendCoin extends React.Component {
                             <strong>{ translate('SEND.BALANCE_AFTER_FEE') }</strong>
                           </div>
                           <div className="edit">
-                            <span className="shade padding-bottom-15">
+                            <span className="shade padding-bottom-15 selectable">
                             { this.state.ethPreflightResult.result.balanceAferFee }
                             </span>
                           </div>
@@ -895,11 +895,11 @@ class SendCoin extends React.Component {
                     </div>
                     <div className="edit">
                       { translate('SEND.FROM') }
-                      <div className="shade margin-top-5 wb--all">{ this.props.address }</div>
+                      <div className="shade margin-top-5 wb--all selectable">{ this.props.address }</div>
                     </div>
                     <div className="edit">
                       { translate('SEND.TO') }
-                      <div className="shade margin-top-5 wb--all">{ this.state.sendTo }</div>
+                      <div className="shade margin-top-5 wb--all selectable">{ this.state.sendTo }</div>
                     </div>
                     <div className="edit">
                       { translate('SEND.AMOUNT') }
@@ -907,7 +907,7 @@ class SendCoin extends React.Component {
                     </div>
                     <div className="edit">
                       { translate('SEND.TXID') }
-                      <div className="shade margin-top-5 wb--all">
+                      <div className="shade margin-top-5 wb--all selectable">
                       {
                         this.state.sendResult &&
                         this.state.sendResult.result &&
@@ -941,7 +941,7 @@ class SendCoin extends React.Component {
                     <div className="edit error">
                     { translate('SEND.ERROR') } <i className="fa fa-close"></i>
                     </div>
-                    <div className="edit padding-bottom-15">
+                    <div className="edit padding-bottom-15 selectable">
                       <div className="shade">{ this.state.sendResult.result }</div>
                       { this.state.sendResult.raw &&
                         this.state.sendResult.raw.txid &&

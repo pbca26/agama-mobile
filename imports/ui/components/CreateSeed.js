@@ -102,7 +102,7 @@ class CreateSeed extends React.Component {
       return (
         <div className="form create-seed">
           <div className="title margin-bottom-25">{ translate('LOGIN.THIS_IS_YOUR_NEW_SEED') }</div>
-          <div className="seed-gen-box">{ this.state.seed }</div>
+          <div className="seed-gen-box selectable">{ this.state.seed }</div>
           <div className="text-center margin-top-30">
             <QRCode
               value={ this.state.seed }

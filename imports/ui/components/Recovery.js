@@ -120,7 +120,7 @@ class Recovery extends React.Component {
         <div
           key={ `recovery-priv-keys-${i}` }
           className="seed-gen-box">
-          <strong>{ keys[i].name }:</strong> { keys[i].value }
+          <strong>{ keys[i].name }:</strong> <span className="selectable">{ keys[i].value }</span>
         </div>
       );
     }
@@ -183,7 +183,7 @@ class Recovery extends React.Component {
             <div className="title margin-bottom-10">
               { translate('RECOVERY.' + (this.state.isPrivKey ? 'PRIV_KEY' : 'SEED')) }
             </div>
-            <div className="seed-gen-box margin-bottom-10">{ this.state.passphrase }</div>
+            <div className="seed-gen-box margin-bottom-10 selectable">{ this.state.passphrase }</div>
             { this.state.showPrivKeys &&
               <div className="recovery-priv-keys">
                 <div className="title margin-bottom-10">{ translate('RECOVERY.PRIV_KEYS') }</div>

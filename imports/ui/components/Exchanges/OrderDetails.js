@@ -123,28 +123,28 @@ class ExchangesOrderDetails extends React.Component {
             </div>
             <div className="edit">
               { translate('EXCHANGES.DEPOSIT_ADDRESS') }
-              <div className="shade margin-top-5">
+              <div className="shade margin-top-5 selectable">
                 { _cache.exchangeAddress.address }
               </div>
             </div>
             <div className="edit">
               { translate('EXCHANGES.DEPOSIT_TX_ID') }
               <div
-                className="shade margin-top-5"
+                className="shade margin-top-5 selectable"
                 onClick={ () => this.openExplorerUrl(_cache.depositCoin.toLowerCase(), _cache.inputTransactionHash || this.props.findDeposits(_cache.orderId)[0]) }>
                 { _cache.inputTransactionHash || this.props.findDeposits(_cache.orderId)[0] ? <span>{ _cache.inputTransactionHash || this.props.findDeposits(_cache.orderId)[0] } <i className="fa fa-external-link margin-left-10"></i></span> : translate('EXCHANGES.NA') }
               </div>
             </div>
             <div className="edit">
               { translate('EXCHANGES.DEST_ADDRESS') }
-              <div className="shade margin-top-5">
+              <div className="shade margin-top-5 selectable">
                 { _cache.destinationAddress.address }
               </div>
             </div>
             <div className="edit">
               { translate('EXCHANGES.DEST_TX_ID') }
               <div
-                className="shade margin-top-5"
+                className="shade margin-top-5 selectable"
                 onClick={ () => this.openExplorerUrl(_cache.destinationCoin.toLowerCase(), _cache.outputTransactionHash) }>
                 { _cache.outputTransactionHash ? <span>{ _cache.outputTransactionHash } <i className="fa fa-external-link margin-left-10"></i></span> : translate('EXCHANGES.NA') }
               </div>
@@ -160,7 +160,7 @@ class ExchangesOrderDetails extends React.Component {
               <div
                 className="shade margin-top-5"
                 onClick={ this.props.openOrderOnline }>
-                { _cache.orderId }
+                <span className="selectable">{ _cache.orderId }</span>
                 <i className="fa fa-external-link margin-left-10"></i>
               </div>
             </div>
@@ -171,13 +171,13 @@ class ExchangesOrderDetails extends React.Component {
           <div>
             <div className="edit">
               { translate('EXCHANGES.FROM') }
-              <div className="shade margin-top-5">
+              <div className="shade margin-top-5 selectable">
                 { this.props.activeOrderDetailsDepositTx.inputAddresses ? this.props.activeOrderDetailsDepositTx.inputAddresses[0] : translate('EXCHANGES.NA') }
               </div>
             </div>
             <div className="edit">
               { translate('EXCHANGES.TO') }
-              <div className="shade margin-top-5">
+              <div className="shade margin-top-5 selectable">
                 { this.props.activeOrderDetailsDepositTx.address }
               </div>
             </div>
@@ -218,7 +218,7 @@ class ExchangesOrderDetails extends React.Component {
               <div
                 className="shade margin-top-5"
                 onClick={ () => this.openExplorerUrl(_cache.depositCoin.toLowerCase(), this.props.activeOrderDetailsDepositTx.txid) }>
-                { this.props.activeOrderDetailsDepositTx.txid } <i className="fa fa-external-link margin-left-10"></i>
+                <span className="selectable">{ this.props.activeOrderDetailsDepositTx.txid }</span> <i className="fa fa-external-link margin-left-10"></i>
               </div>
             </div>
           </div>
