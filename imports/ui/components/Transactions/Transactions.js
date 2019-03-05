@@ -145,7 +145,7 @@ class Transactions extends React.Component {
                   <QRCode
                     value={ this.props.address }
                     size={ 198 } />
-                  <div className="text-center wb--all">{ this.props.address }</div>
+                  <div className="text-center wb--all selectable">{ this.props.address }</div>
                 </div>
               }
             </div>

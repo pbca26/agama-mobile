@@ -142,8 +142,12 @@ div {
 .app-container {
   &.unselectable {
     user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
   }
   .selectable {
     user-select: text;
+    -webkit-user-select: text;
+    -webkit-touch-callout: default;
   }
 }
