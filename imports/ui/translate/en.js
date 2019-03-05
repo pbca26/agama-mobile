@@ -80,7 +80,7 @@ const lang = {
       SAVE: 'Save',
       REQUIRE_PIN_CONFIRM: 'Require PIN to confirm transaction',
       PURGE_ALL_DATA: 'Purge all data',
-      PURGE_ALL_DATA_WARNING: 'Warning! This is going to destroy all data on this device including your encrypted seed.',
+      PURGE_ALL_DATA_WARNING: 'Warning! This is going to destroy all Agama wallet data on this device including your encrypted seed.',
       SELECT_SERVER_BELOW: 'Select another server from the list below',
       CURRENCY: 'Currency',
       DEBUG: 'Debug',
