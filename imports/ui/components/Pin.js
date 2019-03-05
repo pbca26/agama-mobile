@@ -1,9 +1,7 @@
 import React from 'react';
-import jsQR from 'jsqr';
 import {
   setLocalStorageVar,
   getLocalStorageVar,
-  convertURIToImageData,
 } from '../actions/utils';
 import {
   encryptkey,
@@ -20,101 +18,74 @@ class Pin extends React.Component {
   constructor() {
     super();
     this.state = {
-      passphrase: config.preload ? config.preload.seed : null,
-      passphraseTooShort: false,
+      oldPing: null,
+      wrongPin: false,
+      wrongPinRetries: 0,
       pinOverride: config.preload ? config.preload.pin : null,
       pinOverrideTooShort: false,
       pinSet: false,
-      qrScanError: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.updateInput = this.updateInput.bind(this);
-    this.scanQR = this.scanQR.bind(this);
     this.save = this.save.bind(this);
   }
 
   updateInput(e) {
     this.setState({
       [e.target.name]: e.target.value,
-      passphraseTooShort: false,
       pinOverrideTooShort: false,
-      qrScanError: false,
-    });
-  }
-
-  scanQR() {
-    MeteorCamera.getPicture({
-      quality: 100,
-    }, (error, data) => {
-      if (error) {
-        devlog('qrcam err', error);
-        
-        this.setState({
-          qrScanError: error.errorClass && error.errorClass.error && error.errorClass.error !== 'cancel' ? true : false,
-        });
-        Meteor.setTimeout(() => {
-          this.setState({
-            qrScanError: false,
-          });
-        }, 5000);
-      } else {
-        convertURIToImageData(data)
-        .then((imageData) => {
-          const decodedQR = jsQR.decodeQRFromImage(
-            imageData.data,
-            imageData.width,
-            imageData.height
-          );
-
-          if (!decodedQR) {
-            this.setState({
-              qrScanError: true,
-            });
-            Meteor.setTimeout(() => {
-              this.setState({
-                qrScanError: false,
-              });
-            }, 5000);
-          } else {
-            this.setState({
-              qrScanError: false,
-              passphrase: decodedQR,
-            });
-          }
-        });
-      }
     });
   }
 
   save() {
-    if (!this.state.passphrase) {
-      this.setState({
-        passphraseTooShort: true,
-      });
-    } else {
-      if (this.state.pinOverride &&
-          this.state.pinOverride.length >= 6) {
-        const _encryptedKey = encryptkey(this.state.pinOverride, this.state.passphrase);
+    if (this.state.pinOverride &&
+        this.state.pinOverride.length >= 6) {
+      const _encryptedKey = getLocalStorageVar('seed');
+      const _decryptedKey = decryptkey(this.state.oldPin, _encryptedKey.encryptedKey);
+      const pinBruteforceProtection = getLocalStorageVar('settings').pinBruteforceProtection;
+      const pinBruteforceProtectionRetries = getLocalStorageVar('seed').pinRetries;
+      
+      if (_decryptedKey) {
+        const encryptedKey = encryptkey(this.state.pinOverride, _decryptedKey);
+        setLocalStorageVar('seed', pinBruteforceProtection ? { encryptedKey, pinRetries: 0 } : { encryptedKey });
 
-        setLocalStorageVar('seed', { encryptedKey: _encryptedKey });
         this.setState({
+          oldPin: null,
+          pinOverride: null,
+          wrongPinRetries: 0,
           pinSet: true,
           pinOverrideTooShort: false,
-          qrScanError: false,
-          passphraseTooShort: false,
+          wrongPin: false,
         });
 
         Meteor.setTimeout(() => {
           this.setState(this.defaultState);
-          this.props.changeActiveSection('login');
-        }, 500);
+          this.props.lock();
+        }, 3000);
       } else {
-        this.setState({
-          pinOverrideTooShort: true,
-          qrScanError: false,
-          passphraseTooShort: false,
-        });
+        if (!pinBruteforceProtection) {
+          this.setState({
+            wrongPin: true,
+            pinOverrideTooShort: false,
+          });
+        } else if (pinBruteforceProtectionRetries < 3) {
+          let _seedStorage = getLocalStorageVar('seed');
+          _seedStorage.pinRetries += 1;
+          setLocalStorageVar('seed', _seedStorage);
+  
+          this.setState({
+            wrongPin: true,
+            wrongPinRetries: _seedStorage.pinRetries,
+            pinOverrideTooShort: false,
+          });
+        } else {
+          this.props.lock(true);
+        }
       }
+    } else {
+      this.setState({
+        pinOverrideTooShort: true,
+      });
     }
   }
 
@@ -122,34 +93,21 @@ class Pin extends React.Component {
     return (
       <div className="form pin-override">
         <div className="title padding-bottom-30 text-center fs14 sz350">
-        { translate('PIN.PROVIDE_A_SEED') }
+        { translate('PIN.PROVIDE_PIN') }
         </div>
-        <div
-          onClick={ this.scanQR }
-          className="group3 margin-bottom-20">
-          <div className="btn-inner">
-            <div className="btn">{ translate('SEND.SCAN_QR') }</div>
-            <div className="group2">
-              <i className="fa fa-qrcode"></i>
-            </div>
-          </div>
-        </div>
-        { this.state.qrScanError &&
-          <div className="error margin-top-5 margin-bottom-15 sz350">
-            <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
-          </div>
-        }
         <div className="edit margin-bottom-10">
           <input
             type="password"
-            name="passphrase"
+            className="form-control"
+            name="oldPin"
             onChange={ this.updateInput }
-            placeholder={ `${translate('LOGIN.ENTER_PASSPHRASE')} ${translate('LOGIN.OR_WIF')}` }
-            value={ this.state.passphrase || '' } />
+            placeholder={ translate('PIN.ENTER_OLD_PIN') }
+            disabled={ this.state.pinSet }
+            value={ this.state.oldPin || '' } />
         </div>
-        { this.state.passphraseTooShort &&
+        { this.state.wrongPin &&
           <div className="error margin-top-15 sz350">
-            <i className="fa fa-warning"></i> { translate('PIN.PROVIDE_A_PASSPHRASE') }
+            <i className="fa fa-warning"></i> { this.state.wrongPinRetries === 0 ? translate('LOGIN.WRONG_PIN') : translate('LOGIN.WRONG_PIN_ATTEMPTS', 3 - this.state.wrongPinRetries) }
           </div>
         }
         <div className="margin-bottom-25 margin-top-40 edit">
@@ -157,7 +115,8 @@ class Pin extends React.Component {
             type="password"
             name="pinOverride"
             onChange={ this.updateInput }
-            placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
+            placeholder={ translate('PIN.ENTER_NEW_PIN') }
+            disabled={ this.state.pinSet }
             value={ this.state.pinOverride || '' } />
         </div>
         { this.state.pinOverrideTooShort &&
@@ -166,11 +125,16 @@ class Pin extends React.Component {
           </div>
         }
         { this.state.pinSet &&
-          <div className="margin-bottom-15 margin-top-15 sz350">{ translate('PIN.SEED_IS_ENCRYPTED') }</div>
+          <div className="margin-bottom-15 margin-top-15 sz350 success">{ translate('PIN.PIN_CHANGED') }</div>
         }
         <div
           onClick={ this.save }
-          className="group3 margin-top-40">
+          className="group3 margin-top-40"
+          disabled={
+            !this.state.oldPin ||
+            !this.state.pinOverride ||
+            this.state.pinSet
+          }>
           <div className="btn-inner">
             <div className="btn">{ translate('PIN.SAVE') }</div>
             <div className="group2">

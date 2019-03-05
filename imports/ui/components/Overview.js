@@ -1,9 +1,13 @@
 import React from 'react';
 import Spinner from './Spinner';
+import FiatSymbol from './FiatSymbol';
 
 import { formatValue } from 'agama-wallet-lib/build/utils';
 import translate from '../translate/translate';
-import { assetsPath } from '../actions/utils';
+import {
+  assetsPath,
+  getLocalStorageVar,
+} from '../actions/utils';
 
 class Overview extends React.Component {
   constructor() {
@@ -14,28 +18,35 @@ class Overview extends React.Component {
 
   renderOverview() {
     if (this.props.overview) {
+      const settingsCurrency = getLocalStorageVar('settings').fiat;
       const _overview = this.props.overview;
       let _items = [];
-      let _totalUSDBalance = 0;
-      let _totalBTCBalance = 0;
+      let _totalFiatBalance = 0;
 
-      for (let i = 0; i < _overview.length; i++) {
-        _totalUSDBalance += _overview[i].balanceUSD;
-        _totalBTCBalance += _overview[i].balanceBTC;
+      if (_overview[0].balanceFiat !== 'loading') {
+        for (let i = 0; i < _overview.length; i++) {
+          _totalFiatBalance += _overview[i].balanceFiat;
+        }
       }
 
       _items.push(
         <div
           className="group7"
-          key="overview-coins-usd-balance">
+          key="overview-coins-fiat-balance">
           <div className="cryptocardbg">
             <img
               className="rectangle5"
               src={ `${assetsPath.home}/home-rectangle-5.png` } />
           </div>
-          <div className="totalvalue">{ translate('OVERVIEW.TOTAL_VALUE') }</div>
-          <div className="a3467812">{ formatValue(_totalUSDBalance) }</div>
-          <div className="label1">$</div>
+          { _overview[0].balanceFiat !== 'loading' &&
+            <div className="totalvalue">{ translate('OVERVIEW.TOTAL_VALUE') }</div>
+          }
+          <div className="a3467812">{ _overview[0].balanceFiat !== 'loading' ? formatValue(_totalFiatBalance) : translate('OVERVIEW.PLEASE_WAIT') }</div>
+          { _overview[0].balanceFiat !== 'loading' &&
+            <div className="label1">
+              <FiatSymbol symbol={ settingsCurrency } />
+            </div>
+          }
           <div className="cryptocardgraph">
             <div className="group4">
               <div className="group2">
@@ -77,6 +88,24 @@ class Overview extends React.Component {
       );
 
       for (let i = 0; i < _overview.length; i++) {
+        const _name = _overview[i].coin.split('|')[0];
+        const _mode = _overview[i].coin.split('|')[1];
+        let _priceChangeColor = 'green';
+        
+        if (_overview[i].priceChange &&
+            _overview[i].priceChange.data &&
+            _overview[i].priceChange.data.hasOwnProperty('percent_change_1h') &&
+            _overview[i].priceChange.data.percent_change_1h < 0) {
+          _priceChangeColor = 'red';
+        }
+  
+        if (_overview[i].priceChange &&
+            _overview[i].priceChange.data &&
+            _overview[i].priceChange.data.hasOwnProperty('percent_change_24h') &&
+            _overview[i].priceChange.data.percent_change_24h < 0) {
+          _priceChangeColor = 'red';
+        }
+
         _items.push(
           <div
             key={ `overview-coins-${_overview[i].coin}` }
@@ -84,18 +113,28 @@ class Overview extends React.Component {
             <img
               className="div1"
               src={ `${assetsPath.home}/trends-rectangle-7.png` } />
-            <div className="a1241">
-              ~ $ { formatValue(_overview[i].usdPricePerItem) } { translate('OVERVIEW.PER_COIN') }
-            </div>
+            { _overview[i].fiatPricePerItem > 0 &&
+              <div className="a1241">
+                ~ <FiatSymbol symbol={ settingsCurrency } /> { Number(Number(_overview[i].fiatPricePerItem).toFixed(4)) } { translate('OVERVIEW.PER_COIN') }
+              </div>
+            }
             { /*<img className="path5" src={ `${assetsPath.home}/home-path-5.png` } />*/ }
             <div className="btc">
               <img
                 className="oval4"
-                src={ `${assetsPath.coinLogo}/${_overview[i].coin}.png` } />
+                src={ `${assetsPath.coinLogo}/${_mode}/${_name.toLowerCase()}.png` } />
             </div>
-            <div className="bitcoin">{ translate('COINS.' + _overview[i].coin.toUpperCase()) }</div>
+            <div className="bitcoin">{ translate(`${_mode.toUpperCase()}.${_name.toUpperCase()}`) }</div>
             <div className="a0000041">{ formatValue(_overview[i].balanceNative) }</div>
-            <div className="a123345">${ formatValue(_overview[i].balanceUSD) }</div>
+            { _overview[i].balanceFiat > 0 &&
+              <div className="a123345">
+              <FiatSymbol symbol={ settingsCurrency } />{ Number(Number(_overview[i].balanceFiat).toFixed(4)) }
+              { _overview[i].priceChange &&
+                _overview[i].priceChange.data &&
+                <i className={ `fa fa-arrow-${_priceChangeColor === 'red' ? 'down' : 'up'} icon-price-change ${_priceChangeColor}` }></i>
+              }
+              </div>
+            }
           </div>
         );
       }
@@ -105,10 +144,6 @@ class Overview extends React.Component {
           { _items[0] }
           <div className="overview-coins">{ _items.splice(1) }</div>
         </div>
-      );
-    } else {
-      return (
-        <Spinner />
       );
     }
   }
@@ -125,7 +160,13 @@ class Overview extends React.Component {
           { this.props.overview !== 'error' &&
             <div className="home-inner">
               { this.renderOverview() }
-              <div className="yourcoins">{ translate('OVERVIEW.YOUR_COINS') }</div>
+              <div className="yourcoins">
+                { translate('OVERVIEW.' + (this.props.overview && this.props.overview.length ? 'YOUR_COINS' : 'LOADING')) }
+              </div>
+              { this.props.overview &&
+                this.props.overview[0].balanceNative === 'loading' &&
+                <Spinner />
+              }
               { /*<img
                 className="combinedshape2"
                 src={ `${assetsPath.home}/home-combined-shape 2.png` } />*/ }

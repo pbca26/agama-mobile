@@ -1,4 +1,7 @@
 import translate from '../translate/translate';
+import { Meteor } from 'meteor/meteor';
+import _coinsList from './coins';
+import electrumServers from 'agama-wallet-lib/build/electrum-servers';
 
 export const assetsPath = {
   coinLogo: '/images/cryptologo',
@@ -63,86 +66,76 @@ export const convertURIToImageData = (URI) => {
   });
 };
 
-export const _coinsList = [
-  'KMD',
-  'CHIPS',
-  'SUPERNET',
-  'REVS',
-  'PANGEA',
-  'DEX',
-  'JUMBLR',
-  'BET',
-  'CRYPTO',
-  'COQUI',
-  'OOT',
-  'HODL',
-  'MSHARK',
-  'BOTS',
-  'MGW',
-  'BTCH',
-  'KV',
-  'WLC',
-  'MNZ',
-  'BNTN',
-  'CHAIN',
-  'GLXT',
-  'EQL',
-  'PRLPAY',
-  'ZILLA',
-  'PIZZA',
-  'BEER',
-  'CCL',
-  'VRSC',
-  'CALL',
-  'BTC',
-  'DOGE',
-  'DGB',
-  'BTG',
-  'BCH',
-  'FAIR',
-  'VIA',
-  'MONA',
-  'ZEC',
-  'HUSH',
-  'ARG',
-  'DASH',
-  'CRW',
-  'VTC',
-  'LTC',
-  'NMC',
-  'SIB',
-  'XMY',
-  'ZCL',
-  'EMC2',
-  'FJC',
-  'GAME',
-  'BCBC',
-  'BTCZ',
-  'QTUM',
-  'DNR',
-  'XZC',
-  'FTC',
-  'GBX',
-  //'NINJA',  
-  //'SHARK',
-  //'MVP',
-  //'CEAL',
-  //'MESH',
-  //'VOTE2018',
-  //'BLK',
-  //'BTX', (?) needs a fix
-];
-
 // sorting needs to be done
 export let coinsList = []; // sorted
-let _coins = {};
-
-for (let i = 0; i < _coinsList.length; i++) {
-  _coins[translate('COINS.' + _coinsList[i].toUpperCase())] = _coinsList[i];
-}
-
-_coins = sortObject(_coins);
+let _coins = {
+  spv: {},
+  eth: {},
+};
 
 for (let key in _coins) {
-  coinsList.push(_coins[key]);
+  for (let i = 0; i < _coinsList[key].length; i++) {
+    _coins[key][translate(`${key.toUpperCase()}.${_coinsList[key][i].toUpperCase()}`)] = _coinsList[key][i];
+  }
+  
+  _coins[key] = sortObject(_coins[key]);
+
+  for (let _key in _coins[key]) {
+    coinsList.push({
+      name: (`${_coins[key][_key]}|${key}`).toLowerCase(),
+      title: _key,
+      mode: key,
+    });
+  }
 }
+
+export const removeDisabledSPVCoins = (coins) => {
+  for (let key in coins) {
+    if (key.indexOf('|spv') > -1) {
+      const _name = key.split('|')[0];
+    
+      if (!electrumServers[_name]) delete coins[key];
+    }
+  }
+
+  return coins;
+};
+
+export const sortTransactions = (transactions, sortBy) => {
+  return transactions.sort((b, a) => {
+    if (a[sortBy ? sortBy : 'height'] < b[sortBy ? sortBy : 'height'] &&
+        a[sortBy ? sortBy : 'height'] &&
+        b[sortBy ? sortBy : 'height']) {
+      return -1;
+    }
+
+    if (a[sortBy ? sortBy : 'height'] > b[sortBy ? sortBy : 'height'] &&
+        a[sortBy ? sortBy : 'height'] &&
+        b[sortBy ? sortBy : 'height']) {
+      return 1;
+    }
+
+    if (!a[sortBy ? sortBy : 'height'] &&
+        b[sortBy ? sortBy : 'height']) {
+      return 1;
+    }
+
+    if (!b[sortBy ? sortBy : 'height'] &&
+        a[sortBy ? sortBy : 'height']) {
+      return -1;
+    }
+
+    return 0;
+  });
+}
+
+// single level
+export const joinPropsUrl = (obj) => {
+  let out = [];
+  
+  for (let key in obj) {
+    out.push(`${key}=${obj[key]}`);
+  }
+
+  return out.join('&');
+};

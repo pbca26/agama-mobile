@@ -3,6 +3,23 @@
   padding: 0 10px;
   height: 100%;
   
+  .icon-price-change {
+    position: absolute;
+    font-size: 12px;
+    right: -16px;
+    margin-top: -5px;
+    
+    &.green {
+      color: #66bb6a;
+    }
+    &.red {
+      color: #f96868;
+    }
+  }
+  .loader {
+    top: 140px;
+    right: 60px;
+  }
   .home-inner {
     max-width: 375px;
     height: 100%;

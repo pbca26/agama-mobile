@@ -5,6 +5,8 @@ body {
   color: white;
   margin: 0;
   overflow-x: hidden;
+  padding-top: constant(safe-area-inset-top);
+  padding-top: env(safe-area-inset-top);
 }
 
 .nav-menu {
@@ -131,4 +133,21 @@ div {
 .width-limit {
   width: 90%;
   margin: 0 auto;
+}
+
+.wb--all {
+  word-break: break-all;
+}
+
+.app-container {
+  &.unselectable {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+  .selectable {
+    user-select: text;
+    -webkit-user-select: text;
+    -webkit-touch-callout: default;
+  }
 }

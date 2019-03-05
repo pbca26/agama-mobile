@@ -15,8 +15,43 @@
     border-bottom: solid 2px #5F6277;
     padding: 30px 0 40px 10px;
 
+    &.item--sm {
+      padding: 30px 0 30px 10px;
+    }
     &.last {
+      padding: 30px 0 40px 10px;
       border: none;
     }
+  }
+}
+
+.addcoin-ui {
+  &.settings-coins {
+    .home {
+      .overview-coins {
+        top: 0;
+        padding-bottom: 25px;
+
+        .switch-block {
+          position: absolute;
+          display: inline-block;
+          right: 20px;
+          margin-top: 30px;
+        }
+      }
+    }
+    .menu-back {
+      position: fixed;
+      top: 4px;
+      z-index: 400;
+    }
+  }
+}
+
+.settings-pin {
+  .menu-back {
+    position: fixed;
+    top: 4px;
+    z-index: 400;
   }
 }

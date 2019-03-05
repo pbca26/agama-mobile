@@ -1,6 +1,10 @@
 import React from 'react';
 import translate from '../translate/translate';
-import { fail } from 'assert';
+import electrumServers from 'agama-wallet-lib/build/electrum-servers';
+import { getRandomElectrumServer } from 'agama-wallet-lib/build/utils';
+import { Meteor } from 'meteor/meteor';
+
+const MAX_RETRIES = 3;
 
 class ServerSelect extends React.Component {
   constructor() {
@@ -12,6 +16,7 @@ class ServerSelect extends React.Component {
       errorTestingServer: false,
       connecting: false,
       spvServerRetryInProgress: false,
+      retryCount: 0,
     };
     this.updateInput = this.updateInput.bind(this);
     this.setElectrumServer = this.setElectrumServer.bind(this);
@@ -21,12 +26,13 @@ class ServerSelect extends React.Component {
     this.props.getServersList()
     .then((res) => {
       const _coin = this.props.coin;
+      const _name = _coin.split('|')[0];
       const _server = this.props.coins[this.props.coin].server;
 
       this.setState({
-        selectedOption: _server.ip + ':' + _server.port + ':' + _server.proto,
-        electrumServer: _server.ip + ':' + _server.port + ':' + _server.proto,
-        serverList: res[_coin].serverList,
+        selectedOption: `${_server.ip}:${_server.port}:${_server.proto}`,
+        electrumServer: `${_server.ip}:${_server.port}:${_server.proto}`,
+        serverList: res[_name].serverList,
         errorTestingServer: false,
         connecting: false,
         spvServerRetryInProgress: false,
@@ -45,6 +51,7 @@ class ServerSelect extends React.Component {
 
   setElectrumServer() {
     const _server = this.state.selectedOption.split(':');
+    const _coin = this.props.coin.split('|')[0].toLowerCase();
 
     this.setState({
       spvServerRetryInProgress: true,
@@ -58,11 +65,31 @@ class ServerSelect extends React.Component {
     )
     .then((res) => {
       if (res === 'error') {
-        this.setState({
-          errorTestingServer: true,
-          connecting: false,
-          spvServerRetryInProgress: false,
-        });
+        if (electrumServers[_coin].serverList !== 'none' &&
+            electrumServers[_coin].serverList.length > 1 &&
+            this.state.retryCount <= MAX_RETRIES) {
+          const _spvServers = electrumServers[_coin].serverList;
+          const _randomServer = getRandomElectrumServer(
+            _spvServers,
+            _server
+          );
+
+          this.setState({
+            selectedOption: `${_randomServer.ip}:${_randomServer.port}:${_randomServer.proto}`,
+            retryCount: this.state.retryCount + 1,
+          });
+
+          Meteor.setTimeout(() => {
+            this.setElectrumServer();
+          }, 100);
+        } else {
+          this.setState({
+            errorTestingServer: true,
+            connecting: false,
+            spvServerRetryInProgress: false,
+            retryCount: 0,
+          });
+        }
       } else {
         this.setState({
           errorTestingServer: false,
@@ -78,6 +105,10 @@ class ServerSelect extends React.Component {
           } 
         );
         this.props.dashboardRefresh();
+
+        if (this.props.activeSection === 'server-select') {
+          this.props.historyBack();
+        }
       }
     });
   }
@@ -90,7 +121,9 @@ class ServerSelect extends React.Component {
       _items.push(
         <option
           key={ `spv-server-list-${i}` }
-          value={ _spvServers[i] }>{ `${_spvServers[i]}` }</option>
+          value={ _spvServers[i] }>
+          { `${_spvServers[i]}` }
+        </option>
       );
     }
 
@@ -98,12 +131,22 @@ class ServerSelect extends React.Component {
   }
 
   render() {
+    const _name = this.props.coin.split('|')[0];
+    const _mode = this.props.coin.split('|')[1];
+
     return (
       <div className="form server-select">
-        <div className="bold text-center">
-          <i className="fa fa-warning error padding-right-5"></i>
-          <span className="error width-limit">{ translate('DASHBOARD.CON_ERROR', this.props.coin.toUpperCase()) }</span>
-        </div>
+        { this.props.activeSection !== 'server-select' &&
+          <div className="bold text-center">
+            <i className="fa fa-warning error padding-right-5"></i>
+            <span className="error width-limit">{ translate('DASHBOARD.CON_ERROR', _name.toUpperCase()) }</span>
+          </div>
+        }
+        { this.props.activeSection === 'server-select' &&
+          <div className="bold text-center">
+            <span className="width-limit">{ translate('SETTINGS.SELECT_SERVER_BELOW') }</span>
+          </div>
+        }
         <div className="server-select-inner">
           <div>
             <select

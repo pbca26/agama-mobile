@@ -28,6 +28,7 @@ class Login extends React.Component {
       pinOverrideTooShort: false,
       pin: config.preload ? config.preload.pin : '',
       wrongPin: false,
+      wrongPinRetries: 0,
       qrScanError: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
@@ -37,6 +38,14 @@ class Login extends React.Component {
     this.toggleCreatePin = this.toggleCreatePin.bind(this);
     this.scanQR = this.scanQR.bind(this);    
   }
+
+  componentWillMount() {
+    if (getLocalStorageVar('seed')) {
+      this.setState({
+        createPin: true,
+      });
+    }
+  } 
 
   updateInput(e) {
     this.setState({
@@ -97,6 +106,8 @@ class Login extends React.Component {
     if (isPinAccess) {
       // decrypt
       const _encryptedKey = getLocalStorageVar('seed');
+      const pinBruteforceProtection = getLocalStorageVar('settings').pinBruteforceProtection;
+      const pinBruteforceProtectionRetries = getLocalStorageVar('seed').pinRetries;
 
       if (_encryptedKey &&
           _encryptedKey.encryptedKey &&
@@ -105,13 +116,33 @@ class Login extends React.Component {
         const _decryptedKey = decryptkey(this.state.pin, _encryptedKey.encryptedKey);
 
         if (_decryptedKey) {
+          if (pinBruteforceProtection) {
+            let _seedStorage = getLocalStorageVar('seed');
+            _seedStorage.pinRetries = 0;
+            setLocalStorageVar('seed', _seedStorage);
+          }
+          
           this.props.login(_decryptedKey);
           this.setState(this.defaultState);
         } else {
-          this.setState({
-            pinOverrideTooShort: false,
-            wrongPin: true,
-          });
+          if (!pinBruteforceProtection) {
+            this.setState({
+              pinOverrideTooShort: false,
+              wrongPin: true,
+            });
+          } else if (pinBruteforceProtectionRetries < 3) {
+            let _seedStorage = getLocalStorageVar('seed');
+            _seedStorage.pinRetries += 1;
+            setLocalStorageVar('seed', _seedStorage);
+    
+            this.setState({
+              pinOverrideTooShort: false,
+              wrongPin: true,
+              wrongPinRetries: _seedStorage.pinRetries,
+            });
+          } else {
+            this.props.lock(true);
+          }
         }
       } else {
         this.setState({
@@ -191,7 +222,7 @@ class Login extends React.Component {
                 </div>
                 { this.state.wrongPin &&
                   <div className="error margin-top-10 margin-bottom-25 sz350">
-                    <i className="fa fa-warning"></i> { translate('LOGIN.WRONG_PIN') }
+                    <i className="fa fa-warning"></i> { this.state.wrongPinRetries === 0 ? translate('LOGIN.WRONG_PIN') : translate('LOGIN.WRONG_PIN_ATTEMPTS', 3 - this.state.wrongPinRetries) }
                   </div>
                 }
               </div>
@@ -246,7 +277,8 @@ class Login extends React.Component {
                     <input
                       type="checkbox"
                       value="on"
-                      checked={ this.state.createPin } />
+                      checked={ this.state.createPin }
+                      readOnly />
                     <div
                       className="slider"
                       onClick={ this.toggleCreatePin }></div>

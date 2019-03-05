@@ -51,7 +51,7 @@ class KMDInterest extends React.Component {
     this.props.sendtx(
       this.props.coin,
       this.props.address,
-      Number(this.props.balance.balanceSats) - 10000,
+      Number(this.props.balance.balanceSats) - 20000,
       null,
       true
     )
@@ -65,6 +65,7 @@ class KMDInterest extends React.Component {
         });
 
         Meteor.setTimeout(() => {
+          this.props.dashboardRefresh();
           this.props.changeActiveSection('dashboard');
         }, 10000);
       } else {
@@ -100,7 +101,7 @@ class KMDInterest extends React.Component {
             { formatValue(_utxo[i].interest) }
           </td>
           <td>
-            { _utxo[i].locktime &&
+            { Number(_utxo[i].locktime) > 0 &&
               <i className="fa fa-check-circle green locktime-icon"></i>
             }
             { !_utxo[i].locktime &&
@@ -121,6 +122,11 @@ class KMDInterest extends React.Component {
           <div className="margin-top-40">
             <p>
               <strong className="green">{ translate('CLAIM.REQ_TO_CLAIM_P1') }:</strong> { translate('CLAIM.REQ_TO_CLAIM_P2') }.
+            </p>
+          </div>
+          <div className="margin-top-40">
+            <p>
+              <strong>{ translate('CLAIM.TIP') }:</strong> { translate('CLAIM.TIP_DESC') }
             </p>
           </div>
           <div className="text-center margin-top-35">
@@ -168,7 +174,7 @@ class KMDInterest extends React.Component {
           }
           { this.state.success &&
             <div className="padding-bottom-10 text-center green bold">
-              { translate('CLAIM.YOU_SUCCESFULLY_CLAIMED') } { formatValue(this.props.balance.interest) } KMD
+              { translate('CLAIM.YOU_SUCCESFULLY_CLAIMED') } { formatValue(this.props.balance.interest - 0.0002) } KMD
             </div>
           }
           { !this.props.utxo &&

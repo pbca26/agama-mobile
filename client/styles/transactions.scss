@@ -40,6 +40,11 @@
       line-height: 22px;
     }
   
+    .transactions-dpow-flag {
+      position: absolute;
+      margin-top: 13px;
+    }
+
     .cryptocardbtc {
       height: 145px;
       max-width: 347px;
@@ -262,6 +267,38 @@
     overflow-x: hidden;
     margin: 0;
   }
+
+  .transaction-details {
+    background-color: #373A4C;
+    overflow-x: hidden;
+    position: absolute;
+    top: 80px;
+    left: 0;
+    padding: 0 10px;
+
+    .uc-first {
+      text-transform: capitalize;
+    }
+    .title {
+      text-align: center;
+      padding: 20px 0 25px 0;
+    }
+    .menu-back {
+      position: fixed;
+      top: 4px;
+      z-index: 400;
+    }
+    .shade {
+      opacity: 0.8;
+    }
+    .edit {
+      font-size: 14px;
+      word-break: break-all;
+      width: 100%;
+      max-width: 100%;
+      padding-bottom: 25px;
+    }
+  }
 }
 
 .send-receive-block {
@@ -323,6 +360,18 @@
       button {
         width: calc(345px/3 - 16px);
       }
+    }
+  }
+  .btn-claim {
+    .fa.fa-exclamation {
+      position: absolute;
+      border-radius: 50%;
+      background-color: #373A4C;
+      color: #ff7575;
+      padding: 4px 9px;
+      top: -10px;
+      right: 21px;
+      border: solid 1px rgba(255, 255, 255, 0.5);
     }
   }
 }
