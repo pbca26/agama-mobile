@@ -71,6 +71,10 @@ class AddCoin extends React.Component {
                 src={ `${assetsPath.coinLogo}/${_mode}/${_name}.png` } />
             </div>
             <div className="bitcoin">{ translate(`${_mode.toUpperCase()}.${_name.toUpperCase()}`) }</div>
+            { _mode === 'eth' &&
+              erc20ContractId[_mode.toUpperCase()] &&
+              <div className="badge badge--erc20">ERC20</div>
+            }
           </div>
         );
 

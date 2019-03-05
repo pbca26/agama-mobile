@@ -238,4 +238,19 @@
       }
     }
   }
+  .badge {
+    color: #fff;
+    padding: 1px 3px;
+    text-align: center;
+    white-space: nowrap;
+    position: absolute;
+
+    &.badge--erc20 {
+      background-color: #4caf50;
+      font-size: 11px;
+      left: 21px;
+      margin-top: 65px;
+      border-radius: 4px;
+    }
+  }
 }
