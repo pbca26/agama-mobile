@@ -16,6 +16,7 @@ import settingsDefaults from './settingsDefaults';
 import SettingsCoins from './Coins';
 import btcFeesSource from './btcFees';
 import Pin from '../Pin';
+import SettingsUserAgreement from './UserAgreement';
 
 // TODO: reset settings/purge seed and pin
 
@@ -78,7 +79,18 @@ class Settings extends React.Component {
         activeView: name,
       });
       this.props.changeTitle('remove-coin');
-    } else if (this.state.activeView === 'coins') {
+    } else if (name === 'agreement') {
+      this.setState({
+        activeView: name,
+      });
+      this.props.changeTitle('agreement');
+    } else if (
+      this.state.activeView === 'coins' ||
+      this.state.activeView === 'agreement'
+    ) {
+      this.setState({
+        activeView: null,
+      });
       this.props.changeTitle('settings');
     } else {
       this.setState({
@@ -216,6 +228,21 @@ class Settings extends React.Component {
     if (!this.state.activeView) {
       return (
         <div className="form settings">
+          <div
+            onClick={ () => this.toggleActiveView('about') }
+            className="item item--sm">
+            { translate('APP_TITLE.ABOUT') }
+          </div>
+          <div
+            onClick={ () => this.toggleActiveView('support') }
+            className="item item--sm">
+            { translate('APP_TITLE.SUPPORT') }
+          </div>
+          <div
+            onClick={ () => this.toggleActiveView('agreement') }
+            className="item item--sm">
+            { translate('APP_TITLE.AGREEMENT') }
+          </div>
           <div className="margin-top-10 item">
             <div className="padding-bottom-20">{ translate('SETTINGS.AUTOLOCK_TIMEOUT') }</div>
             <select
@@ -375,6 +402,16 @@ class Settings extends React.Component {
           <Pin
             changeActiveSection={ this.changeActiveSection }
             lock={ this.props.lock } />
+        </div>
+      );
+    } else if (this.state.activeView === 'agreement') {
+      return (
+        <div className="settings-user-agreement">
+          <img
+            className="menu-back"
+            src={ `${assetsPath.menu}/trends-combined-shape.png` }
+            onClick={ () => this.toggleActiveView() } />
+          <SettingsUserAgreement />
         </div>
       );
     }

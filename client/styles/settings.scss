@@ -48,10 +48,16 @@
   }
 }
 
-.settings-pin {
+.settings-pin,
+.settings-user-agreement {
   .menu-back {
     position: fixed;
     top: 4px;
     z-index: 400;
   }
+}
+
+.settings-user-agreement {
+  padding: 10px;
+  text-align: justify;
 }
