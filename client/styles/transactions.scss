@@ -10,6 +10,19 @@
   padding: 0 10px;
   padding-top: 30px;
   
+  .balance-fiat {
+    margin-left: 61px;
+    margin-top: 8px;
+    font-size: 14px;
+
+    &.kmd-interest {
+      display: inline-block;
+      margin-top: 0;
+      padding-left: 9px;
+      margin-left: 9px;
+      border-left: solid 2px;
+    }
+  }
   .interest {
     margin-top: 16px;
   }
@@ -53,6 +66,15 @@
       margin: 0;
       left: 0;
   
+      &.kmd-interest {
+        .coin-title {
+          top: 15px;
+        }
+        .coin-balance {
+          top: 56px;
+        }
+      }
+
       .group8 {
         top: 0;
         height: 145px;

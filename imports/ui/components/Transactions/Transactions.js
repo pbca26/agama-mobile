@@ -6,10 +6,15 @@ import {
   isKomodoCoin,
 } from 'agama-wallet-lib/build/coin-helpers';
 import translate from '../../translate/translate';
+import QRCode from 'qrcode.react';
+import {
+  assetsPath,
+  getLocalStorageVar,
+} from '../../actions/utils';
+
 import Spinner from '../Spinner';
 import TransactionDetails from './TransactionDetails';
-import QRCode from 'qrcode.react';
-import { assetsPath } from '../../actions/utils';
+import FiatSymbol from '../FiatSymbol';
 
 class Transactions extends React.Component {
   constructor() {
@@ -20,7 +25,6 @@ class Transactions extends React.Component {
     };
     this.toggleTxDetails = this.toggleTxDetails.bind(this);
     this.openExternalURL = this.openExternalURL.bind(this);
-    this.isInterestDefined = this.isInterestDefined.bind(this);
     this.toggleQR = this.toggleQR.bind(this);
     this.showClaimButton = this.showClaimButton.bind(this);
     this.closeTransactionDetails = this.closeTransactionDetails.bind(this);
@@ -54,16 +58,6 @@ class Transactions extends React.Component {
     if (_props.balance &&
         _props.balance.balance &&
         _props.balance.balance > 0) {
-      return true;
-    }
-  }
-
-  isInterestDefined() {
-    const _props = this.props;
-
-    if (_props.balance &&
-        _props.balance.interest &&
-        _props.balance.interest > 0) {
       return true;
     }
   }
@@ -205,6 +199,7 @@ class Transactions extends React.Component {
       const _balance = this.props.balance;
       const _name = _coin.split('|')[0];
       const _mode = _coin.split('|')[1];
+      const settingsCurrency = getLocalStorageVar('settings').fiat;
 
       return (
         <div className="transactions-ui">
@@ -236,9 +231,18 @@ class Transactions extends React.Component {
                     </div>
                     <div className="coin-balance">
                       <div className="balance">
-                      { translate('BALANCE.BALANCE') }: { _balance ? formatValue(_balance.balance) : 0 } { _name.toUpperCase() }
+                        { translate('BALANCE.BALANCE') }: { _balance ? formatValue(_balance.balance) : 0 } { _name.toUpperCase() }
+                        { _balance &&
+                          Number(_balance.balance) > 0 &&
+                          this.props.prices &&
+                          this.props.prices[_name.toUpperCase()] &&
+                          this.props.prices[_name.toUpperCase()][settingsCurrency.toUpperCase()] &&
+                          <div className={ 'balance-fiat' + (this.showClaimButton() ? ' kmd-interest' : '') }>
+                            <FiatSymbol symbol={ settingsCurrency } /> { formatValue(_balance.balance * this.props.prices[_name.toUpperCase()][settingsCurrency.toUpperCase()]) }
+                          </div>
+                        }
                       </div>
-                      { this.isInterestDefined() &&
+                      { this.showClaimButton() &&
                         <div className="interest">
                         { translate('BALANCE.INTEREST') }: { _balance ? formatValue(_balance.interest) : 0 } { _name.toUpperCase() }
                         </div>
