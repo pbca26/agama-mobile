@@ -126,6 +126,10 @@ App.accessRule('https://mainnet.infura.io');
 App.accessRule('https://ropsten.infura.io');
 // exchanges
 App.accessRule('https://coinswitch.co');
+// support
+App.accessRule('https://discordapp.com');
+App.accessRule('https://support.komodoplatform.com');
+App.accessRule('https//github.com');
 
 // Set PhoneGap/Cordova preferences.
 App.setPreference('BackgroundColor', '0xffffffff'); // 0x45485FFF

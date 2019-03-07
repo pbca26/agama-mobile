@@ -303,6 +303,12 @@ const lang = {
       AGREEMENT_P3: 'The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software',
       AGREEMENT_P4: 'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.',
     },
+    SUPPORT: {
+      SELECT_AN_OPTION: 'Select an option',
+      GH_TICKET: 'Open Github ticket',
+      DISCORD: 'Visit Agama wallet channel on Discord',
+      SUPPORT_KOMODOPLATFORM: 'Open ticket at support.komodoplatform.com',
+    },
     SPV: {
       // asset chains
       BET: 'BET',

@@ -17,6 +17,7 @@ import SettingsCoins from './Coins';
 import btcFeesSource from './btcFees';
 import Pin from '../Pin';
 import SettingsUserAgreement from './UserAgreement';
+import SettingsSupport from './Support';
 
 // TODO: reset settings/purge seed and pin
 
@@ -234,9 +235,9 @@ class Settings extends React.Component {
             { translate('APP_TITLE.ABOUT') }
           </div>
           <div
-            onClick={ () => this.toggleActiveView('support') }
             className="item item--sm">
             { translate('APP_TITLE.SUPPORT') }
+            <SettingsSupport />
           </div>
           <div
             onClick={ () => this.toggleActiveView('agreement') }
@@ -373,7 +374,7 @@ class Settings extends React.Component {
           }
           <div
             onClick={ this.save }
-            className="group3 margin-top-25">
+            className="group3 margin-top-25 margin-bottom-25">
             <div className="btn-inner">
               <div className="btn">{ translate('SETTINGS.SAVE') }</div>
               <div className="group2">
