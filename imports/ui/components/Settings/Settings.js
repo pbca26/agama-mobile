@@ -18,6 +18,7 @@ import btcFeesSource from './btcFees';
 import Pin from '../Pin';
 import SettingsUserAgreement from './UserAgreement';
 import SettingsSupport from './Support';
+import SettingsAbout from './About';
 
 // TODO: reset settings/purge seed and pin
 
@@ -85,9 +86,15 @@ class Settings extends React.Component {
         activeView: name,
       });
       this.props.changeTitle('agreement');
+    } else if (name === 'about') {
+      this.setState({
+        activeView: name,
+      });
+      this.props.changeTitle('about');
     } else if (
       this.state.activeView === 'coins' ||
-      this.state.activeView === 'agreement'
+      this.state.activeView === 'agreement' ||
+      this.state.activeView === 'about'
     ) {
       this.setState({
         activeView: null,
@@ -413,6 +420,16 @@ class Settings extends React.Component {
             src={ `${assetsPath.menu}/trends-combined-shape.png` }
             onClick={ () => this.toggleActiveView() } />
           <SettingsUserAgreement />
+        </div>
+      );
+    } else if (this.state.activeView === 'about') {
+      return (
+        <div className="settings-about">
+          <img
+            className="menu-back"
+            src={ `${assetsPath.menu}/trends-combined-shape.png` }
+            onClick={ () => this.toggleActiveView() } />
+          <SettingsAbout />
         </div>
       );
     }

@@ -309,6 +309,10 @@ const lang = {
       DISCORD: 'Visit Agama wallet channel on Discord',
       SUPPORT_KOMODOPLATFORM: 'Open ticket at support.komodoplatform.com',
     },
+    ABOUT: {
+      AGAMA_MOBILE: 'Agama wallet mobile',
+      VERSION: 'Version',
+    },
     SPV: {
       // asset chains
       BET: 'BET',
