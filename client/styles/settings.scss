@@ -105,4 +105,31 @@
       }
     }
   }
+  .about-change-log-link-block {
+    padding: 25px 0 10px 0;
+    text-align: center;
+
+    a {
+      font-size: 14px;
+      border-bottom: dashed 1px;
+    }
+  }
+}
+
+.about-change-log {
+  padding-top: 20px;
+
+  h4 {
+    margin: 10px 0;
+    padding-bottom: 7px;
+  }
+
+  ul {
+    font-size: 14px;
+
+    li {
+      padding-bottom: 10px;
+      line-height: 25px;
+    }
+  }
 }

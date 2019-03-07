@@ -312,6 +312,9 @@ const lang = {
     ABOUT: {
       AGAMA_MOBILE: 'Agama wallet mobile',
       VERSION: 'Version',
+      CHANGE_LOG: 'Change log',
+      DISPLAY_CHANGE_LOG: 'Show change log',
+      HIDE_CHANGE_LOG: 'Hide change log',
     },
     SPV: {
       // asset chains
