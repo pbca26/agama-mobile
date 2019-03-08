@@ -228,7 +228,7 @@ const lang = {
       SEND: 'Send',
       RECEIVE: 'Receive',
       ADD_COIN: 'Add coin',
-      CREATE_SEED: 'Create seed',
+      CREATE_SEED: 'Create / restore wallet',
       CON_ERROR: 'Connection error. Please try another @template@ server.',
       SWITCH_SERVER: 'Switch server',
       ERROR_TESTING_SERVER: 'Error: server @template@ is unreachable!',
@@ -298,6 +298,8 @@ const lang = {
       ABOUT: 'About',
       SUPPORT: 'Support',
       AGREEMENT: 'User agreement',
+      RESTORE_WALLET: 'Restore wallet',
+      CREATE_WALLET: 'Create wallet',
     },
     AGREEMENT: {
       AGREEMENT_P1: 'This is experimental and unfinished software. Use at your own risk! No warranty for any kind of damage!',

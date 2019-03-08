@@ -973,7 +973,7 @@ class App extends React.Component {
                       className="line"
                       src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                   </div>
-                  <div
+                  {/*<div
                     className="item"
                     disabled={ this.state.activeSection === 'create-seed' }>
                     <div
@@ -984,7 +984,7 @@ class App extends React.Component {
                     <img
                       className="line"
                       src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
-                  </div>
+                  </div>*/}
                   { getLocalStorageVar('seed') &&
                     <div
                       className="item"
@@ -1110,7 +1110,8 @@ class App extends React.Component {
               <Login
                 { ...this.state }
                 login={ this.login }
-                lock={ this.lock } />
+                lock={ this.lock }
+                changeTitle={ this.changeTitle } />
             }
             { this.state.activeSection === 'create-seed' &&
               <CreateSeed

@@ -1,6 +1,11 @@
 .form {
   &.login {
     .login-create-pin {
+      .menu-back {
+        position: fixed;
+        top: 4px;
+        z-index: 400;
+      }
       .scan-qr {
         top: 0;
       }

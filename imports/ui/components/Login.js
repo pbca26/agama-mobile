@@ -30,13 +30,18 @@ class Login extends React.Component {
       wrongPin: false,
       wrongPinRetries: 0,
       qrScanError: false,
+      activeView: null,
+      step: 0,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.updateInput = this.updateInput.bind(this);
     this.triggerKey = this.triggerKey.bind(this);
     this.login = this.login.bind(this);
     this.toggleCreatePin = this.toggleCreatePin.bind(this);
-    this.scanQR = this.scanQR.bind(this);    
+    this.restoreWalletInit = this.restoreWalletInit.bind(this);
+    this.createWalletInit = this.createWalletInit.bind(this);
+    this.scanQR = this.scanQR.bind(this);
+    this.menuBack = this.menuBack.bind(this);
   }
 
   componentWillMount() {
@@ -45,7 +50,27 @@ class Login extends React.Component {
         createPin: true,
       });
     }
-  } 
+  }
+
+  menuBack() {
+
+  }
+
+  restoreWalletInit() {
+    this.setState({
+      activeView: 'restore',
+      step: 0,
+    });
+    this.props.changeTitle('restore_wallet');
+  }
+
+  createWalletInit() {
+    this.setState({
+      activeView: 'create',
+      step: 0,
+    });
+    this.props.changeTitle('create_wallet');
+  }
 
   updateInput(e) {
     this.setState({
@@ -198,6 +223,54 @@ class Login extends React.Component {
     }
   }
 
+  renderRestoreWallet() {
+    return (
+      <div>
+        <div className="title">Please provide your seed / private key (WIF) below</div>
+        <div
+          onClick={ this.scanQR }
+          className="group3 scan-qr">
+          <div className="btn-inner">
+            <div className="btn">{ translate('SEND.SCAN_QR') }</div>
+            <div className="group2">
+              <i className="fa fa-qrcode"></i>
+            </div>
+          </div>
+        </div>
+        { this.state.qrScanError &&
+          <div className="error margin-top-15 sz350">
+            <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
+          </div>
+        }
+        <div className="group">
+          <div className="edit">
+            <input
+              type="password"
+              className="form-control"
+              name="passphrase"
+              onChange={ this.updateInput }
+              placeholder={ `${translate('LOGIN.ENTER_PASSPHRASE')} ${translate('LOGIN.OR_WIF')}` }
+              value={ this.state.passphrase || '' } />
+          </div>
+        </div>
+        <div
+          disabled={ !this.state.passphrase }
+          onClick={ () => this.login(false) }
+          className="group3">
+          <div className="btn-inner">
+            <div className="btn">Next</div>
+            <div className="group2">
+              <div className="rectangle8copy"></div>
+              <img
+                className="path6"
+                src={ `${assetsPath.login}/reset-password-path-6.png` } />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   render() {
     if ((this.props.activeSection === 'login' || (!this.props.auth && this.props.activeSection !== 'addcoin')) &&
         this.props.coins &&
@@ -243,86 +316,130 @@ class Login extends React.Component {
           }
           { !getLocalStorageVar('seed') &&
             <div className="form-inner login-create-pin">
-              <div className="title">{ translate('LOGIN.CREATE_A_PIN') }</div>
-              <div className="title fs14 text-center width-limit">{ translate('LOGIN.EMPTY_SEED') }</div>
-              <div>
-                <div
-                  onClick={ this.scanQR }
-                  className="group3 scan-qr">
-                  <div className="btn-inner">
-                    <div className="btn">{ translate('SEND.SCAN_QR') }</div>
-                    <div className="group2">
-                      <i className="fa fa-qrcode"></i>
+              { this.state.activeView &&
+                <img
+                  className="menu-back"
+                  src={ `${assetsPath.menu}/trends-combined-shape.png` }
+                  onClick={ this.menuBack } />
+              }
+              { this.state.activeView &&
+                this.state.activeView === 'restore' &&
+                this.renderRestoreWallet()
+              }
+              { !this.state.activeView &&
+                <div>
+                  <div className="title">Please choose an option below</div>
+                  <div>
+                    <div
+                      onClick={ this.restoreWalletInit }
+                      className="group3 scan-qr">
+                      <div className="btn-inner">
+                        <div className="btn">I want to restore wallet</div>
+                        <div className="group2">
+                          <div className="rectangle8copy"></div>
+                          <img
+                            className="path6"
+                            src={ `${assetsPath.login}/reset-password-path-6.png` } />
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-                { this.state.qrScanError &&
-                  <div className="error margin-top-15 sz350">
-                    <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
-                  </div>
-                }
-                <div className="group">
-                  <div className="edit">
-                    <input
-                      type="password"
-                      className="form-control"
-                      name="passphrase"
-                      onChange={ this.updateInput }
-                      placeholder={ `${translate('LOGIN.ENTER_PASSPHRASE')} ${translate('LOGIN.OR_WIF')}` }
-                      value={ this.state.passphrase || '' } />
-                  </div>
-                </div>
-                <div className="margin-bottom-35 margin-top-40 sz350">
-                  <label className="switch">
-                    <input
-                      type="checkbox"
-                      value="on"
-                      checked={ this.state.createPin }
-                      readOnly />
+                  <div>
                     <div
-                      className="slider"
-                      onClick={ this.toggleCreatePin }></div>
-                  </label>
+                      onClick={ this.createWalletInit }
+                      className="group3 scan-qr">
+                      <div className="btn-inner">
+                        <div className="btn">I want to create new wallet</div>
+                        <div className="group2">
+                          <div className="rectangle8copy"></div>
+                          <img
+                            className="path6"
+                            src={ `${assetsPath.login}/reset-password-path-6.png` } />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/*<div className="title fs14 text-center width-limit">{ translate('LOGIN.EMPTY_SEED') }</div>
+                  <div>
+                    <div
+                      onClick={ this.scanQR }
+                      className="group3 scan-qr">
+                      <div className="btn-inner">
+                        <div className="btn">{ translate('SEND.SCAN_QR') }</div>
+                        <div className="group2">
+                          <i className="fa fa-qrcode"></i>
+                        </div>
+                      </div>
+                    </div>
+                    { this.state.qrScanError &&
+                      <div className="error margin-top-15 sz350">
+                        <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
+                      </div>
+                    }
+                    <div className="group">
+                      <div className="edit">
+                        <input
+                          type="password"
+                          className="form-control"
+                          name="passphrase"
+                          onChange={ this.updateInput }
+                          placeholder={ `${translate('LOGIN.ENTER_PASSPHRASE')} ${translate('LOGIN.OR_WIF')}` }
+                          value={ this.state.passphrase || '' } />
+                      </div>
+                    </div>
+                    <div className="margin-bottom-35 margin-top-40 sz350">
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          value="on"
+                          checked={ this.state.createPin }
+                          readOnly />
+                        <div
+                          className="slider"
+                          onClick={ this.toggleCreatePin }></div>
+                      </label>
+                      <div
+                        className="toggle-label pointer"
+                        onClick={ this.toggleCreatePin }>
+                        { translate('LOGIN.OVERRIDE_PIN') }
+                      </div>
+                    </div>
+                  </div>
+                  { this.state.createPin &&
+                    <div className="group no-padding-top">
+                      <div className="edit">
+                        <input
+                          type="password"
+                          className="form-control"
+                          name="pinOverride"
+                          onChange={ this.updateInput }
+                          placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
+                          value={ this.state.pinOverride || '' } />
+                      </div>
+                    </div>
+                  }
+                  { this.state.createPin &&
+                    this.state.pinOverrideTooShort &&
+                    <div className="error margin-top-15 sz350">
+                      <i className="fa fa-warning"></i> { translate('LOGIN.PIN_TOO_SHORT') }
+                    </div>
+                  }
                   <div
-                    className="toggle-label pointer"
-                    onClick={ this.toggleCreatePin }>
-                    { translate('LOGIN.OVERRIDE_PIN') }
-                  </div>
-                </div>
-              </div>
-              { this.state.createPin &&
-                <div className="group no-padding-top">
-                  <div className="edit">
-                    <input
-                      type="password"
-                      className="form-control"
-                      name="pinOverride"
-                      onChange={ this.updateInput }
-                      placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
-                      value={ this.state.pinOverride || '' } />
-                  </div>
+                    disabled={ !this.state.passphrase }
+                    onClick={ () => this.login(false) }
+                    className="group3">
+                    <div className="btn-inner">
+                      <div className="btn">{ translate('LOGIN.SIGN_IN') }</div>
+                      <div className="group2">
+                        <div className="rectangle8copy"></div>
+                        <img
+                          className="path6"
+                          src={ `${assetsPath.login}/reset-password-path-6.png` } />
+                      </div>
+                    </div>
+                </div>*/}
                 </div>
               }
-              { this.state.createPin &&
-                this.state.pinOverrideTooShort &&
-                <div className="error margin-top-15 sz350">
-                  <i className="fa fa-warning"></i> { translate('LOGIN.PIN_TOO_SHORT') }
-                </div>
-              }
-              <div
-                disabled={ !this.state.passphrase }
-                onClick={ () => this.login(false) }
-                className="group3">
-                <div className="btn-inner">
-                  <div className="btn">{ translate('LOGIN.SIGN_IN') }</div>
-                  <div className="group2">
-                    <div className="rectangle8copy"></div>
-                    <img
-                      className="path6"
-                      src={ `${assetsPath.login}/reset-password-path-6.png` } />
-                  </div>
-                </div>
-              </div>
             </div>
           }
         </div>
