@@ -1,6 +1,16 @@
 .form {
   &.login {
     .login-create-pin {
+      .restore-seed-verify {
+        font-size: 14px;
+
+        span {
+          float: right;
+          border-bottom: dashed 1px;
+          font-size: 13px;
+          margin-right: 5px;
+        }
+      }
       .menu-back {
         position: fixed;
         top: 4px;

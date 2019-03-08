@@ -17,6 +17,9 @@ import {
   config,
 } from '../actions/dev';
 import { Meteor } from 'meteor/meteor';
+import { isPrivKey } from 'agama-wallet-lib/build/keys';
+
+// TODO: PIN replace onscreen keyboard with virtual one
 
 class Login extends React.Component {
   constructor() {
@@ -32,6 +35,10 @@ class Login extends React.Component {
       qrScanError: false,
       activeView: null,
       step: 0,
+      restoreIsPrivKey: false,
+      restorePin: null,
+      restorePinCofirm: null,
+      restorePinError: null,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.updateInput = this.updateInput.bind(this);
@@ -42,6 +49,7 @@ class Login extends React.Component {
     this.createWalletInit = this.createWalletInit.bind(this);
     this.scanQR = this.scanQR.bind(this);
     this.prevStep = this.prevStep.bind(this);
+    this.nextStep = this.nextStep.bind(this);
   }
 
   componentWillMount() {
@@ -52,11 +60,61 @@ class Login extends React.Component {
     }
   }
 
+  nextStep() {
+    if (this.state.activeView === 'restore') {
+      if (this.state.step === 0) {
+        const restoreIsPrivKey = isPrivKey(this.state.passphrase);
+        
+        this.setState({
+          restoreIsPrivKey,
+          step: this.state.step + 1,
+        });
+      } else if (this.state.step === 1) {
+        let restorePinError;
+
+        if (!this.state.restorePin ||
+            (this.state.restorePin && this.state.restorePin.length < 6)) {
+          restorePinError = 'PIN is too short';
+        } else if (
+          !this.state.restorePinConfirm ||
+          (this.state.restorePinConfirm && this.state.restorePinConfirm.length < 6)
+        ) {
+          restorePinError = 'PIN confirm is too short';
+        } else if (
+          this.state.restorePin &&
+          this.state.restorePinConfirm &&
+          this.state.restorePin !== this.state.restorePinConfirm
+        ) {
+          restorePinError = 'PIN and PIN confirmation are not matching';
+        }
+
+        if (restorePinError) {
+          this.setState({
+            restorePinError,
+          });
+        } else {
+          const _encryptedKey = encryptkey(this.state.restorePin, this.state.passphrase);
+
+          setLocalStorageVar('seed', getLocalStorageVar('settings').pinBruteforceProtection ? {
+            encryptedKey: _encryptedKey,
+            pinRetries: 0,
+          }: {
+            encryptedKey: _encryptedKey,
+          });
+
+          this.setState({
+            step: this.state.step + 1,
+          });
+        }
+      }
+    }
+  }
+
   prevStep() {
     if (this.state.step === 0) {
       this.props.changeTitle('login');
     }
-    
+
     this.setState({
       step: this.state.step <= 1 ? 0 : this.state.step - 1,
       activeView: this.state.step === 0 ? null : this.state.activeView,
@@ -154,6 +212,7 @@ class Login extends React.Component {
             setLocalStorageVar('seed', _seedStorage);
           }
           
+          this.props.changeTitle();
           this.props.login(_decryptedKey);
           this.setState(this.defaultState);
         } else {
@@ -173,7 +232,9 @@ class Login extends React.Component {
               wrongPinRetries: _seedStorage.pinRetries,
             });
           } else {
+            this.props.changeTitle();
             this.props.lock(true);
+            this.setState(this.defaultState);
           }
         }
       } else {
@@ -199,6 +260,7 @@ class Login extends React.Component {
           });
         }
       } else {
+        this.props.changeTitle();
         this.props.login(this.state.passphrase);
         this.setState(this.defaultState);
       }
@@ -232,40 +294,146 @@ class Login extends React.Component {
 
   renderRestoreWallet() {
     return (
-      <div>
-        <div className="title">Please provide your seed / private key (WIF) below</div>
-        <div
-          onClick={ this.scanQR }
-          className="group3 scan-qr">
-          <div className="btn-inner">
-            <div className="btn">{ translate('SEND.SCAN_QR') }</div>
-            <div className="group2">
-              <i className="fa fa-qrcode"></i>
+      <div className="restore-wallet">
+        { this.state.step === 0 &&
+          <div className="step1">
+            <div className="title">Please provide your seed / private key (WIF) below</div>
+            <div
+              onClick={ this.scanQR }
+              className="group3 scan-qr">
+              <div className="btn-inner">
+                <div className="btn">{ translate('SEND.SCAN_QR') }</div>
+                <div className="group2">
+                  <i className="fa fa-qrcode"></i>
+                </div>
+              </div>
+            </div>
+            { this.state.qrScanError &&
+              <div className="error margin-top-15 sz350">
+                <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
+              </div>
+            }
+            <div className="group">
+              <div className="edit">
+                <input
+                  type="password"
+                  className="form-control"
+                  name="passphrase"
+                  onChange={ this.updateInput }
+                  placeholder={ `${translate('LOGIN.ENTER_PASSPHRASE')} ${translate('LOGIN.OR_WIF')}` }
+                  value={ this.state.passphrase || '' } />
+              </div>
+            </div>
+            <div
+              disabled={ !this.state.passphrase }
+              onClick={ this.nextStep }
+              className="group3">
+              <div className="btn-inner">
+                <div className="btn">Next</div>
+                <div className="group2">
+                  <div className="rectangle8copy"></div>
+                  <img
+                    className="path6"
+                    src={ `${assetsPath.login}/reset-password-path-6.png` } />
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        { this.state.qrScanError &&
-          <div className="error margin-top-15 sz350">
-            <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
+        }
+        { this.state.step === 1 &&
+          <div className="step2">
+            <div className="title">Please provide PIN and PIN confirmation below</div>
+            <div className="group">
+              <div className="edit restore-seed-verify">
+                { this.state.isPrivKey ? 'You provided a private key' : 'You provided a seed' }
+                <span onClick={ this.prevStep }>Wrong?</span>
+              </div>
+            </div>
+            <div className="group">
+              <div className="edit">
+                <input
+                  type="password"
+                  className="form-control"
+                  name="restorePin"
+                  onChange={ this.updateInput }
+                  placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
+                  value={ this.state.restorePin || '' } />
+              </div>
+            </div>
+            <div className="group">
+              <div className="edit">
+                <input
+                  type="password"
+                  className="form-control"
+                  name="restorePinConfirm"
+                  onChange={ this.updateInput }
+                  placeholder="Confirm PIN"
+                  value={ this.state.restorePinConfirm || '' } />
+              </div>
+            </div>
+            { this.state.restorePinError &&
+              <div className="error margin-top-15 sz350">
+                <i className="fa fa-warning"></i> { this.state.restorePinError }
+              </div>
+            }
+            <div
+              disabled={
+                !this.state.restorePin ||
+                !this.state.restorePinConfirm
+              }
+              onClick={ this.nextStep }
+              className="group3">
+              <div className="btn-inner">
+                <div className="btn">Next</div>
+                <div className="group2">
+                  <div className="rectangle8copy"></div>
+                  <img
+                    className="path6"
+                    src={ `${assetsPath.login}/reset-password-path-6.png` } />
+                </div>
+              </div>
+            </div>
           </div>
+        }
+        { this.state.step === 2 &&
+          <div className="step3">
+            { this.renderLoginInForm() }
+          </div>
+        }
+      </div>
+    );
+  }
+
+  renderLoginInForm() {
+    return (
+      <div className="form-inner">
+        { !this.state.activeView &&
+          <div className="title">{ translate('LOGIN.SIGN_IN_TO_YOUR_ACC') }</div>
+        }
+        { this.state.activeView &&
+          <div className="title">You are all set!<br />Try to login now.</div>
         }
         <div className="group">
           <div className="edit">
             <input
               type="password"
               className="form-control"
-              name="passphrase"
+              name="pin"
               onChange={ this.updateInput }
-              placeholder={ `${translate('LOGIN.ENTER_PASSPHRASE')} ${translate('LOGIN.OR_WIF')}` }
-              value={ this.state.passphrase || '' } />
+              placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
+              value={ this.state.pin || '' } />
           </div>
+          { this.state.wrongPin &&
+            <div className="error margin-top-10 margin-bottom-25 sz350">
+              <i className="fa fa-warning"></i> { this.state.wrongPinRetries === 0 ? translate('LOGIN.WRONG_PIN') : translate('LOGIN.WRONG_PIN_ATTEMPTS', 3 - this.state.wrongPinRetries) }
+            </div>
+          }
         </div>
         <div
-          disabled={ !this.state.passphrase }
-          onClick={ () => this.login(false) }
+          onClick={ () => this.login(true) }
           className="group3">
           <div className="btn-inner">
-            <div className="btn">Next</div>
+            <div className="btn">{ translate('LOGIN.SIGN_IN') }</div>
             <div className="group2">
               <div className="rectangle8copy"></div>
               <img
@@ -288,40 +456,10 @@ class Login extends React.Component {
       return (
         <div className="form login">
           { getLocalStorageVar('seed') &&
-            <div className="form-inner">
-              <div className="title">{ translate('LOGIN.SIGN_IN_TO_YOUR_ACC') }</div>
-              <div className="group">
-                <div className="edit">
-                  <input
-                    type="password"
-                    className="form-control"
-                    name="pin"
-                    onChange={ this.updateInput }
-                    placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
-                    value={ this.state.pin || '' } />
-                </div>
-                { this.state.wrongPin &&
-                  <div className="error margin-top-10 margin-bottom-25 sz350">
-                    <i className="fa fa-warning"></i> { this.state.wrongPinRetries === 0 ? translate('LOGIN.WRONG_PIN') : translate('LOGIN.WRONG_PIN_ATTEMPTS', 3 - this.state.wrongPinRetries) }
-                  </div>
-                }
-              </div>
-              <div
-                onClick={ () => this.login(true) }
-                className="group3">
-                <div className="btn-inner">
-                  <div className="btn">{ translate('LOGIN.SIGN_IN') }</div>
-                  <div className="group2">
-                    <div className="rectangle8copy"></div>
-                    <img
-                      className="path6"
-                      src={ `${assetsPath.login}/reset-password-path-6.png` } />
-                  </div>
-                </div>
-              </div>
-            </div>
+            !this.state.activeView &&
+            this.renderLoginInForm()
           }
-          { !getLocalStorageVar('seed') &&
+          { (!getLocalStorageVar('seed') || this.state.activeView) &&
             <div className="form-inner login-create-pin">
               { this.state.activeView &&
                 <img
