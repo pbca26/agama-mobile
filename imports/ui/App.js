@@ -152,7 +152,7 @@ class App extends React.Component {
           setLocalStorageVar('coins', _localStorageCoins);
         }       
       }
-      
+
       this.setState({
         coins: _localStorageCoins,
       });
@@ -485,7 +485,7 @@ class App extends React.Component {
         } else if (getLocalStorageVar('settings').mainView !== 'default' &&
           this.state.activeSection === 'overview'
         ) {
-          actions.getOverview(this.state.coins)
+          this.props.actions.getOverview(this.state.coins)
           .then((res) => {
             this.setState({
               overview: res,
@@ -632,19 +632,48 @@ class App extends React.Component {
   login(passphrase) {
     const { actions } = this.props;
     let overviewCoinsInit = [];
+    
+    if (getLocalStorageVar('seed') &&
+        getLocalStorageVar('settings').mainView !== 'default' &&
+        getLocalStorageVar('overview') &&
+        getLocalStorageVar('overview').length > 0) {
+      const overviewCache = getLocalStorageVar('overview');
+      let overviewCacheCoinsFlat = [];
+      
+      for (let i = 0; i < overviewCache.length; i++) {
+        overviewCacheCoinsFlat.push(overviewCache[i].coin);
+      }
 
-    for (let key in this.state.coins) {
-      overviewCoinsInit.push({
-        balanceFiat: 'loading',
-        balanceNative: 'loading',
-        coin: key,
-        fiatPricePerItem: 'loading',
+      for (let key in this.state.coins) {
+        if (overviewCacheCoinsFlat.indexOf(key) > -1) {
+          overviewCoinsInit.push(overviewCache[overviewCacheCoinsFlat.indexOf(key)]);
+        } else {
+          overviewCoinsInit.push({
+            balanceFiat: 'loading',
+            balanceNative: 'loading',
+            coin: key,
+            fiatPricePerItem: 'loading',
+          });
+        }
+      }
+
+      this.setState({
+        overview: overviewCoinsInit,
+      });
+    } else {
+      for (let key in this.state.coins) {
+        overviewCoinsInit.push({
+          balanceFiat: 'loading',
+          balanceNative: 'loading',
+          coin: key,
+          fiatPricePerItem: 'loading',
+        });
+      }
+
+      this.setState({
+        overview: overviewCoinsInit,
       });
     }
-
-    this.setState({
-      overview: overviewCoinsInit,
-    });
 
     const _login = () => {
       actions.auth(passphrase, this.state.coins)

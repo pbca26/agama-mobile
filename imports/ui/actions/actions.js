@@ -3,6 +3,7 @@ import { Promise } from 'meteor/promise';
 import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
 import {
   getLocalStorageVar,
+  setLocalStorageVar,
   sortObject,
 } from './utils';
 import {
@@ -742,6 +743,11 @@ const getOverview = (coins) => {
             }
   
             resolve(_overviewItems);
+
+            if (getLocalStorageVar('seed') &&
+                getLocalStorageVar('settings').mainView !== 'default') {
+              setLocalStorageVar('overview', _overviewItems);
+            }
           }
         });
       });
