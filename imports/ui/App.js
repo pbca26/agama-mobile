@@ -436,7 +436,7 @@ class App extends React.Component {
     this.scrollToTop();
   }
 
-  switchCoin(coin, skipRefresh) {
+  switchCoin(coin, skipRefresh, mainView) {
     const _name = coin.split('|')[0];
     const _mode = coin.split('|')[1];
 
@@ -444,7 +444,7 @@ class App extends React.Component {
       coin: coin,
       address: this.state.pubKeys[_mode][_name],
       history: this.state.activeSection,
-      activeSection: skipRefresh ? this.state.activeSection : 'dashboard',
+      activeSection: skipRefresh && !mainView ? this.state.activeSection : 'dashboard',
       transactions: this.state.coins[coin] ? this.state.coins[coin].transactions: null,
       balance: this.state.coins[coin] ? this.state.coins[coin].balance: null,
     });
@@ -459,6 +459,10 @@ class App extends React.Component {
     } else {
       Meteor.setTimeout(() => {
         this.dashboardRefresh();
+
+        if (mainView) {
+          this.scrollToTop();
+        }
       }, 10);
     }
   }
@@ -478,8 +482,7 @@ class App extends React.Component {
       const _updateInterval = Meteor.setInterval(() => {
         if (this.state.activeSection === 'dashboard') {
           this.dashboardRefresh();
-        } else if (
-          getLocalStorageVar('settings').mainView !== 'default' &&
+        } else if (getLocalStorageVar('settings').mainView !== 'default' &&
           this.state.activeSection === 'overview'
         ) {
           actions.getOverview(this.state.coins)

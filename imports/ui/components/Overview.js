@@ -106,10 +106,12 @@ class Overview extends React.Component {
           _priceChangeColor = 'red';
         }
 
+        const settingsMainView = getLocalStorageVar('settings').mainView;
         _items.push(
           <div
             key={ `overview-coins-${_overview[i].coin}` }
-            className="overview-coin">
+            className="overview-coin"
+            onClick={ settingsMainView !== 'default' ? () => this.props.switchCoin(_overview[i].coin, true, true) : null }>
             <img
               className="div1"
               src={ `${assetsPath.home}/trends-rectangle-7.png` } />
