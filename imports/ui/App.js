@@ -371,7 +371,7 @@ class App extends React.Component {
 
         this.setState({
           coins,
-          history: null,
+          history: getLocalStorageVar('settings').mainView !== 'default' && !skipRefresh ? 'overview' : null,
           activeSection: skipRefresh ? this.state.activeSection : 'dashboard',
           coin,
           address: res,
@@ -383,6 +383,13 @@ class App extends React.Component {
 
         if (!skipRefresh) this.scrollToTop();
         this.dashboardRefresh();
+
+        actions.getOverview(coins)
+        .then((res) => {
+          this.setState({
+            overview: res,
+          });
+        });
       });
     }
   }
@@ -926,9 +933,11 @@ class App extends React.Component {
                         onClick={ () => this.toggleMenuOption('addcoin') }>
                         { translate('DASHBOARD.ADD_COIN') }
                       </div>
-                      <img
-                        className="line"
-                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                      { getLocalStorageVar('settings').mainView === 'default' &&
+                        <img
+                          className="line"
+                          src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                      }
                     </div>
                   }
                   <div>
