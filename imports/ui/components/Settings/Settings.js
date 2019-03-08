@@ -37,6 +37,7 @@ class Settings extends React.Component {
       debug: false,
       btcFeesSource: btcFeesSource[0].name,
       pinBruteforceProtection: false,
+      mainView: 'default',
       activeView: null,
       removeCoins: null,
     };
@@ -61,6 +62,7 @@ class Settings extends React.Component {
         debug: _settings.debug,
         btcFeesSource: _settings.btcFeesSource,
         pinBruteforceProtection: _settings.pinBruteforceProtection,
+        mainView: _settings.mainView,
         purgeData: false,
         removeCoins: null,
       });
@@ -167,6 +169,7 @@ class Settings extends React.Component {
         debug: this.state.debug,
         btcFeesSource: this.state.btcFeesSource,
         pinBruteforceProtection: this.state.pinBruteforceProtection,
+        mainView: this.state.mainView,
       });
 
       if (this.state.removeCoins) {
@@ -284,6 +287,18 @@ class Settings extends React.Component {
               onChange={ (event) => this.updateInput(event) }
               autoFocus>
               { this.renderBTCFeesOptions() }
+            </select>
+          </div>
+          <div className="margin-top-10 item">
+            <div className="padding-bottom-20">{ translate('SETTINGS.MAIN_VIEW') }</div>
+            <select
+              className="form-control form-material"
+              name="mainView"
+              value={ this.state.mainView }
+              onChange={ (event) => this.updateInput(event) }
+              autoFocus>
+              <option value="default">{ translate('SETTINGS.DEFAULT') }</option>
+              <option value="overview">{ translate('APP_TITLE.OVERVIEW') }</option>
             </select>
           </div>
           <div className="item item--sm">

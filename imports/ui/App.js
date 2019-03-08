@@ -478,6 +478,16 @@ class App extends React.Component {
       const _updateInterval = Meteor.setInterval(() => {
         if (this.state.activeSection === 'dashboard') {
           this.dashboardRefresh();
+        } else if (
+          getLocalStorageVar('settings').mainView !== 'default' &&
+          this.state.activeSection === 'overview'
+        ) {
+          actions.getOverview(this.state.coins)
+          .then((res) => {
+            this.setState({
+              overview: res,
+            });
+          });
         }
       }, DASHBOARD_UPDATE_INTERVAL);
 
@@ -667,15 +677,16 @@ class App extends React.Component {
           address = res.spv[coin.split('|')[0]] || res.eth[coin.split('|')[0]];
         }
   
+        const settingsMainView = getLocalStorageVar('settings').mainView;
         this.setState({
           auth: true,
           pubKeys: res,
           coin,
           address,
           history: null,
-          activeSection: 'dashboard',
+          activeSection: settingsMainView === 'default' ? 'dashboard' : 'overview',
         });
-  
+
         this.dashboardRefresh();
         this.toggleAutoRefresh();
         this.globalClick();
@@ -808,24 +819,26 @@ class App extends React.Component {
                     <div
                       className="title"
                       onClick={ this.toggleOverview }>
-                      { translate('APP_TITLE.OVERVIEW') }
+                      { translate('APP_TITLE.' + (getLocalStorageVar('settings').mainView !== 'default' ? 'DASHBOARD' : 'OVERVIEW')) }
                     </div>
                     <img
                       className="line"
                       src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                   </div>
-                  <div
-                    className="item"
-                    disabled={ this.state.activeSection === 'dashboard' }>
+                  { getLocalStorageVar('settings').mainView === 'default' &&
                     <div
-                      className="title"
-                      onClick={ () => this.changeActiveSection('dashboard', true) }>
-                      { translate('DASHBOARD.DASHBOARD') }
+                      className="item"
+                      disabled={ this.state.activeSection === 'dashboard' }>
+                      <div
+                        className="title"
+                        onClick={ () => this.changeActiveSection('dashboard', true) }>
+                        { translate('DASHBOARD.DASHBOARD') }
+                      </div>
+                      <img
+                        className="line"
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                     </div>
-                    <img
-                      className="line"
-                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
-                  </div>
+                  }
                   { getLocalStorageVar('seed') &&
                     <div
                       className="item"
@@ -887,7 +900,9 @@ class App extends React.Component {
                     </div>
                   }
                   <div>
-                  { this.renderActiveCoins() }
+                  { getLocalStorageVar('settings').mainView === 'default' &&
+                    this.renderActiveCoins()
+                  }
                   </div>
                 </div>
               }
@@ -999,7 +1014,7 @@ class App extends React.Component {
               src={ `${assetsPath.home}/home-combined-shape.png` } />
           }
           <div className="ui-title">
-            { translate('APP_TITLE.' + (this.state.displayMenu ? 'MENU' : this.state.title && this.state.title.toUpperCase() || this.state.activeSection.toUpperCase())) }
+            { translate('APP_TITLE.' + (this.state.displayMenu ? 'MENU' : this.state.title && this.state.title.toUpperCase() || (getLocalStorageVar('settings').mainView === 'default' ? this.state.activeSection.toUpperCase() : this.state.activeSection === 'overview' ? 'DASHBOARD' : this.state.activeSection.toUpperCase()))) }
           </div>
         </div>
         { this.state.displayMenu &&
@@ -1113,7 +1128,9 @@ class App extends React.Component {
             }
             { this.state.auth &&
               this.state.activeSection === 'overview' &&
-              <Overview { ...this.state } />
+              <Overview
+                { ...this.state }
+                switchCoin={ this.switchCoin } />
             }
             { this.state.activeSection === 'settings' &&
               <Settings

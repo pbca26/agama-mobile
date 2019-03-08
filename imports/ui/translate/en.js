@@ -92,6 +92,8 @@ const lang = {
       PURGE_SEED_AFTER_3_PIN_ATTEMPTS: 'Purge seed after 3 failed PIN attempts',
       CHANGE_PIN: 'Change PIN',
       COINS_SAVED: 'Coins selection saved',
+      MAIN_VIEW: 'Main view',
+      DEFAULT: 'Transactions history',
     },
     RECOVERY: {
       PROVIDE_YOUR_PIN: 'Provide your PIN number to unlock seed/WIF.',
