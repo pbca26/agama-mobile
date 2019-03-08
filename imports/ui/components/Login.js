@@ -41,7 +41,7 @@ class Login extends React.Component {
     this.restoreWalletInit = this.restoreWalletInit.bind(this);
     this.createWalletInit = this.createWalletInit.bind(this);
     this.scanQR = this.scanQR.bind(this);
-    this.menuBack = this.menuBack.bind(this);
+    this.prevStep = this.prevStep.bind(this);
   }
 
   componentWillMount() {
@@ -52,8 +52,15 @@ class Login extends React.Component {
     }
   }
 
-  menuBack() {
-
+  prevStep() {
+    if (this.state.step === 0) {
+      this.props.changeTitle('login');
+    }
+    
+    this.setState({
+      step: this.state.step <= 1 ? 0 : this.state.step - 1,
+      activeView: this.state.step === 0 ? null : this.state.activeView,
+    });
   }
 
   restoreWalletInit() {
@@ -320,7 +327,7 @@ class Login extends React.Component {
                 <img
                   className="menu-back"
                   src={ `${assetsPath.menu}/trends-combined-shape.png` }
-                  onClick={ this.menuBack } />
+                  onClick={ this.prevStep } />
               }
               { this.state.activeView &&
                 this.state.activeView === 'restore' &&
