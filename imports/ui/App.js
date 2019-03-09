@@ -28,7 +28,6 @@ import AddCoin from './components/AddCoin';
 import Login from './components/Login';
 import Transactions from './components/Transactions/Transactions';
 import ServerSelect from './components/ServerSelect';
-import CreateSeed from './components/CreateSeed';
 import KMDInterest from './components/KMDInterest';
 import OfflineSigning from './components/OfflineSigning';
 import Pin from './components/Pin';
@@ -949,7 +948,7 @@ class App extends React.Component {
               }
               { !this.state.auth &&
                 <div className="items">
-                  { (this.state.activeSection === 'addcoin' || this.state.activeSection === 'create-seed') &&
+                  { this.state.activeSection === 'addcoin' &&
                     <div className="item">
                       <div
                         className="title"
@@ -973,18 +972,6 @@ class App extends React.Component {
                       className="line"
                       src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                   </div>
-                  {/*<div
-                    className="item"
-                    disabled={ this.state.activeSection === 'create-seed' }>
-                    <div
-                      className="title"
-                      onClick={ () => this.toggleMenuOption('create-seed') }>
-                      { translate('DASHBOARD.CREATE_SEED') }
-                    </div>
-                    <img
-                      className="line"
-                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
-                  </div>*/}
                   { getLocalStorageVar('seed') &&
                     <div
                       className="item"
@@ -1040,7 +1027,7 @@ class App extends React.Component {
         <div className="app-header">
           { this.state.history &&
             !this.state.displayMenu &&
-            ((this.state.auth && this.state.history !== 'login' && this.state.history !== 'create-seed') || !this.state.auth) &&
+            ((this.state.auth && this.state.history !== 'login') || !this.state.auth) &&
             this.state.history !== this.state.activeSection &&
             (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
             <img
@@ -1112,12 +1099,6 @@ class App extends React.Component {
                 login={ this.login }
                 lock={ this.lock }
                 changeTitle={ this.changeTitle } />
-            }
-            { this.state.activeSection === 'create-seed' &&
-              <CreateSeed
-                { ...this.state }
-                login={ this.login }
-                changeActiveSection={ this.changeActiveSection } />
             }
             { !this.state.conError &&
               <SendCoin
