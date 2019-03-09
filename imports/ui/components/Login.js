@@ -45,27 +45,39 @@ class Login extends React.Component {
       restorePinError: null,
       createSeed: null,
       createSeedShuffled: null,
+      createSeedConfirm: [],
       createSeedDisplayQR: false,
+      createPin: null,
+      createPinCofirm: null,
+      createPinError: null,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.updateInput = this.updateInput.bind(this);
-    this.triggerKey = this.triggerKey.bind(this);
     this.login = this.login.bind(this);
-    this.toggleCreatePin = this.toggleCreatePin.bind(this);
     this.restoreWalletInit = this.restoreWalletInit.bind(this);
     this.createWalletInit = this.createWalletInit.bind(this);
     this.scanQR = this.scanQR.bind(this);
     this.prevStep = this.prevStep.bind(this);
     this.nextStep = this.nextStep.bind(this);
     this.toggleCreateQR = this.toggleCreateQR.bind(this);
+    this.clearCreateSeedConfirm = this.clearCreateSeedConfirm.bind(this);
+    this.createSeedConfirmPush = this.createSeedConfirmPush.bind(this);
   }
 
-  componentWillMount() {
-    if (getLocalStorageVar('seed')) {
-      this.setState({
-        createPin: true,
-      });
-    }
+  clearCreateSeedConfirm() {
+    this.setState({
+      createSeedConfirm: [],
+    });
+  }
+
+  createSeedConfirmPush(word) {
+    let createSeedConfirm = JSON.parse(JSON.stringify(this.state.createSeedConfirm));
+
+    createSeedConfirm.push(word);    
+
+    this.setState({
+      createSeedConfirm,
+    });
   }
 
   nextStep() {
@@ -115,6 +127,49 @@ class Login extends React.Component {
           });
         }
       }
+    } else {
+      if (this.state.step === 2) {
+        let createPinError;
+        
+        if (!this.state.createPin ||
+            (this.state.createPin && this.state.createPin.length < 6)) {
+          createPinError = 'PIN is too short';
+        } else if (
+          !this.state.createPinConfirm ||
+          (this.state.createPinConfirm && this.state.createPinConfirm.length < 6)
+        ) {
+          createPinError = 'PIN confirm is too short';
+        } else if (
+          this.state.createPin &&
+          this.state.createPinConfirm &&
+          this.state.createPin !== this.state.createPinConfirm
+        ) {
+          createPinError = 'PIN and PIN confirmation are not matching';
+        }
+
+        if (createPinError) {
+          this.setState({
+            createPinError,
+          });
+        } else {
+          const _encryptedKey = encryptkey(this.state.createPin, this.state.createSeed);
+
+          setLocalStorageVar('seed', getLocalStorageVar('settings').pinBruteforceProtection ? {
+            encryptedKey: _encryptedKey,
+            pinRetries: 0,
+          }: {
+            encryptedKey: _encryptedKey,
+          });
+
+          this.setState({
+            step: this.state.step + 1,
+          });
+        }
+      } else {
+        this.setState({
+          step: this.state.step + 1,
+        });
+      }
     }
   }
 
@@ -125,6 +180,8 @@ class Login extends React.Component {
 
     if (this.state.activeView === 'create' &&
         this.state.step === 1) {
+      const newSeed = passphraseGenerator.generatePassPhrase(256);
+      
       this.setState({
         step: this.state.step <= 1 ? 0 : this.state.step - 1,
         activeView: this.state.step === 0 ? null : this.state.activeView,
@@ -135,6 +192,11 @@ class Login extends React.Component {
       this.setState({
         step: this.state.step <= 1 ? 0 : this.state.step - 1,
         activeView: this.state.step === 0 ? null : this.state.activeView,
+        createPinConfirm: [],
+        createPin: null,
+        createPinCofirm: null,
+        restorePin: null,
+        restorePinCofirm: null,
       });
     }
   }
@@ -143,6 +205,17 @@ class Login extends React.Component {
     this.setState({
       activeView: 'restore',
       step: 0,
+      restoreIsPrivKey: false,
+      restorePin: null,
+      restorePinCofirm: null,
+      restorePinError: null,
+      createSeed: null,
+      createSeedShuffled: null,
+      createSeedConfirm: [],
+      createSeedDisplayQR: false,
+      createPin: null,
+      createPinCofirm: null,
+      createPinError: null,
     });
     this.props.changeTitle('restore_wallet');
   }
@@ -153,14 +226,18 @@ class Login extends React.Component {
     this.setState({
       activeView: 'create',
       step: 0,
+      restoreIsPrivKey: false,
+      restorePin: null,
+      restorePinCofirm: null,
+      restorePinError: null,
       createSeed: newSeed,
       createSeedShuffled: shuffleArray(newSeed.split(' ')),
+      createSeedConfirm: [],
+      createSeedDisplayQR: false,
+      createPin: null,
+      createPinCofirm: null,
+      createPinError: null,
     });
-
-    setTimeout(() => {
-      console.warn(this.state);
-    }, 1000);
-    this.props.changeTitle('create_wallet');
   }
 
   updateInput(e) {
@@ -293,35 +370,30 @@ class Login extends React.Component {
     }
   }
 
-  toggleCreatePin() {
-    this.setState({
-      createPin: !this.state.createPin,
-    });
-  }
-
   toggleCreateQR() {
     this.setState({
       createSeedDisplayQR: !this.state.createSeedDisplayQR,
     });
   }
 
-  triggerKey(key) {
-    if (key === 'back') {
-      this.setState({
-        pin: this.state.pin.slice(0, -1),
-        wrongPin: false,
-      });
-    } else if (key === 'remove') {
-      this.setState({
-        pin: '',
-        wrongPin: false,
-      });
-    } else {
-      this.setState({
-        pin: this.state.pin + key,
-        wrongPin: false,
-      });
+  renderCreateSeedWordsConfirm() {
+    const words = this.state.createSeedShuffled;
+    let items = [];
+
+    for (let i = 0; i < words.length; i++) {
+      if (this.state.createSeedConfirm.indexOf(words[i]) === -1) {
+        items.push(
+          <span
+            key={ `seed-confirm-word-${i}` }
+            className="seed-confirm-word"
+            onClick={ () => this.createSeedConfirmPush(words[i]) }>
+            { words[i] }
+          </span>
+        );
+      }
     }
+
+    return items;
   }
 
   renderCreateWallet() {
@@ -359,45 +431,22 @@ class Login extends React.Component {
         }
         { this.state.step === 1 &&
           <div className="step2">
-            <div className="title">Please provide PIN and PIN confirmation below</div>
-            <div className="group">
-              <div className="edit restore-seed-verify">
-                { this.state.isPrivKey ? 'You provided a private key' : 'You provided a seed' }
-                <span onClick={ this.prevStep }>Wrong?</span>
+            <div className="title">To confirm that you recorded your seed please place the words in their exact order below.</div>
+            { this.state.createSeedConfirm.length < this.state.createSeedShuffled.length &&
+              <div className="seed-words-block">
+                { this.renderCreateSeedWordsConfirm() }
               </div>
-            </div>
-            <div className="group">
-              <div className="edit">
-                <input
-                  type="password"
-                  className="form-control"
-                  name="restorePin"
-                  onChange={ this.updateInput }
-                  placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
-                  value={ this.state.restorePin || '' } />
-              </div>
-            </div>
-            <div className="group">
-              <div className="edit">
-                <input
-                  type="password"
-                  className="form-control"
-                  name="restorePinConfirm"
-                  onChange={ this.updateInput }
-                  placeholder="Confirm PIN"
-                  value={ this.state.restorePinConfirm || '' } />
-              </div>
-            </div>
-            { this.state.restorePinError &&
-              <div className="error margin-top-15 sz350">
-                <i className="fa fa-warning"></i> { this.state.restorePinError }
+            }
+            { this.state.createSeedConfirm &&
+              this.state.createSeedConfirm.length > 0 &&
+              <div className="margin-top-10">
+                <i
+                  onClick={ this.clearCreateSeedConfirm }
+                  className="fa fa-trash"></i>
+                <div className="seed-gen-box">{ this.state.createSeedConfirm.join(' ') }</div>
               </div>
             }
             <div
-              disabled={
-                !this.state.restorePin ||
-                !this.state.restorePinConfirm
-              }
               onClick={ this.nextStep }
               className="group3">
               <div className="btn-inner">
@@ -414,6 +463,55 @@ class Login extends React.Component {
         }
         { this.state.step === 2 &&
           <div className="step3">
+            <div className="title">Please provide PIN and PIN confirmation below</div>
+            <div className="group">
+              <div className="edit">
+                <input
+                  type="password"
+                  className="form-control"
+                  name="createPin"
+                  onChange={ this.updateInput }
+                  placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
+                  value={ this.state.createPin || '' } />
+              </div>
+            </div>
+            <div className="group">
+              <div className="edit">
+                <input
+                  type="password"
+                  className="form-control"
+                  name="createPinConfirm"
+                  onChange={ this.updateInput }
+                  placeholder="Confirm PIN"
+                  value={ this.state.createPinConfirm || '' } />
+              </div>
+            </div>
+            { this.state.createPinError &&
+              <div className="error margin-top-15 sz350">
+                <i className="fa fa-warning"></i> { this.state.createPinError }
+              </div>
+            }
+            <div
+              disabled={
+                !this.state.createPin ||
+                !this.state.createPinConfirm
+              }
+              onClick={ this.nextStep }
+              className="group3">
+              <div className="btn-inner">
+                <div className="btn">Next</div>
+                <div className="group2">
+                  <div className="rectangle8copy"></div>
+                  <img
+                    className="path6"
+                    src={ `${assetsPath.login}/reset-password-path-6.png` } />
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+        { this.state.step === 3 &&
+          <div className="step4">
             { this.renderLoginInForm() }
           </div>
         }
@@ -591,6 +689,7 @@ class Login extends React.Component {
           { (!getLocalStorageVar('seed') || this.state.activeView) &&
             <div className="form-inner login-create-pin">
               { this.state.activeView &&
+                this.state.step < 2 &&
                 <img
                   className="menu-back"
                   src={ `${assetsPath.menu}/trends-combined-shape.png` }
@@ -637,85 +736,6 @@ class Login extends React.Component {
                       </div>
                     </div>
                   </div>
-                  {/*<div className="title fs14 text-center width-limit">{ translate('LOGIN.EMPTY_SEED') }</div>
-                  <div>
-                    <div
-                      onClick={ this.scanQR }
-                      className="group3 scan-qr">
-                      <div className="btn-inner">
-                        <div className="btn">{ translate('SEND.SCAN_QR') }</div>
-                        <div className="group2">
-                          <i className="fa fa-qrcode"></i>
-                        </div>
-                      </div>
-                    </div>
-                    { this.state.qrScanError &&
-                      <div className="error margin-top-15 sz350">
-                        <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
-                      </div>
-                    }
-                    <div className="group">
-                      <div className="edit">
-                        <input
-                          type="password"
-                          className="form-control"
-                          name="passphrase"
-                          onChange={ this.updateInput }
-                          placeholder={ `${translate('LOGIN.ENTER_PASSPHRASE')} ${translate('LOGIN.OR_WIF')}` }
-                          value={ this.state.passphrase || '' } />
-                      </div>
-                    </div>
-                    <div className="margin-bottom-35 margin-top-40 sz350">
-                      <label className="switch">
-                        <input
-                          type="checkbox"
-                          value="on"
-                          checked={ this.state.createPin }
-                          readOnly />
-                        <div
-                          className="slider"
-                          onClick={ this.toggleCreatePin }></div>
-                      </label>
-                      <div
-                        className="toggle-label pointer"
-                        onClick={ this.toggleCreatePin }>
-                        { translate('LOGIN.OVERRIDE_PIN') }
-                      </div>
-                    </div>
-                  </div>
-                  { this.state.createPin &&
-                    <div className="group no-padding-top">
-                      <div className="edit">
-                        <input
-                          type="password"
-                          className="form-control"
-                          name="pinOverride"
-                          onChange={ this.updateInput }
-                          placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
-                          value={ this.state.pinOverride || '' } />
-                      </div>
-                    </div>
-                  }
-                  { this.state.createPin &&
-                    this.state.pinOverrideTooShort &&
-                    <div className="error margin-top-15 sz350">
-                      <i className="fa fa-warning"></i> { translate('LOGIN.PIN_TOO_SHORT') }
-                    </div>
-                  }
-                  <div
-                    disabled={ !this.state.passphrase }
-                    onClick={ () => this.login(false) }
-                    className="group3">
-                    <div className="btn-inner">
-                      <div className="btn">{ translate('LOGIN.SIGN_IN') }</div>
-                      <div className="group2">
-                        <div className="rectangle8copy"></div>
-                        <img
-                          className="path6"
-                          src={ `${assetsPath.login}/reset-password-path-6.png` } />
-                      </div>
-                    </div>
-                </div>*/}
                 </div>
               }
             </div>

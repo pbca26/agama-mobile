@@ -5,10 +5,30 @@
         .fa-qrcode {
           position: absolute;
           font-size: 24px;
-          margin-top: 19px;
+          margin-top: 25px;
           margin-left: 0;
           background: #373A4C;
-          padding: 8px;
+          padding: 8px 12px;
+        }
+        .fa-trash {
+          position: absolute;
+          font-size: 24px;
+          margin-top: -36px;
+          margin-left: 0;
+          background: #373A4C;
+          padding: 8px 12px;
+        }
+        .seed-words-block {
+          margin-top: 20px;
+          padding: 10px;
+          line-height: 25px;
+
+          span {
+            background: #373A4C;
+            padding: 5px 12px;
+            margin: 10px 8px;
+            display: inline-block;
+          }
         }
       }
       .create-wallet-security-tip {
@@ -17,12 +37,11 @@
         font-size: 14px;
       }
       .seed-gen-box {
-        margin-top: 20px;
         background-color: #373A4C;
         height: auto;
         width: auto;
         margin: 0;
-        margin-top: 40px;
+        margin-top: 55px;
         font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
         font-size: 16px;
         color: #fff;
