@@ -1,6 +1,35 @@
 .form {
   &.login {
     .login-create-pin {
+      .create-wallet {
+        .fa-qrcode {
+          position: absolute;
+          font-size: 24px;
+          margin-top: 19px;
+          margin-left: 0;
+          background: #373A4C;
+          padding: 8px;
+        }
+      }
+      .create-wallet-security-tip {
+        margin-top: 30px;
+        text-align: center;
+        font-size: 14px;
+      }
+      .seed-gen-box {
+        margin-top: 20px;
+        background-color: #373A4C;
+        height: auto;
+        width: auto;
+        margin: 0;
+        margin-top: 40px;
+        font-family: 'AppleSystemUIFont', Helvetica, Arial, serif;
+        font-size: 16px;
+        color: #fff;
+        text-align: justify;
+        line-height: 26px;
+        padding: 20px 20px;
+      }
       .restore-seed-verify {
         font-size: 14px;
 

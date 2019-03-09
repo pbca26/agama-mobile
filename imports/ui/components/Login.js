@@ -1,5 +1,7 @@
 import React from 'react';
 import jsQR from 'jsqr';
+import QRCode from 'qrcode.react';
+
 import {
   maskPubAddress,
   setLocalStorageVar,
@@ -18,6 +20,8 @@ import {
 } from '../actions/dev';
 import { Meteor } from 'meteor/meteor';
 import { isPrivKey } from 'agama-wallet-lib/build/keys';
+import passphraseGenerator from 'agama-wallet-lib/build/crypto/passphrasegenerator';
+import { shuffleArray } from '../actions/utils';
 
 // TODO: PIN replace onscreen keyboard with virtual one
 
@@ -39,6 +43,9 @@ class Login extends React.Component {
       restorePin: null,
       restorePinCofirm: null,
       restorePinError: null,
+      createSeed: null,
+      createSeedShuffled: null,
+      createSeedDisplayQR: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.updateInput = this.updateInput.bind(this);
@@ -50,6 +57,7 @@ class Login extends React.Component {
     this.scanQR = this.scanQR.bind(this);
     this.prevStep = this.prevStep.bind(this);
     this.nextStep = this.nextStep.bind(this);
+    this.toggleCreateQR = this.toggleCreateQR.bind(this);
   }
 
   componentWillMount() {
@@ -115,10 +123,20 @@ class Login extends React.Component {
       this.props.changeTitle('login');
     }
 
-    this.setState({
-      step: this.state.step <= 1 ? 0 : this.state.step - 1,
-      activeView: this.state.step === 0 ? null : this.state.activeView,
-    });
+    if (this.state.activeView === 'create' &&
+        this.state.step === 1) {
+      this.setState({
+        step: this.state.step <= 1 ? 0 : this.state.step - 1,
+        activeView: this.state.step === 0 ? null : this.state.activeView,
+        createSeed: newSeed,
+        createSeedShuffled: shuffleArray(newSeed.split(' ')),
+      });
+    } else {
+      this.setState({
+        step: this.state.step <= 1 ? 0 : this.state.step - 1,
+        activeView: this.state.step === 0 ? null : this.state.activeView,
+      });
+    }
   }
 
   restoreWalletInit() {
@@ -130,10 +148,18 @@ class Login extends React.Component {
   }
 
   createWalletInit() {
+    const newSeed = passphraseGenerator.generatePassPhrase(256);
+
     this.setState({
       activeView: 'create',
       step: 0,
+      createSeed: newSeed,
+      createSeedShuffled: shuffleArray(newSeed.split(' ')),
     });
+
+    setTimeout(() => {
+      console.warn(this.state);
+    }, 1000);
     this.props.changeTitle('create_wallet');
   }
 
@@ -273,6 +299,12 @@ class Login extends React.Component {
     });
   }
 
+  toggleCreateQR() {
+    this.setState({
+      createSeedDisplayQR: !this.state.createSeedDisplayQR,
+    });
+  }
+
   triggerKey(key) {
     if (key === 'back') {
       this.setState({
@@ -290,6 +322,103 @@ class Login extends React.Component {
         wrongPin: false,
       });
     }
+  }
+
+  renderCreateWallet() {
+    return (
+      <div className="create-wallet">
+        { this.state.step === 0 &&
+          <div className="step1">
+            <div className="title">This is your new seed<br />Please write it down somewhere safe.</div>
+            <div className="create-wallet-security-tip">For best security practices make sure you are in a private space/room.</div>
+            <i
+              onClick={ this.toggleCreateQR }
+              className="fa fa-qrcode"></i>
+            <div className="seed-gen-box selectable">{ this.state.createSeed }</div>
+            { this.state.createSeedDisplayQR &&
+              <div className="text-center margin-top-30">
+                <QRCode
+                  value={ this.state.createSeed }
+                  size={ 320 } />
+              </div>
+            }
+            <div
+              onClick={ this.nextStep }
+              className="group3">
+              <div className="btn-inner">
+                <div className="btn">Next</div>
+                <div className="group2">
+                  <div className="rectangle8copy"></div>
+                  <img
+                    className="path6"
+                    src={ `${assetsPath.login}/reset-password-path-6.png` } />
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+        { this.state.step === 1 &&
+          <div className="step2">
+            <div className="title">Please provide PIN and PIN confirmation below</div>
+            <div className="group">
+              <div className="edit restore-seed-verify">
+                { this.state.isPrivKey ? 'You provided a private key' : 'You provided a seed' }
+                <span onClick={ this.prevStep }>Wrong?</span>
+              </div>
+            </div>
+            <div className="group">
+              <div className="edit">
+                <input
+                  type="password"
+                  className="form-control"
+                  name="restorePin"
+                  onChange={ this.updateInput }
+                  placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
+                  value={ this.state.restorePin || '' } />
+              </div>
+            </div>
+            <div className="group">
+              <div className="edit">
+                <input
+                  type="password"
+                  className="form-control"
+                  name="restorePinConfirm"
+                  onChange={ this.updateInput }
+                  placeholder="Confirm PIN"
+                  value={ this.state.restorePinConfirm || '' } />
+              </div>
+            </div>
+            { this.state.restorePinError &&
+              <div className="error margin-top-15 sz350">
+                <i className="fa fa-warning"></i> { this.state.restorePinError }
+              </div>
+            }
+            <div
+              disabled={
+                !this.state.restorePin ||
+                !this.state.restorePinConfirm
+              }
+              onClick={ this.nextStep }
+              className="group3">
+              <div className="btn-inner">
+                <div className="btn">Next</div>
+                <div className="group2">
+                  <div className="rectangle8copy"></div>
+                  <img
+                    className="path6"
+                    src={ `${assetsPath.login}/reset-password-path-6.png` } />
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+        { this.state.step === 2 &&
+          <div className="step3">
+            { this.renderLoginInForm() }
+          </div>
+        }
+      </div>
+    );
   }
 
   renderRestoreWallet() {
@@ -466,6 +595,10 @@ class Login extends React.Component {
                   className="menu-back"
                   src={ `${assetsPath.menu}/trends-combined-shape.png` }
                   onClick={ this.prevStep } />
+              }
+              { this.state.activeView &&
+                this.state.activeView === 'create' &&
+                this.renderCreateWallet()
               }
               { this.state.activeView &&
                 this.state.activeView === 'restore' &&
