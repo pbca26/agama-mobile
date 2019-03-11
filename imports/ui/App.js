@@ -893,20 +893,6 @@ class App extends React.Component {
                         src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                     </div>
                   }
-                  { getLocalStorageVar('seed') &&
-                    <div
-                      className="item"
-                      disabled={ this.state.activeSection === 'recovery' }>
-                      <div
-                        className="title"
-                        onClick={ () => this.toggleMenuOption('recovery') }>
-                        { translate('APP_TITLE.RECOVERY') }
-                      </div>
-                      <img
-                        className="line"
-                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
-                    </div>
-                  }
                   <div
                     className="item"
                     disabled={ this.state.activeSection === 'settings' }>
@@ -988,20 +974,6 @@ class App extends React.Component {
                       className="line"
                       src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                   </div>
-                  { getLocalStorageVar('seed') &&
-                    <div
-                      className="item"
-                      disabled={ this.state.activeSection === 'pin' }>
-                      <div
-                        className="title"
-                        onClick={ () => this.toggleMenuOption('pin') }>
-                        { translate('APP_TITLE.PIN') }
-                      </div>
-                      <img
-                        className="line"
-                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
-                    </div>
-                  }
                   { /*this.state.activeSection !== 'offlinesig' &&
                     <div className="item">
                       <div
@@ -1096,7 +1068,6 @@ class App extends React.Component {
           (this.state.conError || this.state.activeSection === 'server-select') &&
           this.state.activeSection !== 'overview' &&
           this.state.activeSection !== 'settings' &&
-          this.state.activeSection !== 'recovery' &&
           this.state.activeSection !== 'addcoin' &&
           <ServerSelect
             { ...this.state }

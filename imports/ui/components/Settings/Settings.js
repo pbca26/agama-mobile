@@ -436,6 +436,11 @@ class Settings extends React.Component {
             </div>
           </div>
           <div
+            onClick={ () => this.props.changeActiveSection('recovery') }
+            className="item item--sm">
+            { translate('APP_TITLE.RECOVERY') }
+          </div>
+          <div
             onClick={ () => this.toggleActiveView('pin') }
             className="item item--sm">
             { translate('SETTINGS.CHANGE_PIN') }
