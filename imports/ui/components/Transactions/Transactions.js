@@ -132,18 +132,6 @@ class Transactions extends React.Component {
             onClick={ this.toggleQR }>
             <i className="fa fa-inbox"></i> { translate('DASHBOARD.RECEIVE') }
           </button>
-          { this.state.showQR &&
-            <div className="receive-qr">
-              { this.props.address &&
-                <div>
-                  <QRCode
-                    value={ this.props.address }
-                    size={ 198 } />
-                  <div className="text-center wb--all selectable">{ this.props.address }</div>
-                </div>
-              }
-            </div>
-          }
           { this.props.coin === 'kmd|spv' &&
             <button
               type="button"
@@ -159,6 +147,18 @@ class Transactions extends React.Component {
                 <i className="fa fa-exclamation"></i>
               }
             </button>
+          }
+          { this.state.showQR &&
+            <div className="receive-qr">
+              { this.props.address &&
+                <div>
+                  <QRCode
+                    value={ this.props.address }
+                    size={ 198 } />
+                  <div className="text-center wb--all selectable">{ this.props.address }</div>
+                </div>
+              }
+            </div>
           }
         </div>
       </div>
