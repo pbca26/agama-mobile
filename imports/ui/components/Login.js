@@ -194,6 +194,7 @@ class Login extends React.Component {
       this.setState({
         step: this.state.step <= 1 ? 0 : this.state.step - 1,
         activeView: this.state.step === 0 ? null : this.state.activeView,
+        passphrase: this.state.activeView === 'restore' && this.state.step <= 1 ? this.state.passphrase : null,
         createSeedConfirm: [],
         createPin: null,
         createPinConfirm: null,
@@ -422,6 +423,7 @@ class Login extends React.Component {
             }
             { this.state.createSeedConfirm &&
               this.state.createSeedConfirm.length > 0 &&
+              this.state.createSeed !== this.state.createSeedConfirm.join(' ') &&
               <div className="margin-top-10">
                 <i
                   onClick={ this.clearCreateSeedConfirm }
@@ -431,6 +433,7 @@ class Login extends React.Component {
             }
             <div
               onClick={ this.nextStep }
+              disabled={ this.state.createSeed !== this.state.createSeedConfirm.join(' ') }
               className="group3">
               <div className="btn-inner">
                 <div className="btn">{ translate('LOGIN.NEXT') }</div>
@@ -555,7 +558,7 @@ class Login extends React.Component {
             <div className="title">{ translate('LOGIN.PLEASE_PROVIDE_PIN') }</div>
             <div className="group">
               <div className="edit restore-seed-verify">
-                { translate('LOGIN.' + (this.state.isPrivKey ? 'YOU_PROVIDED_PRIVKEY' : 'YOU_PROVIDED_SEED')) }
+                { translate('LOGIN.' + (this.state.restoreIsPrivKey ? 'YOU_PROVIDED_PRIVKEY' : 'YOU_PROVIDED_SEED')) }
                 <span onClick={ this.prevStep }>
                   { translate('LOGIN.WRONG') }
                 </span>
