@@ -30,10 +30,8 @@ class Login extends React.Component {
     super();
     this.state = {
       passphrase: config.preload ? config.preload.seed : null,
-      createPin: !getLocalStorageVar('seed') ? true : false,
-      pinOverride: config.preload ? config.preload.pin : null,
-      pinOverrideTooShort: false,
       pin: config.preload ? config.preload.pin : '',
+      pinTooShort: false,
       wrongPin: false,
       wrongPinRetries: 0,
       qrScanError: false,
@@ -41,14 +39,14 @@ class Login extends React.Component {
       step: 0,
       restoreIsPrivKey: false,
       restorePin: null,
-      restorePinCofirm: null,
+      restorePinConfirm: null,
       restorePinError: null,
       createSeed: null,
       createSeedShuffled: null,
       createSeedConfirm: [],
       createSeedDisplayQR: false,
       createPin: null,
-      createPinCofirm: null,
+      createPinConfirm: null,
       createPinError: null,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
@@ -94,18 +92,18 @@ class Login extends React.Component {
 
         if (!this.state.restorePin ||
             (this.state.restorePin && this.state.restorePin.length < 6)) {
-          restorePinError = 'PIN is too short';
+          restorePinError = translate('LOGIN.PIN_TOO_SHORT');
         } else if (
           !this.state.restorePinConfirm ||
           (this.state.restorePinConfirm && this.state.restorePinConfirm.length < 6)
         ) {
-          restorePinError = 'PIN confirm is too short';
+          restorePinError = translate('LOGIN.PIN_CONFIRM_TOO_SHORT');
         } else if (
           this.state.restorePin &&
           this.state.restorePinConfirm &&
           this.state.restorePin !== this.state.restorePinConfirm
         ) {
-          restorePinError = 'PIN and PIN confirmation are not matching';
+          restorePinError = translate('LOGIN.PIN_MISMATCH');
         }
 
         if (restorePinError) {
@@ -124,6 +122,8 @@ class Login extends React.Component {
 
           this.setState({
             step: this.state.step + 1,
+            restorePin: null,
+            restorePinConfirm: null,
           });
         }
       }
@@ -133,18 +133,18 @@ class Login extends React.Component {
         
         if (!this.state.createPin ||
             (this.state.createPin && this.state.createPin.length < 6)) {
-          createPinError = 'PIN is too short';
+          createPinError = translate('LOGIN.PIN_TOO_SHORT');
         } else if (
           !this.state.createPinConfirm ||
           (this.state.createPinConfirm && this.state.createPinConfirm.length < 6)
         ) {
-          createPinError = 'PIN confirm is too short';
+          createPinError = translate('LOGIN.PIN_CONFIRM_TOO_SHORT');
         } else if (
           this.state.createPin &&
           this.state.createPinConfirm &&
           this.state.createPin !== this.state.createPinConfirm
         ) {
-          createPinError = 'PIN and PIN confirmation are not matching';
+          createPinError = translate('LOGIN.PIN_MISMATCH')
         }
 
         if (createPinError) {
@@ -163,6 +163,8 @@ class Login extends React.Component {
 
           this.setState({
             step: this.state.step + 1,
+            createPin: null,
+            createPinConfirm: null,
           });
         }
       } else {
@@ -192,11 +194,11 @@ class Login extends React.Component {
       this.setState({
         step: this.state.step <= 1 ? 0 : this.state.step - 1,
         activeView: this.state.step === 0 ? null : this.state.activeView,
-        createPinConfirm: [],
+        createSeedConfirm: [],
         createPin: null,
-        createPinCofirm: null,
+        createPinConfirm: null,
         restorePin: null,
-        restorePinCofirm: null,
+        restorePinConfirm: null,
       });
     }
   }
@@ -207,14 +209,14 @@ class Login extends React.Component {
       step: 0,
       restoreIsPrivKey: false,
       restorePin: null,
-      restorePinCofirm: null,
+      restorePinConfirm: null,
       restorePinError: null,
       createSeed: null,
       createSeedShuffled: null,
       createSeedConfirm: [],
       createSeedDisplayQR: false,
       createPin: null,
-      createPinCofirm: null,
+      createPinConfirm: null,
       createPinError: null,
     });
     this.props.changeTitle('restore_wallet');
@@ -228,14 +230,14 @@ class Login extends React.Component {
       step: 0,
       restoreIsPrivKey: false,
       restorePin: null,
-      restorePinCofirm: null,
+      restorePinConfirm: null,
       restorePinError: null,
       createSeed: newSeed,
       createSeedShuffled: shuffleArray(newSeed.split(' ')),
       createSeedConfirm: [],
       createSeedDisplayQR: false,
       createPin: null,
-      createPinCofirm: null,
+      createPinConfirm: null,
       createPinError: null,
     });
   }
@@ -245,7 +247,7 @@ class Login extends React.Component {
       [e.target.name]: e.target.value,
       wrongPin: false,
       qrScanError: false,
-      pinOverrideTooShort: false,
+      pinTooShort: false,
     });
   }
 
@@ -296,77 +298,54 @@ class Login extends React.Component {
   }
 
   login(isPinAccess) {
-    if (isPinAccess) {
-      // decrypt
-      const _encryptedKey = getLocalStorageVar('seed');
-      const pinBruteforceProtection = getLocalStorageVar('settings').pinBruteforceProtection;
-      const pinBruteforceProtectionRetries = getLocalStorageVar('seed').pinRetries;
+    // decrypt
+    const _encryptedKey = getLocalStorageVar('seed');
+    const pinBruteforceProtection = getLocalStorageVar('settings').pinBruteforceProtection;
+    const pinBruteforceProtectionRetries = getLocalStorageVar('seed').pinRetries;
 
-      if (_encryptedKey &&
-          _encryptedKey.encryptedKey &&
-          this.state.pin &&
-          this.state.pin.length >= 6) {
-        const _decryptedKey = decryptkey(this.state.pin, _encryptedKey.encryptedKey);
+    if (_encryptedKey &&
+        _encryptedKey.encryptedKey &&
+        this.state.pin &&
+        this.state.pin.length >= 6) {
+      const _decryptedKey = decryptkey(this.state.pin, _encryptedKey.encryptedKey);
 
-        if (_decryptedKey) {
-          if (pinBruteforceProtection) {
-            let _seedStorage = getLocalStorageVar('seed');
-            _seedStorage.pinRetries = 0;
-            setLocalStorageVar('seed', _seedStorage);
-          }
-          
-          this.props.changeTitle();
-          this.props.login(_decryptedKey);
-          this.setState(this.defaultState);
-        } else {
-          if (!pinBruteforceProtection) {
-            this.setState({
-              pinOverrideTooShort: false,
-              wrongPin: true,
-            });
-          } else if (pinBruteforceProtectionRetries < 3) {
-            let _seedStorage = getLocalStorageVar('seed');
-            _seedStorage.pinRetries += 1;
-            setLocalStorageVar('seed', _seedStorage);
-    
-            this.setState({
-              pinOverrideTooShort: false,
-              wrongPin: true,
-              wrongPinRetries: _seedStorage.pinRetries,
-            });
-          } else {
-            this.props.changeTitle();
-            this.props.lock(true);
-            this.setState(this.defaultState);
-          }
+      if (_decryptedKey) {
+        if (pinBruteforceProtection) {
+          let _seedStorage = getLocalStorageVar('seed');
+          _seedStorage.pinRetries = 0;
+          setLocalStorageVar('seed', _seedStorage);
         }
+        
+        this.props.changeTitle();
+        this.props.login(_decryptedKey);
+        this.setState(this.defaultState);
       } else {
-        this.setState({
-          pinOverrideTooShort: false,
-          wrongPin: true,
-        });
+        if (!pinBruteforceProtection) {
+          this.setState({
+            pinTooShort: false,
+            wrongPin: true,
+          });
+        } else if (pinBruteforceProtectionRetries < 3) {
+          let _seedStorage = getLocalStorageVar('seed');
+          _seedStorage.pinRetries += 1;
+          setLocalStorageVar('seed', _seedStorage);
+  
+          this.setState({
+            pinTooShort: false,
+            wrongPin: true,
+            wrongPinRetries: _seedStorage.pinRetries,
+          });
+        } else {
+          this.props.changeTitle();
+          this.props.lock(true);
+          this.setState(this.defaultState);
+        }
       }
     } else {
-      if (this.state.createPin) {
-        if (this.state.pinOverride &&
-            this.state.pinOverride.length >= 6) {
-          const _encryptedKey = encryptkey(this.state.pinOverride, this.state.passphrase);
-
-          setLocalStorageVar('seed', { encryptedKey: _encryptedKey });
-
-          this.props.login(this.state.passphrase);
-          this.setState(this.defaultState);
-        } else {
-          this.setState({
-            pinOverrideTooShort: true,
-            wrongPin: false,
-          });
-        }
-      } else {
-        this.props.changeTitle();
-        this.props.login(this.state.passphrase);
-        this.setState(this.defaultState);
-      }
+      this.setState({
+        pinTooShort: true,
+        wrongPin: true,
+      });
     }
   }
 
@@ -401,8 +380,12 @@ class Login extends React.Component {
       <div className="create-wallet">
         { this.state.step === 0 &&
           <div className="step1">
-            <div className="title">This is your new seed<br />Please write it down somewhere safe.</div>
-            <div className="create-wallet-security-tip">For best security practices make sure you are in a private space/room.</div>
+            <div className="title">
+              { translate('LOGIN.NEW_SEED_P1') }
+              <br />
+              { translate('LOGIN.NEW_SEED_P2') }
+            </div>
+            <div className="create-wallet-security-tip">{ translate('LOGIN.NEW_SEED_SEC_TIP') }</div>
             <i
               onClick={ this.toggleCreateQR }
               className="fa fa-qrcode"></i>
@@ -418,7 +401,7 @@ class Login extends React.Component {
               onClick={ this.nextStep }
               className="group3">
               <div className="btn-inner">
-                <div className="btn">Next</div>
+                <div className="btn">{ translate('LOGIN.NEXT') }</div>
                 <div className="group2">
                   <div className="rectangle8copy"></div>
                   <img
@@ -431,7 +414,7 @@ class Login extends React.Component {
         }
         { this.state.step === 1 &&
           <div className="step2">
-            <div className="title">To confirm that you recorded your seed please place the words in their exact order below.</div>
+            <div className="title">{ translate('LOGIN.TO_CONFIRM_SEED') }</div>
             { this.state.createSeedConfirm.length < this.state.createSeedShuffled.length &&
               <div className="seed-words-block">
                 { this.renderCreateSeedWordsConfirm() }
@@ -450,7 +433,7 @@ class Login extends React.Component {
               onClick={ this.nextStep }
               className="group3">
               <div className="btn-inner">
-                <div className="btn">Next</div>
+                <div className="btn">{ translate('LOGIN.NEXT') }</div>
                 <div className="group2">
                   <div className="rectangle8copy"></div>
                   <img
@@ -463,7 +446,7 @@ class Login extends React.Component {
         }
         { this.state.step === 2 &&
           <div className="step3">
-            <div className="title">Please provide PIN and PIN confirmation below</div>
+            <div className="title">{ translate('LOGIN.PLEASE_PROVIDE_PIN') }</div>
             <div className="group">
               <div className="edit">
                 <input
@@ -482,7 +465,7 @@ class Login extends React.Component {
                   className="form-control"
                   name="createPinConfirm"
                   onChange={ this.updateInput }
-                  placeholder="Confirm PIN"
+                  placeholder={ translate('LOGIN.CONFIRM_PIN') }
                   value={ this.state.createPinConfirm || '' } />
               </div>
             </div>
@@ -499,7 +482,7 @@ class Login extends React.Component {
               onClick={ this.nextStep }
               className="group3">
               <div className="btn-inner">
-                <div className="btn">Next</div>
+                <div className="btn">{ translate('LOGIN.NEXT') }</div>
                 <div className="group2">
                   <div className="rectangle8copy"></div>
                   <img
@@ -524,7 +507,7 @@ class Login extends React.Component {
       <div className="restore-wallet">
         { this.state.step === 0 &&
           <div className="step1">
-            <div className="title">Please provide your seed / private key (WIF) below</div>
+            <div className="title">{ translate('LOGIN.PLEASE_PROVIDE_SEED_BELOW') }</div>
             <div
               onClick={ this.scanQR }
               className="group3 scan-qr">
@@ -556,7 +539,7 @@ class Login extends React.Component {
               onClick={ this.nextStep }
               className="group3">
               <div className="btn-inner">
-                <div className="btn">Next</div>
+                <div className="btn">{ translate('LOGIN.NEXT') }</div>
                 <div className="group2">
                   <div className="rectangle8copy"></div>
                   <img
@@ -569,11 +552,13 @@ class Login extends React.Component {
         }
         { this.state.step === 1 &&
           <div className="step2">
-            <div className="title">Please provide PIN and PIN confirmation below</div>
+            <div className="title">{ translate('LOGIN.PLEASE_PROVIDE_PIN') }</div>
             <div className="group">
               <div className="edit restore-seed-verify">
-                { this.state.isPrivKey ? 'You provided a private key' : 'You provided a seed' }
-                <span onClick={ this.prevStep }>Wrong?</span>
+                { translate('LOGIN.' + (this.state.isPrivKey ? 'YOU_PROVIDED_PRIVKEY' : 'YOU_PROVIDED_SEED')) }
+                <span onClick={ this.prevStep }>
+                  { translate('LOGIN.WRONG') }
+                </span>
               </div>
             </div>
             <div className="group">
@@ -594,7 +579,7 @@ class Login extends React.Component {
                   className="form-control"
                   name="restorePinConfirm"
                   onChange={ this.updateInput }
-                  placeholder="Confirm PIN"
+                  placeholder={ translate('LOGIN.CONFIRM_PIN') }
                   value={ this.state.restorePinConfirm || '' } />
               </div>
             </div>
@@ -611,7 +596,7 @@ class Login extends React.Component {
               onClick={ this.nextStep }
               className="group3">
               <div className="btn-inner">
-                <div className="btn">Next</div>
+                <div className="btn">{ translate('LOGIN.NEXT') }</div>
                 <div className="group2">
                   <div className="rectangle8copy"></div>
                   <img
@@ -638,7 +623,11 @@ class Login extends React.Component {
           <div className="title">{ translate('LOGIN.SIGN_IN_TO_YOUR_ACC') }</div>
         }
         { this.state.activeView &&
-          <div className="title">You are all set!<br />Try to login now.</div>
+          <div className="title">
+            { translate('LOGIN.YOU_ARE_ALL_SET') }
+            <br />
+            { translate('LOGIN.TRY_TO_LOGIN_NOW') }
+          </div>
         }
         <div className="group">
           <div className="edit">
@@ -652,12 +641,12 @@ class Login extends React.Component {
           </div>
           { this.state.wrongPin &&
             <div className="error margin-top-10 margin-bottom-25 sz350">
-              <i className="fa fa-warning"></i> { this.state.wrongPinRetries === 0 ? translate('LOGIN.WRONG_PIN') : translate('LOGIN.WRONG_PIN_ATTEMPTS', 3 - this.state.wrongPinRetries) }
+              <i className="fa fa-warning"></i> { this.state.wrongPinRetries === 0 ? translate(this.state.pinTooShort ? 'LOGIN.PIN_TOO_SHORT' : 'LOGIN.WRONG_PIN') : translate('LOGIN.WRONG_PIN_ATTEMPTS', 3 - this.state.wrongPinRetries) }
             </div>
           }
         </div>
         <div
-          onClick={ () => this.login(true) }
+          onClick={ this.login }
           className="group3">
           <div className="btn-inner">
             <div className="btn">{ translate('LOGIN.SIGN_IN') }</div>
@@ -677,7 +666,6 @@ class Login extends React.Component {
     if ((this.props.activeSection === 'login' || (!this.props.auth && this.props.activeSection !== 'addcoin')) &&
         this.props.coins &&
         Object.keys(this.props.coins).length &&
-        this.props.activeSection !== 'create-seed' &&
         this.props.activeSection !== 'offlinesig' &&
         this.props.activeSection !== 'pin') {
       return (
@@ -705,13 +693,13 @@ class Login extends React.Component {
               }
               { !this.state.activeView &&
                 <div>
-                  <div className="title">Please choose an option below</div>
+                  <div className="title">{ translate('LOGIN.PLEASE_CHOOSE_AN_OPTION_BELOW') }</div>
                   <div>
                     <div
                       onClick={ this.restoreWalletInit }
                       className="group3 scan-qr">
                       <div className="btn-inner">
-                        <div className="btn">I want to restore wallet</div>
+                        <div className="btn">{ translate('LOGIN.I_WANT_TO_RESTORE_WALLET') }</div>
                         <div className="group2">
                           <div className="rectangle8copy"></div>
                           <img
@@ -726,7 +714,7 @@ class Login extends React.Component {
                       onClick={ this.createWalletInit }
                       className="group3 scan-qr">
                       <div className="btn-inner">
-                        <div className="btn">I want to create new wallet</div>
+                        <div className="btn">{ translate('LOGIN.I_WANT_TO_CREATE_WALLET') }</div>
                         <div className="group2">
                           <div className="rectangle8copy"></div>
                           <img
