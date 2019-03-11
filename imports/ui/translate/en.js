@@ -94,6 +94,7 @@ const lang = {
       COINS_SAVED: 'Coins selection saved',
       MAIN_VIEW: 'Main view',
       DEFAULT: 'Transactions history',
+      SETTINS_PIN_REQUIRED: 'PIN confirmation is required',
     },
     RECOVERY: {
       PROVIDE_YOUR_PIN: 'Provide your PIN number to unlock seed/WIF.',

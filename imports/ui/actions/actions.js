@@ -459,22 +459,22 @@ const balance = (network) => {
               if (!_balance.hasOwnProperty('confirmed')) {
                 resolve('error');
               } else {
-                const _balance = {
+                const retBalance = {
                   balance: Number(fromSats(_balance.confirmed).toFixed(8)),
                   unconfirmed: Number(fromSats(_balance.unconfirmed).toFixed(8)),
                 };
                 let _cache = getLocalStorageVar('cache') || {};
                 
                 if (_cache.balance) {
-                  _cache.balance[network] = _balance;
+                  _cache.balance[network] = retBalance;
                 } else {
                   _cache.balance = {};
-                  _cache.balance[network] = _balance;
+                  _cache.balance[network] = retBalance;
                 }
 
                 setLocalStorageVar('cache', _cache);
 
-                resolve(_balance);
+                resolve(retBalance);
               }
             }
           }

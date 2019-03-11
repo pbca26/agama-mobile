@@ -40,6 +40,10 @@ class Settings extends React.Component {
       mainView: 'default',
       activeView: null,
       removeCoins: null,
+      pinConfirmRequired: false,
+      pin: null,
+      wrongPin: false,
+      wrongPinRetries: 0,
     };
     this.updateInput = this.updateInput.bind(this);
     this.toggleConfirmPin = this.toggleConfirmPin.bind(this);
@@ -114,6 +118,7 @@ class Settings extends React.Component {
   updateInput(e) {
     this.setState({
       [e.target.name]: e.target.value,
+      wrongPin: false,
     });
   }
 
@@ -126,6 +131,7 @@ class Settings extends React.Component {
   toggleConfirmPin() {
     this.setState({
       requirePin: !this.state.requirePin,
+      pinConfirmRequired: getLocalStorageVar('settings').requirePin === true && this.state.requirePin === true ? true : false,
     });
   }
 
@@ -138,18 +144,12 @@ class Settings extends React.Component {
   togglePinBruteforceProtection() {
     this.setState({
       pinBruteforceProtection: !this.state.pinBruteforceProtection,
+      pinConfirmRequired: getLocalStorageVar('settings').pinBruteforceProtection === true && this.state.pinBruteforceProtection === true ? true : false,
     })
   }
 
   save() {
-    if (this.state.pinBruteforceProtection) {
-      let _seedStorage = getLocalStorageVar('seed');
-
-      if (!_seedStorage.hasOwnProperty('pinRetries')) {
-        _seedStorage.pinRetries = 0;
-        setLocalStorageVar('seed', _seedStorage);
-      }
-    }
+    let _pinConfirmRequired = false;
 
     if (this.state.purgeData) {
       setLocalStorageVar('settings', settingsDefaults);
@@ -163,45 +163,105 @@ class Settings extends React.Component {
       });
       setLocalStorageVar('cache', null);
     } else {
-      setLocalStorageVar('settings', {
-        autoLockTimeout: this.state.autoLockTimeout,
-        requirePin: this.state.requirePin,
-        fiat: this.state.fiat,
-        debug: this.state.debug,
-        btcFeesSource: this.state.btcFeesSource,
-        pinBruteforceProtection: this.state.pinBruteforceProtection,
-        mainView: this.state.mainView,
-      });
-
-      if (this.state.removeCoins) {
-        let localStorageCoins = getLocalStorageVar('coins');
-
-        for (let key in this.state.removeCoins) {
-          if (!this.state.removeCoins[key]) {
-            delete localStorageCoins[key];
+      const _settings = getLocalStorageVar('settings');
+      const _saveSettings = () => {
+        if (this.state.pinBruteforceProtection) {
+          let _seedStorage = getLocalStorageVar('seed');
+    
+          if (!_seedStorage.hasOwnProperty('pinRetries')) {
+            _seedStorage.pinRetries = 0;
+            setLocalStorageVar('seed', _seedStorage);
           }
         }
+        
+        setLocalStorageVar('settings', {
+          autoLockTimeout: this.state.autoLockTimeout,
+          requirePin: this.state.requirePin,
+          fiat: this.state.fiat,
+          debug: this.state.debug,
+          btcFeesSource: this.state.btcFeesSource,
+          pinBruteforceProtection: this.state.pinBruteforceProtection,
+          mainView: this.state.mainView,
+        });
 
-        setLocalStorageVar('coins', localStorageCoins);
-        this.props.updateCoinsList();
+        if (this.state.removeCoins) {
+          let localStorageCoins = getLocalStorageVar('coins');
+
+          for (let key in this.state.removeCoins) {
+            if (!this.state.removeCoins[key]) {
+              delete localStorageCoins[key];
+            }
+          }
+
+          setLocalStorageVar('coins', localStorageCoins);
+          this.props.updateCoinsList();
+        }
+      };
+
+      if (this.state.pinConfirmRequired) {
+        const _encryptedKey = getLocalStorageVar('seed');
+        const _decryptedKey = decryptkey(this.state.pin, _encryptedKey.encryptedKey);
+        const pinBruteforceProtection = getLocalStorageVar('settings').pinBruteforceProtection;
+        const pinBruteforceProtectionRetries = getLocalStorageVar('seed').pinRetries;
+        
+        if (_decryptedKey) {
+          if (pinBruteforceProtection) {
+            let _seedStorage = getLocalStorageVar('seed');
+            _seedStorage.pinRetries = 0;
+            setLocalStorageVar('seed', _seedStorage);
+          }
+    
+          this.setState({
+            wrongPin: false,
+            wrongPinRetries: 0,
+            pin: null,
+            pinConfirmRequired: false,
+          });
+          _pinConfirmRequired = false;
+          _saveSettings();
+        } else {
+          if (!pinBruteforceProtection) {
+            this.setState({
+              wrongPin: true,
+            });
+            _pinConfirmRequired = true;
+          } else if (pinBruteforceProtectionRetries < 3) {
+            let _seedStorage = getLocalStorageVar('seed');
+            _seedStorage.pinRetries += 1;
+            setLocalStorageVar('seed', _seedStorage);
+    
+            this.setState({
+              wrongPin: true,
+              wrongPinRetries: _seedStorage.pinRetries,
+            });
+            _pinConfirmRequired = true;
+          } else {
+            _pinConfirmRequired = true;
+            this.props.lock(true);
+          }
+        }    
+      } else {
+        _saveSettings();
       }
     }
 
-    this.setState({
-      isSaved: true,
-    });
-
-    Meteor.setTimeout(() => {
+    if (!_pinConfirmRequired) {
       this.setState({
-        isSaved: false,
+        isSaved: true,
       });
 
-      if (this.state.purgeData) {
-        this.props.logout();
-      }
-    }, this.state.purgeData ? SETTINGS_SAVED_PURGE_MSG_TIMEOUT : SETTINGS_SAVED_MSG_TIMEOUT);
+      Meteor.setTimeout(() => {
+        this.setState({
+          isSaved: false,
+        });
 
-    this.props.globalClick();
+        if (this.state.purgeData) {
+          this.props.logout();
+        }
+      }, this.state.purgeData ? SETTINGS_SAVED_PURGE_MSG_TIMEOUT : SETTINGS_SAVED_MSG_TIMEOUT);
+
+      this.props.globalClick();
+    }
   }
 
   renderFiatOptions() {
@@ -392,11 +452,36 @@ class Settings extends React.Component {
             className="item item--sm last">
             { translate('SETTINGS.REMOVE_COIN') }
           </div>
+          { this.state.pinConfirmRequired &&
+            <div className="pin-confirm">
+              <div className="pin-confirm-title">{ translate('SETTINGS.SETTINS_PIN_REQUIRED') }</div>
+              <div className="margin-bottom-35">
+                <div className="edit">
+                  <input
+                    type="password"
+                    className="form-control"
+                    name="pin"
+                    onChange={ this.updateInput }
+                    placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
+                    value={ this.state.pin || '' } />
+                </div>
+              </div>
+            </div>
+          }
+          { this.state.wrongPin &&
+            <div className="error margin-top-15 sz350">
+              <i className="fa fa-warning"></i> { this.state.wrongPinRetries === 0 ? translate('LOGIN.WRONG_PIN') : translate('LOGIN.WRONG_PIN_ATTEMPTS', 3 - this.state.wrongPinRetries) }
+            </div>
+          }
           { this.state.isSaved &&
             <div className="padding-bottom-20 text-center success">{ translate('SETTINGS.SAVED') }</div>
           }
           <div
             onClick={ this.save }
+            disabled={
+              this.state.pinConfirmRequired &&
+              !this.state.pin
+            }
             className="group3 margin-top-25 margin-bottom-25">
             <div className="btn-inner">
               <div className="btn">{ translate('SETTINGS.SAVE') }</div>

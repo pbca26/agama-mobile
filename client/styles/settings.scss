@@ -133,3 +133,16 @@
     }
   }
 }
+
+.pin-confirm {
+  text-align: center;
+  margin-top: 20px;
+  border: dashed 1px rgba(255, 255, 255, 0.4);
+  padding-top: 32px;
+  margin-bottom: 60px;
+
+  .pin-confirm-title {
+    margin-bottom: 14px;
+    font-size: 14px;
+  }
+}
