@@ -439,7 +439,9 @@ class App extends React.Component {
       this.getEthGasPrice();
     }
 
-    this.scrollToTop();
+    Meteor.setTimeout(() => {
+      this.scrollToTop();
+    }, 10);
   }
 
   switchCoin(coin, skipRefresh, mainView) {
@@ -802,13 +804,13 @@ class App extends React.Component {
   toggleMenuOption(optionName) {
     Meteor.setTimeout(() => {
       this.toggleMenu();
+      this.scrollToTop();
     }, 10);
 
     this.setState({
       history: this.state.activeSection,
       activeSection: this.state.activeSection === optionName ? (this.state.auth ? 'dashboard' : 'login') : optionName,
     });
-    this.scrollToTop();
   }
 
   renderActiveCoins() {
@@ -969,6 +971,18 @@ class App extends React.Component {
                       className="title"
                       onClick={ () => this.toggleMenuOption('addcoin') }>
                       { translate('DASHBOARD.ADD_COIN') }
+                    </div>
+                    <img
+                      className="line"
+                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                  </div>
+                  <div
+                    className="item"
+                    disabled={ this.state.activeSection === 'settings' }>
+                    <div
+                      className="title"
+                      onClick={ () => this.toggleMenuOption('settings') }>
+                      { translate('APP_TITLE.SETTINGS') }
                     </div>
                     <img
                       className="line"
@@ -1144,6 +1158,7 @@ class App extends React.Component {
             }
             { this.state.activeSection === 'settings' &&
               <Settings
+                auth={ this.state.auth }
                 coin={ this.state.coin }
                 coins={ this.state.coins }
                 globalClick={ this.globalClick }

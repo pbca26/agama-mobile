@@ -663,7 +663,8 @@ class Login extends React.Component {
   }
 
   render() {
-    if ((this.props.activeSection === 'login' || (!this.props.auth && this.props.activeSection !== 'addcoin')) &&
+    if ((!this.props.auth && this.props.activeSection !== 'settings') &&
+        (this.props.activeSection === 'login' || (!this.props.auth && this.props.activeSection !== 'addcoin')) &&
         this.props.coins &&
         Object.keys(this.props.coins).length &&
         this.props.activeSection !== 'offlinesig' &&

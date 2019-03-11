@@ -315,19 +315,21 @@ class Settings extends React.Component {
             className="item item--sm">
             { translate('APP_TITLE.AGREEMENT') }
           </div>
-          <div className="margin-top-10 item">
-            <div className="padding-bottom-20">{ translate('SETTINGS.AUTOLOCK_TIMEOUT') }</div>
-            <select
-              className="form-control form-material"
-              name="autoLockTimeout"
-              value={ this.state.autoLockTimeout }
-              onChange={ (event) => this.updateInput(event) }
-              autoFocus>
-              <option value="600000">10 { translate('SETTINGS.MINUTES') }</option>
-              <option value="1200000">20 { translate('SETTINGS.MINUTES') }</option>
-              <option value="1800000">30 { translate('SETTINGS.MINUTES') }</option>
-            </select>
-          </div>
+          { this.props.auth &&
+            <div className="margin-top-10 item">
+              <div className="padding-bottom-20">{ translate('SETTINGS.AUTOLOCK_TIMEOUT') }</div>
+              <select
+                className="form-control form-material"
+                name="autoLockTimeout"
+                value={ this.state.autoLockTimeout }
+                onChange={ (event) => this.updateInput(event) }
+                autoFocus>
+                <option value="600000">10 { translate('SETTINGS.MINUTES') }</option>
+                <option value="1200000">20 { translate('SETTINGS.MINUTES') }</option>
+                <option value="1800000">30 { translate('SETTINGS.MINUTES') }</option>
+              </select>
+            </div>
+          }
           <div className="margin-top-10 item">
             <div className="padding-bottom-20">{ translate('SETTINGS.CURRENCY') }</div>
             <select
@@ -362,40 +364,44 @@ class Settings extends React.Component {
               <option value="overview">{ translate('APP_TITLE.OVERVIEW') }</option>
             </select>
           </div>
-          <div className="item item--sm">
-            <label className="switch">
-              <input
-                type="checkbox"
-                value="on"
-                checked={ this.state.requirePin }
-                readOnly />
+          { this.props.auth &&
+            <div className="item item--sm">
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  value="on"
+                  checked={ this.state.requirePin }
+                  readOnly />
+                <div
+                  className="slider"
+                  onClick={ this.toggleConfirmPin }></div>
+              </label>
               <div
-                className="slider"
-                onClick={ this.toggleConfirmPin }></div>
-            </label>
-            <div
-              className="toggle-label"
-              onClick={ this.toggleConfirmPin }>
-              { translate('SETTINGS.REQUIRE_PIN_CONFIRM') }
+                className="toggle-label"
+                onClick={ this.toggleConfirmPin }>
+                { translate('SETTINGS.REQUIRE_PIN_CONFIRM') }
+              </div>
             </div>
-          </div>
-          <div className="item item--sm">
-            <label className="switch">
-              <input
-                type="checkbox"
-                value="on"
-                checked={ this.state.pinBruteforceProtection }
-                readOnly />
+          }
+          { this.props.auth &&
+            <div className="item item--sm">
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  value="on"
+                  checked={ this.state.pinBruteforceProtection }
+                  readOnly />
+                <div
+                  className="slider"
+                  onClick={ this.togglePinBruteforceProtection }></div>
+              </label>
               <div
-                className="slider"
-                onClick={ this.togglePinBruteforceProtection }></div>
-            </label>
-            <div
-              className="toggle-label"
-              onClick={ this.togglePinBruteforceProtection }>
-              { translate('SETTINGS.PURGE_SEED_AFTER_3_PIN_ATTEMPTS') }
+                className="toggle-label"
+                onClick={ this.togglePinBruteforceProtection }>
+                { translate('SETTINGS.PURGE_SEED_AFTER_3_PIN_ATTEMPTS') }
+              </div>
             </div>
-          </div>
+          }
           <div className="item item--sm">
             <label className="switch">
               <input
@@ -435,17 +441,22 @@ class Settings extends React.Component {
               { translate('SETTINGS.DEBUG') }
             </div>
           </div>
-          <div
-            onClick={ () => this.props.changeActiveSection('recovery') }
-            className="item item--sm">
-            { translate('APP_TITLE.RECOVERY') }
-          </div>
-          <div
-            onClick={ () => this.toggleActiveView('pin') }
-            className="item item--sm">
-            { translate('SETTINGS.CHANGE_PIN') }
-          </div>
-          { this.props.coin.indexOf('|spv') > -1 &&
+          { this.props.auth &&
+            <div
+              onClick={ () => this.props.changeActiveSection('recovery') }
+              className="item item--sm">
+              { translate('APP_TITLE.RECOVERY') }
+            </div>
+          }
+          { this.props.auth &&
+            <div
+              onClick={ () => this.toggleActiveView('pin') }
+              className="item item--sm">
+              { translate('SETTINGS.CHANGE_PIN') }
+            </div>
+          }
+          { this.props.auth &&
+            this.props.coin.indexOf('|spv') > -1 &&
             <div
               onClick={ () => this.props.changeActiveSection('server-select') }
               className="item item--sm">
@@ -458,6 +469,7 @@ class Settings extends React.Component {
             { translate('SETTINGS.REMOVE_COIN') }
           </div>
           { this.state.pinConfirmRequired &&
+            this.props.auth &&
             <div className="pin-confirm">
               <div className="pin-confirm-title">{ translate('SETTINGS.SETTINS_PIN_REQUIRED') }</div>
               <div className="margin-bottom-35">
