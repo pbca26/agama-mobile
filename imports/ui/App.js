@@ -445,14 +445,29 @@ class App extends React.Component {
   switchCoin(coin, skipRefresh, mainView) {
     const _name = coin.split('|')[0];
     const _mode = coin.split('|')[1];
+    let _cache = getLocalStorageVar('cache');
+    let _balance = this.state.coins[coin] ? this.state.coins[coin].transactions: null;
+    let _transactions = this.state.coins[coin] ? this.state.coins[coin].balance: null;
+    
+    if (_cache &&
+        _cache.balance &&
+        _cache.balance[coin]) {
+      _balance = _cache.balance[coin];
+    }
+
+    if (_cache &&
+        _cache.transactions &&
+        _cache.transactions[coin]) {
+       _transactions = _cache.transactions[coin];
+    }
 
     this.setState({
       coin: coin,
       address: this.state.pubKeys[_mode][_name],
       history: this.state.activeSection,
       activeSection: skipRefresh && !mainView ? this.state.activeSection : 'dashboard',
-      transactions: this.state.coins[coin] ? this.state.coins[coin].transactions: null,
-      balance: this.state.coins[coin] ? this.state.coins[coin].balance: null,
+      transactions: _transactions,
+      balance: _balance,
     });
 
     // toggle refresh and update in-mem coins cache obj

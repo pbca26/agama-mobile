@@ -161,7 +161,7 @@ class Settings extends React.Component {
           deposits: {},
         },
       });
-      setLocalStorageVar('overview', null);
+      setLocalStorageVar('cache', null);
     } else {
       setLocalStorageVar('settings', {
         autoLockTimeout: this.state.autoLockTimeout,

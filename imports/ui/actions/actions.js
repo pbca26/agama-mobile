@@ -350,6 +350,17 @@ const transactions = (network, options) => {
           options ? options.txid : null
         )
         .then((res) => {
+          let _cache = getLocalStorageVar('cache') || {};
+          
+          if (_cache.transactions) {
+            _cache.transactions[network] = res;
+          } else {
+            _cache.transactions = {};
+            _cache.transactions[network] = res;
+          }
+
+          setLocalStorageVar('cache', _cache);
+
           resolve(res);
         });
       } else if (network.indexOf('|eth') > -1) {
@@ -367,8 +378,19 @@ const transactions = (network, options) => {
         }
 
         ethTransactions(address, options)
-        .then((_transactions) => {
-          resolve(_transactions);
+        .then((res) => {
+          let _cache = getLocalStorageVar('cache') || {};
+          
+          if (_cache.transactions) {
+            _cache.transactions[network] = res;
+          } else {
+            _cache.transactions = {};
+            _cache.transactions[network] = res;
+          }
+
+          setLocalStorageVar('cache', _cache);
+          
+          resolve(res);
         });
       }
     });
@@ -384,6 +406,7 @@ const balance = (network) => {
         const address = keys.spv[_name].pub;
         let _electrumServer = getLocalStorageVar('coins')[network].server;
         _electrumServer.serverList = electrumServers[_name].serverList;
+        
         let params = {
           port: _electrumServer.port,
           ip: _electrumServer.ip,
@@ -418,6 +441,17 @@ const balance = (network) => {
                   cache
                 )
                 .then((res) => {
+                  let _cache = getLocalStorageVar('cache') || {};
+
+                  if (_cache.balance) {
+                    _cache.balance['kmd|spv'] = res;
+                  } else {
+                    _cache.balance = {};
+                    _cache.balance['kmd|spv'] = res;
+                  }
+
+                  setLocalStorageVar('cache', _cache);
+
                   resolve(res);
                 });
               }
@@ -425,10 +459,22 @@ const balance = (network) => {
               if (!_balance.hasOwnProperty('confirmed')) {
                 resolve('error');
               } else {
-                resolve({
+                const _balance = {
                   balance: Number(fromSats(_balance.confirmed).toFixed(8)),
                   unconfirmed: Number(fromSats(_balance.unconfirmed).toFixed(8)),
-                });
+                };
+                let _cache = getLocalStorageVar('cache') || {};
+                
+                if (_cache.balance) {
+                  _cache.balance[network] = _balance;
+                } else {
+                  _cache.balance = {};
+                  _cache.balance[network] = _balance;
+                }
+
+                setLocalStorageVar('cache', _cache);
+
+                resolve(_balance);
               }
             }
           }
@@ -448,11 +494,23 @@ const balance = (network) => {
         }
 
         ethBalance(address, options)
-        .then((_balance) => {
-          resolve({
-            balance: _balance.balance,
+        .then((res) => {
+          const _balance = {
+            balance: res.balance,
             unconfirmed: 0,
-          });
+          };
+          let _cache = getLocalStorageVar('cache') || {};
+          
+          if (_cache.balance) {
+            _cache.balance[network] = _balance;
+          } else {
+            _cache.balance = {};
+            _cache.balance[network] = _balance;
+          }
+
+          setLocalStorageVar('cache', _cache);
+
+          resolve(_balance);
         });
       }
     });
@@ -608,6 +666,7 @@ const getOverview = (coins) => {
         return new Promise((resolve, reject) => {
           if (pair.coin.indexOf('|spv') > -1) {
             const _electrumServer = getLocalStorageVar('coins')[pair.coin].server;
+
             let params = {
               port: _electrumServer.port,
               ip: _electrumServer.ip,
