@@ -423,11 +423,12 @@ class Login extends React.Component {
             }
             { this.state.createSeedConfirm &&
               this.state.createSeedConfirm.length > 0 &&
-              this.state.createSeed !== this.state.createSeedConfirm.join(' ') &&
               <div className="margin-top-10">
-                <i
-                  onClick={ this.clearCreateSeedConfirm }
-                  className="fa fa-trash"></i>
+                { this.state.createSeed !== this.state.createSeedConfirm.join(' ') &&
+                  <i
+                    onClick={ this.clearCreateSeedConfirm }
+                    className="fa fa-trash"></i>
+                }
                 <div className="seed-gen-box">{ this.state.createSeedConfirm.join(' ') }</div>
               </div>
             }
