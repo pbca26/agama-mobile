@@ -72,7 +72,7 @@ class AddCoin extends React.Component {
             </div>
             <div className="bitcoin">{ translate(`${_mode.toUpperCase()}.${_name.toUpperCase()}`) }</div>
             { _mode === 'eth' &&
-              erc20ContractId[_mode.toUpperCase()] &&
+              erc20ContractId[_name.toUpperCase()] &&
               <div className="badge badge--erc20">ERC20</div>
             }
           </div>

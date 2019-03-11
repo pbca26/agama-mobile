@@ -79,6 +79,10 @@ class Settings extends React.Component {
       removeCoins,
     });
     this.props.changeTitle('settings');
+
+    Meteor.setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 50);
   }
 
   toggleActiveView(name) {
@@ -112,7 +116,9 @@ class Settings extends React.Component {
       });
     }
 
-    window.scrollTo(0, 0);
+    Meteor.setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 50);
   }
 
   updateInput(e) {
