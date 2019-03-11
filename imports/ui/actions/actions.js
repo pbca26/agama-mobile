@@ -746,7 +746,9 @@ const getOverview = (coins) => {
 
             if (getLocalStorageVar('seed') &&
                 getLocalStorageVar('settings').mainView !== 'default') {
-              setLocalStorageVar('overview', _overviewItems);
+              let _cache = getLocalStorageVar('cache') || {};
+              _cache.overview = _overviewItems;
+              setLocalStorageVar('cache', _cache);
             }
           }
         });

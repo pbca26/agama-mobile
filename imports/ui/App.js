@@ -641,9 +641,10 @@ class App extends React.Component {
     
     if (getLocalStorageVar('seed') &&
         getLocalStorageVar('settings').mainView !== 'default' &&
-        getLocalStorageVar('overview') &&
-        getLocalStorageVar('overview').length > 0) {
-      const overviewCache = getLocalStorageVar('overview');
+        getLocalStorageVar('cache') &&
+        getLocalStorageVar('cache').overview &&
+        getLocalStorageVar('cache').overview.length > 0) {
+      const overviewCache = getLocalStorageVar('cache').overview;
       let overviewCacheCoinsFlat = [];
       
       for (let i = 0; i < overviewCache.length; i++) {
