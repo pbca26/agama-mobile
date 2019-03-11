@@ -431,6 +431,7 @@ class Login extends React.Component {
             }
             <div
               onClick={ this.nextStep }
+              disabled={ this.state.createSeed !== this.state.createSeedConfirm.join(' ') }
               className="group3">
               <div className="btn-inner">
                 <div className="btn">{ translate('LOGIN.NEXT') }</div>
