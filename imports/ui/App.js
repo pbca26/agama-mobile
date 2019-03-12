@@ -201,6 +201,7 @@ class App extends React.Component {
       }
     } else {
       this.setState({
+        auth: false,
         coins: {},
         address: null,
         balance: null,
@@ -208,7 +209,8 @@ class App extends React.Component {
         utxo: null,
         coin: null,
         activeSection: 'addcoin',
-        history: null,  
+        history: null,
+        title: null,
       });
     }
   }
@@ -643,6 +645,8 @@ class App extends React.Component {
     .then((res) => {
       let lockState = Object.assign({}, this.defaultState);
       lockState.coins = this.state.coins;
+      lockState.title = null;
+      lockState.history = null;
 
       this.toggleAutoRefresh(true);
       Meteor.setTimeout(() => {
