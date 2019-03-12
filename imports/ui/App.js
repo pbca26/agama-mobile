@@ -634,7 +634,15 @@ class App extends React.Component {
 
     if (typeof purgeSeed === 'boolean' &&
         purgeSeed === true) {
+      setLocalStorageVar('coins', null);
       setLocalStorageVar('seed', null);
+      setLocalStorageVar('exchanges', {
+        coinswitch: {
+          orders: {},
+          deposits: {},
+        },
+      });
+      setLocalStorageVar('cache', null);
     }
 
     if (this.globalClickTimeout) {

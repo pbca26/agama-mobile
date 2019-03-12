@@ -159,7 +159,7 @@ class Settings extends React.Component {
 
     if (this.state.purgeData) {
       setLocalStorageVar('settings', settingsDefaults);
-      setLocalStorageVar('coins', {});
+      setLocalStorageVar('coins', null);
       setLocalStorageVar('seed', null);
       setLocalStorageVar('exchanges', {
         coinswitch: {
