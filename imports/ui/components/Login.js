@@ -49,6 +49,7 @@ class Login extends React.Component {
       createPin: null,
       createPinConfirm: null,
       createPinError: null,
+      displaySeed: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.updateInput = this.updateInput.bind(this);
@@ -62,6 +63,13 @@ class Login extends React.Component {
     this.clearCreateSeedConfirm = this.clearCreateSeedConfirm.bind(this);
     this.createSeedConfirmPush = this.createSeedConfirmPush.bind(this);
     this.addcoinCB = this.addcoinCB.bind(this);
+    this.toggleSeedVisibility = this.toggleSeedVisibility.bind(this);
+  }
+
+  toggleSeedVisibility() {
+    this.setState({
+      displaySeed: !this.state.displaySeed,
+    });
   }
 
   addcoinCB(coin) {
@@ -128,6 +136,7 @@ class Login extends React.Component {
         this.setState({
           restoreIsPrivKey,
           step: this.state.step + 1,
+          displaySeed: false,
         });
       } else if (this.state.step === 1) {
         let restorePinError;
@@ -243,6 +252,7 @@ class Login extends React.Component {
       createPin: null,
       createPinConfirm: null,
       createPinError: null,
+      displaySeed: false,
     });
     this.props.changeTitle('restore_wallet');
   }
@@ -264,6 +274,7 @@ class Login extends React.Component {
       createPin: null,
       createPinConfirm: null,
       createPinError: null,
+      displaySeed: false,
     });
   }
 
@@ -557,14 +568,24 @@ class Login extends React.Component {
               </div>
             }
             <div className="group">
-              <div className="edit">
-                <input
-                  type="password"
-                  className="form-control"
-                  name="passphrase"
-                  onChange={ this.updateInput }
-                  placeholder={ `${translate('LOGIN.ENTER_PASSPHRASE')} ${translate('LOGIN.OR_WIF')}` }
-                  value={ this.state.passphrase || '' } />
+              <div className="edit create-wallet-seed">
+                { this.state.passphrase &&
+                  <i
+                    onClick={ this.toggleSeedVisibility }
+                    className={ 'fa fa-eye' + (this.state.displaySeed ? '-slash' : '') }></i>
+                }
+                { this.state.displaySeed &&
+                  <span>{ this.state.passphrase }</span>
+                }
+                { !this.state.displaySeed &&
+                  <input
+                    type="password"
+                    className="form-control"
+                    name="passphrase"
+                    onChange={ this.updateInput }
+                    placeholder={ `${translate('LOGIN.ENTER_PASSPHRASE')} ${translate('LOGIN.OR_WIF')}` }
+                    value={ this.state.passphrase || '' } />
+                }
               </div>
             </div>
             <div

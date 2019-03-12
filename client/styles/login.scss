@@ -1,5 +1,19 @@
 .form {
   &.login {
+    .create-wallet-seed {
+      span {
+        display: block;
+        font-size: 14px;
+        margin-right: 35px;
+      }
+      .fa {
+        position: absolute;
+        margin-left: 290px;
+      }
+      input[type="password"].form-control {
+        width: calc(100% - 35px);
+      }
+    }
     .login-create-pin {
       .create-wallet {
         .fa-qrcode {
