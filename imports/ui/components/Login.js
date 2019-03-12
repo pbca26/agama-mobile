@@ -730,7 +730,7 @@ class Login extends React.Component {
   }
 
   render() {
-    if (((getLocalStorageVar('coins') && getLocalStorageVar('seed')) || (!getLocalStorageVar('coins') && !getLocalStorageVar('seed'))) &&
+    if (((getLocalStorageVar('coins') && Object.keys(getLocalStorageVar('coins')).length && getLocalStorageVar('seed')) || ((!getLocalStorageVar('coins') || (getLocalStorageVar('coins') && !Object.keys(getLocalStorageVar('coins')).length)) && !getLocalStorageVar('seed'))) &&
         ((!this.props.auth && this.props.activeSection !== 'settings') &&
         (this.props.activeSection === 'login' || (!this.props.auth && this.props.activeSection !== 'addcoin')) &&
         this.props.activeSection !== 'offlinesig' &&

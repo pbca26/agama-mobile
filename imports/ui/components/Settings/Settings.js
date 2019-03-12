@@ -499,7 +499,9 @@ class Settings extends React.Component {
           { this.state.isSaved &&
             <div className="padding-bottom-20 text-center success">
               { translate('SETTINGS.SAVED') }
-              <div className="padding-top-10">{ translate('SETTINGS.LOGOUT_REQUIRED') }</div>
+              { !this.state.purgeData &&
+                <div className="padding-top-10">{ translate('SETTINGS.LOGOUT_REQUIRED') }</div>
+              }
             </div>
           }
           <div

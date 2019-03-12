@@ -99,10 +99,10 @@ class AddCoin extends React.Component {
     if (this.props.activate ||
         (this.props.activeSection !== 'pin' &&
         this.props.activeSection !== 'offlinesig') ||
-        (!getLocalStorageVar('coins') && getLocalStorageVar('seed'))) {
+        ((!getLocalStorageVar('coins') || (getLocalStorageVar('coins') && !Object.keys(getLocalStorageVar('coins')).length)) && getLocalStorageVar('seed'))) {
       if (this.props.activate ||
           this.props.activeSection === 'addcoin' ||
-          (!getLocalStorageVar('coins') && getLocalStorageVar('seed'))) {
+          ((!getLocalStorageVar('coins') || (getLocalStorageVar('coins') && !Object.keys(getLocalStorageVar('coins')).length)) && getLocalStorageVar('seed'))) {
         return (
           <div className="addcoin-ui">
             <div className="home form">
