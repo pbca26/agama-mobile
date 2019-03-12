@@ -95,6 +95,7 @@ const lang = {
       MAIN_VIEW: 'Main view',
       DEFAULT: 'Transactions history',
       SETTINS_PIN_REQUIRED: 'PIN confirmation is required',
+      LOGOUT_REQUIRED: 'Certain settings changes require logout',
     },
     RECOVERY: {
       PROVIDE_YOUR_PIN: 'Provide your PIN number to unlock seed/WIF.',
