@@ -289,7 +289,7 @@ class App extends React.Component {
 
   historyBack() {
     this.setState({
-      activeSection: this.state.history,
+      activeSection: this.state.activeSection === 'dashboard' && getLocalStorageVar('settings').mainView !== 'default' ? 'overview' : this.state.history,
       history: null,
     });
     
@@ -1031,7 +1031,7 @@ class App extends React.Component {
         className={ 'app-container' + (config.dev ? '' : ' unselectable') }
         onClick={ this.globalClick }>
         <div className="app-header">
-          { this.state.history &&
+          { (this.state.history || (getLocalStorageVar('settings').mainView !== 'default' && this.state.activeSection === 'dashboard')) &&
             !this.state.displayMenu &&
             ((this.state.auth && this.state.history !== 'login') || !this.state.auth) &&
             this.state.history !== this.state.activeSection &&
