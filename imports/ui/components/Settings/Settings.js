@@ -231,7 +231,7 @@ class Settings extends React.Component {
               wrongPin: true,
             });
             _pinConfirmRequired = true;
-          } else if (pinBruteforceProtectionRetries < 3) {
+          } else if (pinBruteforceProtectionRetries < 2) {
             let _seedStorage = getLocalStorageVar('seed');
             _seedStorage.pinRetries += 1;
             setLocalStorageVar('seed', _seedStorage);

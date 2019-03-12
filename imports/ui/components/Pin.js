@@ -68,7 +68,7 @@ class Pin extends React.Component {
             wrongPin: true,
             pinOverrideTooShort: false,
           });
-        } else if (pinBruteforceProtectionRetries < 3) {
+        } else if (pinBruteforceProtectionRetries < 2) {
           let _seedStorage = getLocalStorageVar('seed');
           _seedStorage.pinRetries += 1;
           setLocalStorageVar('seed', _seedStorage);

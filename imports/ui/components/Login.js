@@ -361,7 +361,7 @@ class Login extends React.Component {
             pinTooShort: false,
             wrongPin: true,
           });
-        } else if (pinBruteforceProtectionRetries < 3) {
+        } else if (pinBruteforceProtectionRetries < 2) {
           let _seedStorage = getLocalStorageVar('seed');
           _seedStorage.pinRetries += 1;
           setLocalStorageVar('seed', _seedStorage);
@@ -371,6 +371,10 @@ class Login extends React.Component {
             wrongPin: true,
             wrongPinRetries: _seedStorage.pinRetries,
           });
+
+          setTimeout(() => {
+            console.warn(this.state);
+          }, 100);
         } else {
           this.props.changeTitle();
           this.props.lock(true);
