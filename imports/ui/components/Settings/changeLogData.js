@@ -1,7 +1,6 @@
 const changeLogData = [{
   version: '0.1.5',
   changes: [
-    'In-wallet exchange (Coinswitch)',
     'dPoW icon',
     'Recovery show priv keys toggle',
     'Transaction details view',

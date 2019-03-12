@@ -869,7 +869,7 @@ class App extends React.Component {
               </div>
               { this.state.auth &&
                 <div className="items">
-                  <div
+                  {/*<div
                     className="item"
                     disabled={ this.state.activeSection === 'exchanges' }>
                     <div
@@ -880,7 +880,7 @@ class App extends React.Component {
                     <img
                       className="line"
                       src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
-                  </div>
+                  </div>*/}
                   <div
                     className="item"
                     disabled={ this.state.activeSection === 'overview' }>
