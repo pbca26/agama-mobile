@@ -50,6 +50,7 @@ class SettingsSupport extends React.Component {
         name="selector"
         onChange={ (event) => this.updateInput(event) }>
         <option
+          disabled
           value="none">
           { translate('SUPPORT.SELECT_AN_OPTION') }
         </option>
