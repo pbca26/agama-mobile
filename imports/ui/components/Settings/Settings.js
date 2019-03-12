@@ -503,7 +503,8 @@ class Settings extends React.Component {
             onClick={ this.save }
             disabled={
               this.state.pinConfirmRequired &&
-              !this.state.pin
+              !this.state.pin ||
+              (this.state.pin && this.state.pin < 6)
             }
             className="group3 margin-top-25 margin-bottom-25">
             <div className="btn-inner">

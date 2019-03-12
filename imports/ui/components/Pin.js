@@ -133,7 +133,8 @@ class Pin extends React.Component {
           disabled={
             !this.state.oldPin ||
             !this.state.pinOverride ||
-            this.state.pinSet
+            this.state.pinSet ||
+            ((this.state.oldPin && this.state.oldPin.length < 6) || (this.state.pinOverride && this.state.pinOverride.length < 6))
           }>
           <div className="btn-inner">
             <div className="btn">{ translate('PIN.SAVE') }</div>

@@ -168,7 +168,10 @@ class Recovery extends React.Component {
           </div>
         </div>
         <div
-          disabled={ !this.state.pin }
+          disabled={
+            !this.state.pin ||
+            (this.state.pin && this.state.pin.length < 6)
+          }
           onClick={ this.decodeSeed }
           className="group3 margin-top-40">
           <div className="btn-inner">

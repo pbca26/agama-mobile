@@ -710,7 +710,11 @@ class Login extends React.Component {
         </div>
         <div
           onClick={ this.login }
-          className="group3">
+          className="group3"
+          disabled={
+            !this.state.pin ||
+            (this.state.pin && this.state.pin.length < 6)
+          }>
           <div className="btn-inner">
             <div className="btn">{ translate('LOGIN.SIGN_IN') }</div>
             <div className="group2">

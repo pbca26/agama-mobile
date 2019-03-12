@@ -869,7 +869,8 @@ class SendCoin extends React.Component {
                     className="btn-inner pull-right"
                     disabled={
                       (this.state.spvPreflightResult && this.state.spvPreflightResult.result && !this.state.spvPreflightResult.result.fee) ||
-                      (this.state.spvPreflightResult && this.state.spvPreflightResult.result && !this.state.spvPreflightResult.result.value)
+                      (this.state.spvPreflightResult && this.state.spvPreflightResult.result && !this.state.spvPreflightResult.result.value) ||
+                      (getLocalStorageVar('settings').requirePin && ((this.state.pin && this.state.pin.length < 6) || !this.state.pin))
                     }>
                     <div className="btn">{ translate('SEND.CONFIRM') }</div>
                     <div className="group2">
