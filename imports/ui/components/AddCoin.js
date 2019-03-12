@@ -3,6 +3,7 @@ import React from 'react';
 import {
   coinsList,
   assetsPath,
+  getLocalStorageVar,
 } from '../actions/utils';
 import translate from '../translate/translate';
 import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
@@ -64,7 +65,7 @@ class AddCoin extends React.Component {
           <div
             onClick={ () => this.addCoin(_coin.name) }
             key={ `overview-coins-${_coin.name}` }
-            className={ 'overview-coin' + (_coins[_coin.name] ? ' disabled' : '') }>
+            className={ 'overview-coin' + (_coins && _coins[_coin.name] ? ' disabled' : '') }>
             <div className="btc">
               <img
                 className="oval4"
@@ -79,7 +80,7 @@ class AddCoin extends React.Component {
         );
 
         if (this.props.activate &&
-            (this.props.coins.indexOf(_coin.name) === -1 || this.props.filterOut.indexOf(_coin.name) > -1)) {
+            (this.props.coins && this.props.coins.indexOf(_coin.name) === -1 || this.props.filterOut && this.props.filterOut.indexOf(_coin.name) > -1)) {
           _items.pop();
         }
       }
@@ -96,13 +97,12 @@ class AddCoin extends React.Component {
 
   render() {
     if (this.props.activate ||
-        (this.props.activeSection !== 'create-seed' &&
-        this.props.activeSection !== 'pin' &&
-        this.props.activeSection !== 'offlinesig')) {
+        (this.props.activeSection !== 'pin' &&
+        this.props.activeSection !== 'offlinesig') ||
+        (!getLocalStorageVar('coins') && getLocalStorageVar('seed'))) {
       if (this.props.activate ||
           this.props.activeSection === 'addcoin' ||
-          !this.props.coins ||
-          (this.props.coins && !Object.keys(this.props.coins).length)) {
+          (!getLocalStorageVar('coins') && getLocalStorageVar('seed'))) {
         return (
           <div className="addcoin-ui">
             <div className="home form">

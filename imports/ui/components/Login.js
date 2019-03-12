@@ -22,6 +22,7 @@ import { Meteor } from 'meteor/meteor';
 import { isPrivKey } from 'agama-wallet-lib/build/keys';
 import passphraseGenerator from 'agama-wallet-lib/build/crypto/passphrasegenerator';
 import { shuffleArray } from '../actions/utils';
+import AddCoin from './AddCoin';
 
 // TODO: PIN replace onscreen keyboard with virtual one
 
@@ -60,6 +61,47 @@ class Login extends React.Component {
     this.toggleCreateQR = this.toggleCreateQR.bind(this);
     this.clearCreateSeedConfirm = this.clearCreateSeedConfirm.bind(this);
     this.createSeedConfirmPush = this.createSeedConfirmPush.bind(this);
+    this.addcoinCB = this.addcoinCB.bind(this);
+  }
+
+  addcoinCB(coin) {
+    this.props.addCoin(coin);
+    
+    if (this.state.activeView === 'restore') {
+      const _encryptedKey = encryptkey(this.state.restorePin, this.state.passphrase);
+      
+      setLocalStorageVar('seed', getLocalStorageVar('settings').pinBruteforceProtection ? {
+        encryptedKey: _encryptedKey,
+        pinRetries: 0,
+      }: {
+        encryptedKey: _encryptedKey,
+      });
+
+      this.setState({
+        step: this.state.step + 1,
+        restorePin: null,
+        restorePinConfirm: null,
+        passphrase: null,
+      });
+    } else {
+      const _encryptedKey = encryptkey(this.state.createPin, this.state.createSeed);
+      
+      setLocalStorageVar('seed', getLocalStorageVar('settings').pinBruteforceProtection ? {
+        encryptedKey: _encryptedKey,
+        pinRetries: 0,
+      }: {
+        encryptedKey: _encryptedKey,
+      });
+
+      this.setState({
+        step: this.state.step + 1,
+        createPin: null,
+        createPinConfirm: null,
+        createSeed: null,
+        createSeedConfirm: [],
+        createSeedShuffled: null,
+      });
+    }
   }
 
   clearCreateSeedConfirm() {
@@ -111,21 +153,14 @@ class Login extends React.Component {
             restorePinError,
           });
         } else {
-          const _encryptedKey = encryptkey(this.state.restorePin, this.state.passphrase);
-
-          setLocalStorageVar('seed', getLocalStorageVar('settings').pinBruteforceProtection ? {
-            encryptedKey: _encryptedKey,
-            pinRetries: 0,
-          }: {
-            encryptedKey: _encryptedKey,
-          });
-
           this.setState({
             step: this.state.step + 1,
-            restorePin: null,
-            restorePinConfirm: null,
           });
         }
+      } else {
+        this.setState({
+          step: this.state.step + 1,
+        });
       }
     } else {
       if (this.state.step === 2) {
@@ -152,19 +187,8 @@ class Login extends React.Component {
             createPinError,
           });
         } else {
-          const _encryptedKey = encryptkey(this.state.createPin, this.state.createSeed);
-
-          setLocalStorageVar('seed', getLocalStorageVar('settings').pinBruteforceProtection ? {
-            encryptedKey: _encryptedKey,
-            pinRetries: 0,
-          }: {
-            encryptedKey: _encryptedKey,
-          });
-
           this.setState({
             step: this.state.step + 1,
-            createPin: null,
-            createPinConfirm: null,
           });
         }
       } else {
@@ -498,7 +522,12 @@ class Login extends React.Component {
           </div>
         }
         { this.state.step === 3 &&
-          <div className="step4">
+          <AddCoin
+            cb={ this.addcoinCB }
+            activate={ true } />
+        }
+        { this.state.step === 4 &&
+          <div className="step5">
             { this.renderLoginInForm() }
           </div>
         }
@@ -612,7 +641,12 @@ class Login extends React.Component {
           </div>
         }
         { this.state.step === 2 &&
-          <div className="step3">
+          <AddCoin
+            cb={ this.addcoinCB }
+            activate={ true } />
+        }
+        { this.state.step === 3 &&
+          <div className="step4">
             { this.renderLoginInForm() }
           </div>
         }
@@ -667,12 +701,11 @@ class Login extends React.Component {
   }
 
   render() {
-    if ((!this.props.auth && this.props.activeSection !== 'settings') &&
+    if (((getLocalStorageVar('coins') && getLocalStorageVar('seed')) || (!getLocalStorageVar('coins') && !getLocalStorageVar('seed'))) &&
+        ((!this.props.auth && this.props.activeSection !== 'settings') &&
         (this.props.activeSection === 'login' || (!this.props.auth && this.props.activeSection !== 'addcoin')) &&
-        this.props.coins &&
-        Object.keys(this.props.coins).length &&
         this.props.activeSection !== 'offlinesig' &&
-        this.props.activeSection !== 'pin') {
+        this.props.activeSection !== 'pin')) {
       return (
         <div className="form login">
           { getLocalStorageVar('seed') &&

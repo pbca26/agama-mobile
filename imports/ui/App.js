@@ -1099,7 +1099,8 @@ class App extends React.Component {
                 { ...this.state }
                 login={ this.login }
                 lock={ this.lock }
-                changeTitle={ this.changeTitle } />
+                changeTitle={ this.changeTitle }
+                addCoin={ this.addCoin } />
             }
             { !this.state.conError &&
               <SendCoin
