@@ -1,4 +1,5 @@
 import React from 'react';
+import { Meteor } from 'meteor/meteor';
 
 import {
   coinsList,
@@ -19,6 +20,12 @@ class AddCoin extends React.Component {
     this.updateInput = this.updateInput.bind(this);
     this.clearSearchTerm = this.clearSearchTerm.bind(this);
     this.addCoin = this.addCoin.bind(this);
+  }
+
+  componentWillMount() {
+    Meteor.setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 50);
   }
 
   clearSearchTerm() {
