@@ -6,6 +6,7 @@ import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
 import electrumServers from 'agama-wallet-lib/build/electrum-servers';
 import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 import transactionBuilder from 'agama-wallet-lib/build/transaction-builder';
+import dpowCoins from 'agama-wallet-lib/build/electrum-servers-dpow';
 import translate from '../translate/translate';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
@@ -26,7 +27,8 @@ const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, val
     .then((utxoList) => {
       if (utxoList &&
           utxoList.length) {
-        const _network = electrumJSNetworks[isKomodoCoin(network) ? 'kmd' : network];    
+        const _network = electrumJSNetworks[network.toLowerCase()] || electrumJSNetworks[isKomodoCoin(network) ? 'kmd' : network];    
+
         let _data = transactionBuilder.data(
           _network,
           value,
@@ -35,8 +37,39 @@ const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, val
           changeAddress,
           utxoList
         );
-
+        let dpowSecured = true;
+        
         devlog('send data', _data);
+
+        if (network.toLowerCase() === 'kmd' &&
+            _data.totalInterest > 0.0002) {
+          fee = fee * 2;
+          value = value - 10000;
+
+          _data = transactionBuilder.data(
+            _network,
+            value,
+            fee,
+            outputAddress,
+            changeAddress,
+            utxoList
+          );
+        }
+
+        if (dpowCoins.indexOf(network.toUpperCase()) > -1) {
+          let dpowSecured = true;
+          devlog(`${network} spv dpow enabled create tx, verify if all utxo are dpow secured`);
+          
+          for (let i = 0; i < _data.inputs.length; i++) {
+            if (_data.inputs[i].hasOwnProperty('dpowSecured') &&
+                !_data.inputs[i].dpowSecured) {
+              dpowSecured = false;
+              break;
+            }
+          }
+
+          _data.dpowSecured = dpowSecured;
+        }
 
         if (_data.balance) {
           if (!push) {
@@ -64,23 +97,33 @@ const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, val
 
         // push to network
         if (push) {
-          HTTP.call('POST', `http://${proxyServer.ip}:${proxyServer.port}/api/pushtx`, {
+          let data = {
+            port: electrumServer.port,
+            ip: electrumServer.ip,
+            proto: electrumServer.proto,
+            rawtx: _tx,
+          };
+          devlog('req', {
+            method: 'POST',
+            url: `http://${proxyServer.ip}:${proxyServer.port}/api/pushtx`,
+            params: data,
+          });
+      
+          HTTP.call(
+            'POST',
+            `http://${proxyServer.ip}:${proxyServer.port}/api/pushtx`,
+          {
             headers: {
               'Content-Type': 'application/json',
             },
-            data: {
-              rawtx: _tx,
-              port: electrumServer.port,
-              ip: electrumServer.ip,
-              proto: electrumServer.proto,
-            },
+            data,
           }, (error, result) => {
             result = JSON.parse(result.content);
 
             if (result.msg === 'error') {
               resolve({
                 msg: 'error',
-                result: translate('API.CON_ERROR'),
+                result: JSON.stringify(result.result).indexOf('code') > -1 ? `${translate('API.PUSH_ERROR')} ${JSON.stringify(result.result)}` : translate('API.CON_ERROR'),
               });
             } else {
               const txid = result.result;

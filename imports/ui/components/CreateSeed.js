@@ -61,24 +61,26 @@ class CreateSeed extends React.Component {
         pristine: false,
       });
     } else {
-      if (this.state.createPin) {
-        if (this.state.pinOverride &&
-            this.state.pinOverride.length >= 6) {
-          const _encryptedKey = encryptkey(this.state.pinOverride, this.state.seed);
+      if (this.state.confirmSeedSaved) {
+        if (this.state.createPin) {
+          if (this.state.pinOverride &&
+              this.state.pinOverride.length >= 6) {
+            const _encryptedKey = encryptkey(this.state.pinOverride, this.state.seed);
 
-          setLocalStorageVar('seed', { encryptedKey: _encryptedKey });
+            setLocalStorageVar('seed', { encryptedKey: _encryptedKey });
 
+            this.props.login(this.state.seed);
+            this.setState(this.defaultState);
+          } else {
+            this.setState({
+              pinOverrideTooShort: true,
+              wrongPin: false,
+            });
+          }
+        } else {
           this.props.login(this.state.seed);
           this.setState(this.defaultState);
-        } else {
-          this.setState({
-            pinOverrideTooShort: true,
-            wrongPin: false,
-          });
         }
-      } else {
-        this.props.login(this.state.seed);
-        this.setState(this.defaultState);
       }
     }
   }
@@ -100,7 +102,7 @@ class CreateSeed extends React.Component {
       return (
         <div className="form create-seed">
           <div className="title margin-bottom-25">{ translate('LOGIN.THIS_IS_YOUR_NEW_SEED') }</div>
-          <div className="seed-gen-box">{ this.state.seed }</div>
+          <div className="seed-gen-box selectable">{ this.state.seed }</div>
           <div className="text-center margin-top-30">
             <QRCode
               value={ this.state.seed }
@@ -114,7 +116,8 @@ class CreateSeed extends React.Component {
               <input
                 type="checkbox"
                 value="on"
-                checked={ this.state.confirmSeedSaved } />
+                checked={ this.state.confirmSeedSaved }
+                readOnly />
               <div
                 className="slider"
                 onClick={ this.toggleConfirmSeed }></div>
@@ -136,7 +139,8 @@ class CreateSeed extends React.Component {
               <input
                 type="checkbox"
                 value="on"
-                checked={ this.state.createPin } />
+                checked={ this.state.createPin }
+                readOnly />
               <div
                 className="slider"
                 onClick={ this.toggleCreatePin }></div>
@@ -164,10 +168,10 @@ class CreateSeed extends React.Component {
               </div>
             }
           </div>
-          <div
-            onClick={ this.login }
-            className="group3">
-            <div className="btn-inner">
+          <div className="group3">
+            <div
+              onClick={ this.login }
+              className="btn-inner">
               <div className="btn">{ translate('LOGIN.SIGN_IN') }</div>
               <div className="group2">
                 <img

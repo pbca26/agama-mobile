@@ -1,15 +1,32 @@
+import {
+  joinPropsUrl,
+  getLocalStorageVar,
+} from './utils';
+
+const _settings = getLocalStorageVar('settings');
+
 export const config = {
-  dev: false,
-  debug: false,
+  dev: _settings && _settings.debug ? true : false,
+  debug: _settings && _settings.debug ? true : false,
+  debugOptions: {
+    req: _settings && _settings.debug ? true : false,
+    stringify: _settings && _settings.debug ? true : false,
+  },
 };
 
 export const devlog = (msg, data) => {
   if (config.dev ||
       config.debug) {
-    if (data) {
-      console.warn(msg, data);
-    } else {
-      console.warn(msg);
+    if (config.debugOptions &&
+        config.debugOptions.req &&
+        msg === 'req') {
+      console.warn(`req method: ${data.method}, url: ${data.url}?${joinPropsUrl(data.params)}`);
+    } else if (msg !== 'req') {
+      if (data) {
+        console.warn(msg, config.debugOptions && config.debugOptions.stringify ? JSON.stringify(data) : data);
+      } else {
+        console.warn(config.debugOptions && config.debugOptions.stringify ? JSON.stringify(msg) : msg);
+      }
     }
   }
 };

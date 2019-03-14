@@ -9,21 +9,34 @@ import {
 } from 'agama-wallet-lib/build/utils';
 import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 import electrumJSTxDecoder from 'agama-wallet-lib/build/transaction-decoder';
+import dpowCoins from 'agama-wallet-lib/build/electrum-servers-dpow';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
 const listunspent = (proxyServer, electrumServer, address, network, full, verify, cache) => {
   let _atLeastOneDecodeTxFailed = false;
+  let params = {
+    port: electrumServer.port,
+    ip: electrumServer.ip,
+    proto: electrumServer.proto,
+    address,
+  };
+
+  if (dpowCoins.indexOf(network.toUpperCase()) > -1) {
+    devlog(`${network} spv dpow enabled listunspent, req verbose tx data`);
+    params.verbose = true;
+  }
+
+  devlog('req', {
+    method: 'GET',
+    url: `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent`,
+    params,
+  });
 
   if (full) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {      
       HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent`, {
-        params: {
-          port: electrumServer.port,
-          ip: electrumServer.ip,
-          proto: electrumServer.proto,
-          address,
-        },
+        params,
       }, (error, result) => {
         result = JSON.parse(result.content);
 
@@ -36,14 +49,22 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
               _utxoJSON.length) {
             let formattedUtxoList = [];
             let _utxo = [];
-
+            
+            params = {
+              port: electrumServer.port,
+              ip: electrumServer.ip,
+              proto: electrumServer.proto,
+            };
+            
+            devlog('req', {
+              method: 'GET',
+              url: `http://${proxyServer.ip}:${proxyServer.port}/api/getcurrentblock`,
+              params,
+            });
+                      
             // get current height
             HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/getcurrentblock`, {
-              params: {
-                port: electrumServer.port,
-                ip: electrumServer.ip,
-                proto: electrumServer.proto,
-              },
+              params,
             }, (error, result) => {
               result = JSON.parse(result.content);
 
@@ -56,7 +77,7 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
                     Number(currentHeight) > 0) {
                   // filter out unconfirmed utxos
                   for (let i = 0; i < _utxoJSON.length; i++) {
-                    if (Number(currentHeight) - Number(_utxoJSON[i].height) !== 0) {
+                    if (Number(currentHeight) - Number(_utxoJSON[i].height) > 0) {
                       _utxo.push(_utxoJSON[i]);
                     }
                   }
@@ -93,7 +114,7 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
                             devlog(_rawtxJSON);
 
                             // decode tx
-                            const _network = electrumJSNetworks[isKomodoCoin(network) ? 'kmd' : network];
+                            const _network = electrumJSNetworks[network.toLowerCase()] || electrumJSNetworks[isKomodoCoin(network) ? 'kmd' : network];
                             let decodedTx;
                             
                             if (cache.getDecodedTransaction(_utxoItem.tx_hash, network)) {
@@ -132,6 +153,17 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
                                   locktime: decodedTx.format.locktime,
                                 };
 
+                                if (dpowCoins.indexOf(network.toUpperCase()) > -1 &&
+                                    _utxoItem.hasOwnProperty('verbose')) {
+                                  _resolveObj.dpowSecured = false;
+    
+                                  if (_utxoItem.verbose.hasOwnProperty('confirmations')) {
+                                    if (_utxoItem.verbose.confirmations >= 2) {
+                                      _resolveObj.dpowSecured = true;
+                                    } 
+                                  }
+                                }
+
                                 // merkle root verification agains another electrum server
                                 if (verify) {
                                   verifyMerkleByCoin(
@@ -162,10 +194,22 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
                                   amount: Number(fromSats(_utxoItem.value)),
                                   amountSats: _utxoItem.value,
                                   confirmations: Number(_utxoItem.height) === 0 ? 0 : currentHeight - _utxoItem.height,
+                                  currentHeight,
                                   spendable: true,
                                   verified: false,
                                 };
 
+                                if (dpowCoins.indexOf(network.toUpperCase()) > -1 &&
+                                    _utxoItem.hasOwnProperty('verbose')) {
+                                  _resolveObj.dpowSecured = false;
+
+                                  if (_utxoItem.verbose.hasOwnProperty('confirmations')) {
+                                    if (_utxoItem.verbose.confirmations >= 2) {
+                                      _resolveObj.dpowSecured = true;
+                                    } 
+                                  }
+                                }
+                                
                                 // merkle root verification agains another electrum server
                                 if (verify) {
                                   verifyMerkleByCoin(
@@ -196,7 +240,7 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
                     }))
                     .then(promiseResult => {
                       if (!_atLeastOneDecodeTxFailed) {
-                        devlog(promiseResult);
+                        devlog(`${network} listunspent`, promiseResult);
                         resolve(promiseResult);
                       } else {
                         devlog('listunspent error, cant decode tx(s)');
@@ -217,13 +261,11 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
     });
   } else {
     return new Promise((resolve, reject) => {
-      HTTP.call('GET', `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent`, {
-        params: {
-          port: electrumServer.port,
-          ip: electrumServer.ip,
-          proto: electrumServer.proto,
-          address,
-        },
+      HTTP.call(
+        'GET',
+        `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent`,
+      {
+        params,
       }, (error, result) => {
         result = JSON.parse(result.content);
 
