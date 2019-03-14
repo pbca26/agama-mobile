@@ -869,18 +869,20 @@ class App extends React.Component {
               </div>
               { this.state.auth &&
                 <div className="items">
-                  {/*<div
-                    className="item"
-                    disabled={ this.state.activeSection === 'exchanges' }>
+                  { getLocalStorageVar('settings').debug &&
                     <div
-                      className="title"
-                      onClick={ this.toggleExchanges }>
-                      { translate('APP_TITLE.EXCHANGES') }
+                      className="item"
+                      disabled={ this.state.activeSection === 'exchanges' }>
+                      <div
+                        className="title"
+                        onClick={ this.toggleExchanges }>
+                        { translate('APP_TITLE.EXCHANGES') }
+                      </div>
+                      <img
+                        className="line"
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                     </div>
-                    <img
-                      className="line"
-                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
-                  </div>*/}
+                  }
                   <div
                     className="item"
                     disabled={ this.state.activeSection === 'overview' }>

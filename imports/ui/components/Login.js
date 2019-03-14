@@ -23,6 +23,7 @@ import { isPrivKey } from 'agama-wallet-lib/build/keys';
 import passphraseGenerator from 'agama-wallet-lib/build/crypto/passphrasegenerator';
 import { shuffleArray } from '../actions/utils';
 import AddCoin from './AddCoin';
+import UserAgreement from './Settings/UserAgreement';
 
 // TODO: PIN replace onscreen keyboard with virtual one
 
@@ -50,6 +51,7 @@ class Login extends React.Component {
       createPinConfirm: null,
       createPinError: null,
       displaySeed: false,
+      agreementAccepted: getLocalStorageVar('agreement') && getLocalStorageVar('agreement') === true || false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.updateInput = this.updateInput.bind(this);
@@ -64,6 +66,13 @@ class Login extends React.Component {
     this.createSeedConfirmPush = this.createSeedConfirmPush.bind(this);
     this.addcoinCB = this.addcoinCB.bind(this);
     this.toggleSeedVisibility = this.toggleSeedVisibility.bind(this);
+    this.agreementAcceptedCB = this.agreementAcceptedCB.bind(this);
+  }
+
+  agreementAcceptedCB() {
+    this.setState({
+      agreementAccepted: true,
+    });
   }
 
   toggleSeedVisibility() {
@@ -418,132 +427,141 @@ class Login extends React.Component {
   renderCreateWallet() {
     return (
       <div className="create-wallet">
-        { this.state.step === 0 &&
-          <div className="step1">
-            <div className="title">
-              { translate('LOGIN.NEW_SEED_P1') }
-              <br />
-              { translate('LOGIN.NEW_SEED_P2') }
-            </div>
-            <div className="create-wallet-security-tip">{ translate('LOGIN.NEW_SEED_SEC_TIP') }</div>
-            <i
-              onClick={ this.toggleCreateQR }
-              className="fa fa-qrcode"></i>
-            <div className="seed-gen-box selectable">{ this.state.createSeed }</div>
-            { this.state.createSeedDisplayQR &&
-              <div className="text-center margin-top-30">
-                <QRCode
-                  value={ this.state.createSeed }
-                  size={ 320 } />
-              </div>
-            }
-            <div
-              onClick={ this.nextStep }
-              className="group3">
-              <div className="btn-inner">
-                <div className="btn">{ translate('LOGIN.NEXT') }</div>
-                <div className="group2">
-                  <div className="rectangle8copy"></div>
-                  <img
-                    className="path6"
-                    src={ `${assetsPath.login}/reset-password-path-6.png` } />
-                </div>
-              </div>
-            </div>
-          </div>
+        { !this.state.agreementAccepted &&
+          <UserAgreement
+            enableButton={ true }
+            cb={ this.agreementAcceptedCB } />
         }
-        { this.state.step === 1 &&
-          <div className="step2">
-            <div className="title">{ translate('LOGIN.TO_CONFIRM_SEED') }</div>
-            { this.state.createSeedConfirm.length < this.state.createSeedShuffled.length &&
-              <div className="seed-words-block">
-                { this.renderCreateSeedWordsConfirm() }
-              </div>
-            }
-            { this.state.createSeedConfirm &&
-              this.state.createSeedConfirm.length > 0 &&
-              <div className="margin-top-10">
-                { this.state.createSeed !== this.state.createSeedConfirm.join(' ') &&
-                  <i
-                    onClick={ this.clearCreateSeedConfirm }
-                    className="fa fa-trash"></i>
+        { this.state.agreementAccepted &&
+          <div>
+            { this.state.step === 0 &&
+              <div className="step1">
+                <div className="title">
+                  { translate('LOGIN.NEW_SEED_P1') }
+                  <br />
+                  { translate('LOGIN.NEW_SEED_P2') }
+                </div>
+                <div className="create-wallet-security-tip">{ translate('LOGIN.NEW_SEED_SEC_TIP') }</div>
+                <i
+                  onClick={ this.toggleCreateQR }
+                  className="fa fa-qrcode"></i>
+                <div className="seed-gen-box selectable">{ this.state.createSeed }</div>
+                { this.state.createSeedDisplayQR &&
+                  <div className="text-center margin-top-30">
+                    <QRCode
+                      value={ this.state.createSeed }
+                      size={ 320 } />
+                  </div>
                 }
-                <div className="seed-gen-box">{ this.state.createSeedConfirm.join(' ') }</div>
-              </div>
-            }
-            <div
-              onClick={ this.nextStep }
-              disabled={ this.state.createSeed !== this.state.createSeedConfirm.join(' ') }
-              className="group3">
-              <div className="btn-inner">
-                <div className="btn">{ translate('LOGIN.NEXT') }</div>
-                <div className="group2">
-                  <div className="rectangle8copy"></div>
-                  <img
-                    className="path6"
-                    src={ `${assetsPath.login}/reset-password-path-6.png` } />
+                <div
+                  onClick={ this.nextStep }
+                  className="group3">
+                  <div className="btn-inner">
+                    <div className="btn">{ translate('LOGIN.NEXT') }</div>
+                    <div className="group2">
+                      <div className="rectangle8copy"></div>
+                      <img
+                        className="path6"
+                        src={ `${assetsPath.login}/reset-password-path-6.png` } />
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        }
-        { this.state.step === 2 &&
-          <div className="step3">
-            <div className="title">{ translate('LOGIN.PLEASE_PROVIDE_PIN') }</div>
-            <div className="group">
-              <div className="edit">
-                <input
-                  type="password"
-                  className="form-control"
-                  name="createPin"
-                  onChange={ this.updateInput }
-                  placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
-                  value={ this.state.createPin || '' } />
-              </div>
-            </div>
-            <div className="group">
-              <div className="edit">
-                <input
-                  type="password"
-                  className="form-control"
-                  name="createPinConfirm"
-                  onChange={ this.updateInput }
-                  placeholder={ translate('LOGIN.CONFIRM_PIN') }
-                  value={ this.state.createPinConfirm || '' } />
-              </div>
-            </div>
-            { this.state.createPinError &&
-              <div className="error margin-top-15 sz350">
-                <i className="fa fa-warning"></i> { this.state.createPinError }
-              </div>
             }
-            <div
-              disabled={
-                !this.state.createPin ||
-                !this.state.createPinConfirm
-              }
-              onClick={ this.nextStep }
-              className="group3">
-              <div className="btn-inner">
-                <div className="btn">{ translate('LOGIN.NEXT') }</div>
-                <div className="group2">
-                  <div className="rectangle8copy"></div>
-                  <img
-                    className="path6"
-                    src={ `${assetsPath.login}/reset-password-path-6.png` } />
+            { this.state.step === 1 &&
+              <div className="step2">
+                <div className="title">{ translate('LOGIN.TO_CONFIRM_SEED') }</div>
+                { this.state.createSeedConfirm.length < this.state.createSeedShuffled.length &&
+                  <div className="seed-words-block">
+                    { this.renderCreateSeedWordsConfirm() }
+                  </div>
+                }
+                { this.state.createSeedConfirm &&
+                  this.state.createSeedConfirm.length > 0 &&
+                  <div className="margin-top-10">
+                    { this.state.createSeed !== this.state.createSeedConfirm.join(' ') &&
+                      <i
+                        onClick={ this.clearCreateSeedConfirm }
+                        className="fa fa-trash"></i>
+                    }
+                    <div className="seed-gen-box">{ this.state.createSeedConfirm.join(' ') }</div>
+                  </div>
+                }
+                <div
+                  onClick={ this.nextStep }
+                  disabled={ this.state.createSeed !== this.state.createSeedConfirm.join(' ') }
+                  className="group3">
+                  <div className="btn-inner">
+                    <div className="btn">{ translate('LOGIN.NEXT') }</div>
+                    <div className="group2">
+                      <div className="rectangle8copy"></div>
+                      <img
+                        className="path6"
+                        src={ `${assetsPath.login}/reset-password-path-6.png` } />
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        }
-        { this.state.step === 3 &&
-          <AddCoin
-            cb={ this.addcoinCB }
-            activate={ true } />
-        }
-        { this.state.step === 4 &&
-          <div className="step5">
-            { this.renderLoginInForm() }
+            }
+            { this.state.step === 2 &&
+              <div className="step3">
+                <div className="title">{ translate('LOGIN.PLEASE_PROVIDE_PIN') }</div>
+                <div className="group">
+                  <div className="edit">
+                    <input
+                      type="password"
+                      className="form-control"
+                      name="createPin"
+                      onChange={ this.updateInput }
+                      placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
+                      value={ this.state.createPin || '' } />
+                  </div>
+                </div>
+                <div className="group">
+                  <div className="edit">
+                    <input
+                      type="password"
+                      className="form-control"
+                      name="createPinConfirm"
+                      onChange={ this.updateInput }
+                      placeholder={ translate('LOGIN.CONFIRM_PIN') }
+                      value={ this.state.createPinConfirm || '' } />
+                  </div>
+                </div>
+                { this.state.createPinError &&
+                  <div className="error margin-top-15 sz350">
+                    <i className="fa fa-warning"></i> { this.state.createPinError }
+                  </div>
+                }
+                <div
+                  disabled={
+                    !this.state.createPin ||
+                    !this.state.createPinConfirm
+                  }
+                  onClick={ this.nextStep }
+                  className="group3">
+                  <div className="btn-inner">
+                    <div className="btn">{ translate('LOGIN.NEXT') }</div>
+                    <div className="group2">
+                      <div className="rectangle8copy"></div>
+                      <img
+                        className="path6"
+                        src={ `${assetsPath.login}/reset-password-path-6.png` } />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+            { this.state.step === 3 &&
+              <AddCoin
+                cb={ this.addcoinCB }
+                activate={ true } />
+            }
+            { this.state.step === 4 &&
+              <div className="step5">
+                { this.renderLoginInForm() }
+              </div>
+            }
           </div>
         }
       </div>
@@ -553,126 +571,135 @@ class Login extends React.Component {
   renderRestoreWallet() {
     return (
       <div className="restore-wallet">
-        { this.state.step === 0 &&
-          <div className="step1">
-            <div className="title">{ translate('LOGIN.PLEASE_PROVIDE_SEED_BELOW') }</div>
-            <div
-              onClick={ this.scanQR }
-              className="group3 scan-qr">
-              <div className="btn-inner">
-                <div className="btn">{ translate('SEND.SCAN_QR') }</div>
-                <div className="group2">
-                  <i className="fa fa-qrcode"></i>
+        { !this.state.agreementAccepted &&
+          <UserAgreement
+            enableButton={ true }
+            cb={ this.agreementAcceptedCB } />
+        }
+        { this.state.agreementAccepted &&
+          <div>
+            { this.state.step === 0 &&
+              <div className="step1">
+                <div className="title">{ translate('LOGIN.PLEASE_PROVIDE_SEED_BELOW') }</div>
+                <div
+                  onClick={ this.scanQR }
+                  className="group3 scan-qr">
+                  <div className="btn-inner">
+                    <div className="btn">{ translate('SEND.SCAN_QR') }</div>
+                    <div className="group2">
+                      <i className="fa fa-qrcode"></i>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            { this.state.qrScanError &&
-              <div className="error margin-top-15 sz350">
-                <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
+                { this.state.qrScanError &&
+                  <div className="error margin-top-15 sz350">
+                    <i className="fa fa-warning"></i> { translate('SEND.QR_SCAN_ERR') }
+                  </div>
+                }
+                <div className="group">
+                  <div className="edit create-wallet-seed">
+                    { this.state.passphrase &&
+                      <i
+                        onClick={ this.toggleSeedVisibility }
+                        className={ 'fa fa-eye' + (this.state.displaySeed ? '-slash' : '') }></i>
+                    }
+                    { this.state.displaySeed &&
+                      <span>{ this.state.passphrase }</span>
+                    }
+                    { !this.state.displaySeed &&
+                      <input
+                        type="password"
+                        className="form-control"
+                        name="passphrase"
+                        onChange={ this.updateInput }
+                        placeholder={ `${translate('LOGIN.ENTER_PASSPHRASE')} ${translate('LOGIN.OR_WIF')}` }
+                        value={ this.state.passphrase || '' } />
+                    }
+                  </div>
+                </div>
+                <div
+                  disabled={ !this.state.passphrase }
+                  onClick={ this.nextStep }
+                  className="group3">
+                  <div className="btn-inner">
+                    <div className="btn">{ translate('LOGIN.NEXT') }</div>
+                    <div className="group2">
+                      <div className="rectangle8copy"></div>
+                      <img
+                        className="path6"
+                        src={ `${assetsPath.login}/reset-password-path-6.png` } />
+                    </div>
+                  </div>
+                </div>
               </div>
             }
-            <div className="group">
-              <div className="edit create-wallet-seed">
-                { this.state.passphrase &&
-                  <i
-                    onClick={ this.toggleSeedVisibility }
-                    className={ 'fa fa-eye' + (this.state.displaySeed ? '-slash' : '') }></i>
-                }
-                { this.state.displaySeed &&
-                  <span>{ this.state.passphrase }</span>
-                }
-                { !this.state.displaySeed &&
-                  <input
-                    type="password"
-                    className="form-control"
-                    name="passphrase"
-                    onChange={ this.updateInput }
-                    placeholder={ `${translate('LOGIN.ENTER_PASSPHRASE')} ${translate('LOGIN.OR_WIF')}` }
-                    value={ this.state.passphrase || '' } />
-                }
-              </div>
-            </div>
-            <div
-              disabled={ !this.state.passphrase }
-              onClick={ this.nextStep }
-              className="group3">
-              <div className="btn-inner">
-                <div className="btn">{ translate('LOGIN.NEXT') }</div>
-                <div className="group2">
-                  <div className="rectangle8copy"></div>
-                  <img
-                    className="path6"
-                    src={ `${assetsPath.login}/reset-password-path-6.png` } />
+            { this.state.step === 1 &&
+              <div className="step2">
+                <div className="title">{ translate('LOGIN.PLEASE_PROVIDE_PIN') }</div>
+                <div className="group">
+                  <div className="edit restore-seed-verify">
+                    { translate('LOGIN.' + (this.state.restoreIsPrivKey ? 'YOU_PROVIDED_PRIVKEY' : 'YOU_PROVIDED_SEED')) }
+                    <span onClick={ this.prevStep }>
+                      { translate('LOGIN.WRONG') }
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        }
-        { this.state.step === 1 &&
-          <div className="step2">
-            <div className="title">{ translate('LOGIN.PLEASE_PROVIDE_PIN') }</div>
-            <div className="group">
-              <div className="edit restore-seed-verify">
-                { translate('LOGIN.' + (this.state.restoreIsPrivKey ? 'YOU_PROVIDED_PRIVKEY' : 'YOU_PROVIDED_SEED')) }
-                <span onClick={ this.prevStep }>
-                  { translate('LOGIN.WRONG') }
-                </span>
-              </div>
-            </div>
-            <div className="group">
-              <div className="edit">
-                <input
-                  type="password"
-                  className="form-control"
-                  name="restorePin"
-                  onChange={ this.updateInput }
-                  placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
-                  value={ this.state.restorePin || '' } />
-              </div>
-            </div>
-            <div className="group">
-              <div className="edit">
-                <input
-                  type="password"
-                  className="form-control"
-                  name="restorePinConfirm"
-                  onChange={ this.updateInput }
-                  placeholder={ translate('LOGIN.CONFIRM_PIN') }
-                  value={ this.state.restorePinConfirm || '' } />
-              </div>
-            </div>
-            { this.state.restorePinError &&
-              <div className="error margin-top-15 sz350">
-                <i className="fa fa-warning"></i> { this.state.restorePinError }
+                <div className="group">
+                  <div className="edit">
+                    <input
+                      type="password"
+                      className="form-control"
+                      name="restorePin"
+                      onChange={ this.updateInput }
+                      placeholder={ translate('LOGIN.ENTER_6_DIGIT_PIN') }
+                      value={ this.state.restorePin || '' } />
+                  </div>
+                </div>
+                <div className="group">
+                  <div className="edit">
+                    <input
+                      type="password"
+                      className="form-control"
+                      name="restorePinConfirm"
+                      onChange={ this.updateInput }
+                      placeholder={ translate('LOGIN.CONFIRM_PIN') }
+                      value={ this.state.restorePinConfirm || '' } />
+                  </div>
+                </div>
+                { this.state.restorePinError &&
+                  <div className="error margin-top-15 sz350">
+                    <i className="fa fa-warning"></i> { this.state.restorePinError }
+                  </div>
+                }
+                <div
+                  disabled={
+                    !this.state.restorePin ||
+                    !this.state.restorePinConfirm
+                  }
+                  onClick={ this.nextStep }
+                  className="group3">
+                  <div className="btn-inner">
+                    <div className="btn">{ translate('LOGIN.NEXT') }</div>
+                    <div className="group2">
+                      <div className="rectangle8copy"></div>
+                      <img
+                        className="path6"
+                        src={ `${assetsPath.login}/reset-password-path-6.png` } />
+                    </div>
+                  </div>
+                </div>
               </div>
             }
-            <div
-              disabled={
-                !this.state.restorePin ||
-                !this.state.restorePinConfirm
-              }
-              onClick={ this.nextStep }
-              className="group3">
-              <div className="btn-inner">
-                <div className="btn">{ translate('LOGIN.NEXT') }</div>
-                <div className="group2">
-                  <div className="rectangle8copy"></div>
-                  <img
-                    className="path6"
-                    src={ `${assetsPath.login}/reset-password-path-6.png` } />
-                </div>
+            { this.state.step === 2 &&
+              <AddCoin
+                cb={ this.addcoinCB }
+                activate={ true } />
+            }
+            { this.state.step === 3 &&
+              <div className="step4">
+                { this.renderLoginInForm() }
               </div>
-            </div>
-          </div>
-        }
-        { this.state.step === 2 &&
-          <AddCoin
-            cb={ this.addcoinCB }
-            activate={ true } />
-        }
-        { this.state.step === 3 &&
-          <div className="step4">
-            { this.renderLoginInForm() }
+            }
           </div>
         }
       </div>
