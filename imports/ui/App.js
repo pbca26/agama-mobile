@@ -1235,7 +1235,8 @@ class App extends React.Component {
                 lock={ this.lock } />
             }
             { this.state.activeSection === 'elections' &&
-              <NotaryVote />
+              <NotaryVote
+                historyBack={ this.historyBack }/>
             }
           </div>
         }

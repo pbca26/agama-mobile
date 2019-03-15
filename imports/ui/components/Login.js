@@ -380,10 +380,6 @@ class Login extends React.Component {
             wrongPin: true,
             wrongPinRetries: _seedStorage.pinRetries,
           });
-
-          setTimeout(() => {
-            console.warn(this.state);
-          }, 100);
         } else {
           this.props.changeTitle();
           this.props.lock(true);
@@ -757,7 +753,8 @@ class Login extends React.Component {
   }
 
   render() {
-    if (((getLocalStorageVar('coins') && Object.keys(getLocalStorageVar('coins')).length && getLocalStorageVar('seed')) || ((!getLocalStorageVar('coins') || (getLocalStorageVar('coins') && !Object.keys(getLocalStorageVar('coins')).length)) && !getLocalStorageVar('seed'))) &&
+    if (this.props.activeSection !== 'elections' &&
+        ((getLocalStorageVar('coins') && Object.keys(getLocalStorageVar('coins')).length && getLocalStorageVar('seed')) || ((!getLocalStorageVar('coins') || (getLocalStorageVar('coins') && !Object.keys(getLocalStorageVar('coins')).length)) && !getLocalStorageVar('seed'))) &&
         ((!this.props.auth && this.props.activeSection !== 'settings') &&
         (this.props.activeSection === 'login' || (!this.props.auth && this.props.activeSection !== 'addcoin')) &&
         this.props.activeSection !== 'offlinesig' &&
