@@ -96,6 +96,7 @@ const lang = {
       DEFAULT: 'Transactions history',
       SETTINS_PIN_REQUIRED: 'PIN confirmation is required',
       LOGOUT_REQUIRED: 'Certain settings changes require logout',
+      PURGE_NN_DATA: 'Purge Notary Node Elections data',
     },
     RECOVERY: {
       PROVIDE_YOUR_PIN: 'Provide your PIN number to unlock seed/WIF.',

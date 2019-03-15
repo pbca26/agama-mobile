@@ -19,6 +19,7 @@ import Pin from '../Pin';
 import SettingsUserAgreement from './UserAgreement';
 import SettingsSupport from './Support';
 import SettingsAbout from './About';
+import nnConfig from '../NNVote/config';
 
 // TODO: reset settings/purge seed and pin
 
@@ -33,6 +34,7 @@ class Settings extends React.Component {
       requirePin: false,
       isSaved: false,
       purgeData: false,
+      prugeNNVoteData: false,
       fiat: 'usd',
       debug: false,
       btcFeesSource: btcFeesSource[0].name,
@@ -48,6 +50,7 @@ class Settings extends React.Component {
     this.updateInput = this.updateInput.bind(this);
     this.toggleConfirmPin = this.toggleConfirmPin.bind(this);
     this.togglePurgeData = this.togglePurgeData.bind(this);
+    this.togglePurgeNNVoteData = this.togglePurgeNNVoteData.bind(this);
     this.toggleDebug = this.toggleDebug.bind(this);
     this.togglePinBruteforceProtection = this.togglePinBruteforceProtection.bind(this);
     this.toggleActiveView = this.toggleActiveView.bind(this);
@@ -68,6 +71,7 @@ class Settings extends React.Component {
         pinBruteforceProtection: _settings.pinBruteforceProtection,
         mainView: _settings.mainView,
         purgeData: false,
+        purgeNNVoteData: false,
         removeCoins: null,
       });
     }
@@ -133,6 +137,12 @@ class Settings extends React.Component {
       purgeData: !this.state.purgeData,
     });
   }
+
+  togglePurgeNNVoteData() {
+    this.setState({
+      purgeNNVoteData: !this.state.purgeNNVoteData,
+    });
+  }
   
   toggleConfirmPin() {
     this.setState({
@@ -168,6 +178,8 @@ class Settings extends React.Component {
         },
       });
       setLocalStorageVar('cache', null);
+    } else if (this.state.purgeNNVoteData) {
+      setLocalStorageVar('nn', null);
     } else {
       const _settings = getLocalStorageVar('settings');
       const _saveSettings = () => {
@@ -430,6 +442,27 @@ class Settings extends React.Component {
               </div>
             }
           </div>
+          { getLocalStorageVar('nn') &&
+            Math.floor(Date.now() / 1000) > nnConfig.activation && 
+            Math.floor(Date.now() / 1000) < nnConfig.deactivation &&
+            <div className="item item--sm">
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  value="on"
+                  checked={ this.state.purgeNNVoteData }
+                  readOnly />
+                <div
+                  className="slider"
+                  onClick={ this.togglePurgeNNVoteData }></div>
+              </label>
+              <div
+                className="toggle-label"
+                onClick={ this.togglePurgeNNVoteData }>
+                { translate('SETTINGS.PURGE_NN_DATA') }
+              </div>
+            </div>
+          }
           <div className="item item--sm">
             <label className="switch">
               <input
