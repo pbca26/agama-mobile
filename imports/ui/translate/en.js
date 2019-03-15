@@ -321,6 +321,7 @@ const lang = {
       AGREEMENT: 'User agreement',
       RESTORE_WALLET: 'Restore wallet',
       CREATE_WALLET: 'Create wallet',
+      ELECTIONS: 'Notary Node Elections',
     },
     AGREEMENT: {
       AGREEMENT_P1: 'This is experimental and unfinished software. Use at your own risk! No warranty for any kind of damage!',

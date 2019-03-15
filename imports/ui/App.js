@@ -36,6 +36,8 @@ import Overview from './components/Overview';
 import Settings from './components/Settings/Settings';
 import Exchanges from './components/Exchanges/Exchanges';
 import settingsDefaults from './components/Settings/settingsDefaults';
+import nnConfig from './components/NotaryVote/config';
+import NotaryVote from './components/NotaryVote/NotaryVote';
 
 const DASHBOARD_UPDATE_INTERVAL = 120000; // 2m
 const PROXY_RETRY_COUNT = 2;
@@ -957,6 +959,19 @@ class App extends React.Component {
                       }
                     </div>
                   }
+                  { Math.floor(Date.now() / 1000) > nnConfig.activation && 
+                    Math.floor(Date.now() / 1000) < nnConfig.deactivation &&
+                    <div className="item">
+                      <div
+                        className="title"
+                        onClick={ () => this.toggleMenuOption('elections') }>
+                        { translate('APP_TITLE.ELECTIONS') }
+                      </div>
+                      <img
+                        className="line"
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                    </div>
+                  }
                   <div>
                   { getLocalStorageVar('settings').mainView === 'default' &&
                     this.renderActiveCoins()
@@ -1018,6 +1033,19 @@ class App extends React.Component {
                         className="title"
                         onClick={ () => this.toggleMenuOption('login') }>
                         { translate('APP_TITLE.LOGIN') }
+                      </div>
+                      <img
+                        className="line"
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                    </div>
+                  }
+                  { Math.floor(Date.now() / 1000) > nnConfig.activation && 
+                    Math.floor(Date.now() / 1000) < nnConfig.deactivation &&
+                    <div className="item">
+                      <div
+                        className="title"
+                        onClick={ () => this.toggleMenuOption('elections') }>
+                        { translate('APP_TITLE.ELECTIONS') }
                       </div>
                       <img
                         className="line"
@@ -1205,6 +1233,9 @@ class App extends React.Component {
                 getBtcFees={ this.getBtcFees }
                 pubKeys={ this.state.pubKeys }
                 lock={ this.lock } />
+            }
+            { this.state.activeSection === 'elections' &&
+              <NotaryVote />
             }
           </div>
         }

@@ -19,7 +19,7 @@ import Pin from '../Pin';
 import SettingsUserAgreement from './UserAgreement';
 import SettingsSupport from './Support';
 import SettingsAbout from './About';
-import nnConfig from '../NNVote/config';
+import nnConfig from '../NotaryVote/config';
 
 // TODO: reset settings/purge seed and pin
 
