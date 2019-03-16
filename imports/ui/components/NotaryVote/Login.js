@@ -19,8 +19,6 @@ import {
 } from '../../actions/dev';
 import { Meteor } from 'meteor/meteor';
 import { isPrivKey } from 'agama-wallet-lib/build/keys';
-import passphraseGenerator from 'agama-wallet-lib/build/crypto/passphrasegenerator';
-import { shuffleArray } from '../../actions/utils';
 import UserAgreement from '../Settings/UserAgreement';
 
 class NotaryVoteLogin extends React.Component {
@@ -33,26 +31,17 @@ class NotaryVoteLogin extends React.Component {
       wrongPin: false,
       wrongPinRetries: 0,
       qrScanError: false,
-      activeView: null,
       step: 0,
       restoreIsPrivKey: false,
       restorePin: null,
       restorePinConfirm: null,
       restorePinError: null,
-      createSeed: null,
-      createSeedShuffled: null,
-      createSeedConfirm: [],
-      createSeedDisplayQR: false,
-      createPin: null,
-      createPinConfirm: null,
-      createPinError: null,
       displaySeed: false,
       agreementAccepted: getLocalStorageVar('agreement') && getLocalStorageVar('agreement') === true || false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.updateInput = this.updateInput.bind(this);
     this.login = this.login.bind(this);
-    this.restoreWalletInit = this.restoreWalletInit.bind(this);
     this.scanQR = this.scanQR.bind(this);
     this.prevStep = this.prevStep.bind(this);
     this.nextStep = this.nextStep.bind(this);
@@ -73,48 +62,58 @@ class NotaryVoteLogin extends React.Component {
   }
 
   nextStep() {
-    if (this.state.activeView === 'restore') {
-      if (this.state.step === 0) {
-        const restoreIsPrivKey = isPrivKey(this.state.passphrase);
-        
+    if (this.state.step === 0) {
+      const restoreIsPrivKey = isPrivKey(this.state.passphrase);
+      
+      this.setState({
+        restoreIsPrivKey,
+        step: this.state.step + 1,
+        displaySeed: false,
+      });
+    } else if (this.state.step === 1) {
+      let restorePinError;
+
+      if (!this.state.restorePin ||
+          (this.state.restorePin && this.state.restorePin.length < 6)) {
+        restorePinError = translate('LOGIN.PIN_TOO_SHORT');
+      } else if (
+        !this.state.restorePinConfirm ||
+        (this.state.restorePinConfirm && this.state.restorePinConfirm.length < 6)
+      ) {
+        restorePinError = translate('LOGIN.PIN_CONFIRM_TOO_SHORT');
+      } else if (
+        this.state.restorePin &&
+        this.state.restorePinConfirm &&
+        this.state.restorePin !== this.state.restorePinConfirm
+      ) {
+        restorePinError = translate('LOGIN.PIN_MISMATCH');
+      }
+
+      if (restorePinError) {
         this.setState({
-          restoreIsPrivKey,
-          step: this.state.step + 1,
-          displaySeed: false,
+          restorePinError,
         });
-      } else if (this.state.step === 1) {
-        let restorePinError;
-
-        if (!this.state.restorePin ||
-            (this.state.restorePin && this.state.restorePin.length < 6)) {
-          restorePinError = translate('LOGIN.PIN_TOO_SHORT');
-        } else if (
-          !this.state.restorePinConfirm ||
-          (this.state.restorePinConfirm && this.state.restorePinConfirm.length < 6)
-        ) {
-          restorePinError = translate('LOGIN.PIN_CONFIRM_TOO_SHORT');
-        } else if (
-          this.state.restorePin &&
-          this.state.restorePinConfirm &&
-          this.state.restorePin !== this.state.restorePinConfirm
-        ) {
-          restorePinError = translate('LOGIN.PIN_MISMATCH');
-        }
-
-        if (restorePinError) {
-          this.setState({
-            restorePinError,
-          });
-        } else {
-          this.setState({
-            step: this.state.step + 1,
-          });
-        }
       } else {
+        const _encryptedKey = encryptkey(this.state.restorePin, this.state.passphrase);
+        
+        setLocalStorageVar('nn', getLocalStorageVar('settings').pinBruteforceProtection ? {
+          encryptedKey: _encryptedKey,
+          pinRetries: 0,
+        }: {
+          encryptedKey: _encryptedKey,
+        });
+  
         this.setState({
           step: this.state.step + 1,
+          restorePin: null,
+          restorePinConfirm: null,
+          passphrase: null,
         });
       }
+    } else {
+      this.setState({
+        step: this.state.step + 1,
+      });
     }
   }
 
@@ -124,35 +123,11 @@ class NotaryVoteLogin extends React.Component {
     } else {
       this.setState({
         step: this.state.step <= 1 ? 0 : this.state.step - 1,
-        activeView: this.state.step === 0 ? null : this.state.activeView,
-        passphrase: this.state.activeView === 'restore' && this.state.step <= 1 ? this.state.passphrase : null,
-        createSeedConfirm: [],
-        createPin: null,
-        createPinConfirm: null,
+        passphrase: this.state.step <= 1 ? this.state.passphrase : null,
         restorePin: null,
         restorePinConfirm: null,
       });
     }
-  }
-
-  restoreWalletInit() {
-    this.setState({
-      activeView: 'restore',
-      step: 0,
-      restoreIsPrivKey: false,
-      restorePin: null,
-      restorePinConfirm: null,
-      restorePinError: null,
-      createSeed: null,
-      createSeedShuffled: null,
-      createSeedConfirm: [],
-      createSeedDisplayQR: false,
-      createPin: null,
-      createPinConfirm: null,
-      createPinError: null,
-      displaySeed: false,
-    });
-    this.props.changeTitle('restore_wallet');
   }
 
   updateInput(e) {
@@ -229,7 +204,6 @@ class NotaryVoteLogin extends React.Component {
           setLocalStorageVar('nn', _seedStorage);
         }
         
-        this.props.changeTitle();
         this.props.login(_decryptedKey);
         this.setState(this.defaultState);
       } else {
@@ -249,7 +223,6 @@ class NotaryVoteLogin extends React.Component {
             wrongPinRetries: _seedStorage.pinRetries,
           });
         } else {
-          this.props.changeTitle();
           this.props.lock(true);
           this.setState(this.defaultState);
         }
@@ -399,7 +372,7 @@ class NotaryVoteLogin extends React.Component {
     return (
       <div className="form-inner">
         { !this.state.activeView &&
-          <div className="title">{ translate('LOGIN.SIGN_IN_TO_YOUR_ACC') }</div>
+          <div className="title">{ translate('LOGIN.SIGN_IN_TO_YOUR_NN_ACC') }</div>
         }
         { this.state.activeView &&
           <div className="title">
