@@ -42,6 +42,7 @@ import {
   syncHistory,
 } from './exchanges';
 import getPrices from './prices';
+import nnConfig from '../components/NotaryVote/config';
 
 let _cache = {};
 // runtime cache wrapper functions
@@ -143,6 +144,7 @@ const cache = {
 let keys = {
   spv: {},
   eth: {},
+  nn: {},
 };
 let connect = {
   eth: null,
@@ -253,8 +255,8 @@ const sendtx = (network, outputAddress, value, verify, push, btcFee) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
       const _name = network.split('|')[0];
-      const changeAddress = keys.spv[_name].pub;
-      let _electrumServer = getLocalStorageVar('coins')[network].server;
+      const changeAddress = network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? keys.nn[_name].pub : keys.spv[_name].pub;
+      let _electrumServer = network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? getLocalStorageVar('nnCoin')[network].server : getLocalStorageVar('coins')[network].server;
       _electrumServer.serverList = electrumServers[_name].serverList;
 
       devlog(`sendtx ${network}`);
@@ -266,9 +268,9 @@ const sendtx = (network, outputAddress, value, verify, push, btcFee) => {
         changeAddress,
         value,
         btcFee ? { perbyte: true, value: btcFee } : (isKomodoCoin(network) ? electrumServers.kmd.txfee : electrumServers[_name].txfee),
-        keys.spv[_name].priv,
+        network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? keys.nn[_name].priv : keys.spv[_name].priv,
         _name,
-        verify,
+        network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? false : verify,
         push,
         cache
       )
@@ -286,7 +288,6 @@ const sendtxEth = (network, dest, amount, gasPrice, push) => {
 
       if (_name === 'eth' ||
           _name === 'eth_ropsten') {
-        // wallet, coin, push, dest, amount, gasPrice, network
         ethCreateTx(
           connect[_name],
           _name,
@@ -300,7 +301,6 @@ const sendtxEth = (network, dest, amount, gasPrice, push) => {
           resolve(res);
         })
       } else {
-        // wallet, symbol, push, dest, amount, gasPrice
         ethCreateTxERC20(
           connect.eth,
           _name,
@@ -327,8 +327,8 @@ const transactions = (network, options) => {
         let _electrumServer;
         
         if (!options) {
-          address = keys.spv[_name].pub;
-          _electrumServer = getLocalStorageVar('coins')[network].server;
+          address = network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? keys.nn[_name].pub : keys.spv[_name].pub;
+          _electrumServer = network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? getLocalStorageVar('nnCoin')[network].server : getLocalStorageVar('coins')[network].server;
           _electrumServer.serverList = electrumServers[_name].serverList;
         } else {
           address = options.pub;
@@ -404,7 +404,7 @@ const balance = (network) => {
 
       if (network.indexOf('|spv') > -1) {
         const address = keys.spv[_name].pub;
-        let _electrumServer = getLocalStorageVar('coins')[network].server;
+        let _electrumServer = network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? getLocalStorageVar('nnCoin')[network].server : getLocalStorageVar('coins')[network].server;
         _electrumServer.serverList = electrumServers[_name].serverList;
         
         let params = {
@@ -545,6 +545,7 @@ const auth = (seed, coins) => {
       let _pubKeys = {
         spv: {},
         eth: {},
+        nn: {},
       };
 
       for (let key in coins) {
@@ -566,11 +567,11 @@ const auth = (seed, coins) => {
             _seedToWif = seedToWif(_seed, electrumJSNetworks[_key.toLowerCase()] || electrumJSNetworks.kmd, true);
           }
 
-          keys.spv[_key] = {
+          keys[key.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? 'nn' : 'spv'][_key] = {
             pub: _seedToWif.pub,
             priv: _seedToWif.priv,
           };
-          _pubKeys.spv[_key] = _seedToWif.pub;
+          _pubKeys[key.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? 'nn' : 'spv'][_key] = _seedToWif.pub;
         } else if (key.indexOf('|eth') > -1) {
           const _seed = seedToPriv(seed, 'eth');
           const _ethKeys = etherKeys(_seed, true);
@@ -889,6 +890,12 @@ const getKeys = () => {
   };
 };
 
+const isNNAuth = () => {
+  return async (dispatch) => {
+    return keys.nn;
+  };
+};
+
 export default {
   auth,
   getKeys,
@@ -911,4 +918,5 @@ export default {
   getOrder,
   placeOrder,
   syncExchangesHistory,
+  isNNAuth,
 }

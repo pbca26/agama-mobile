@@ -180,6 +180,7 @@ class Settings extends React.Component {
       setLocalStorageVar('cache', null);
     } else if (this.state.purgeNNVoteData) {
       setLocalStorageVar('nn', null);
+      setLocalStorageVar('nnCoin', null);
     } else {
       const _settings = getLocalStorageVar('settings');
       const _saveSettings = () => {

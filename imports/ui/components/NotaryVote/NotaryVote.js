@@ -38,13 +38,19 @@ class NotaryVote extends React.Component {
     super();
     this.state = {
       auth: false,
+      coin: `${nnConfig.coin}|spv|nn`,
+      address: null,
+      history: null,
+      balance: null,
+      activeSection: 'dashboard',
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.login = this.login.bind(this);
+    this.dashboardRefresh = this.dashboardRefresh.bind(this);
   }
 
   addCoin(coin) {
-    let coins = getLocalStorageVar('coins') || {};
+    let coins = getLocalStorageVar('nnCoin') || {};
 
     const _coin = coin.split('|')[0];
     let server = electrumServers[_coin];
@@ -71,15 +77,34 @@ class NotaryVote extends React.Component {
       coins[coin] = {};
     }
 
-    setLocalStorageVar('coins', coins);
+    setLocalStorageVar('nnCoin', coins);
   }
 
-  login() {
-    this.setState({
-      auth: true,
-    });
+  dashboardRefresh() {
 
-    // sync balance/history
+  }
+
+  scrollToTop() {
+    window.scrollTo(0, 0);
+  }
+
+  login(passphrase) {
+    this.props.actions.auth(passphrase, getLocalStorageVar('nnCoin'))
+    .then((res) => {
+      console.warn('nnlogin', res);
+      // select a coin and an address
+      const address = res;
+
+      this.setState({
+        auth: true,
+        address: res,
+        history: null,
+        activeSection: 'dashboard',
+      });
+
+      this.dashboardRefresh();
+      this.scrollToTop();
+    });
   }
 
   componentWillMount() {
@@ -88,7 +113,7 @@ class NotaryVote extends React.Component {
       console.warn('NotaryVote keys', res);
     });
 
-    if (!getLocalStorageVar('coins') || (getLocalStorageVar('coins') && !getLocalStorageVar('coins')[`${nnConfig.coin}|spv|nn`])) {
+    if (!getLocalStorageVar('nnCoin') || (getLocalStorageVar('nnCoin') && !getLocalStorageVar('nnCoin')[`${nnConfig.coin}|spv|nn`])) {
       this.addCoin(`${nnConfig.coin}|spv|nn`);
     }
   }

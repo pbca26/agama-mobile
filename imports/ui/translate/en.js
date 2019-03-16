@@ -136,6 +136,7 @@ const lang = {
       OR_WIF: 'or WIF',
       CREATE_A_PIN: 'Create a pin to Sign In.',
       SIGN_IN_TO_YOUR_ACC: 'Sign In to your Agama account.',
+      SIGN_IN_TO_YOUR_NN_ACC: 'Sign In to your Agama Notary Elections account.',
       SIGN_IN: 'Sign In',
       PIN_ACCESS: 'PIN access',
       WRONG_PIN: 'Wrong PIN!',
