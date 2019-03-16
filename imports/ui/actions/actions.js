@@ -403,7 +403,7 @@ const balance = (network) => {
       const _name = network.split('|')[0];
 
       if (network.indexOf('|spv') > -1) {
-        const address = keys.spv[_name].pub;
+        const address = network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? keys.nn[_name].pub : keys.spv[_name].pub;
         let _electrumServer = network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? getLocalStorageVar('nnCoin')[network].server : getLocalStorageVar('coins')[network].server;
         _electrumServer.serverList = electrumServers[_name].serverList;
         
@@ -892,7 +892,7 @@ const getKeys = () => {
 
 const isNNAuth = () => {
   return async (dispatch) => {
-    return keys.nn;
+    return Object.keys(keys.nn).length ? true : false;
   };
 };
 

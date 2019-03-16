@@ -27,11 +27,13 @@ import {
   config,
 } from '../../actions/dev';
 import { isPrivKey } from 'agama-wallet-lib/build/keys';
-import passphraseGenerator from 'agama-wallet-lib/build/crypto/passphrasegenerator';
-import { shuffleArray } from '../../actions/utils';
 import UserAgreement from '../Settings/UserAgreement';
 import NotaryVoteLogin from './Login';
 import nnConfig from './config';
+import Transactions from '../Transactions/Transactions';
+
+const PROXY_RETRY_COUNT = 2;
+const PROXY_RETRY_TIMEOUT = 5000;
 
 class NotaryVote extends React.Component {
   constructor() {
@@ -43,10 +45,24 @@ class NotaryVote extends React.Component {
       history: null,
       balance: null,
       activeSection: 'dashboard',
+      loading: false,
+      conError: false,
+      proxyError: false,
+      proxyErrorCount: 0,
+      proxyRetryInProgress: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.login = this.login.bind(this);
     this.dashboardRefresh = this.dashboardRefresh.bind(this);
+    this.getBalance = this.getBalance.bind(this);
+    this.getTransactions = this.getTransactions.bind(this);
+    this.changeActiveSection = this.changeActiveSection.bind(this);
+  }
+
+  changeActiveSection(activeSection) {
+    this.setState({
+      activeSection,
+    });
   }
 
   addCoin(coin) {
@@ -80,8 +96,110 @@ class NotaryVote extends React.Component {
     setLocalStorageVar('nnCoin', coins);
   }
 
-  dashboardRefresh() {
+  retryProxy(disableAnimation) {
+    const { actions } = this.props;
 
+    if (!disableAnimation ||
+        typeof disableAnimation === 'object') {
+      this.setState({
+        proxyRetryInProgress: true,
+      });
+
+      Meteor.setTimeout(() => {
+        this.setState({
+          proxyRetryInProgress: false,
+        });
+      }, 1000);
+    }
+    
+    this.props.actions.getAnotherProxy();
+    this.dashboardRefresh();
+  }
+
+  getBalance() {
+    const { actions } = this.props;
+
+    actions.balance(this.state.coin)
+    .then((res) => {
+      console.warn('nn balance', res);
+
+      if (res &&
+          res === 'proxy-error') {
+        let _newState = {
+          proxyError: true,
+          proxyErrorCount: this.state.proxyErrorCount + 1,
+        };
+
+        if (this.state.proxyErrorCount + 1 <= PROXY_RETRY_COUNT &&
+            this.state.proxyErrorCount >= 0) {
+          Meteor.setTimeout(() => {
+            devlog(`proxy retry attempt #${this.state.proxyErrorCount}`);
+            this.retryProxy(true);
+          }, PROXY_RETRY_TIMEOUT);
+        } else {
+          _newState = {
+            proxyError: true,
+            proxyErrorCount: -777,
+          }
+          devlog(`${PROXY_RETRY_COUNT} consecutive proxy retry attempts have failed, go manual`);
+        }
+
+        this.setState(_newState);
+      } else {
+        if (res &&
+            !res.hasOwnProperty('balance') &&
+            res.indexOf('error') > -1) {
+          this.setState({
+            balance: null,
+            transactions: null,
+            conError: true,
+          });
+        } else {
+          this.setState({
+            balance: res,
+            conError: false,
+            proxyError: false,
+            proxyErrorCount: 0,
+          });
+        }
+      }
+    });
+  }
+
+  getTransactions() {
+    this.setState({
+      loading: true,
+    });
+
+    this.props.actions.transactions(this.state.coin)
+    .then((res) => {
+      console.warn('nn txs', res);
+
+      if (res &&
+          (res.indexOf('error') > -1 || res.indexOf('proxy-error') > -1)) {
+        this.setState({
+          balance: null,
+          transactions: null,
+          loading: false,
+          conError: true,
+        });
+      } else {
+        res = sort(res, 'timestamp', true);
+
+        this.setState({
+          transactions: res,
+          loading: false,
+          conError: false,
+          proxyError: false,
+          proxyErrorCount: 0,          
+        });
+      }
+    });
+  }
+
+  dashboardRefresh() {
+    this.getBalance();
+    this.getTransactions();
   }
 
   scrollToTop() {
@@ -110,7 +228,27 @@ class NotaryVote extends React.Component {
   componentWillMount() {
     this.props.actions.isNNAuth()
     .then((res) => {
-      console.warn('NotaryVote keys', res);
+      let _cache = getLocalStorageVar('cache');
+      let _balance;
+      let _transactions;
+      
+      if (_cache &&
+          _cache.balance &&
+          _cache.balance[this.state.coin]) {
+        _balance = _cache.balance[this.state.coin];
+      }
+  
+      if (_cache &&
+          _cache.transactions &&
+          _cache.transactions[this.state.coin]) {
+         _transactions = _cache.transactions[this.state.coin];
+      }
+
+      this.setState({
+        auth: res,
+        transactions: _transactions,
+        balance: _balance,
+      });
     });
 
     if (!getLocalStorageVar('nnCoin') || (getLocalStorageVar('nnCoin') && !getLocalStorageVar('nnCoin')[`${nnConfig.coin}|spv|nn`])) {
@@ -121,7 +259,17 @@ class NotaryVote extends React.Component {
   render() {
     if (this.state.auth) {
       return (
-        <section>nn vote here</section>
+        <section>
+          { this.state.activeSection === 'dashboard' &&
+            <div>
+              { !this.state.conError &&
+                <Transactions
+                  { ...this.state }
+                  changeActiveSection={ this.changeActiveSection } />
+              }
+            </div>
+          }
+        </section>
       );
     } else {
       return (

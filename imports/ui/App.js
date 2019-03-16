@@ -1041,7 +1041,9 @@ class App extends React.Component {
                   }
                   { Math.floor(Date.now() / 1000) > nnConfig.activation && 
                     Math.floor(Date.now() / 1000) < nnConfig.deactivation &&
-                    <div className="item">
+                    <div
+                      className="item"
+                      disabled={ this.state.activeSection === 'elections' }>
                       <div
                         className="title"
                         onClick={ () => this.toggleMenuOption('elections') }>
