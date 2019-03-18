@@ -124,14 +124,16 @@ class Transactions extends React.Component {
             type="button"
             onClick={ () => this.props.changeActiveSection('send') }
             className="btn btn-primary waves-effect waves-light margin-right-20">
-            <i className="fa fa-send"></i> { translate('DASHBOARD.SEND') }
+            <i className="fa fa-send"></i> { translate('DASHBOARD.' + (!this.props.vote ? 'SEND': 'SEND_VOTE')) }
           </button>
-          <button
-            type="button"
-            className="btn btn-success waves-effect waves-light"
-            onClick={ this.toggleQR }>
-            <i className="fa fa-inbox"></i> { translate('DASHBOARD.RECEIVE') }
-          </button>
+          { !this.props.vote &&
+            <button
+              type="button"
+              className="btn btn-success waves-effect waves-light"
+              onClick={ this.toggleQR }>
+              <i className="fa fa-inbox"></i> { translate('DASHBOARD.RECEIVE') }
+            </button>
+          }
           { this.props.coin === 'kmd|spv' &&
             <button
               type="button"
@@ -207,18 +209,19 @@ class Transactions extends React.Component {
             <TransactionDetails
               coin={ this.props.coin }
               tx={ this.props.transactions[this.state.toggledTxDetails] }
-              cb={ this.closeTransactionDetails } />
+              cb={ this.closeTransactionDetails }
+              vote={ this.props.vote } />
           }
           { this.state.toggledTxDetails === 'none' &&
             <div className="individualportfolio">
               <div className="individualportfolio-inner">
                 { this.props.loading &&
                   !this.props.transactions &&
-                  <div className="lasttransactions">{ translate('TRANSACTIONS.LOADING_HISTORY') }...</div>                  
+                  <div className="lasttransactions">{ translate('TRANSACTIONS.' + (this.props.vote ? 'LOADING_HISTORY_VOTE' : 'LOADING_HISTORY')) }...</div>                  
                 }
                 { this.props.transactions &&
                   <div className="lasttransactions">
-                    { translate('TRANSACTIONS.' + (!_items.length ? 'NO_HISTORY' : 'LAST_TX')) }
+                    { translate('TRANSACTIONS.' + (!_items.length ? 'NO_HISTORY' : (this.props.vote ? 'LAST_TX_VOTE' : 'LAST_TX'))) }
                   </div>
                 }
                 <div className="cryptocardbtc-block">

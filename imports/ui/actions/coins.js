@@ -62,7 +62,6 @@ const _coinsList = {
     //'BCBC',
     'BTCZ',
     'QTUM',
-    'DNR',
     'XZC',
     'FTC',
     'GBX',

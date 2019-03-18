@@ -265,7 +265,8 @@ class NotaryVote extends React.Component {
               { !this.state.conError &&
                 <Transactions
                   { ...this.state }
-                  changeActiveSection={ this.changeActiveSection } />
+                  changeActiveSection={ this.changeActiveSection }
+                  vote={ true } />
               }
             </div>
           }
