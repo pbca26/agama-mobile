@@ -32,6 +32,7 @@ import NotaryVoteLogin from './Login';
 import nnConfig from './config';
 import Transactions from '../Transactions/Transactions';
 import SendCoin from '../SendCoin';
+import ServerSelect from '../ServerSelect';
 
 const PROXY_RETRY_COUNT = 2;
 const PROXY_RETRY_TIMEOUT = 5000;
@@ -61,6 +62,15 @@ class NotaryVote extends React.Component {
     this.getTransactions = this.getTransactions.bind(this);
     this.changeActiveSection = this.changeActiveSection.bind(this);
     this.lock = this.lock.bind(this);
+    this.retryProxy = this.retryProxy.bind(this);
+    this.updateDefaultCoinServer = this.updateDefaultCoinServer.bind(this);
+  }
+
+  updateDefaultCoinServer(coin, server) {
+    let _newState = JSON.parse(JSON.stringify(getLocalStorageVar('nnCoin')));
+    _newState[coin].server = server;
+    
+    setLocalStorageVar('nnCoin', _newState);
   }
 
   lock() {
@@ -106,8 +116,6 @@ class NotaryVote extends React.Component {
   }
 
   retryProxy(disableAnimation) {
-    const { actions } = this.props;
-
     if (!disableAnimation ||
         typeof disableAnimation === 'object') {
       this.setState({
@@ -224,7 +232,7 @@ class NotaryVote extends React.Component {
         activeSection: 'dashboard',
       });
 
-      this.dashboardRefresh();
+      //this.dashboardRefresh();
       this.scrollToTop();
 
       this.nnUpdateInterval = Meteor.setInterval(() => {
@@ -283,21 +291,24 @@ class NotaryVote extends React.Component {
     if (this.state.auth) {
       return (
         <section className="vote-main">
-          { !this.state.conError &&
+          { (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
             this.state.activeSection === 'send' &&
+            !this.state.conError &&
             <img
               className="menu-back"
               src={ `${assetsPath.menu}/trends-combined-shape.png` }
               onClick={ () => this.changeActiveSection('dashboard') } />
           }
-          { !this.state.conError &&
+          { (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
             this.state.activeSection === 'dashboard' &&
+            !this.state.conError &&
             <Transactions
               { ...this.state }
               changeActiveSection={ this.changeActiveSection }
               vote={ true } />
           }
-          { !this.state.conError &&
+          { (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
+            !this.state.conError &&
             this.state.activeSection === 'send' &&
             <SendCoin
               vote={ true }
@@ -306,6 +317,39 @@ class NotaryVote extends React.Component {
               balance={ this.state.balance || 'loading' }
               sendtx={ this.props.actions.sendtx }
               lock={ this.lock } />
+          }
+          { this.state.proxyError &&
+            this.state.proxyErrorCount === -777 &&
+            <div className="app-main">
+              <div className="con-error width-limit">
+                <i className="fa fa-warning error"></i> <span className="error">{ translate('DASHBOARD.PROXY_ERROR') }</span>
+              </div>
+              <div className="form proxy">
+                <div
+                  onClick={ this.retryProxy }
+                  disabled={
+                    this.state.proxyRetryInProgress &&
+                    this.state.proxyErrorCount !== -777
+                  }
+                  className={ 'group3' + (this.state.proxyRetryInProgress ? ' retrying' : '') }>
+                  <div className="btn-inner">
+                    <div className="btn">{ translate('DASHBOARD.RETRY') }</div>
+                    <div className="group2">
+                      <i className="fa fa-refresh"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+          { this.state.conError &&
+            <ServerSelect
+              coin={ this.state.coin }
+              coins={ getLocalStorageVar('nnCoin') }
+              dashboardRefresh={ this.dashboardRefresh }
+              getServersList={ this.props.actions.getServersList }
+              setDefaultServer={ this.props.actions.setDefaultServer }
+              updateDefaultCoinServer={ this.updateDefaultCoinServer } />
           }
         </section>
       );
