@@ -35,6 +35,7 @@ import SendCoin from '../SendCoin';
 
 const PROXY_RETRY_COUNT = 2;
 const PROXY_RETRY_TIMEOUT = 5000;
+const DASHBOARD_UPDATE_INTERVAL = 120000; // 2m
 
 class NotaryVote extends React.Component {
   constructor() {
@@ -52,6 +53,7 @@ class NotaryVote extends React.Component {
       proxyErrorCount: 0,
       proxyRetryInProgress: false,
     };
+    this.nnUpdateInterval = null;
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.login = this.login.bind(this);
     this.dashboardRefresh = this.dashboardRefresh.bind(this);
@@ -224,12 +226,24 @@ class NotaryVote extends React.Component {
 
       this.dashboardRefresh();
       this.scrollToTop();
+
+      this.nnUpdateInterval = Meteor.setInterval(() => {
+        this.dashboardRefresh();
+      }, DASHBOARD_UPDATE_INTERVAL);
     });
   }
 
   componentWillMount() {
     this.props.actions.isNNAuth()
     .then((res) => {
+      if (res &&
+          res === true) {
+        this.dashboardRefresh();
+        this.nnUpdateInterval = Meteor.setInterval(() => {
+          this.dashboardRefresh();
+        }, DASHBOARD_UPDATE_INTERVAL);
+      }
+
       let _cache = getLocalStorageVar('cache');
       let _balance;
       let _transactions;
@@ -255,6 +269,13 @@ class NotaryVote extends React.Component {
 
     if (!getLocalStorageVar('nnCoin') || (getLocalStorageVar('nnCoin') && !getLocalStorageVar('nnCoin')[`${nnConfig.coin}|spv|nn`])) {
       this.addCoin(`${nnConfig.coin}|spv|nn`);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.nnUpdateInterval) {
+      Meteor.clearInterval(this.nnUpdateInterval);
+      this.nnUpdateInterval = null;
     }
   }
 
