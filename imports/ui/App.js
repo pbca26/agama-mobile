@@ -301,6 +301,11 @@ class App extends React.Component {
       history: null,
     });
     
+    if (this.state.activeSection === 'send' ||
+        this.state.activeSection === 'exchanges') {
+      this.dashboardRefresh();
+    }
+
     this.scrollToTop();
   }
 
@@ -452,6 +457,11 @@ class App extends React.Component {
     Meteor.setTimeout(() => {
       this.scrollToTop();
     }, 10);
+
+    if (this.state.activeSection === 'send' &&
+        (section === 'dashboard' || section === 'overview')) {
+      this.dashboardRefresh();
+    }
   }
 
   switchCoin(coin, skipRefresh, mainView) {
@@ -831,6 +841,11 @@ class App extends React.Component {
       history: this.state.activeSection,
       activeSection: this.state.activeSection === optionName ? (this.state.auth ? 'dashboard' : 'login') : optionName,
     });
+
+    if ((this.state.activeSection === 'send' || this.state.activeSection === 'exchanges') &&
+        (optionName === 'dashboard' || optionName === 'overview')) {
+      this.dashboardRefresh();
+    }
   }
 
   renderActiveCoins() {

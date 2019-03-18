@@ -82,6 +82,10 @@ class NotaryVote extends React.Component {
     this.setState({
       activeSection,
     });
+
+    if (activeSection === 'dashboard') {
+      this.dashboardRefresh();
+    }
   }
 
   addCoin(coin) {
@@ -232,7 +236,7 @@ class NotaryVote extends React.Component {
         activeSection: 'dashboard',
       });
 
-      //this.dashboardRefresh();
+      this.dashboardRefresh();
       this.scrollToTop();
 
       this.nnUpdateInterval = Meteor.setInterval(() => {
