@@ -158,6 +158,12 @@ class App extends React.Component {
         coins: _localStorageCoins,
       });
     }
+
+    if ((Math.floor(Date.now() / 1000) < nnConfig.activation || Math.floor(Date.now() / 1000) > nnConfig.deactivation) &&
+        getLocalStorageVar('nn')) {
+      setLocalStorageVar('nn', null);
+      setLocalStorageVar('nnCoin', null);
+    }
   }
 
   updatePrices() {
@@ -1237,8 +1243,7 @@ class App extends React.Component {
                 lock={ this.lock } />
             }
             { this.state.activeSection === 'elections' &&
-              <NotaryVote
-                historyBack={ this.historyBack }/>
+              <NotaryVote historyBack={ this.historyBack }/>
             }
           </div>
         }

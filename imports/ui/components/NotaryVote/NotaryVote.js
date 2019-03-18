@@ -31,6 +31,7 @@ import UserAgreement from '../Settings/UserAgreement';
 import NotaryVoteLogin from './Login';
 import nnConfig from './config';
 import Transactions from '../Transactions/Transactions';
+import SendCoin from '../SendCoin';
 
 const PROXY_RETRY_COUNT = 2;
 const PROXY_RETRY_TIMEOUT = 5000;
@@ -57,6 +58,12 @@ class NotaryVote extends React.Component {
     this.getBalance = this.getBalance.bind(this);
     this.getTransactions = this.getTransactions.bind(this);
     this.changeActiveSection = this.changeActiveSection.bind(this);
+    this.lock = this.lock.bind(this);
+  }
+
+  lock() {
+    this.setState(this.defaultState);
+    setLocalStorageVar('nn', null);
   }
 
   changeActiveSection(activeSection) {
@@ -121,8 +128,6 @@ class NotaryVote extends React.Component {
 
     actions.balance(this.state.coin)
     .then((res) => {
-      console.warn('nn balance', res);
-
       if (res &&
           res === 'proxy-error') {
         let _newState = {
@@ -173,8 +178,6 @@ class NotaryVote extends React.Component {
 
     this.props.actions.transactions(this.state.coin)
     .then((res) => {
-      console.warn('nn txs', res);
-
       if (res &&
           (res.indexOf('error') > -1 || res.indexOf('proxy-error') > -1)) {
         this.setState({
@@ -209,13 +212,12 @@ class NotaryVote extends React.Component {
   login(passphrase) {
     this.props.actions.auth(passphrase, getLocalStorageVar('nnCoin'))
     .then((res) => {
-      console.warn('nnlogin', res);
       // select a coin and an address
-      const address = res;
+      const address = res.nn && res.nn[nnConfig.coin];
 
       this.setState({
         auth: true,
-        address: res,
+        address,
         history: null,
         activeSection: 'dashboard',
       });
@@ -259,16 +261,30 @@ class NotaryVote extends React.Component {
   render() {
     if (this.state.auth) {
       return (
-        <section>
-          { this.state.activeSection === 'dashboard' &&
-            <div>
-              { !this.state.conError &&
-                <Transactions
-                  { ...this.state }
-                  changeActiveSection={ this.changeActiveSection }
-                  vote={ true } />
-              }
-            </div>
+        <section className="vote-main">
+          { !this.state.conError &&
+            this.state.activeSection === 'send' &&
+            <img
+              className="menu-back"
+              src={ `${assetsPath.menu}/trends-combined-shape.png` }
+              onClick={ () => this.changeActiveSection('dashboard') } />
+          }
+          { !this.state.conError &&
+            this.state.activeSection === 'dashboard' &&
+            <Transactions
+              { ...this.state }
+              changeActiveSection={ this.changeActiveSection }
+              vote={ true } />
+          }
+          { !this.state.conError &&
+            this.state.activeSection === 'send' &&
+            <SendCoin
+              vote={ true }
+              coin={ this.state.coin }
+              address={ this.state.address }
+              balance={ this.state.balance || 'loading' }
+              sendtx={ this.props.actions.sendtx }
+              lock={ this.lock } />
           }
         </section>
       );

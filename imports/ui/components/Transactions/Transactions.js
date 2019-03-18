@@ -123,7 +123,7 @@ class Transactions extends React.Component {
             disabled={ !this.showSendButton() }
             type="button"
             onClick={ () => this.props.changeActiveSection('send') }
-            className="btn btn-primary waves-effect waves-light margin-right-20">
+            className={ 'btn btn-primary waves-effect waves-light ' + (this.props.vote ? 'no-margin-right' : 'margin-right-20') }>
             <i className="fa fa-send"></i> { translate('DASHBOARD.' + (!this.props.vote ? 'SEND': 'SEND_VOTE')) }
           </button>
           { !this.props.vote &&

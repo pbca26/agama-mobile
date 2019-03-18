@@ -1,4 +1,16 @@
 .form.settings {
+  .pin-confirm {
+    text-align: center;
+    margin-top: 20px;
+    border: dashed 1px rgba(255, 255, 255, 0.4);
+    padding-top: 32px;
+    margin-bottom: 60px;
+  
+    .pin-confirm-title {
+      margin-bottom: 14px;
+      font-size: 14px;
+    }
+  }
   .group3 {
     top: 0;
     left: 0;
@@ -131,18 +143,5 @@
       padding-bottom: 10px;
       line-height: 25px;
     }
-  }
-}
-
-.pin-confirm {
-  text-align: center;
-  margin-top: 20px;
-  border: dashed 1px rgba(255, 255, 255, 0.4);
-  padding-top: 32px;
-  margin-bottom: 60px;
-
-  .pin-confirm-title {
-    margin-bottom: 14px;
-    font-size: 14px;
   }
 }
