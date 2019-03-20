@@ -202,6 +202,23 @@ class Transactions extends React.Component {
       const _name = _coin.split('|')[0];
       const _mode = _coin.split('|')[1];
       const settingsCurrency = getLocalStorageVar('settings').fiat;
+      let _priceChangeColor = 'green';
+      
+      if (this.props.prices &&
+          this.props.prices[_name.toUpperCase()] &&
+          this.props.prices[_name.toUpperCase()].data &&
+          this.props.prices[_name.toUpperCase()].priceChange.data.hasOwnProperty('percent_change_1h') &&
+          this.props.prices[_name.toUpperCase()].priceChange.data.percent_change_1h < 0) {
+        _priceChangeColor = 'red';
+      }
+
+      if (this.props.prices &&
+          this.props.prices[_name.toUpperCase()].priceChange &&
+          this.props.prices[_name.toUpperCase()].priceChange.data &&
+          this.props.prices[_name.toUpperCase()].priceChange.data.hasOwnProperty('percent_change_24h') &&
+          this.props.prices[_name.toUpperCase()].priceChange.data.percent_change_24h < 0) {
+        _priceChangeColor = 'red';
+      }
 
       return (
         <div className="transactions-ui">
@@ -230,7 +247,7 @@ class Transactions extends React.Component {
                       className="coin-icon"
                       src={ `${assetsPath.coinLogo}/${_mode}/${_name.toLowerCase()}.png` } />
                     <div className="coin-title">
-                    { translate(_mode.toUpperCase() + '.' + _name.toUpperCase()).length > 18 ? _name.toUpperCase() :  translate(_mode.toUpperCase() + '.' + _name.toUpperCase()) }
+                    { translate(_mode.toUpperCase() + '.' + _name.toUpperCase()).length > 18 ? _name.toUpperCase() : translate(_mode.toUpperCase() + '.' + _name.toUpperCase()) }
                     </div>
                     <div className="coin-balance">
                       <div className="balance">
@@ -243,6 +260,10 @@ class Transactions extends React.Component {
                           (_mode === 'eth' || (_mode === 'spv' && !isKomodoCoin(_name.toUpperCase())) || (_mode === 'spv' && isKomodoCoin(_name.toUpperCase()) && !this.props.prices[_name.toUpperCase()].hasOwnProperty('KIC'))) &&
                           <div className={ 'balance-fiat' + (this.showClaimButton() ? ' kmd-interest' : '') }>
                             <FiatSymbol symbol={ settingsCurrency } /> { formatValue(_balance.balance * (this.props.prices[_name.toUpperCase()].AVG && this.props.prices[_name.toUpperCase()].AVG[settingsCurrency.toUpperCase()] ? this.props.prices[_name.toUpperCase()].AVG[settingsCurrency.toUpperCase()] : this.props.prices[_name.toUpperCase()][settingsCurrency.toUpperCase()])) }
+                            { this.props.prices[_name.toUpperCase()].priceChange &&
+                              this.props.prices[_name.toUpperCase()].priceChange.data &&
+                              <i className={ `fa fa-arrow-${_priceChangeColor === 'red' ? 'down' : 'up'} icon-price-change ${_priceChangeColor}` }></i>
+                            }
                           </div>
                         }
                       </div>

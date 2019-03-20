@@ -15,6 +15,13 @@
     margin-top: 8px;
     font-size: 14px;
 
+    .icon-price-change {
+      position: absolute;
+      font-size: 12px;
+      margin-left: 3px;
+      margin-top: -2px;
+      color: #fff;
+    }
     &.kmd-interest {
       display: inline-block;
       margin-top: 0;
