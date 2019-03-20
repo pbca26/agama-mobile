@@ -240,8 +240,9 @@ class Transactions extends React.Component {
                           this.props.prices &&
                           this.props.prices[_name.toUpperCase()] &&
                           this.props.prices[_name.toUpperCase()][settingsCurrency.toUpperCase()] &&
+                          (_mode === 'eth' || (_mode === 'spv' && !isKomodoCoin(_name.toUpperCase())) || (_mode === 'spv' && isKomodoCoin(_name.toUpperCase()) && !this.props.prices[_name.toUpperCase()].hasOwnProperty('KIC'))) &&
                           <div className={ 'balance-fiat' + (this.showClaimButton() ? ' kmd-interest' : '') }>
-                            <FiatSymbol symbol={ settingsCurrency } /> { formatValue(_balance.balance * this.props.prices[_name.toUpperCase()][settingsCurrency.toUpperCase()]) }
+                            <FiatSymbol symbol={ settingsCurrency } /> { formatValue(_balance.balance * (this.props.prices[_name.toUpperCase()].AVG && this.props.prices[_name.toUpperCase()].AVG[settingsCurrency.toUpperCase()] ? this.props.prices[_name.toUpperCase()].AVG[settingsCurrency.toUpperCase()] : this.props.prices[_name.toUpperCase()][settingsCurrency.toUpperCase()])) }
                           </div>
                         }
                       </div>

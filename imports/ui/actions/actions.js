@@ -793,6 +793,21 @@ const getOverview = (coins) => {
             for (let i = 0; i < promiseResult.length; i++) {
               const _coin = promiseResult[i].coin.split('|')[0];
   
+              if (promiseResult[i].coin.indexOf('|spv') > -1 &&
+                  isKomodoCoin(_coin.toUpperCase()) &&
+                  _prices[_coin.toUpperCase()] &&
+                  _prices[_coin.toUpperCase()][settingsCurrency.toUpperCase()] &&
+                  _prices[_coin.toUpperCase()].hasOwnProperty('KIC')) {
+                _prices[_coin.toUpperCase()][settingsCurrency.toUpperCase()] = 0;
+                delete _prices[_coin.toUpperCase()].priceChange;
+              } else {
+                if (_prices[_coin.toUpperCase()].AVG &&
+                    _prices[_coin.toUpperCase()].AVG[settingsCurrency.toUpperCase()]) {
+                  devlog(`overview ${_coin.toUpperCase()} use AVG price`);
+                  _prices[_coin.toUpperCase()][settingsCurrency.toUpperCase()] = _prices[_coin.toUpperCase()].AVG[settingsCurrency.toUpperCase()];
+                }
+              }
+
               _overviewItems.push({
                 coin: promiseResult[i].coin,
                 balanceNative: promiseResult[i].balance,
