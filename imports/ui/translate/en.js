@@ -398,6 +398,7 @@ const lang = {
       KOIN: 'Koinon Coin',
       KSB: 'KSB',
       OUR: 'ØUR',
+      LUMBER: 'Lumberscout',
       // crypto
       SUQA: 'SUQA',
       BZC: 'Bitzec',

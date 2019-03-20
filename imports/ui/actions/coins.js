@@ -37,6 +37,7 @@ const _coinsList = {
     'PTX',
     'KSB',
     'OUR',
+    'LUMBER',
     // other coins
     'BTC',
     'DOGE',
