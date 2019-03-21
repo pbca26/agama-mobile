@@ -206,13 +206,15 @@ class Transactions extends React.Component {
       
       if (this.props.prices &&
           this.props.prices[_name.toUpperCase()] &&
-          this.props.prices[_name.toUpperCase()].data &&
+          this.props.prices[_name.toUpperCase()].priceChange &&
+          this.props.prices[_name.toUpperCase()].priceChange.data &&
           this.props.prices[_name.toUpperCase()].priceChange.data.hasOwnProperty('percent_change_1h') &&
           this.props.prices[_name.toUpperCase()].priceChange.data.percent_change_1h < 0) {
         _priceChangeColor = 'red';
       }
 
       if (this.props.prices &&
+          this.props.prices[_name.toUpperCase()] &&
           this.props.prices[_name.toUpperCase()].priceChange &&
           this.props.prices[_name.toUpperCase()].priceChange.data &&
           this.props.prices[_name.toUpperCase()].priceChange.data.hasOwnProperty('percent_change_24h') &&
