@@ -404,6 +404,7 @@ class App extends React.Component {
             overview: res,
           });
         });
+        this.updatePrices();
       });
     }
   }
