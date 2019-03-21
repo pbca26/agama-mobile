@@ -817,14 +817,14 @@ const getOverview = (coins) => {
               });
             }
   
-            resolve(_overviewItems);
-
             if (getLocalStorageVar('seed') &&
                 getLocalStorageVar('settings').mainView !== 'default') {
               let _cache = getLocalStorageVar('cache') || {};
               _cache.overview = _overviewItems;
               setLocalStorageVar('cache', _cache);
             }
+
+            resolve(_overviewItems);
           }
         });
       });

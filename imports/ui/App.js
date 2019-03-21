@@ -164,6 +164,12 @@ class App extends React.Component {
       setLocalStorageVar('nn', null);
       setLocalStorageVar('nnCoin', null);
     }
+
+    if (getLocalStorageVar('prices')) {
+      this.setState({
+        prices: getLocalStorageVar('prices'),
+      });
+    }
   }
 
   updatePrices() {

@@ -178,6 +178,7 @@ class Settings extends React.Component {
         },
       });
       setLocalStorageVar('cache', null);
+      setLocalStorageVar('prices', null);
     } else if (this.state.purgeNNVoteData) {
       setLocalStorageVar('nn', null);
       setLocalStorageVar('nnCoin', null);
