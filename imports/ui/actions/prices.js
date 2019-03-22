@@ -31,7 +31,7 @@ const getPrices = (coins, priceChange) => {
       }, (error, result) => {
         if (!result) {
           resolve('error');
-        } else {          
+        } else {
           try {
             const _prices = JSON.parse(result.content).result;
             setLocalStorageVar('prices', _prices);
