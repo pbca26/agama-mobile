@@ -61,7 +61,7 @@ App.accessRule('http://CHIPS1.explorer.supernet.org');
 App.accessRule('https://explorer.coqui.cash');
 App.accessRule('https://explorer.utrum.io');
 App.accessRule('https://www.mnzexplorer.com');
-
+App.accessRule('https://explorer.ilien.io');
 // Set PhoneGap/Cordova preferences.
 App.setPreference('BackgroundColor', '0xffffffff');
 /*App.setPreference('HideKeyboardFormAccessoryBar', true);

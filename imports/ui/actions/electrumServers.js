@@ -10,6 +10,17 @@ export let electrumServers = {
       'electrum2.cipig.net:10011'
     ],
 },
+  ilien: { // !estimatefee
+    ip: 'electrumo1.ilien.io',
+    port: 65011,
+    proto: 'tcp',
+    txfee: 10000,
+    abbr: 'ILN',
+    serverList: [
+       'electrum1.ilien.io:65011',
+       'electrum2.ilien.io:65011'
+    ],
+},
   eql: { // !estimatefee
     ip: '159.65.91.235',
     port: 10801,
