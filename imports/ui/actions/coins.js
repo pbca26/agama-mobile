@@ -11,6 +11,7 @@ const _coinsList = {
     'BET',
     'CRYPTO',
     'COQUI',
+    'ILN',
     'OOT',
     'HODL',
     'MSHARK',
