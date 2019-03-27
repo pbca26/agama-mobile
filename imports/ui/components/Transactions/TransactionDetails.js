@@ -112,7 +112,7 @@ class TransactionDetails extends React.Component {
         <div className="edit">
           { translate('EXCHANGES.HEIGHT') }
           <div className="shade margin-top-5">
-            { tx.height }
+            { tx.height || translate('TRANSACTIONS.NA') }
           </div>
         </div>
         <div className="edit">
