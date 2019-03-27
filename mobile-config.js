@@ -116,6 +116,7 @@ App.accessRule('https://explorer.dionpay.com');
 App.accessRule('https://explorer.zcoin.io');
 App.accessRule('http://explorer1.patenttx.com');
 App.accessRule('http://kmdice.explorer.dexstats.info');
+App.accessRule('http://explorer.ilien.io');
 // eth
 App.accessRule('https://etherscan.io');
 App.accessRule('https://api.etherscan.io');

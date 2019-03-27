@@ -356,6 +356,7 @@ const lang = {
       BOTS: 'BOTS',
       CEAL: 'CEAL NET',
       COQUI: 'COQUI',
+      ILN: 'ILN',
       CHAIN: 'Chainmakers',
       GLXT: 'GLXToken',
       EQL: 'Equaliser',
