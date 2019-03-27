@@ -305,6 +305,7 @@ class App extends React.Component {
     this.setState({
       activeSection: this.state.activeSection === 'dashboard' && getLocalStorageVar('settings').mainView !== 'default' ? 'overview' : this.state.history,
       history: null,
+      title: null,
     });
     
     if (this.state.activeSection === 'send' ||
