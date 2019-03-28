@@ -119,6 +119,7 @@ App.accessRule('http://kmdice.explorer.dexstats.info');
 App.accessRule('https://explorer.ilien.io');
 App.accessRule('https://rick.kmd.dev');
 App.accessRule('https://morty.kmd.dev');
+App.accessRule('http://groestlsight.groestlcoin.org');
 // eth
 App.accessRule('https://etherscan.io');
 App.accessRule('https://api.etherscan.io');
