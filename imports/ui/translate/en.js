@@ -287,6 +287,7 @@ const lang = {
       DPOW_SECURED: 'dPoW secured',
       YES: 'Yes',
       NO: 'No',
+      NA: 'N/A',
     },
     CLAIM: {
       WARNING: 'Warning',
@@ -400,6 +401,8 @@ const lang = {
       KSB: 'KSB',
       OUR: 'ØUR',
       LUMBER: 'Lumberscout',
+      RICK: 'Rick',
+      MORTY: 'Morty',
       // crypto
       SUQA: 'SUQA',
       BZC: 'Bitzec',

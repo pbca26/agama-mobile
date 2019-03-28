@@ -46,7 +46,7 @@ App.accessRule('http://94.130.98.74');
 App.accessRule('http://94.130.225.86:80');
 App.accessRule('http://94.130.98.74:80');
 App.accessRule('https://bitcoinfees.earn.com');
-// atomic
+// atomic explorer
 App.accessRule('https://www.atomicexplorer.com');
 // coin explorers
 App.accessRule('https://www.kmdexplorer.io');
@@ -116,7 +116,9 @@ App.accessRule('https://explorer.dionpay.com');
 App.accessRule('https://explorer.zcoin.io');
 App.accessRule('http://explorer1.patenttx.com');
 App.accessRule('http://kmdice.explorer.dexstats.info');
-App.accessRule('http://explorer.ilien.io');
+App.accessRule('https://explorer.ilien.io');
+App.accessRule('https://rick.kmd.dev');
+App.accessRule('https://morty.kmd.dev');
 // eth
 App.accessRule('https://etherscan.io');
 App.accessRule('https://api.etherscan.io');

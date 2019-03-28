@@ -39,6 +39,8 @@ const _coinsList = {
     'KSB',
     'OUR',
     'LUMBER',
+    'RICK',
+    'MORTY',
     // other coins
     'BTC',
     'DOGE',
@@ -69,6 +71,7 @@ const _coinsList = {
     'GBX',
     'SUQA',
     'BZC',
+    'GRS',
     //'NINJA',
     //'SHARK',
     //'MVP',
