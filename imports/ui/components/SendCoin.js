@@ -853,6 +853,12 @@ class SendCoin extends React.Component {
                   <strong>{ translate('SEND.NOTICE') }:</strong> { translate('SEND.DPOW_UNSECURE') }.
                 </div>
               }
+              { this.state.spvPreflightResult &&
+                this.state.spvPreflightResult.msg === 'error' &&
+                <div className="error margin-top-15 margin-bottom-25 fs14 margin-left-5">
+                  { typeof this.state.spvPreflightResult.result === 'object' ? JSON.stringify(this.state.spvPreflightResult.result) : this.state.spvPreflightResult.result }
+                </div>
+              }
               <div className="widget-body-footer">
                 <div className="group3 margin-top-50">
                   <div

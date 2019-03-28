@@ -85,102 +85,117 @@ const createtx = (proxyServer, electrumServer, outputAddress, changeAddress, val
           });
         }
 
-        const _tx = transactionBuilder.transaction(
-          outputAddress,
-          changeAddress,
-          wif,
-          _network,
-          _data.inputs,
-          _data.change,
-          _data.value
-        );
-
-        // push to network
-        if (push) {
-          let data = {
-            port: electrumServer.port,
-            ip: electrumServer.ip,
-            proto: electrumServer.proto,
-            rawtx: _tx,
-          };
-          devlog('req', {
-            method: 'POST',
-            url: `http://${proxyServer.ip}:${proxyServer.port}/api/pushtx`,
-            params: data,
+        if (typeof _data === 'string') {
+          resolve ({
+            msg: 'error',
+            result: _data,
           });
-      
-          HTTP.call(
-            'POST',
-            `http://${proxyServer.ip}:${proxyServer.port}/api/pushtx`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            data,
-          }, (error, result) => {
-            result = JSON.parse(result.content);
+        }
 
-            if (result.msg === 'error') {
-              resolve({
-                msg: 'error',
-                result: JSON.stringify(result.result).indexOf('code') > -1 ? `${translate('API.PUSH_ERROR')} ${JSON.stringify(result.result)}` : translate('API.CON_ERROR'),
-              });
-            } else {
-              const txid = result.result;
-              _data.raw = _tx;
-              _data.txid = txid; 
-              _data.utxoSet = utxoList;           
+        if (_data.inputs &&
+            _data.inputs.length) {
+          const _tx = transactionBuilder.transaction(
+            outputAddress,
+            changeAddress,
+            wif,
+            _network,
+            _data.inputs,
+            _data.change,
+            _data.value
+          );
 
-              if (txid &&
-                  txid.indexOf('bad-txns-inputs-spent') > -1) {
-                const successObj = {
+          // push to network
+          if (push) {
+            let data = {
+              port: electrumServer.port,
+              ip: electrumServer.ip,
+              proto: electrumServer.proto,
+              rawtx: _tx,
+            };
+            devlog('req', {
+              method: 'POST',
+              url: `http://${proxyServer.ip}:${proxyServer.port}/api/pushtx`,
+              params: data,
+            });
+        
+            HTTP.call(
+              'POST',
+              `http://${proxyServer.ip}:${proxyServer.port}/api/pushtx`,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              data,
+            }, (error, result) => {
+              result = JSON.parse(result.content);
+
+              if (result.msg === 'error') {
+                resolve({
                   msg: 'error',
-                  result: translate('API.BAD_TX_INPUTS_SPENT_ERR'),
-                  raw: _data,
-                };
-
-                resolve(successObj);
+                  result: JSON.stringify(result.result).indexOf('code') > -1 ? `${translate('API.PUSH_ERROR')} ${JSON.stringify(result.result)}` : translate('API.CON_ERROR'),
+                });
               } else {
+                const txid = result.result;
+                _data.raw = _tx;
+                _data.txid = txid; 
+                _data.utxoSet = utxoList;           
+
                 if (txid &&
-                    txid.length === 64) {
-                  if (txid.indexOf('bad-txns-in-belowout') > -1) {
-                    const successObj = {
-                      msg: 'error',
-                      result: translate('API.BAD_TX_INPUTS_SPENT_ERR'),
-                      raw: _data,
-                    };
+                    txid.indexOf('bad-txns-inputs-spent') > -1) {
+                  const successObj = {
+                    msg: 'error',
+                    result: translate('API.BAD_TX_INPUTS_SPENT_ERR'),
+                    raw: _data,
+                  };
 
-                    resolve(successObj);
-                  } else {
-                    const successObj = {
-                      msg: 'success',
-                      result: _data,
-                    };
-
-                    resolve(successObj);
-                  }
+                  resolve(successObj);
                 } else {
                   if (txid &&
-                      txid.indexOf('bad-txns-in-belowout') > -1) {
-                    const successObj = {
-                      msg: 'error',
-                      result: translate('API.BAD_TX_INPUTS_SPENT_ERR'),
-                      raw: _data,
-                    };
+                      txid.length === 64) {
+                    if (txid.indexOf('bad-txns-in-belowout') > -1) {
+                      const successObj = {
+                        msg: 'error',
+                        result: translate('API.BAD_TX_INPUTS_SPENT_ERR'),
+                        raw: _data,
+                      };
 
-                    resolve(successObj);
+                      resolve(successObj);
+                    } else {
+                      const successObj = {
+                        msg: 'success',
+                        result: _data,
+                      };
+
+                      resolve(successObj);
+                    }
                   } else {
-                    const successObj = {
-                      msg: 'error',
-                      result: translate('API.CANT_BROADCAST_TX_ERR'),
-                      raw: _data,
-                    };
+                    if (txid &&
+                        txid.indexOf('bad-txns-in-belowout') > -1) {
+                      const successObj = {
+                        msg: 'error',
+                        result: translate('API.BAD_TX_INPUTS_SPENT_ERR'),
+                        raw: _data,
+                      };
 
-                    resolve(successObj);
+                      resolve(successObj);
+                    } else {
+                      const successObj = {
+                        msg: 'error',
+                        result: translate('API.CANT_BROADCAST_TX_ERR'),
+                        raw: _data,
+                      };
+
+                      resolve(successObj);
+                    }
                   }
                 }
               }
-            }
+            });
+          }
+        } else {
+          resolve ({
+            msg: 'error',
+            result: translate('API.NO_UTXO_ERR'),
           });
         }
       } else {
