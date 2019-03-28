@@ -16,7 +16,7 @@ const lang = {
       DEST_TX_ID: 'Receive Transaction ID',
       STATUS: 'Status',
       ORDER_ID: 'Order ID',
-      FROM: 'Form',
+      FROM: 'From',
       TO: 'To',
       AMOUNT: 'Amount',
       FEE: 'Fee',
