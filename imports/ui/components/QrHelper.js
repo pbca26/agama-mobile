@@ -37,6 +37,7 @@ class QrHelper extends React.Component {
   render() {
     return (
       <div className="form qr-helper">
+        <div className="qr-helper-inner-top-overlay"></div>
         <div className="qr-helper-inner">
           <div className="title">
             { translate('QR_HELPER.HOW_TO_USE') }

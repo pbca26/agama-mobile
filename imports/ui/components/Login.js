@@ -783,6 +783,9 @@ class Login extends React.Component {
         this.props.activeSection !== 'pin')) {
       return (
         <div className="form login">
+          { this.state.displayQrHelper &&
+            <QrHelper cb={ this.qrHelperCB } />
+          }
           { getLocalStorageVar('seed') &&
             !this.state.activeView &&
             this.renderLoginInForm()

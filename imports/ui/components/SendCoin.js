@@ -656,6 +656,9 @@ class SendCoin extends React.Component {
   
       return (
         <div className="form send">
+          { this.state.displayQrHelper &&
+            <QrHelper cb={ this.qrHelperCB } />
+          }
           <div className="steps margin-top-10">
             <div className={ 'step' + (this.state.sendCurrentStep === 0 ? ' current' : '') }></div>
             <div className={ 'step' + (this.state.sendCurrentStep === 1 ? ' current' : '') }></div>
