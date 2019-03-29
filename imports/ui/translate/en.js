@@ -351,6 +351,13 @@ const lang = {
       DISPLAY_CHANGE_LOG: 'Show change log',
       HIDE_CHANGE_LOG: 'Hide change log',
     },
+    QR_HELPER: {
+      HOW_TO_USE: 'How to use QR scan',
+      HOW_TO_USE_DESC_P1: 'To get QR scan working take a picture with your camera.',
+      HOW_TO_USE_DESC_P2: 'Real time QR scan is not supported yet.',
+      DONT_DISPLAY_AGAIN: 'Don\'t display this again',
+      USE_QR_SCAN: 'Use QR Scan',
+    },
     SPV: {
       // asset chains
       BET: 'BET',

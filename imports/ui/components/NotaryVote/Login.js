@@ -20,6 +20,7 @@ import {
 import { Meteor } from 'meteor/meteor';
 import { isPrivKey } from 'agama-wallet-lib/build/keys';
 import UserAgreement from '../Settings/UserAgreement';
+import QrHelper from '../QrHelper';
 
 class NotaryVoteLogin extends React.Component {
   constructor() {
@@ -38,15 +39,18 @@ class NotaryVoteLogin extends React.Component {
       restorePinError: null,
       displaySeed: false,
       agreementAccepted: getLocalStorageVar('agreement') && getLocalStorageVar('agreement') === true || false,
+      displayQrHelper: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.updateInput = this.updateInput.bind(this);
     this.login = this.login.bind(this);
     this.scanQR = this.scanQR.bind(this);
+    this._scanQR = this._scanQR.bind(this);
     this.prevStep = this.prevStep.bind(this);
     this.nextStep = this.nextStep.bind(this);
     this.toggleSeedVisibility = this.toggleSeedVisibility.bind(this);
     this.agreementAcceptedCB = this.agreementAcceptedCB.bind(this);
+    this.qrHelperCB = this.qrHelperCB.bind(this);
   }
 
   agreementAcceptedCB() {
@@ -139,7 +143,15 @@ class NotaryVoteLogin extends React.Component {
     });
   }
 
-  scanQR() {
+  qrHelperCB() {
+    this._scanQR();
+
+    this.setState({
+      displayQrHelper: false,
+    });
+  }
+
+  _scanQR() {
     MeteorCamera.getPicture({
       quality: 100,
     }, (error, data) => {
@@ -183,6 +195,16 @@ class NotaryVoteLogin extends React.Component {
         });
       }
     });
+  }
+
+  scanQR() {
+    if (!getLocalStorageVar('qrhelper')) {
+      this.setState({
+        displayQrHelper: true,
+      });
+    } else {
+      this._scanQR();
+    }
   }
 
   login(isPinAccess) {
@@ -421,6 +443,9 @@ class NotaryVoteLogin extends React.Component {
   render() {
     return (
       <div className="form login">
+        { this.state.displayQrHelper &&
+          <QrHelper cb={ this.qrHelperCB } />
+        }
         { getLocalStorageVar('nn') &&
           this.renderLoginInForm()
         }

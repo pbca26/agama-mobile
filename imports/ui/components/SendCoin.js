@@ -28,6 +28,7 @@ import electrumServers from 'agama-wallet-lib/build/electrum-servers';
 import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 import { Meteor } from 'meteor/meteor';
 import { getAddress } from 'ethers/utils/address';
+import QrHelper from './QrHelper';
 
 class SendCoin extends React.Component {
   constructor() {
@@ -54,15 +55,18 @@ class SendCoin extends React.Component {
       ethPreflightSendInProgress: false,
       ethPreflightResult: null,
       ethFee: 'average',
+      displayQrHelper: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.changeSendCoinStep = this.changeSendCoinStep.bind(this);
     this.updateInput = this.updateInput.bind(this);
     this.scanQR = this.scanQR.bind(this);
+    this._scanQR = this._scanQR.bind(this);
     this.validate = this.validate.bind(this);
     this.decodeSeed = this.decodeSeed.bind(this);
     this.openExternalURL = this.openExternalURL.bind(this);
     this.setSendAmountAll = this.setSendAmountAll.bind(this);
+    this.qrHelperCB = this.qrHelperCB.bind(this);
   }
 
   setSendAmountAll() {
@@ -141,7 +145,25 @@ class SendCoin extends React.Component {
     window.open(url, '_system');
   }
 
+  qrHelperCB() {
+    this._scanQR();
+
+    this.setState({
+      displayQrHelper: false,
+    });
+  }
+
   scanQR() {
+    if (!getLocalStorageVar('qrhelper')) {
+      this.setState({
+        displayQrHelper: true,
+      });
+    } else {
+      this._scanQR();
+    }
+  }
+
+  _scanQR() {
     const width = 480;
     const height = 640;
 

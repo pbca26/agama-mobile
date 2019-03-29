@@ -24,6 +24,7 @@ import passphraseGenerator from 'agama-wallet-lib/build/crypto/passphrasegenerat
 import { shuffleArray } from '../actions/utils';
 import AddCoin from './AddCoin';
 import UserAgreement from './Settings/UserAgreement';
+import QrHelper from './QrHelper';
 
 // TODO: PIN replace onscreen keyboard with virtual one
 
@@ -52,6 +53,7 @@ class Login extends React.Component {
       createPinError: null,
       displaySeed: false,
       agreementAccepted: getLocalStorageVar('agreement') && getLocalStorageVar('agreement') === true || false,
+      displayQrHelper: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.updateInput = this.updateInput.bind(this);
@@ -59,6 +61,7 @@ class Login extends React.Component {
     this.restoreWalletInit = this.restoreWalletInit.bind(this);
     this.createWalletInit = this.createWalletInit.bind(this);
     this.scanQR = this.scanQR.bind(this);
+    this._scanQR = this._scanQR.bind(this);
     this.prevStep = this.prevStep.bind(this);
     this.nextStep = this.nextStep.bind(this);
     this.toggleCreateQR = this.toggleCreateQR.bind(this);
@@ -67,6 +70,7 @@ class Login extends React.Component {
     this.addcoinCB = this.addcoinCB.bind(this);
     this.toggleSeedVisibility = this.toggleSeedVisibility.bind(this);
     this.agreementAcceptedCB = this.agreementAcceptedCB.bind(this);
+    this.qrHelperCB = this.qrHelperCB.bind(this);
   }
 
   agreementAcceptedCB() {
@@ -296,7 +300,25 @@ class Login extends React.Component {
     });
   }
 
+  qrHelperCB() {
+    this._scanQR();
+
+    this.setState({
+      displayQrHelper: false,
+    });
+  }
+
   scanQR() {
+    if (!getLocalStorageVar('qrhelper')) {
+      this.setState({
+        displayQrHelper: true,
+      });
+    } else {
+      this._scanQR();
+    }
+  }
+
+  _scanQR() {
     MeteorCamera.getPicture({
       quality: 100,
     }, (error, data) => {

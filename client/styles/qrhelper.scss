@@ -1,0 +1,16 @@
+.form.qr-helper {
+  height: 100%;
+  position: fixed;
+  z-index: 500;
+  top: 0;
+  background-color: #4c4f69;
+
+  .qr-helper-inner {
+    max-width: 400px;
+    margin: 0 auto;
+
+    .width-limit {
+      width: 310px;
+    }
+  }
+}
