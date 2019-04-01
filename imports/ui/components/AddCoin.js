@@ -9,6 +9,7 @@ import {
 import translate from '../translate/translate';
 import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
 import erc20ContractId from 'agama-wallet-lib/build/eth-erc20-contract-id';
+import nnConfig from './NotaryVote/config';
 
 class AddCoin extends React.Component {
   constructor() {
@@ -88,6 +89,11 @@ class AddCoin extends React.Component {
 
         if (this.props.activate &&
             (this.props.coins && this.props.coins.indexOf(_coin.name) === -1 || this.props.filterOut && this.props.filterOut.indexOf(_coin.name) > -1)) {
+          _items.pop();
+        }
+
+        if (_name === nnConfig.coin &&
+            (Math.floor(Date.now() / 1000) < nnConfig.activation || Math.floor(Date.now() / 1000) > nnConfig.deactivation)) {
           _items.pop();
         }
       }

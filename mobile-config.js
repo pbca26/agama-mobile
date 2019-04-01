@@ -120,6 +120,7 @@ App.accessRule('https://explorer.ilien.io');
 App.accessRule('https://rick.kmd.dev');
 App.accessRule('https://morty.kmd.dev');
 App.accessRule('http://groestlsight.groestlcoin.org');
+App.accessRule('https://vote2019.world');
 // eth
 App.accessRule('https://etherscan.io');
 App.accessRule('https://api.etherscan.io');

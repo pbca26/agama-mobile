@@ -46,6 +46,7 @@ const PRICES_UPDATE_INTERVAL = 300000; // 5m
 
 let _settings = getLocalStorageVar('settings');
 
+// init settings
 if (!_settings) {
   setLocalStorageVar('settings', settingsDefaults);
 } else {
@@ -140,6 +141,12 @@ class App extends React.Component {
         if (key.indexOf('|spv') === -1 &&
             key.indexOf('|eth') === -1) {
           _localStorageCoins[`${key}|spv`] = _localStorageCoins[key];
+          delete _localStorageCoins[key];
+          _diffFound = true;
+        } else if (
+          key.indexOf(`${nnConfig.coin}|spv`) > -1 &&
+          (Math.floor(Date.now() / 1000) < nnConfig.activation || Math.floor(Date.now() / 1000) > nnConfig.deactivation)
+        ) {
           delete _localStorageCoins[key];
           _diffFound = true;
         } else if (

@@ -388,7 +388,7 @@ const lang = {
       BTCH: 'BTCH',
       BEER: 'BEER (Test coin)',
       PIZZA: 'PIZZA (Test coin)',
-      VOTE2018: 'VOTE2018 (Notary Elections)',
+      VOTE2019: 'VOTE2019 (Notary Elections)',
       NINJA: 'NINJA',
       GLXT: 'GLXToken',
       BNTN: 'Blocnation',

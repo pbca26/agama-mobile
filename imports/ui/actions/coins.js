@@ -41,6 +41,7 @@ const _coinsList = {
     'LUMBER',
     'RICK',
     'MORTY',
+    'VOTE2019',
     // other coins
     'BTC',
     'DOGE',
@@ -77,7 +78,6 @@ const _coinsList = {
     //'MVP',
     //'CEAL',
     //'MESH',
-    //'VOTE2018',
     //'BLK',
     //'BTX', (?) needs a fix
   ],
