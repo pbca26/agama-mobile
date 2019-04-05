@@ -31,7 +31,7 @@ const changeLogData = [{
     'Added ERC20 tokens: JST, DEC8, TRET, TILE, OVAL, KEA, CLF',
     'ERC20 contract ID changed: SUB, QBUIT, MLN',
     'Removed coins/assets: ARG, MNZ',
-    'New KMD asset chains: OUR, KSB, ILN, RICK, MORTY, VOTE2019',
+    'New KMD asset chains: OUR, KSB, ILN, RICK, MORTY, ZEX, VOTE2019',
     'ZCL sapling support',
     'GRS support',
     'EMC2 WIF keys export (recovery) fix',
