@@ -410,6 +410,7 @@ const lang = {
       LUMBER: 'Lumberscout',
       RICK: 'Rick',
       MORTY: 'Morty',
+      ZEX: 'Zaddex',
       // crypto
       SUQA: 'SUQA',
       BZC: 'Bitzec',

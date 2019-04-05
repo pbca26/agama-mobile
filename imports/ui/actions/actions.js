@@ -331,13 +331,13 @@ const transactions = (network, options) => {
           _electrumServer = network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? getLocalStorageVar('nnCoin')[network].server : getLocalStorageVar('coins')[network].server;
           _electrumServer.serverList = electrumServers[_name].serverList;
         } else {
-          address = options.pub;
           const _randomElectrumServer = electrumServers[_name].serverList[getRandomIntInclusive(0, electrumServers[_name].serverList.length - 1)].split(':');
           _electrumServer = {
             ip: _randomElectrumServer[0],
             port: _randomElectrumServer[1],
             proto: _randomElectrumServer[2],
           };
+          address = options.pub;
         }
 
         listtransactions(
@@ -575,6 +575,7 @@ const auth = (seed, coins) => {
         } else if (key.indexOf('|eth') > -1) {
           const _seed = seedToPriv(seed, 'eth');
           const _ethKeys = etherKeys(_seed, true);
+
           keys.eth[_key] = {
             pub: _ethKeys.address,
             priv: _ethKeys.signingKey.privateKey,
@@ -792,28 +793,30 @@ const getOverview = (coins) => {
   
             for (let i = 0; i < promiseResult.length; i++) {
               const _coin = promiseResult[i].coin.split('|')[0];
+              const coinUC = _coin.toUpperCase();
   
               if (promiseResult[i].coin.indexOf('|spv') > -1 &&
-                  isKomodoCoin(_coin.toUpperCase()) &&
-                  _prices[_coin.toUpperCase()] &&
-                  _prices[_coin.toUpperCase()][settingsCurrency.toUpperCase()] &&
-                  _prices[_coin.toUpperCase()].hasOwnProperty('KIC')) {
-                _prices[_coin.toUpperCase()][settingsCurrency.toUpperCase()] = 0;
-                delete _prices[_coin.toUpperCase()].priceChange;
+                  isKomodoCoin(coinUC) &&
+                  _prices[coinUC] &&
+                  _prices[coinUC][settingsCurrency.toUpperCase()] &&
+                  _prices[coinUC].hasOwnProperty('KIC')) {
+                _prices[coinUC][settingsCurrency.toUpperCase()] = 0;
+                delete _prices[coinUC].priceChange;
               } else if (
-                _prices[_coin.toUpperCase()] &&
-                _prices[_coin.toUpperCase()].AVG &&
-                _prices[_coin.toUpperCase()].AVG[settingsCurrency.toUpperCase()]) {
-                devlog(`overview ${_coin.toUpperCase()} use AVG price`);
-                _prices[_coin.toUpperCase()][settingsCurrency.toUpperCase()] = _prices[_coin.toUpperCase()].AVG[settingsCurrency.toUpperCase()];
+                _prices[coinUC] &&
+                _prices[coinUC].AVG &&
+                _prices[coinUC].AVG[settingsCurrency.toUpperCase()]
+              ) {
+                devlog(`overview ${coinUC} use AVG price`);
+                _prices[coinUC][settingsCurrency.toUpperCase()] = _prices[coinUC].AVG[settingsCurrency.toUpperCase()];
               }
 
               _overviewItems.push({
                 coin: promiseResult[i].coin,
                 balanceNative: promiseResult[i].balance,
-                balanceFiat: _prices[_coin.toUpperCase()] && _prices[_coin.toUpperCase()][settingsCurrency.toUpperCase()] && Number(promiseResult[i].balance) ? Number(_prices[_coin.toUpperCase()][settingsCurrency.toUpperCase()]) * Number(promiseResult[i].balance) : 0,
-                fiatPricePerItem: _prices[_coin.toUpperCase()] && _prices[_coin.toUpperCase()][settingsCurrency.toUpperCase()] ? Number(_prices[_coin.toUpperCase()][settingsCurrency.toUpperCase()]) : 0,
-                priceChange: _prices[_coin.toUpperCase()] && _prices[_coin.toUpperCase()].priceChange ? _prices[_coin.toUpperCase()].priceChange : null,
+                balanceFiat: _prices[coinUC] && _prices[coinUC][settingsCurrency.toUpperCase()] && Number(promiseResult[i].balance) ? Number(_prices[coinUC][settingsCurrency.toUpperCase()]) * Number(promiseResult[i].balance) : 0,
+                fiatPricePerItem: _prices[coinUC] && _prices[coinUC][settingsCurrency.toUpperCase()] ? Number(_prices[coinUC][settingsCurrency.toUpperCase()]) : 0,
+                priceChange: _prices[coinUC] && _prices[coinUC].priceChange ? _prices[coinUC].priceChange : null,
               });
             }
   
