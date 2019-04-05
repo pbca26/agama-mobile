@@ -245,6 +245,14 @@ class NotaryVote extends React.Component {
     });
   }
 
+  componentWillReceiveProps() {
+    if (!getLocalStorageVar('nn')) {
+      this.setState({
+        auth: false,
+      });
+    }
+  }
+
   componentWillMount() {
     this.props.actions.isNNAuth()
     .then((res) => {
