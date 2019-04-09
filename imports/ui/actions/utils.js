@@ -101,34 +101,6 @@ export const removeDisabledSPVCoins = (coins) => {
   return coins;
 };
 
-export const sortTransactions = (transactions, sortBy) => {
-  return transactions.sort((b, a) => {
-    if (a[sortBy ? sortBy : 'height'] < b[sortBy ? sortBy : 'height'] &&
-        a[sortBy ? sortBy : 'height'] &&
-        b[sortBy ? sortBy : 'height']) {
-      return -1;
-    }
-
-    if (a[sortBy ? sortBy : 'height'] > b[sortBy ? sortBy : 'height'] &&
-        a[sortBy ? sortBy : 'height'] &&
-        b[sortBy ? sortBy : 'height']) {
-      return 1;
-    }
-
-    if (!a[sortBy ? sortBy : 'height'] &&
-        b[sortBy ? sortBy : 'height']) {
-      return 1;
-    }
-
-    if (!b[sortBy ? sortBy : 'height'] &&
-        a[sortBy ? sortBy : 'height']) {
-      return -1;
-    }
-
-    return 0;
-  });
-}
-
 // single level
 export const joinPropsUrl = (obj) => {
   let out = [];
@@ -138,4 +110,15 @@ export const joinPropsUrl = (obj) => {
   }
 
   return out.join('&');
+};
+
+// ref: https://stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array
+export const shuffleArray = (a) => {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+
+  return a;
 };

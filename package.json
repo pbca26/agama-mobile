@@ -6,14 +6,14 @@
     "build": "rm -rf build && meteor build build --server=localhost && cp build/android/project/build/outputs/apk/release/android-release-unsigned.apk build/android/android-release-unsigned.apk"
   },
   "dependencies": {
-    "@babel/runtime": "^7.0.0-beta.55",
-    "agama-wallet-lib": "git://github.com/pbca26/agama-wallet-lib.git#dev",
+    "@babel/runtime": "^7.4.2",
+    "agama-wallet-lib": "git+https://github.com/pbca26/agama-wallet-lib.git#dev",
     "babel-runtime": "^6.20.0",
     "bitcoinjs-message": "^2.0.0",
     "bs58check": "^2.1.2",
     "buffer-reverse": "^1.0.1",
     "cordova": "^7.1.0",
-    "ethers": "git://github.com/pbca26/ethers.js",
+    "ethers": "git+https://github.com/pbca26/ethers.js",
     "jsqr": "^0.2.2",
     "meteor-node-stubs": "~0.2.4",
     "nodejs-aes256": "^1.0.1",

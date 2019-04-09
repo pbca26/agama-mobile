@@ -5,7 +5,7 @@ import parseTransactionAddresses from 'agama-wallet-lib/build/transaction-type';
 import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 import electrumJSTxDecoder from 'agama-wallet-lib/build/transaction-decoder';
 import dpowCoins from 'agama-wallet-lib/build/electrum-servers-dpow';
-import { sortTransactions } from './utils';
+import { sortTransactions } from 'agama-wallet-lib/build/utils';
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 

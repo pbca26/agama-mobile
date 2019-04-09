@@ -28,7 +28,6 @@ import AddCoin from './components/AddCoin';
 import Login from './components/Login';
 import Transactions from './components/Transactions/Transactions';
 import ServerSelect from './components/ServerSelect';
-import CreateSeed from './components/CreateSeed';
 import KMDInterest from './components/KMDInterest';
 import OfflineSigning from './components/OfflineSigning';
 import Pin from './components/Pin';
@@ -37,6 +36,8 @@ import Overview from './components/Overview';
 import Settings from './components/Settings/Settings';
 import Exchanges from './components/Exchanges/Exchanges';
 import settingsDefaults from './components/Settings/settingsDefaults';
+import nnConfig from './components/NotaryVote/config';
+import NotaryVote from './components/NotaryVote/NotaryVote';
 
 const DASHBOARD_UPDATE_INTERVAL = 120000; // 2m
 const PROXY_RETRY_COUNT = 2;
@@ -45,6 +46,7 @@ const PRICES_UPDATE_INTERVAL = 300000; // 5m
 
 let _settings = getLocalStorageVar('settings');
 
+// init settings
 if (!_settings) {
   setLocalStorageVar('settings', settingsDefaults);
 } else {
@@ -142,6 +144,12 @@ class App extends React.Component {
           delete _localStorageCoins[key];
           _diffFound = true;
         } else if (
+          key.indexOf(`${nnConfig.coin}|spv`) > -1 &&
+          (Math.floor(Date.now() / 1000) < nnConfig.activation || Math.floor(Date.now() / 1000) > nnConfig.deactivation)
+        ) {
+          delete _localStorageCoins[key];
+          _diffFound = true;
+        } else if (
           (key.indexOf('|spv') > -1 && supportedCoinsList.spv.indexOf(key.split('|')[0].toUpperCase()) === -1) ||
           (key.indexOf('|eth') > -1 && supportedCoinsList.eth.indexOf(key.split('|')[0].toUpperCase()) === -1)) {
           delete _localStorageCoins[key];
@@ -152,9 +160,21 @@ class App extends React.Component {
           setLocalStorageVar('coins', _localStorageCoins);
         }       
       }
-      
+
       this.setState({
         coins: _localStorageCoins,
+      });
+    }
+
+    if ((Math.floor(Date.now() / 1000) < nnConfig.activation || Math.floor(Date.now() / 1000) > nnConfig.deactivation) &&
+        getLocalStorageVar('nn')) {
+      setLocalStorageVar('nn', null);
+      setLocalStorageVar('nnCoin', null);
+    }
+
+    if (getLocalStorageVar('prices')) {
+      this.setState({
+        prices: getLocalStorageVar('prices'),
       });
     }
   }
@@ -202,6 +222,7 @@ class App extends React.Component {
       }
     } else {
       this.setState({
+        auth: false,
         coins: {},
         address: null,
         balance: null,
@@ -209,7 +230,8 @@ class App extends React.Component {
         utxo: null,
         coin: null,
         activeSection: 'addcoin',
-        history: null,  
+        history: null,
+        title: null,
       });
     }
   }
@@ -288,10 +310,16 @@ class App extends React.Component {
 
   historyBack() {
     this.setState({
-      activeSection: this.state.history,
+      activeSection: this.state.activeSection === 'dashboard' && getLocalStorageVar('settings').mainView !== 'default' ? 'overview' : this.state.history,
       history: null,
+      title: null,
     });
     
+    if (this.state.activeSection === 'send' ||
+        this.state.activeSection === 'exchanges') {
+      this.dashboardRefresh();
+    }
+
     this.scrollToTop();
   }
 
@@ -371,7 +399,7 @@ class App extends React.Component {
 
         this.setState({
           coins,
-          history: null,
+          history: getLocalStorageVar('settings').mainView !== 'default' && !skipRefresh ? 'overview' : null,
           activeSection: skipRefresh ? this.state.activeSection : 'dashboard',
           coin,
           address: res,
@@ -383,6 +411,14 @@ class App extends React.Component {
 
         if (!skipRefresh) this.scrollToTop();
         this.dashboardRefresh();
+
+        actions.getOverview(coins)
+        .then((res) => {
+          this.setState({
+            overview: res,
+          });
+        });
+        this.updatePrices();
       });
     }
   }
@@ -433,20 +469,42 @@ class App extends React.Component {
       this.getEthGasPrice();
     }
 
-    this.scrollToTop();
+    Meteor.setTimeout(() => {
+      this.scrollToTop();
+    }, 10);
+
+    if (this.state.activeSection === 'send' &&
+        (section === 'dashboard' || section === 'overview')) {
+      this.dashboardRefresh();
+    }
   }
 
-  switchCoin(coin, skipRefresh) {
+  switchCoin(coin, skipRefresh, mainView) {
     const _name = coin.split('|')[0];
     const _mode = coin.split('|')[1];
+    let _cache = getLocalStorageVar('cache');
+    let _balance = this.state.coins[coin] ? this.state.coins[coin].transactions: null;
+    let _transactions = this.state.coins[coin] ? this.state.coins[coin].balance: null;
+    
+    if (_cache &&
+        _cache.balance &&
+        _cache.balance[coin]) {
+      _balance = _cache.balance[coin];
+    }
+
+    if (_cache &&
+        _cache.transactions &&
+        _cache.transactions[coin]) {
+       _transactions = _cache.transactions[coin];
+    }
 
     this.setState({
       coin: coin,
       address: this.state.pubKeys[_mode][_name],
       history: this.state.activeSection,
-      activeSection: skipRefresh ? this.state.activeSection : 'dashboard',
-      transactions: this.state.coins[coin] ? this.state.coins[coin].transactions: null,
-      balance: this.state.coins[coin] ? this.state.coins[coin].balance: null,
+      activeSection: skipRefresh && !mainView ? this.state.activeSection : 'dashboard',
+      transactions: _transactions,
+      balance: _balance,
     });
 
     // toggle refresh and update in-mem coins cache obj
@@ -459,6 +517,10 @@ class App extends React.Component {
     } else {
       Meteor.setTimeout(() => {
         this.dashboardRefresh();
+
+        if (mainView) {
+          this.scrollToTop();
+        }
       }, 10);
     }
   }
@@ -478,6 +540,15 @@ class App extends React.Component {
       const _updateInterval = Meteor.setInterval(() => {
         if (this.state.activeSection === 'dashboard') {
           this.dashboardRefresh();
+        } else if (getLocalStorageVar('settings').mainView !== 'default' &&
+          this.state.activeSection === 'overview'
+        ) {
+          this.props.actions.getOverview(this.state.coins)
+          .then((res) => {
+            this.setState({
+              overview: res,
+            });
+          });
         }
       }, DASHBOARD_UPDATE_INTERVAL);
 
@@ -596,7 +667,15 @@ class App extends React.Component {
 
     if (typeof purgeSeed === 'boolean' &&
         purgeSeed === true) {
+      setLocalStorageVar('coins', null);
       setLocalStorageVar('seed', null);
+      setLocalStorageVar('exchanges', {
+        coinswitch: {
+          orders: {},
+          deposits: {},
+        },
+      });
+      setLocalStorageVar('cache', null);
     }
 
     if (this.globalClickTimeout) {
@@ -607,6 +686,8 @@ class App extends React.Component {
     .then((res) => {
       let lockState = Object.assign({}, this.defaultState);
       lockState.coins = this.state.coins;
+      lockState.title = null;
+      lockState.history = null;
 
       this.toggleAutoRefresh(true);
       Meteor.setTimeout(() => {
@@ -619,19 +700,49 @@ class App extends React.Component {
   login(passphrase) {
     const { actions } = this.props;
     let overviewCoinsInit = [];
+    
+    if (getLocalStorageVar('seed') &&
+        getLocalStorageVar('settings').mainView !== 'default' &&
+        getLocalStorageVar('cache') &&
+        getLocalStorageVar('cache').overview &&
+        getLocalStorageVar('cache').overview.length > 0) {
+      const overviewCache = getLocalStorageVar('cache').overview;
+      let overviewCacheCoinsFlat = [];
+      
+      for (let i = 0; i < overviewCache.length; i++) {
+        overviewCacheCoinsFlat.push(overviewCache[i].coin);
+      }
 
-    for (let key in this.state.coins) {
-      overviewCoinsInit.push({
-        balanceFiat: 'loading',
-        balanceNative: 'loading',
-        coin: key,
-        fiatPricePerItem: 'loading',
+      for (let key in this.state.coins) {
+        if (overviewCacheCoinsFlat.indexOf(key) > -1) {
+          overviewCoinsInit.push(overviewCache[overviewCacheCoinsFlat.indexOf(key)]);
+        } else {
+          overviewCoinsInit.push({
+            balanceFiat: 'loading',
+            balanceNative: 'loading',
+            coin: key,
+            fiatPricePerItem: 'loading',
+          });
+        }
+      }
+
+      this.setState({
+        overview: overviewCoinsInit,
+      });
+    } else {
+      for (let key in this.state.coins) {
+        overviewCoinsInit.push({
+          balanceFiat: 'loading',
+          balanceNative: 'loading',
+          coin: key,
+          fiatPricePerItem: 'loading',
+        });
+      }
+
+      this.setState({
+        overview: overviewCoinsInit,
       });
     }
-
-    this.setState({
-      overview: overviewCoinsInit,
-    });
 
     const _login = () => {
       actions.auth(passphrase, this.state.coins)
@@ -667,15 +778,16 @@ class App extends React.Component {
           address = res.spv[coin.split('|')[0]] || res.eth[coin.split('|')[0]];
         }
   
+        const settingsMainView = getLocalStorageVar('settings').mainView;
         this.setState({
           auth: true,
           pubKeys: res,
           coin,
           address,
           history: null,
-          activeSection: 'dashboard',
+          activeSection: settingsMainView === 'default' ? 'dashboard' : 'overview',
         });
-  
+
         this.dashboardRefresh();
         this.toggleAutoRefresh();
         this.globalClick();
@@ -737,13 +849,18 @@ class App extends React.Component {
   toggleMenuOption(optionName) {
     Meteor.setTimeout(() => {
       this.toggleMenu();
+      this.scrollToTop();
     }, 10);
 
     this.setState({
       history: this.state.activeSection,
       activeSection: this.state.activeSection === optionName ? (this.state.auth ? 'dashboard' : 'login') : optionName,
     });
-    this.scrollToTop();
+
+    if ((this.state.activeSection === 'send' || this.state.activeSection === 'exchanges') &&
+        (optionName === 'dashboard' || optionName === 'overview')) {
+      this.dashboardRefresh();
+    }
   }
 
   renderActiveCoins() {
@@ -790,50 +907,40 @@ class App extends React.Component {
               </div>
               { this.state.auth &&
                 <div className="items">
-                  <div
-                    className="item"
-                    disabled={ this.state.activeSection === 'exchanges' }>
+                  { getLocalStorageVar('settings').debug &&
                     <div
-                      className="title"
-                      onClick={ this.toggleExchanges }>
-                      { translate('APP_TITLE.EXCHANGES') }
+                      className="item"
+                      disabled={ this.state.activeSection === 'exchanges' }>
+                      <div
+                        className="title"
+                        onClick={ this.toggleExchanges }>
+                        { translate('APP_TITLE.EXCHANGES') }
+                      </div>
+                      <img
+                        className="line"
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                     </div>
-                    <img
-                      className="line"
-                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
-                  </div>
+                  }
                   <div
                     className="item"
                     disabled={ this.state.activeSection === 'overview' }>
                     <div
                       className="title"
                       onClick={ this.toggleOverview }>
-                      { translate('APP_TITLE.OVERVIEW') }
+                      { translate('APP_TITLE.' + (getLocalStorageVar('settings').mainView !== 'default' ? 'DASHBOARD' : 'OVERVIEW')) }
                     </div>
                     <img
                       className="line"
                       src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                   </div>
-                  <div
-                    className="item"
-                    disabled={ this.state.activeSection === 'dashboard' }>
-                    <div
-                      className="title"
-                      onClick={ () => this.changeActiveSection('dashboard', true) }>
-                      { translate('DASHBOARD.DASHBOARD') }
-                    </div>
-                    <img
-                      className="line"
-                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
-                  </div>
-                  { getLocalStorageVar('seed') &&
+                  { getLocalStorageVar('settings').mainView === 'default' &&
                     <div
                       className="item"
-                      disabled={ this.state.activeSection === 'recovery' }>
+                      disabled={ this.state.activeSection === 'dashboard' }>
                       <div
                         className="title"
-                        onClick={ () => this.toggleMenuOption('recovery') }>
-                        { translate('APP_TITLE.RECOVERY') }
+                        onClick={ () => this.changeActiveSection('dashboard', true) }>
+                        { translate('DASHBOARD.DASHBOARD') }
                       </div>
                       <img
                         className="line"
@@ -881,19 +988,36 @@ class App extends React.Component {
                         onClick={ () => this.toggleMenuOption('addcoin') }>
                         { translate('DASHBOARD.ADD_COIN') }
                       </div>
+                      { getLocalStorageVar('settings').mainView === 'default' &&
+                        <img
+                          className="line"
+                          src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                      }
+                    </div>
+                  }
+                  { Math.floor(Date.now() / 1000) > nnConfig.activation && 
+                    Math.floor(Date.now() / 1000) < nnConfig.deactivation &&
+                    <div className="item">
+                      <div
+                        className="title"
+                        onClick={ () => this.toggleMenuOption('elections') }>
+                        { translate('APP_TITLE.ELECTIONS') }
+                      </div>
                       <img
                         className="line"
                         src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                     </div>
                   }
                   <div>
-                  { this.renderActiveCoins() }
+                  { getLocalStorageVar('settings').mainView === 'default' &&
+                    this.renderActiveCoins()
+                  }
                   </div>
                 </div>
               }
               { !this.state.auth &&
                 <div className="items">
-                  { (this.state.activeSection === 'addcoin' || this.state.activeSection === 'create-seed') &&
+                  { this.state.activeSection === 'addcoin' &&
                     <div className="item">
                       <div
                         className="title"
@@ -919,30 +1043,16 @@ class App extends React.Component {
                   </div>
                   <div
                     className="item"
-                    disabled={ this.state.activeSection === 'create-seed' }>
+                    disabled={ this.state.activeSection === 'settings' }>
                     <div
                       className="title"
-                      onClick={ () => this.toggleMenuOption('create-seed') }>
-                      { translate('DASHBOARD.CREATE_SEED') }
+                      onClick={ () => this.toggleMenuOption('settings') }>
+                      { translate('APP_TITLE.SETTINGS') }
                     </div>
                     <img
                       className="line"
                       src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                   </div>
-                  { getLocalStorageVar('seed') &&
-                    <div
-                      className="item"
-                      disabled={ this.state.activeSection === 'pin' }>
-                      <div
-                        className="title"
-                        onClick={ () => this.toggleMenuOption('pin') }>
-                        { translate('APP_TITLE.PIN') }
-                      </div>
-                      <img
-                        className="line"
-                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
-                    </div>
-                  }
                   { /*this.state.activeSection !== 'offlinesig' &&
                     <div className="item">
                       <div
@@ -959,6 +1069,21 @@ class App extends React.Component {
                         className="title"
                         onClick={ () => this.toggleMenuOption('login') }>
                         { translate('APP_TITLE.LOGIN') }
+                      </div>
+                      <img
+                        className="line"
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
+                    </div>
+                  }
+                  { Math.floor(Date.now() / 1000) > nnConfig.activation && 
+                    Math.floor(Date.now() / 1000) < nnConfig.deactivation &&
+                    <div
+                      className="item"
+                      disabled={ this.state.activeSection === 'elections' }>
+                      <div
+                        className="title"
+                        onClick={ () => this.toggleMenuOption('elections') }>
+                        { translate('APP_TITLE.ELECTIONS') }
                       </div>
                       <img
                         className="line"
@@ -982,9 +1107,9 @@ class App extends React.Component {
         className={ 'app-container' + (config.dev ? '' : ' unselectable') }
         onClick={ this.globalClick }>
         <div className="app-header">
-          { this.state.history &&
+          { (this.state.history || (getLocalStorageVar('settings').mainView !== 'default' && this.state.activeSection === 'dashboard')) &&
             !this.state.displayMenu &&
-            ((this.state.auth && this.state.history !== 'login' && this.state.history !== 'create-seed') || !this.state.auth) &&
+            ((this.state.auth && this.state.history !== 'login') || !this.state.auth) &&
             this.state.history !== this.state.activeSection &&
             (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
             <img
@@ -999,7 +1124,7 @@ class App extends React.Component {
               src={ `${assetsPath.home}/home-combined-shape.png` } />
           }
           <div className="ui-title">
-            { translate('APP_TITLE.' + (this.state.displayMenu ? 'MENU' : this.state.title && this.state.title.toUpperCase() || this.state.activeSection.toUpperCase())) }
+            { translate('APP_TITLE.' + (this.state.displayMenu ? 'MENU' : this.state.title && this.state.title.toUpperCase() || (getLocalStorageVar('settings').mainView === 'default' ? this.state.activeSection.toUpperCase() : this.state.activeSection === 'overview' ? 'DASHBOARD' : this.state.activeSection.toUpperCase()))) }
           </div>
         </div>
         { this.state.displayMenu &&
@@ -1037,7 +1162,6 @@ class App extends React.Component {
           (this.state.conError || this.state.activeSection === 'server-select') &&
           this.state.activeSection !== 'overview' &&
           this.state.activeSection !== 'settings' &&
-          this.state.activeSection !== 'recovery' &&
           this.state.activeSection !== 'addcoin' &&
           <ServerSelect
             { ...this.state }
@@ -1054,13 +1178,9 @@ class App extends React.Component {
               <Login
                 { ...this.state }
                 login={ this.login }
-                lock={ this.lock } />
-            }
-            { this.state.activeSection === 'create-seed' &&
-              <CreateSeed
-                { ...this.state }
-                login={ this.login }
-                changeActiveSection={ this.changeActiveSection } />
+                lock={ this.lock }
+                changeTitle={ this.changeTitle }
+                addCoin={ this.addCoin } />
             }
             { !this.state.conError &&
               <SendCoin
@@ -1113,10 +1233,13 @@ class App extends React.Component {
             }
             { this.state.auth &&
               this.state.activeSection === 'overview' &&
-              <Overview { ...this.state } />
+              <Overview
+                { ...this.state }
+                switchCoin={ this.switchCoin } />
             }
             { this.state.activeSection === 'settings' &&
               <Settings
+                auth={ this.state.auth }
                 coin={ this.state.coin }
                 coins={ this.state.coins }
                 globalClick={ this.globalClick }
@@ -1148,6 +1271,9 @@ class App extends React.Component {
                 getBtcFees={ this.getBtcFees }
                 pubKeys={ this.state.pubKeys }
                 lock={ this.lock } />
+            }
+            { this.state.activeSection === 'elections' &&
+              <NotaryVote historyBack={ this.historyBack }/>
             }
           </div>
         }

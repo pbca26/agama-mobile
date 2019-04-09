@@ -106,7 +106,8 @@ class ServerSelect extends React.Component {
         );
         this.props.dashboardRefresh();
 
-        if (this.props.activeSection === 'server-select') {
+        if (this.props.activeSection === 'server-select' &&
+            this.props.hasOwnProperty('historyBack')) {
           this.props.historyBack();
         }
       }

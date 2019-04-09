@@ -96,7 +96,7 @@ class Recovery extends React.Component {
         this.setState({
           wrongPin: true,
         });
-      } else if (pinBruteforceProtectionRetries < 3) {
+      } else if (pinBruteforceProtectionRetries < 2) {
         let _seedStorage = getLocalStorageVar('seed');
         _seedStorage.pinRetries += 1;
         setLocalStorageVar('seed', _seedStorage);
@@ -168,7 +168,10 @@ class Recovery extends React.Component {
           </div>
         </div>
         <div
-          disabled={ !this.state.pin }
+          disabled={
+            !this.state.pin ||
+            (this.state.pin && this.state.pin.length < 6)
+          }
           onClick={ this.decodeSeed }
           className="group3 margin-top-40">
           <div className="btn-inner">
