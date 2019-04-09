@@ -411,6 +411,7 @@ const lang = {
       RICK: 'Rick',
       MORTY: 'Morty',
       ZEX: 'Zaddex',
+      RFOX: 'Red fox',
       // crypto
       SUQA: 'SUQA',
       BZC: 'Bitzec',

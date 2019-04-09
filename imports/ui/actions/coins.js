@@ -43,6 +43,7 @@ const _coinsList = {
     'MORTY',
     'VOTE2019',
     'ZEX',
+    'RFOX',
     // other coins
     'BTC',
     'DOGE',
