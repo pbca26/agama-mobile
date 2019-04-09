@@ -3,6 +3,7 @@ import { Promise } from 'meteor/promise';
 import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
 import {
   getLocalStorageVar,
+  setLocalStorageVar,
   sortObject,
 } from './utils';
 import {
@@ -41,6 +42,7 @@ import {
   syncHistory,
 } from './exchanges';
 import getPrices from './prices';
+import nnConfig from '../components/NotaryVote/config';
 
 let _cache = {};
 // runtime cache wrapper functions
@@ -142,6 +144,7 @@ const cache = {
 let keys = {
   spv: {},
   eth: {},
+  nn: {},
 };
 let connect = {
   eth: null,
@@ -252,8 +255,8 @@ const sendtx = (network, outputAddress, value, verify, push, btcFee) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
       const _name = network.split('|')[0];
-      const changeAddress = keys.spv[_name].pub;
-      let _electrumServer = getLocalStorageVar('coins')[network].server;
+      const changeAddress = network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? keys.nn[_name].pub : keys.spv[_name].pub;
+      let _electrumServer = network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? getLocalStorageVar('nnCoin')[network].server : getLocalStorageVar('coins')[network].server;
       _electrumServer.serverList = electrumServers[_name].serverList;
 
       devlog(`sendtx ${network}`);
@@ -265,9 +268,9 @@ const sendtx = (network, outputAddress, value, verify, push, btcFee) => {
         changeAddress,
         value,
         btcFee ? { perbyte: true, value: btcFee } : (isKomodoCoin(network) ? electrumServers.kmd.txfee : electrumServers[_name].txfee),
-        keys.spv[_name].priv,
+        network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? keys.nn[_name].priv : keys.spv[_name].priv,
         _name,
-        verify,
+        network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? false : verify,
         push,
         cache
       )
@@ -285,7 +288,6 @@ const sendtxEth = (network, dest, amount, gasPrice, push) => {
 
       if (_name === 'eth' ||
           _name === 'eth_ropsten') {
-        // wallet, coin, push, dest, amount, gasPrice, network
         ethCreateTx(
           connect[_name],
           _name,
@@ -299,7 +301,6 @@ const sendtxEth = (network, dest, amount, gasPrice, push) => {
           resolve(res);
         })
       } else {
-        // wallet, symbol, push, dest, amount, gasPrice
         ethCreateTxERC20(
           connect.eth,
           _name,
@@ -326,17 +327,17 @@ const transactions = (network, options) => {
         let _electrumServer;
         
         if (!options) {
-          address = keys.spv[_name].pub;
-          _electrumServer = getLocalStorageVar('coins')[network].server;
+          address = network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? keys.nn[_name].pub : keys.spv[_name].pub;
+          _electrumServer = network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? getLocalStorageVar('nnCoin')[network].server : getLocalStorageVar('coins')[network].server;
           _electrumServer.serverList = electrumServers[_name].serverList;
         } else {
-          address = options.pub;
           const _randomElectrumServer = electrumServers[_name].serverList[getRandomIntInclusive(0, electrumServers[_name].serverList.length - 1)].split(':');
           _electrumServer = {
             ip: _randomElectrumServer[0],
             port: _randomElectrumServer[1],
             proto: _randomElectrumServer[2],
           };
+          address = options.pub;
         }
 
         listtransactions(
@@ -349,6 +350,17 @@ const transactions = (network, options) => {
           options ? options.txid : null
         )
         .then((res) => {
+          let _cache = getLocalStorageVar('cache') || {};
+          
+          if (_cache.transactions) {
+            _cache.transactions[network] = res;
+          } else {
+            _cache.transactions = {};
+            _cache.transactions[network] = res;
+          }
+
+          setLocalStorageVar('cache', _cache);
+
           resolve(res);
         });
       } else if (network.indexOf('|eth') > -1) {
@@ -366,8 +378,19 @@ const transactions = (network, options) => {
         }
 
         ethTransactions(address, options)
-        .then((_transactions) => {
-          resolve(_transactions);
+        .then((res) => {
+          let _cache = getLocalStorageVar('cache') || {};
+          
+          if (_cache.transactions) {
+            _cache.transactions[network] = res;
+          } else {
+            _cache.transactions = {};
+            _cache.transactions[network] = res;
+          }
+
+          setLocalStorageVar('cache', _cache);
+          
+          resolve(res);
         });
       }
     });
@@ -380,9 +403,10 @@ const balance = (network) => {
       const _name = network.split('|')[0];
 
       if (network.indexOf('|spv') > -1) {
-        const address = keys.spv[_name].pub;
-        let _electrumServer = getLocalStorageVar('coins')[network].server;
+        const address = network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? keys.nn[_name].pub : keys.spv[_name].pub;
+        let _electrumServer = network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? getLocalStorageVar('nnCoin')[network].server : getLocalStorageVar('coins')[network].server;
         _electrumServer.serverList = electrumServers[_name].serverList;
+        
         let params = {
           port: _electrumServer.port,
           ip: _electrumServer.ip,
@@ -417,6 +441,17 @@ const balance = (network) => {
                   cache
                 )
                 .then((res) => {
+                  let _cache = getLocalStorageVar('cache') || {};
+
+                  if (_cache.balance) {
+                    _cache.balance['kmd|spv'] = res;
+                  } else {
+                    _cache.balance = {};
+                    _cache.balance['kmd|spv'] = res;
+                  }
+
+                  setLocalStorageVar('cache', _cache);
+
                   resolve(res);
                 });
               }
@@ -424,10 +459,22 @@ const balance = (network) => {
               if (!_balance.hasOwnProperty('confirmed')) {
                 resolve('error');
               } else {
-                resolve({
+                const retBalance = {
                   balance: Number(fromSats(_balance.confirmed).toFixed(8)),
                   unconfirmed: Number(fromSats(_balance.unconfirmed).toFixed(8)),
-                });
+                };
+                let _cache = getLocalStorageVar('cache') || {};
+                
+                if (_cache.balance) {
+                  _cache.balance[network] = retBalance;
+                } else {
+                  _cache.balance = {};
+                  _cache.balance[network] = retBalance;
+                }
+
+                setLocalStorageVar('cache', _cache);
+
+                resolve(retBalance);
               }
             }
           }
@@ -447,11 +494,23 @@ const balance = (network) => {
         }
 
         ethBalance(address, options)
-        .then((_balance) => {
-          resolve({
-            balance: _balance.balance,
+        .then((res) => {
+          const _balance = {
+            balance: res.balance,
             unconfirmed: 0,
-          });
+          };
+          let _cache = getLocalStorageVar('cache') || {};
+          
+          if (_cache.balance) {
+            _cache.balance[network] = _balance;
+          } else {
+            _cache.balance = {};
+            _cache.balance[network] = _balance;
+          }
+
+          setLocalStorageVar('cache', _cache);
+
+          resolve(_balance);
         });
       }
     });
@@ -486,6 +545,7 @@ const auth = (seed, coins) => {
       let _pubKeys = {
         spv: {},
         eth: {},
+        nn: {},
       };
 
       for (let key in coins) {
@@ -507,14 +567,15 @@ const auth = (seed, coins) => {
             _seedToWif = seedToWif(_seed, electrumJSNetworks[_key.toLowerCase()] || electrumJSNetworks.kmd, true);
           }
 
-          keys.spv[_key] = {
+          keys[key.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? 'nn' : 'spv'][_key] = {
             pub: _seedToWif.pub,
             priv: _seedToWif.priv,
           };
-          _pubKeys.spv[_key] = _seedToWif.pub;
+          _pubKeys[key.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? 'nn' : 'spv'][_key] = _seedToWif.pub;
         } else if (key.indexOf('|eth') > -1) {
           const _seed = seedToPriv(seed, 'eth');
           const _ethKeys = etherKeys(_seed, true);
+
           keys.eth[_key] = {
             pub: _ethKeys.address,
             priv: _ethKeys.signingKey.privateKey,
@@ -607,6 +668,7 @@ const getOverview = (coins) => {
         return new Promise((resolve, reject) => {
           if (pair.coin.indexOf('|spv') > -1) {
             const _electrumServer = getLocalStorageVar('coins')[pair.coin].server;
+
             let params = {
               port: _electrumServer.port,
               ip: _electrumServer.ip,
@@ -731,16 +793,40 @@ const getOverview = (coins) => {
   
             for (let i = 0; i < promiseResult.length; i++) {
               const _coin = promiseResult[i].coin.split('|')[0];
+              const coinUC = _coin.toUpperCase();
   
+              if (promiseResult[i].coin.indexOf('|spv') > -1 &&
+                  isKomodoCoin(coinUC) &&
+                  _prices[coinUC] &&
+                  _prices[coinUC][settingsCurrency.toUpperCase()] &&
+                  _prices[coinUC].hasOwnProperty('KIC')) {
+                _prices[coinUC][settingsCurrency.toUpperCase()] = 0;
+                delete _prices[coinUC].priceChange;
+              } else if (
+                _prices[coinUC] &&
+                _prices[coinUC].AVG &&
+                _prices[coinUC].AVG[settingsCurrency.toUpperCase()]
+              ) {
+                devlog(`overview ${coinUC} use AVG price`);
+                _prices[coinUC][settingsCurrency.toUpperCase()] = _prices[coinUC].AVG[settingsCurrency.toUpperCase()];
+              }
+
               _overviewItems.push({
                 coin: promiseResult[i].coin,
                 balanceNative: promiseResult[i].balance,
-                balanceFiat: _prices[_coin.toUpperCase()] && _prices[_coin.toUpperCase()][settingsCurrency.toUpperCase()] && Number(promiseResult[i].balance) ? Number(_prices[_coin.toUpperCase()][settingsCurrency.toUpperCase()]) * Number(promiseResult[i].balance) : 0,
-                fiatPricePerItem: _prices[_coin.toUpperCase()] && _prices[_coin.toUpperCase()][settingsCurrency.toUpperCase()] ? Number(_prices[_coin.toUpperCase()][settingsCurrency.toUpperCase()]) : 0,
-                priceChange: _prices[_coin.toUpperCase()] && _prices[_coin.toUpperCase()].priceChange ? _prices[_coin.toUpperCase()].priceChange : null,
+                balanceFiat: _prices[coinUC] && _prices[coinUC][settingsCurrency.toUpperCase()] && Number(promiseResult[i].balance) ? Number(_prices[coinUC][settingsCurrency.toUpperCase()]) * Number(promiseResult[i].balance) : 0,
+                fiatPricePerItem: _prices[coinUC] && _prices[coinUC][settingsCurrency.toUpperCase()] ? Number(_prices[coinUC][settingsCurrency.toUpperCase()]) : 0,
+                priceChange: _prices[coinUC] && _prices[coinUC].priceChange ? _prices[coinUC].priceChange : null,
               });
             }
   
+            if (getLocalStorageVar('seed') &&
+                getLocalStorageVar('settings').mainView !== 'default') {
+              let _cache = getLocalStorageVar('cache') || {};
+              _cache.overview = _overviewItems;
+              setLocalStorageVar('cache', _cache);
+            }
+
             resolve(_overviewItems);
           }
         });
@@ -822,6 +908,12 @@ const getKeys = () => {
   };
 };
 
+const isNNAuth = () => {
+  return async (dispatch) => {
+    return Object.keys(keys.nn).length ? true : false;
+  };
+};
+
 export default {
   auth,
   getKeys,
@@ -844,4 +936,5 @@ export default {
   getOrder,
   placeOrder,
   syncExchangesHistory,
+  isNNAuth,
 }

@@ -6,10 +6,15 @@ import {
   isKomodoCoin,
 } from 'agama-wallet-lib/build/coin-helpers';
 import translate from '../../translate/translate';
+import QRCode from 'qrcode.react';
+import {
+  assetsPath,
+  getLocalStorageVar,
+} from '../../actions/utils';
+
 import Spinner from '../Spinner';
 import TransactionDetails from './TransactionDetails';
-import QRCode from 'qrcode.react';
-import { assetsPath } from '../../actions/utils';
+import FiatSymbol from '../FiatSymbol';
 
 class Transactions extends React.Component {
   constructor() {
@@ -20,7 +25,6 @@ class Transactions extends React.Component {
     };
     this.toggleTxDetails = this.toggleTxDetails.bind(this);
     this.openExternalURL = this.openExternalURL.bind(this);
-    this.isInterestDefined = this.isInterestDefined.bind(this);
     this.toggleQR = this.toggleQR.bind(this);
     this.showClaimButton = this.showClaimButton.bind(this);
     this.closeTransactionDetails = this.closeTransactionDetails.bind(this);
@@ -54,16 +58,6 @@ class Transactions extends React.Component {
     if (_props.balance &&
         _props.balance.balance &&
         _props.balance.balance > 0) {
-      return true;
-    }
-  }
-
-  isInterestDefined() {
-    const _props = this.props;
-
-    if (_props.balance &&
-        _props.balance.interest &&
-        _props.balance.interest > 0) {
       return true;
     }
   }
@@ -129,26 +123,16 @@ class Transactions extends React.Component {
             disabled={ !this.showSendButton() }
             type="button"
             onClick={ () => this.props.changeActiveSection('send') }
-            className="btn btn-primary waves-effect waves-light margin-right-20">
-            <i className="fa fa-send"></i> { translate('DASHBOARD.SEND') }
+            className={ 'btn btn-primary waves-effect waves-light ' + (this.props.vote ? 'no-margin-right' : 'margin-right-20') }>
+            <i className="fa fa-send"></i> { translate('DASHBOARD.' + (!this.props.vote ? 'SEND': 'SEND_VOTE')) }
           </button>
-          <button
-            type="button"
-            className="btn btn-success waves-effect waves-light"
-            onClick={ this.toggleQR }>
-            <i className="fa fa-inbox"></i> { translate('DASHBOARD.RECEIVE') }
-          </button>
-          { this.state.showQR &&
-            <div className="receive-qr">
-              { this.props.address &&
-                <div>
-                  <QRCode
-                    value={ this.props.address }
-                    size={ 198 } />
-                  <div className="text-center wb--all selectable">{ this.props.address }</div>
-                </div>
-              }
-            </div>
+          { !this.props.vote &&
+            <button
+              type="button"
+              className="btn btn-success waves-effect waves-light"
+              onClick={ this.toggleQR }>
+              <i className="fa fa-inbox"></i> { translate('DASHBOARD.RECEIVE') }
+            </button>
           }
           { this.props.coin === 'kmd|spv' &&
             <button
@@ -165,6 +149,18 @@ class Transactions extends React.Component {
                 <i className="fa fa-exclamation"></i>
               }
             </button>
+          }
+          { this.state.showQR &&
+            <div className="receive-qr">
+              { this.props.address &&
+                <div>
+                  <QRCode
+                    value={ this.props.address }
+                    size={ 198 } />
+                  <div className="text-center wb--all selectable">{ this.props.address }</div>
+                </div>
+              }
+            </div>
           }
         </div>
       </div>
@@ -205,6 +201,26 @@ class Transactions extends React.Component {
       const _balance = this.props.balance;
       const _name = _coin.split('|')[0];
       const _mode = _coin.split('|')[1];
+      const settingsCurrency = getLocalStorageVar('settings').fiat;
+      let _priceChangeColor = 'green';
+      
+      if (this.props.prices &&
+          this.props.prices[_name.toUpperCase()] &&
+          this.props.prices[_name.toUpperCase()].priceChange &&
+          this.props.prices[_name.toUpperCase()].priceChange.data &&
+          this.props.prices[_name.toUpperCase()].priceChange.data.hasOwnProperty('percent_change_1h') &&
+          this.props.prices[_name.toUpperCase()].priceChange.data.percent_change_1h < 0) {
+        _priceChangeColor = 'red';
+      }
+
+      if (this.props.prices &&
+          this.props.prices[_name.toUpperCase()] &&
+          this.props.prices[_name.toUpperCase()].priceChange &&
+          this.props.prices[_name.toUpperCase()].priceChange.data &&
+          this.props.prices[_name.toUpperCase()].priceChange.data.hasOwnProperty('percent_change_24h') &&
+          this.props.prices[_name.toUpperCase()].priceChange.data.percent_change_24h < 0) {
+        _priceChangeColor = 'red';
+      }
 
       return (
         <div className="transactions-ui">
@@ -212,18 +228,19 @@ class Transactions extends React.Component {
             <TransactionDetails
               coin={ this.props.coin }
               tx={ this.props.transactions[this.state.toggledTxDetails] }
-              cb={ this.closeTransactionDetails } />
+              cb={ this.closeTransactionDetails }
+              vote={ this.props.vote } />
           }
           { this.state.toggledTxDetails === 'none' &&
             <div className="individualportfolio">
               <div className="individualportfolio-inner">
                 { this.props.loading &&
                   !this.props.transactions &&
-                  <div className="lasttransactions">{ translate('TRANSACTIONS.LOADING_HISTORY') }...</div>                  
+                  <div className="lasttransactions">{ translate('TRANSACTIONS.' + (this.props.vote ? 'LOADING_HISTORY_VOTE' : 'LOADING_HISTORY')) }...</div>                  
                 }
                 { this.props.transactions &&
                   <div className="lasttransactions">
-                    { translate('TRANSACTIONS.' + (!_items.length ? 'NO_HISTORY' : 'LAST_TX')) }
+                    { translate('TRANSACTIONS.' + (!_items.length ? 'NO_HISTORY' : (this.props.vote ? 'LAST_TX_VOTE' : 'LAST_TX'))) }
                   </div>
                 }
                 <div className="cryptocardbtc-block">
@@ -232,13 +249,27 @@ class Transactions extends React.Component {
                       className="coin-icon"
                       src={ `${assetsPath.coinLogo}/${_mode}/${_name.toLowerCase()}.png` } />
                     <div className="coin-title">
-                    { translate(_mode.toUpperCase() + '.' + _name.toUpperCase()).length > 18 ? _name.toUpperCase() :  translate(_mode.toUpperCase() + '.' + _name.toUpperCase()) }
+                    { translate(_mode.toUpperCase() + '.' + _name.toUpperCase()).length > 18 ? _name.toUpperCase() : translate(_mode.toUpperCase() + '.' + _name.toUpperCase()) }
                     </div>
                     <div className="coin-balance">
                       <div className="balance">
-                      { translate('BALANCE.BALANCE') }: { _balance ? formatValue(_balance.balance) : 0 } { _name.toUpperCase() }
+                        { translate('BALANCE.BALANCE') }: { _balance ? formatValue(_balance.balance) : 0 } { _name.toUpperCase() }
+                        { _balance &&
+                          Number(_balance.balance) > 0 &&
+                          this.props.prices &&
+                          this.props.prices[_name.toUpperCase()] &&
+                          this.props.prices[_name.toUpperCase()][settingsCurrency.toUpperCase()] &&
+                          (_mode === 'eth' || (_mode === 'spv' && !isKomodoCoin(_name.toUpperCase())) || (_mode === 'spv' && isKomodoCoin(_name.toUpperCase()) && !this.props.prices[_name.toUpperCase()].hasOwnProperty('KIC'))) &&
+                          <div className={ 'balance-fiat' + (this.showClaimButton() ? ' kmd-interest' : '') }>
+                            <FiatSymbol symbol={ settingsCurrency } /> { formatValue(_balance.balance * (this.props.prices[_name.toUpperCase()].AVG && this.props.prices[_name.toUpperCase()].AVG[settingsCurrency.toUpperCase()] ? this.props.prices[_name.toUpperCase()].AVG[settingsCurrency.toUpperCase()] : this.props.prices[_name.toUpperCase()][settingsCurrency.toUpperCase()])) }
+                            { this.props.prices[_name.toUpperCase()].priceChange &&
+                              this.props.prices[_name.toUpperCase()].priceChange.data &&
+                              <i className={ `fa fa-arrow-${_priceChangeColor === 'red' ? 'down' : 'up'} icon-price-change ${_priceChangeColor}` }></i>
+                            }
+                          </div>
+                        }
                       </div>
-                      { this.isInterestDefined() &&
+                      { this.showClaimButton() &&
                         <div className="interest">
                         { translate('BALANCE.INTEREST') }: { _balance ? formatValue(_balance.interest) : 0 } { _name.toUpperCase() }
                         </div>

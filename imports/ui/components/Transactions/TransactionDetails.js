@@ -52,7 +52,7 @@ class TransactionDetails extends React.Component {
           className="menu-back"
           src={ `${assetsPath.menu}/trends-combined-shape.png` }
           onClick={ this.menuBack } />
-        <div className="title">{ translate('TRANSACTIONS.TRANSACTION_DETAILS') }</div>
+        <div className="title">{ translate('TRANSACTIONS.' + (this.props.vote ? 'TRANSACTION_DETAILS_VOTE' : 'TRANSACTION_DETAILS')) }</div>
         <div className="edit">
           { translate('TRANSACTIONS.DIRECTION') }
           <div className="shade margin-top-5 uc-first">
@@ -112,7 +112,7 @@ class TransactionDetails extends React.Component {
         <div className="edit">
           { translate('EXCHANGES.HEIGHT') }
           <div className="shade margin-top-5">
-            { tx.height }
+            { tx.height || translate('TRANSACTIONS.NA') }
           </div>
         </div>
         <div className="edit">

@@ -25,6 +25,7 @@ import {
   isNumber,
 } from 'agama-wallet-lib/build/utils';
 import { secondsToString } from 'agama-wallet-lib/build/time';
+import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
 import { Meteor } from 'meteor/meteor';
 import {
   coinswitchStatusLookup,
@@ -787,6 +788,42 @@ class Exchanges extends React.Component {
   renderOrderForm() {
     const coins = Object.keys(this.filterOutETH(this.props.coins));
     const settingsCurrency = getLocalStorageVar('settings').fiat;
+    const _nameSrc = this.state.coinSrc && this.state.coinSrc.split('|')[0].toUpperCase();
+    const _nameDest = this.state.coinDest && this.state.coinDest.split('|')[0].toUpperCase();
+    let fiatPriceSrc = _nameSrc && this.state.fiatPrices && this.state.fiatPrices[_nameSrc] && this.state.fiatPrices[_nameSrc][settingsCurrency.toUpperCase()];
+    let fiatPriceDest = _nameDest && this.state.fiatPrices && this.state.fiatPrices[_nameDest] && this.state.fiatPrices[_nameDest][settingsCurrency.toUpperCase()];
+    
+    if (fiatPriceSrc &&
+        this.state.coinSrc.indexOf('|spv') > -1 &&
+        isKomodoCoin(_nameSrc) &&
+        this.state.fiatPrices[_nameSrc] &&
+        this.state.fiatPrices[_nameSrc][settingsCurrency.toUpperCase()] &&
+        this.state.fiatPrices[_nameSrc].hasOwnProperty('KIC')) {
+      fiatPriceSrc = 0;
+    } else if (
+      fiatPriceSrc &&
+      this.state.fiatPrices[_nameSrc].AVG &&
+      this.state.fiatPrices[_nameSrc].AVG[settingsCurrency.toUpperCase()]
+    ) {
+      devlog(`exchanges ${_nameSrc} use AVG price`);
+      fiatPriceSrc = this.state.fiatPrices[_nameSrc].AVG[settingsCurrency.toUpperCase()];
+    }
+
+    if (fiatPriceDest &&
+        this.state.coinDest.indexOf('|spv') > -1 &&
+        isKomodoCoin(_nameDest.toUpperCase()) &&
+        this.state.fiatPrices[_nameDest] &&
+        this.state.fiatPrices[_nameDest][settingsCurrency.toUpperCase()] &&
+        this.state.fiatPrices[_nameDest].hasOwnProperty('KIC')) {
+      fiatPriceDest = 0;
+    } else if (
+      fiatPriceDest &&
+      this.state.fiatPrices[_nameDest].AVG &&
+      this.state.fiatPrices[_nameDest].AVG[settingsCurrency.toUpperCase()]
+    ) {
+      devlog(`exchanges ${_nameDest} use AVG price`);
+      fiatPriceDest = this.state.fiatPrices[_nameDest].AVG[settingsCurrency.toUpperCase()];
+    }
 
     return (
       <div className="exchanges-new-order">
@@ -971,9 +1008,11 @@ class Exchanges extends React.Component {
                 <span className="one-size">
                   { Number(this.state.amount) } { this.state.coinSrc.split('|')[0].toUpperCase() }
                 </span>
-                <span className="padding-left-30">
-                  <FiatSymbol symbol={ settingsCurrency } /> { Number(Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()][settingsCurrency.toUpperCase()]).toFixed(8)) }
-                </span>
+                { fiatPriceSrc &&
+                  <span className="padding-left-30">
+                    <FiatSymbol symbol={ settingsCurrency } /> { Number(Number(this.state.amount * fiatPriceSrc).toFixed(8)) }
+                  </span>
+                }
               </div>
             </div>
             <div className="edit">
@@ -982,9 +1021,11 @@ class Exchanges extends React.Component {
                 <span className="one-size">
                   { Number(Number(this.state.amount * this.state.exchangeRate.rate).toFixed(8)) } { this.state.coinDest.split('|')[0].toUpperCase() }
                 </span>
-                <span className="padding-left-30">
-                  <FiatSymbol symbol={ settingsCurrency } /> { Number(Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()][settingsCurrency.toUpperCase()]).toFixed(8)) }
-                </span>
+                { fiatPriceDest &&
+                  <span className="padding-left-30">
+                    <FiatSymbol symbol={ settingsCurrency } /> { Number(Number(Number(Number(this.state.amount * this.state.exchangeRate.rate).toFixed(8)) * fiatPriceDest).toFixed(8)) }
+                  </span>
+                }
               </div>
             </div>
             <div className="edit">
@@ -1071,9 +1112,11 @@ class Exchanges extends React.Component {
                 <span className="one-size">
                   { Number(Number(this.state.exchangeOrder.expectedDepositCoinAmount).toFixed(8)) } { this.state.exchangeOrder.depositCoin.toUpperCase() }
                 </span>
-                <span className="padding-left-30">
-                  <FiatSymbol symbol={ settingsCurrency } /> { Number(Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()][settingsCurrency.toUpperCase()]).toFixed(8)) }
-                </span>
+                { fiatPriceSrc &&
+                  <span className="padding-left-30">
+                    <FiatSymbol symbol={ settingsCurrency } /> { Number(Number(this.state.amount * fiatPriceSrc).toFixed(8)) }
+                  </span>
+                }
               </div>
             </div>
             <div className="edit">
@@ -1082,9 +1125,11 @@ class Exchanges extends React.Component {
                 <span className="one-size">
                   { Number(Number(this.state.exchangeOrder.expectedDestinationCoinAmount).toFixed(8)) } { this.state.exchangeOrder.destinationCoin.toUpperCase() }
                 </span>
-                <span className="padding-left-30">
-                  <FiatSymbol symbol={ settingsCurrency } /> { Number(Number(this.state.amount * this.state.fiatPrices[this.state.coinSrc.split('|')[0].toUpperCase()][settingsCurrency.toUpperCase()]).toFixed(8)) }
-                </span>
+                { fiatPriceDest &&
+                  <span className="padding-left-30">
+                    <FiatSymbol symbol={ settingsCurrency } /> { Number(Number(Number(this.state.exchangeOrder.expectedDestinationCoinAmount) * fiatPriceDest).toFixed(8)) }
+                  </span>
+                }
               </div>
             </div>
             <div className="edit">
