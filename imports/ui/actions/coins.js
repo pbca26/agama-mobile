@@ -44,6 +44,7 @@ const _coinsList = {
     'VOTE2019',
     'ZEX',
     'RFOX',
+    'K64',
     // other coins
     'BTC',
     'DOGE',

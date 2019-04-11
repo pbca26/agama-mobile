@@ -412,6 +412,7 @@ const lang = {
       MORTY: 'Morty',
       ZEX: 'Zaddex',
       RFOX: 'Red fox',
+      K64: 'Komodore64',
       // crypto
       SUQA: 'SUQA',
       BZC: 'Bitzec',
