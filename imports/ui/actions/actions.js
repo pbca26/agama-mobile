@@ -914,6 +914,25 @@ const isNNAuth = () => {
   };
 };
 
+const getRemoteTimestamp = () => {
+  return async (dispatch) => {
+    return new Promise((resolve, reject) => {
+      HTTP.call(
+        'GET',
+        'https://www.atomicexplorer.com/api/timestamp/now', {
+        params: {},
+      }, (error, result) => {
+        if (!result) {
+          resolve('error');
+        } else {
+          result = JSON.parse(result.content).result;
+          resolve(result);
+        }
+      });
+    });
+  };
+};
+
 export default {
   auth,
   getKeys,
@@ -937,4 +956,5 @@ export default {
   placeOrder,
   syncExchangesHistory,
   isNNAuth,
+  getRemoteTimestamp,
 }

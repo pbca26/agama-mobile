@@ -1190,7 +1190,8 @@ class App extends React.Component {
                 sendtxEth={ this.props.actions.sendtxEth }
                 changeActiveSection={ this.changeActiveSection }
                 getBtcFees={ this.getBtcFees }
-                lock={ this.lock } />
+                lock={ this.lock }
+                getRemoteTimestamp={ this.props.actions.getRemoteTimestamp } />
             }
             { this.state.activeSection !== 'exchanges' &&
               <AddCoin
@@ -1270,7 +1271,8 @@ class App extends React.Component {
                 sendtxEth={ this.props.actions.sendtxEth }
                 getBtcFees={ this.getBtcFees }
                 pubKeys={ this.state.pubKeys }
-                lock={ this.lock } />
+                lock={ this.lock }
+                getRemoteTimestamp={ this.props.actions.getRemoteTimestamp } />
             }
             { this.state.activeSection === 'elections' &&
               <NotaryVote historyBack={ this.historyBack }/>

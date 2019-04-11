@@ -227,6 +227,7 @@ const lang = {
       DPOW_UNSECURE: 'One ore more of your UTXO(s) are not dPoW secured',
       DPOW_SECURED: 'Your funds are dPoW secured',
       USE_ALL: 'Use all',
+      CLOCK_OUT_OF_SYNC: 'Your local clock is not set properly. This will prevent sending a KMD transaction.',
     },
     ADD_COIN: {
       NO_MATCHING_RESULTS: 'No matching results',
