@@ -1,4 +1,12 @@
 const changeLogData = [{
+  version: '0.1.6',
+  changes: [
+    'New asset chain K64',
+    'KMD send coin clock out of sync check',
+    'Transaction confirmations counter fix',
+    'Low resolution screen scaling fixes',
+  ],
+}, {
   version: '0.1.5',
   changes: [
     'dPoW icon',

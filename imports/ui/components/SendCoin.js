@@ -268,7 +268,6 @@ class SendCoin extends React.Component {
       this.setState(this.defaultState);
     }
 
-    console.warn(this.props.coin);
     if (props.activeSection === 'send' &&
         this.props.coin === 'kmd|spv') {
       this.checkCurrentTimestamp();
