@@ -174,7 +174,7 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
                               outputs: decodedTx.outputs,
                               height: transaction.height,
                               timestamp: Number(transaction.height) === 0 ? Math.floor(Date.now() / 1000) : blockInfo.timestamp,
-                              confirmations: Number(transaction.height) === 0 ? 0 : currentHeight - transaction.height,
+                              confirmations: Number(transaction.height) === 0 ? 0 : currentHeight - transaction.height + 1,
                             };
 
                             const formattedTx = parseTransactionAddresses(_parsedTx, address, network === 'kmd' ? true : false);
@@ -254,7 +254,7 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
                             outputs: 'cant parse',
                             height: transaction.height,
                             timestamp: Number(transaction.height) === 0 ? Math.floor(Date.now() / 1000) : blockInfo.timestamp,
-                            confirmations: Number(transaction.height) === 0 ? 0 : currentHeight - transaction.height,
+                            confirmations: Number(transaction.height) === 0 ? 0 : currentHeight - transaction.height + 1,
                           };
 
                           const formattedTx = parseTransactionAddresses(_parsedTx, address, network === 'kmd' ? true : false);
@@ -269,7 +269,7 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
                           outputs: 'cant parse',
                           height: transaction.height,
                           timestamp: 'cant get block info',
-                          confirmations: Number(transaction.height) === 0 ? 0 : currentHeight - transaction.height,
+                          confirmations: Number(transaction.height) === 0 ? 0 : currentHeight - transaction.height + 1,
                         };
                         const formattedTx = parseTransactionAddresses(_parsedTx, address, network === 'kmd' ? true : false);
                         _rawtx.push(formattedTx);
