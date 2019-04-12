@@ -1,6 +1,6 @@
 App.info({
   id: 'com.supernet.agama',
-  version: '0.1.5',
+  version: '0.1.6',
   buildNumber: '781',
   name: 'Agama',
   description: 'Agama Mobile is a lightweight wallet application that allows users to manage multiple crypto currencies. It\'s built on top of SPV technology which provides a quick way to retrieve and push transaction data.',
@@ -46,7 +46,7 @@ App.accessRule('http://94.130.98.74');
 App.accessRule('http://94.130.225.86:80');
 App.accessRule('http://94.130.98.74:80');
 App.accessRule('https://bitcoinfees.earn.com');
-// atomic
+// atomic explorer
 App.accessRule('https://www.atomicexplorer.com');
 // coin explorers
 App.accessRule('https://www.kmdexplorer.io');
@@ -116,7 +116,13 @@ App.accessRule('https://explorer.dionpay.com');
 App.accessRule('https://explorer.zcoin.io');
 App.accessRule('http://explorer1.patenttx.com');
 App.accessRule('http://kmdice.explorer.dexstats.info');
-App.accessRule('http://explorer.ilien.io');
+App.accessRule('https://explorer.ilien.io');
+App.accessRule('https://rick.kmd.dev');
+App.accessRule('https://morty.kmd.dev');
+App.accessRule('http://groestlsight.groestlcoin.org');
+App.accessRule('https://vote2019.world');
+App.accessRule('https://vote2019.world');
+App.accessRule('http://explorer.komodore64.com');
 // eth
 App.accessRule('https://etherscan.io');
 App.accessRule('https://api.etherscan.io');
@@ -127,6 +133,10 @@ App.accessRule('https://mainnet.infura.io');
 App.accessRule('https://ropsten.infura.io');
 // exchanges
 App.accessRule('https://coinswitch.co');
+// support
+App.accessRule('https://discordapp.com');
+App.accessRule('https://support.komodoplatform.com');
+App.accessRule('https//github.com');
 
 // Set PhoneGap/Cordova preferences.
 App.setPreference('BackgroundColor', '0xffffffff'); // 0x45485FFF

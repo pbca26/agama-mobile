@@ -22,3 +22,9 @@
     margin: 0 auto;
   }
 }
+
+.form.login .create-wallet-seed {
+  span {
+    word-break: break-all;
+  }
+}

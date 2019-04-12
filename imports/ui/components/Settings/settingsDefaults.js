@@ -7,6 +7,7 @@ const settingsDefaults = {
   debug: false,
   btcFeesSource: btcFeesSource[0].name,
   pinBruteforceProtection: false,
+  mainView: 'default',
 };
 
 export default settingsDefaults;

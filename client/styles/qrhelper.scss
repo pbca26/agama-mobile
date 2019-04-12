@@ -1,0 +1,22 @@
+.form.qr-helper {
+  height: 100%;
+  position: fixed;
+  z-index: 500;
+  top: 54px;
+  background-color: #4c4f69;
+
+  .qr-helper-inner-top-overlay {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 54px;
+  }
+  .qr-helper-inner {
+    max-width: 400px;
+    margin: 0 auto;
+
+    .width-limit {
+      width: 310px;
+    }
+  }
+}
