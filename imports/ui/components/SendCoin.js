@@ -12,6 +12,7 @@ import {
   devlog,
   config,
 } from '../actions/dev';
+import { checkTimestamp } from 'agama-wallet-lib/build/time';
 import {
   fromSats,
   toSats,
@@ -28,6 +29,9 @@ import electrumServers from 'agama-wallet-lib/build/electrum-servers';
 import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 import { Meteor } from 'meteor/meteor';
 import { getAddress } from 'ethers/utils/address';
+import QrHelper from './QrHelper';
+
+const SPV_MAX_LOCAL_TIMESTAMP_DEVIATION = 300; // 5 min
 
 class SendCoin extends React.Component {
   constructor() {
@@ -54,15 +58,33 @@ class SendCoin extends React.Component {
       ethPreflightSendInProgress: false,
       ethPreflightResult: null,
       ethFee: 'average',
+      displayQrHelper: false,
+      kmdTimestampError: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.changeSendCoinStep = this.changeSendCoinStep.bind(this);
     this.updateInput = this.updateInput.bind(this);
     this.scanQR = this.scanQR.bind(this);
+    this._scanQR = this._scanQR.bind(this);
     this.validate = this.validate.bind(this);
     this.decodeSeed = this.decodeSeed.bind(this);
     this.openExternalURL = this.openExternalURL.bind(this);
     this.setSendAmountAll = this.setSendAmountAll.bind(this);
+    this.qrHelperCB = this.qrHelperCB.bind(this);
+    this.checkCurrentTimestamp = this.checkCurrentTimestamp.bind(this);
+  }
+
+  checkCurrentTimestamp() {
+    this.props.getRemoteTimestamp()
+    .then((res) => {
+      if (res !== 'error') {
+        if (Math.abs(checkTimestamp(res.result)) > SPV_MAX_LOCAL_TIMESTAMP_DEVIATION) {
+          this.setState({
+            kmdTimestampError: true,
+          });
+        }
+      }
+    });
   }
 
   setSendAmountAll() {
@@ -83,16 +105,16 @@ class SendCoin extends React.Component {
   }
 
   decodeSeed() {
-    const _encryptedKey = getLocalStorageVar('seed');
+    const _encryptedKey = getLocalStorageVar(this.props.vote ? 'nn' : 'seed');
     const _decryptedKey = decryptkey(this.state.pin, _encryptedKey.encryptedKey);
     const pinBruteforceProtection = getLocalStorageVar('settings').pinBruteforceProtection;
-    const pinBruteforceProtectionRetries = getLocalStorageVar('seed').pinRetries;
+    const pinBruteforceProtectionRetries = getLocalStorageVar(this.props.vote ? 'nn' : 'seed').pinRetries;
 
     if (_decryptedKey) {
       if (pinBruteforceProtection) {
-        let _seedStorage = getLocalStorageVar('seed');
+        let _seedStorage = getLocalStorageVar(this.props.vote ? 'nn' : 'seed');
         _seedStorage.pinRetries = 0;
-        setLocalStorageVar('seed', _seedStorage);
+        setLocalStorageVar(this.props.vote ? 'nn' : 'seed', _seedStorage);
       }
 
       this.setState({
@@ -106,10 +128,10 @@ class SendCoin extends React.Component {
         this.setState({
           wrongPin: true,
         });
-      } else if (pinBruteforceProtectionRetries < 3) {
-        let _seedStorage = getLocalStorageVar('seed');
+      } else if (pinBruteforceProtectionRetries < 2) {
+        let _seedStorage = getLocalStorageVar(this.props.vote ? 'nn' : 'seed');
         _seedStorage.pinRetries += 1;
-        setLocalStorageVar('seed', _seedStorage);
+        setLocalStorageVar(this.props.vote ? 'nn' : 'seed', _seedStorage);
 
         this.setState({
           wrongPin: true,
@@ -141,7 +163,25 @@ class SendCoin extends React.Component {
     window.open(url, '_system');
   }
 
+  qrHelperCB() {
+    this._scanQR();
+
+    this.setState({
+      displayQrHelper: false,
+    });
+  }
+
   scanQR() {
+    if (!getLocalStorageVar('qrhelper')) {
+      this.setState({
+        displayQrHelper: true,
+      });
+    } else {
+      this._scanQR();
+    }
+  }
+
+  _scanQR() {
     const width = 480;
     const height = 640;
 
@@ -227,6 +267,11 @@ class SendCoin extends React.Component {
       // reset form state
       this.setState(this.defaultState);
     }
+
+    if (props.activeSection === 'send' &&
+        this.props.coin === 'kmd|spv') {
+      this.checkCurrentTimestamp();
+    }
   }
 
   componentWillMount() {
@@ -248,14 +293,16 @@ class SendCoin extends React.Component {
         });
       }
     }
+
+    if (this.props.coin === 'kmd|spv') {
+      this.checkCurrentTimestamp();
+    }
   }
 
   updateInput(e) {
     this.setState({
       [e.target.name]: e.target.value,
-      spvVerificationWarning: false,
       spvPreflightSendInProgress: false,
-      ethVerificationWarning: false,
       ethPreflightSendInProgress: false,
       validNan: false,
       validTooMuch: false,
@@ -305,7 +352,8 @@ class SendCoin extends React.Component {
 
     if (this.state.sendCurrentStep === 1 &&
         ((storageSettings && storageSettings.requirePin) ||
-        (config.preload && config.enablePinConfirm)) &&
+        (config.preload && config.enablePinConfirm) ||
+        this.props.vote) &&
         !this.decodeSeed()) {
       _isFailed = true;
     }
@@ -599,9 +647,15 @@ class SendCoin extends React.Component {
             this.props.ethGasPrice === 'error' &&
             <div className="error margin-top-15 text-center">{ translate('SEND.ETH_FEES_FETCHING_FAILED') }</div>
           }
+          { this.state.kmdTimestampError &&
+            <div className="error margin-top-15 text-center">
+              <i className="fa fa-warning"></i> { translate('SEND.CLOCK_OUT_OF_SYNC') }
+            </div>
+          }
           <div>
             <div
               disabled={
+                this.state.kmdTimestampError ||
                 !this.state.sendTo ||
                 !this.state.sendAmount ||
                 Number(this.state.sendAmount) < 0 ||
@@ -611,7 +665,7 @@ class SendCoin extends React.Component {
               onClick={ () => this.changeSendCoinStep(1) }
               className="group3 margin-top-50">
               <div className="btn-inner">
-                <div className="btn">{ translate('SEND.SEND') }</div>
+                <div className="btn">{ translate('SEND.' + (this.props.vote ? 'SEND_VOTE' : 'SEND')) }</div>
                 <div className="group2">
                   <div className="rectangle8copy"></div>
                   <img
@@ -628,12 +682,16 @@ class SendCoin extends React.Component {
 
   render() {
     if (this.props.activeSection === 'send' ||
-        this.props.init) {
+        this.props.init ||
+        this.props.vote) {
       const _name = this.props.coin.split('|')[0];
       const _mode = this.props.coin.split('|')[1];
   
       return (
         <div className="form send">
+          { this.state.displayQrHelper &&
+            <QrHelper cb={ this.qrHelperCB } />
+          }
           <div className="steps margin-top-10">
             <div className={ 'step' + (this.state.sendCurrentStep === 0 ? ' current' : '') }></div>
             <div className={ 'step' + (this.state.sendCurrentStep === 1 ? ' current' : '') }></div>
@@ -816,7 +874,8 @@ class SendCoin extends React.Component {
                 </div>
               }
               { ((getLocalStorageVar('settings') && getLocalStorageVar('settings').requirePin) ||
-                (config.preload && config.enablePinConfirm)) &&
+                (config.preload && config.enablePinConfirm) ||
+                this.props.vote) &&
                 <div>
                   <div className="edit pin-confirm">
                     <input
@@ -831,7 +890,7 @@ class SendCoin extends React.Component {
                 </div>
               }
               { this.state.wrongPin &&
-                <div className="error margin-top-15 margin-bottom-25 fs14">
+                <div className="error margin-top-15 margin-bottom-25 fs14 margin-left-5">
                   <i className="fa fa-warning"></i> { this.state.wrongPinRetries === 0 ? translate('LOGIN.WRONG_PIN') : translate('LOGIN.WRONG_PIN_ATTEMPTS', 3 - this.state.wrongPinRetries) }
                 </div>
               }
@@ -852,6 +911,12 @@ class SendCoin extends React.Component {
                   <strong>{ translate('SEND.NOTICE') }:</strong> { translate('SEND.DPOW_UNSECURE') }.
                 </div>
               }
+              { this.state.spvPreflightResult &&
+                this.state.spvPreflightResult.msg === 'error' &&
+                <div className="error margin-top-15 margin-bottom-25 fs14 margin-left-5">
+                  { typeof this.state.spvPreflightResult.result === 'object' ? JSON.stringify(this.state.spvPreflightResult.result) : this.state.spvPreflightResult.result }
+                </div>
+              }
               <div className="widget-body-footer">
                 <div className="group3 margin-top-50">
                   <div
@@ -869,7 +934,8 @@ class SendCoin extends React.Component {
                     className="btn-inner pull-right"
                     disabled={
                       (this.state.spvPreflightResult && this.state.spvPreflightResult.result && !this.state.spvPreflightResult.result.fee) ||
-                      (this.state.spvPreflightResult && this.state.spvPreflightResult.result && !this.state.spvPreflightResult.result.value)
+                      (this.state.spvPreflightResult && this.state.spvPreflightResult.result && !this.state.spvPreflightResult.result.value) ||
+                      (getLocalStorageVar('settings').requirePin && ((this.state.pin && this.state.pin.length < 6) || !this.state.pin))
                     }>
                     <div className="btn">{ translate('SEND.CONFIRM') }</div>
                     <div className="group2">
@@ -885,7 +951,7 @@ class SendCoin extends React.Component {
           }
           { this.state.sendCurrentStep === 2 &&
             <div className="send-step">
-              <div className="step-title">{ translate('SEND.TX_RESULT') }</div>
+              <div className="step-title">{ translate('SEND.' + (this.props.vote ? 'TX_RESULT_VOTE' : 'TX_RESULT')) }</div>
               <div className="margin-top-35">
                 { this.state.sendResult &&
                   this.state.sendResult.msg === 'success' &&

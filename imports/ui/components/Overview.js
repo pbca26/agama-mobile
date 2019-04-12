@@ -92,24 +92,28 @@ class Overview extends React.Component {
         const _mode = _overview[i].coin.split('|')[1];
         let _priceChangeColor = 'green';
         
-        if (_overview[i].priceChange &&
+        if (_overview[i] &&
+            _overview[i].priceChange &&
             _overview[i].priceChange.data &&
             _overview[i].priceChange.data.hasOwnProperty('percent_change_1h') &&
             _overview[i].priceChange.data.percent_change_1h < 0) {
           _priceChangeColor = 'red';
         }
   
-        if (_overview[i].priceChange &&
+        if (_overview[i] &&
+            _overview[i].priceChange &&
             _overview[i].priceChange.data &&
             _overview[i].priceChange.data.hasOwnProperty('percent_change_24h') &&
             _overview[i].priceChange.data.percent_change_24h < 0) {
           _priceChangeColor = 'red';
         }
 
+        const settingsMainView = getLocalStorageVar('settings').mainView;
         _items.push(
           <div
             key={ `overview-coins-${_overview[i].coin}` }
-            className="overview-coin">
+            className="overview-coin"
+            onClick={ settingsMainView !== 'default' ? () => this.props.switchCoin(_overview[i].coin, true, true) : null }>
             <img
               className="div1"
               src={ `${assetsPath.home}/trends-rectangle-7.png` } />
@@ -129,7 +133,8 @@ class Overview extends React.Component {
             { _overview[i].balanceFiat > 0 &&
               <div className="a123345">
               <FiatSymbol symbol={ settingsCurrency } />{ Number(Number(_overview[i].balanceFiat).toFixed(4)) }
-              { _overview[i].priceChange &&
+              { _overview[i] &&
+                _overview[i].priceChange &&
                 _overview[i].priceChange.data &&
                 <i className={ `fa fa-arrow-${_priceChangeColor === 'red' ? 'down' : 'up'} icon-price-change ${_priceChangeColor}` }></i>
               }

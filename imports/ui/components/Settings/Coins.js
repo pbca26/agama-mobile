@@ -142,7 +142,7 @@ class SettingsCoins extends React.Component {
             }
             <div
               onClick={ this.updateCoinsList }
-              className="group3 margin-top-25">
+              className="group3 margin-top-25 margin-bottom-25">
               <div className="btn-inner">
                 <div className="btn">{ translate('SETTINGS.SAVE') }</div>
                 <div className="group2">
