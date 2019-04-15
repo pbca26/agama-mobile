@@ -254,6 +254,7 @@ const _coinsList = {
     'JST',
     'DEC8',
     'ZIL',
+    'TUSD',
   ],
 };
 

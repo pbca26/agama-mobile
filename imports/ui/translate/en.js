@@ -716,6 +716,7 @@ const lang = {
       DEC8: 'DEC8 (TESTCOIN)',
       ETH: 'Ethereum',
       ZIL: 'Zilliqa',
+      TUSD: 'TrueUSD',
     },
     FIAT_CURRENCIES: {
       AUD: 'Australian Dollar',
