@@ -45,6 +45,7 @@ const _coinsList = {
     'ZEX',
     'RFOX',
     'K64',
+    'HUSH',
     // other coins
     'BTC',
     'DOGE',
@@ -55,7 +56,6 @@ const _coinsList = {
     'VIA',
     'MONA',
     'ZEC',
-    'HUSH',
     'DASH',
     'CRW',
     'VTC',
