@@ -102,7 +102,7 @@ class Transactions extends React.Component {
         { Number(tx.interest) === Number(tx.amount) &&
           <span>+</span>
         }
-        { formatValue(tx.amount) * _amountNegative || this.props.coin === 'eth|eth' ? formatValue(tx.amount) * _amountNegative : translate('TRANSACTIONS.UNKNOWN') }
+        { Number(tx.amount) && formatValue(tx.amount) * _amountNegative || this.props.coin === 'eth|eth' ?  Number(tx.amount) && formatValue(tx.amount) * _amountNegative : translate('TRANSACTIONS.UNKNOWN') }
         { Number(tx.amount) !== 0 &&
           <span className="padding-left-5">{ _name.toUpperCase() }</span>
         }
