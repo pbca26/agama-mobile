@@ -72,17 +72,9 @@ const _coinsList = {
     'QTUM',
     'XZC',
     'FTC',
-    'GBX',
     'SUQA',
     'BZC',
     'GRS',
-    //'NINJA',
-    //'SHARK',
-    //'MVP',
-    //'CEAL',
-    //'MESH',
-    //'BLK',
-    //'BTX', (?) needs a fix
   ],
   eth: [
     'ETH',
