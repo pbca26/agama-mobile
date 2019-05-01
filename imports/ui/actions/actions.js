@@ -11,6 +11,7 @@ import {
   seedToWif,
   seedToPriv,
   etherKeys,
+  pubToElectrumScriptHashHex,
 } from 'agama-wallet-lib/build/keys';
 import proxyServers from './proxyServers';
 import electrumServers from 'agama-wallet-lib/build/electrum-servers';
@@ -43,6 +44,7 @@ import {
 } from './exchanges';
 import getPrices from './prices';
 import nnConfig from '../components/NotaryVote/config';
+import getServerVersion from './serverVersion';
 
 let _cache = {};
 // runtime cache wrapper functions
@@ -201,7 +203,7 @@ const getServersList = () => {
 const setDefaultServer = (network, port, ip, proto) => {
   return async (dispatch) => {
     return new Promise((resolve, reject) => {
-      let params = {
+      const params = {
         port,
         ip,
         proto,
@@ -403,82 +405,93 @@ const balance = (network) => {
       const _name = network.split('|')[0];
 
       if (network.indexOf('|spv') > -1) {
-        const address = network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? keys.nn[_name].pub : keys.spv[_name].pub;
-        let _electrumServer = network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? getLocalStorageVar('nnCoin')[network].server : getLocalStorageVar('coins')[network].server;
-        _electrumServer.serverList = electrumServers[_name].serverList;
-        
-        let params = {
-          port: _electrumServer.port,
-          ip: _electrumServer.ip,
-          proto: _electrumServer.proto,
-          address,
-        };
-        devlog('req', {
-          method: 'GET',
-          url: `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`,
-          params,
-        });
-  
-        HTTP.call(
-          'GET',
-          `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`, {
-          params,
-        }, (error, result) => {
-          if (!result) {
-            resolve('proxy-error');
-          } else {
-            const _balance = JSON.parse(result.content).result;
-            
-            if (network === 'kmd|spv') {
-              if (!_balance.hasOwnProperty('confirmed')) {
-                resolve('error');
-              } else {
-                getKMDBalance(
-                  address,
-                  JSON.parse(result.content).result,
-                  proxyServer,
-                  _electrumServer,
-                  cache
-                )
-                .then((res) => {
-                  let _cache = getLocalStorageVar('cache') || {};
+        (async function() {
+          const address = network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? keys.nn[_name].pub : keys.spv[_name].pub;
+          let _electrumServer = network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? getLocalStorageVar('nnCoin')[network].server : getLocalStorageVar('coins')[network].server;
+          _electrumServer.serverList = electrumServers[_name].serverList;
+          
+          const isElectrumProtocolV4 = await getServerVersion(proxyServer, _electrumServer.port, _electrumServer.ip, _electrumServer.proto);
 
+          let params = {
+            port: _electrumServer.port,
+            ip: _electrumServer.ip,
+            proto: _electrumServer.proto,
+            address,
+          };
+
+          if (isElectrumProtocolV4) {
+            params.eprotocol = 1.4;
+            params.address = pubToElectrumScriptHashHex(params.address, electrumJSNetworks[network.split('|')[0].toLowerCase()] || electrumJSNetworks.kmd);
+          }
+          console.warn('isElectrumProtocolV4', isElectrumProtocolV4);
+
+          devlog('req', {
+            method: 'GET',
+            url: `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`,
+            params,
+          });
+    
+          HTTP.call(
+            'GET',
+            `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`, {
+            params,
+          }, (error, result) => {
+            if (!result) {
+              resolve('proxy-error');
+            } else {
+              const _balance = JSON.parse(result.content).result;
+              
+              if (network === 'kmd|spv') {
+                if (!_balance.hasOwnProperty('confirmed')) {
+                  resolve('error');
+                } else {
+                  getKMDBalance(
+                    address,
+                    JSON.parse(result.content).result,
+                    proxyServer,
+                    _electrumServer,
+                    cache
+                  )
+                  .then((res) => {
+                    let _cache = getLocalStorageVar('cache') || {};
+
+                    if (_cache.balance) {
+                      _cache.balance['kmd|spv'] = res;
+                    } else {
+                      _cache.balance = {};
+                      _cache.balance['kmd|spv'] = res;
+                    }
+
+                    setLocalStorageVar('cache', _cache);
+
+                    resolve(res);
+                  });
+                }
+              } else {
+                if (!_balance.hasOwnProperty('confirmed')) {
+                  resolve('error');
+                } else {
+                  const retBalance = {
+                    balance: Number(fromSats(_balance.confirmed).toFixed(8)),
+                    unconfirmed: Number(fromSats(_balance.unconfirmed).toFixed(8)),
+                  };
+                  let _cache = getLocalStorageVar('cache') || {};
+                  
                   if (_cache.balance) {
-                    _cache.balance['kmd|spv'] = res;
+                    _cache.balance[network] = retBalance;
                   } else {
                     _cache.balance = {};
-                    _cache.balance['kmd|spv'] = res;
+                    _cache.balance[network] = retBalance;
                   }
 
                   setLocalStorageVar('cache', _cache);
 
-                  resolve(res);
-                });
-              }
-            } else {
-              if (!_balance.hasOwnProperty('confirmed')) {
-                resolve('error');
-              } else {
-                const retBalance = {
-                  balance: Number(fromSats(_balance.confirmed).toFixed(8)),
-                  unconfirmed: Number(fromSats(_balance.unconfirmed).toFixed(8)),
-                };
-                let _cache = getLocalStorageVar('cache') || {};
-                
-                if (_cache.balance) {
-                  _cache.balance[network] = retBalance;
-                } else {
-                  _cache.balance = {};
-                  _cache.balance[network] = retBalance;
+                  resolve(retBalance);
                 }
-
-                setLocalStorageVar('cache', _cache);
-
-                resolve(retBalance);
               }
             }
-          }
-        });
+          });
+        })();
       } else if (network.indexOf('|eth') > -1) {
         const address = keys.eth[_name].pub;
         let options;
@@ -667,49 +680,58 @@ const getOverview = (coins) => {
       Promise.all(_keys.map((pair, index) => {
         return new Promise((resolve, reject) => {
           if (pair.coin.indexOf('|spv') > -1) {
-            const _electrumServer = getLocalStorageVar('coins')[pair.coin].server;
+            (async function() {
+              const _electrumServer = getLocalStorageVar('coins')[pair.coin].server;
+              const isElectrumProtocolV4 = await getServerVersion(proxyServer, _electrumServer.port, _electrumServer.ip, _electrumServer.proto);
+              
+              let params = {
+                port: _electrumServer.port,
+                ip: _electrumServer.ip,
+                proto: _electrumServer.proto,
+                address: pair.pub,
+              };
 
-            let params = {
-              port: _electrumServer.port,
-              ip: _electrumServer.ip,
-              proto: _electrumServer.proto,
-              address: pair.pub,
-            };
-            devlog('req', {
-              method: 'GET',
-              url: `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`,
-              params,
-            });
-    
-            HTTP.call(
-              'GET',
-              `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`, {
-              params,
-            }, (error, result) => {
-              if (!result) {
-                resolve('proxy-error');
-              } else {
-                try {
-                  const _balance = JSON.parse(result.content).result;
-
-                  resolve({
-                    coin: pair.coin,
-                    pub: pair.pub,
-                    balance: _balance.hasOwnProperty('confirmed') ? Number(fromSats(_balance.confirmed).toFixed(8)) : 'n/a',
-                    unconfirmed: _balance.hasOwnProperty('unconfirmed') ? Number(fromSats(_balance.unconfirmed).toFixed(8)) : 'n/a',
-                  });
-                } catch (e) {
-                  resolve({
-                    coin: pair.coin,
-                    pub: pair.pub,
-                    balance: 0,
-                    unconfirmed: 0,
-                  });
-                  devlog(`unable to get spv balance for ${pair.coin}`);
-                  devlog(JSON.stringify(result));
-                }
+              if (isElectrumProtocolV4) {
+                params.eprotocol = 1.4;
+                params.address = pubToElectrumScriptHashHex(params.address, electrumJSNetworks[pair.coin.split('|')[0].toLowerCase()] || electrumJSNetworks.kmd);
               }
-            });
+
+              devlog('req', {
+                method: 'GET',
+                url: `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`,
+                params,
+              });
+      
+              HTTP.call(
+                'GET',
+                `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance`, {
+                params,
+              }, (error, result) => {
+                if (!result) {
+                  resolve('proxy-error');
+                } else {
+                  try {
+                    const _balance = JSON.parse(result.content).result;
+
+                    resolve({
+                      coin: pair.coin,
+                      pub: pair.pub,
+                      balance: _balance.hasOwnProperty('confirmed') ? Number(fromSats(_balance.confirmed).toFixed(8)) : 'n/a',
+                      unconfirmed: _balance.hasOwnProperty('unconfirmed') ? Number(fromSats(_balance.unconfirmed).toFixed(8)) : 'n/a',
+                    });
+                  } catch (e) {
+                    resolve({
+                      coin: pair.coin,
+                      pub: pair.pub,
+                      balance: 0,
+                      unconfirmed: 0,
+                    });
+                    devlog(`unable to get spv balance for ${pair.coin}`);
+                    devlog(JSON.stringify(result));
+                  }
+                }
+              });
+            })();
           } else if (pair.coin.indexOf('|eth') > -1) {
             const _name = pair.coin.split('|')[0];
             const address = keys.eth[_name].pub;
