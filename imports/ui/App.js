@@ -161,6 +161,19 @@ class App extends React.Component {
         }       
       }
 
+      let _localStorageCache = getLocalStorageVar('cache');
+      
+      if (_localStorageCache.balance) {
+        for (let key in _localStorageCache.balance) {
+          if (!_localStorageCoins[key]) {
+            delete _localStorageCache.balance[key];
+            delete _localStorageCache.transactions[key];
+          }
+        }
+
+        setLocalStorageVar('cache', _localStorageCache);
+      }
+
       this.setState({
         coins: _localStorageCoins,
       });
