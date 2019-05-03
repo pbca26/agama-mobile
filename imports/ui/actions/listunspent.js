@@ -20,8 +20,8 @@ const listunspent = (proxyServer, electrumServer, address, network, full, verify
     (async function() {
       const isElectrumProtocolV4 = await getServerVersion(
         proxyServer,
-        electrumServer.port,
         electrumServer.ip,
+        electrumServer.port,
         electrumServer.proto
       );
 

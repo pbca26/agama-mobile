@@ -5,7 +5,7 @@ import {
   setLocalStorageVar,
 } from './utils';
 
-const getServerVersion = async function (proxyServer, port, ip, proto) {
+const getServerVersion = async function (proxyServer, ip, port, proto) {
   let protocolVersion = getLocalStorageVar('protocolVersion');
   
   return new Promise((resolve, reject) => {

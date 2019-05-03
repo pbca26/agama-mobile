@@ -16,8 +16,8 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
     (async function() {
       const isElectrumProtocolV4 = await getServerVersion(
         proxyServer,
-        electrumServer.port,
         electrumServer.ip,
+        electrumServer.port,
         electrumServer.proto
       );
 

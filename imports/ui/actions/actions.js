@@ -438,8 +438,8 @@ const balance = (network) => {
           
           const isElectrumProtocolV4 = await getServerVersion(
             proxyServer,
-            _electrumServer.port,
             _electrumServer.ip,
+            _electrumServer.port,
             _electrumServer.proto
           );
 
@@ -718,8 +718,8 @@ const getOverview = (coins) => {
               
               const isElectrumProtocolV4 = await getServerVersion(
                 proxyServer,
-                _electrumServer.port,
                 _electrumServer.ip,
+                _electrumServer.port,
                 _electrumServer.proto
               );
               

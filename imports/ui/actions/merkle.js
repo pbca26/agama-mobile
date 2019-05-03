@@ -61,8 +61,8 @@ const verifyMerkle = (txid, height, serverList, electrumServer, proxyServer, cac
             (async function() {
               const isElectrumProtocolV4 = await getServerVersion(
                 proxyServer,
-                _randomServer[1],
                 _randomServer[0],
+                _randomServer[1],
                 _randomServer[2],
               );
 
