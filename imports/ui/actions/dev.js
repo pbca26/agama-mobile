@@ -31,7 +31,7 @@ export const devlog = (msg, data) => {
   }
 };
 
-export const version = '0.1.5';
+export const version = '0.1.6';
 
 /* dev data example, use it for testing purposes only!
 config {

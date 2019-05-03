@@ -32,7 +32,7 @@ const getServerVersion = async function (proxyServer, port, ip, proto) {
         result = JSON.parse(result.content);
 
         if (result.msg === 'error') {
-          return 'error';
+          resolve('error');
         } else {
           devlog('getServerVersion', result.result);
 
