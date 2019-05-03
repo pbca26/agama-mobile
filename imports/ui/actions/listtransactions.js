@@ -14,7 +14,12 @@ const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data
 const listtransactions = (proxyServer, electrumServer, address, network, full, cache, txid) => {
   return new Promise((resolve, reject) => {
     (async function() {
-      const isElectrumProtocolV4 = await getServerVersion(proxyServer, electrumServer.port, electrumServer.ip, electrumServer.proto);
+      const isElectrumProtocolV4 = await getServerVersion(
+        proxyServer,
+        electrumServer.port,
+        electrumServer.ip,
+        electrumServer.proto
+      );
 
       // get current height
       let params = {
@@ -57,7 +62,10 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
 
           if (isElectrumProtocolV4 === true) {
             params.eprotocol = 1.4;
-            params.address = pubToElectrumScriptHashHex(params.address, electrumJSNetworks[network.split('|')[0].toLowerCase()] || electrumJSNetworks.kmd);
+            params.address = pubToElectrumScriptHashHex(
+              params.address,
+              electrumJSNetworks[network.split('|')[0].toLowerCase()] || electrumJSNetworks.kmd
+            );
           }
 
           if (dpowCoins.indexOf(network.toUpperCase()) > -1) {
