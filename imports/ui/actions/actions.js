@@ -25,6 +25,10 @@ import {
   getRandomIntInclusive,
 } from 'agama-wallet-lib/build/utils';
 import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
+import {
+  parseBlock,
+  electrumMerkleRoot,
+} from 'agama-wallet-lib/build/block';
 import { devlog } from './dev';
 import translate from '../translate/translate';
 import ethers from 'ethers';
@@ -45,6 +49,8 @@ import {
 import getPrices from './prices';
 import nnConfig from '../components/NotaryVote/config';
 import getServerVersion from './serverVersion';
+
+setLocalStorageVar('protocolVersion', {});
 
 let _cache = {};
 // runtime cache wrapper functions
@@ -104,6 +110,11 @@ const getTransaction = (txid, coin, httpParams) => {
 
 const getBlockheader = (height, coin, httpParams) => {
   return new Promise((resolve, reject) => {
+    if (httpParams.params.isElectrumProtocolV4 === true) {
+      delete httpParams.params.isElectrumProtocolV4;
+      httpParams.params.eprotocol = 1.4;
+    }
+
     if (!_cache[coin]) {
       _cache[coin] = {};
     }
@@ -123,9 +134,24 @@ const getBlockheader = (height, coin, httpParams) => {
         params: httpParams.params,
       }, (error, result) => {
         const _result = JSON.parse(result.content);
-        
+
         if (_result.msg !== 'error') {
-          _cache[coin].blockheader[height] = result;          
+          if (typeof _result.result === 'string') {            
+            let parsedBlock = parseBlock(
+              _result.result,
+              electrumJSNetworks[coin.toLowerCase()] || electrumJSNetworks.kmd
+            );
+
+            if (parsedBlock.merkleRoot) {
+              parsedBlock.merkle_root = electrumMerkleRoot(parsedBlock);
+            }
+
+            result.content = JSON.stringify({
+              msg: 'success',
+              result: parsedBlock,
+            });
+          }
+          _cache[coin].blockheader[height] = result;
         }
 
         resolve(result);
@@ -410,7 +436,12 @@ const balance = (network) => {
           let _electrumServer = network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? getLocalStorageVar('nnCoin')[network].server : getLocalStorageVar('coins')[network].server;
           _electrumServer.serverList = electrumServers[_name].serverList;
           
-          const isElectrumProtocolV4 = await getServerVersion(proxyServer, _electrumServer.port, _electrumServer.ip, _electrumServer.proto);
+          const isElectrumProtocolV4 = await getServerVersion(
+            proxyServer,
+            _electrumServer.port,
+            _electrumServer.ip,
+            _electrumServer.proto
+          );
 
           let params = {
             port: _electrumServer.port,
@@ -419,11 +450,13 @@ const balance = (network) => {
             address,
           };
 
-          if (isElectrumProtocolV4) {
+          if (isElectrumProtocolV4 === true) {
             params.eprotocol = 1.4;
-            params.address = pubToElectrumScriptHashHex(params.address, electrumJSNetworks[network.split('|')[0].toLowerCase()] || electrumJSNetworks.kmd);
+            params.address = pubToElectrumScriptHashHex(
+              params.address,
+              electrumJSNetworks[network.split('|')[0].toLowerCase()] || electrumJSNetworks.kmd
+            );
           }
-          console.warn('isElectrumProtocolV4', isElectrumProtocolV4);
 
           devlog('req', {
             method: 'GET',
@@ -681,8 +714,14 @@ const getOverview = (coins) => {
         return new Promise((resolve, reject) => {
           if (pair.coin.indexOf('|spv') > -1) {
             (async function() {
-              const _electrumServer = getLocalStorageVar('coins')[pair.coin].server;
-              const isElectrumProtocolV4 = await getServerVersion(proxyServer, _electrumServer.port, _electrumServer.ip, _electrumServer.proto);
+              let _electrumServer = getLocalStorageVar('coins')[pair.coin].server;
+              
+              const isElectrumProtocolV4 = await getServerVersion(
+                proxyServer,
+                _electrumServer.port,
+                _electrumServer.ip,
+                _electrumServer.proto
+              );
               
               let params = {
                 port: _electrumServer.port,
@@ -691,9 +730,12 @@ const getOverview = (coins) => {
                 address: pair.pub,
               };
 
-              if (isElectrumProtocolV4) {
+              if (isElectrumProtocolV4 === true) {
                 params.eprotocol = 1.4;
-                params.address = pubToElectrumScriptHashHex(params.address, electrumJSNetworks[pair.coin.split('|')[0].toLowerCase()] || electrumJSNetworks.kmd);
+                params.address = pubToElectrumScriptHashHex(
+                  params.address,
+                  electrumJSNetworks[pair.coin.split('|')[0].toLowerCase()] || electrumJSNetworks.kmd
+                );
               }
 
               devlog('req', {
