@@ -59,62 +59,58 @@ const verifyMerkle = (txid, height, serverList, electrumServer, proxyServer, cac
             devlog(_res, true);
 
             (async function() {
-              // temp skip verification for ssl electrums
-              // TODO: find out why it's causing problems with electrum proxies
-              if (_randomServer[2] === 'ssl') {
-                resolve(true);
-              } else {
-                const isElectrumProtocolV4 = await getServerVersion(
-                  proxyServer,
-                  _randomServer[0],
-                  _randomServer[1],
-                  _randomServer[2],
-                );
+              const isElectrumProtocolV4 = await getServerVersion(
+                proxyServer,
+                _randomServer[1],
+                _randomServer[0],
+                _randomServer[2],
+              );
 
-                cache.getBlockheader(
-                  height,
-                  network,
-                  {
-                    url: `http://${proxyServer.ip}:${proxyServer.port}/api/getblockinfo`,
-                    params: {
-                      ip: _randomServer[0],
-                      port: _randomServer[1],
-                      proto: _randomServer[2],
-                      height,
-                      isElectrumProtocolV4,
-                    },
-                  }
-                )
-                .then((result) => {
-                  result = JSON.parse(result.content);
+              cache.getBlockheader(
+                height,
+                network,
+                {
+                  url: `http://${proxyServer.ip}:${proxyServer.port}/api/getblockinfo`,
+                  params: {
+                    ip: _randomServer[0],
+                    port: _randomServer[1],
+                    proto: _randomServer[2],
+                    height,
+                    isElectrumProtocolV4,
+                  },
+                }
+              )
+              .then((result) => {
+                result = JSON.parse(result.content);
 
-                  if (result.msg === 'error') {
-                    resolve(CONNECTION_ERROR_OR_INCOMPLETE_DATA);
-                  } else {
-                    const blockInfo = result.result;
+                if (result.msg === 'error') {
+                  resolve(CONNECTION_ERROR_OR_INCOMPLETE_DATA);
+                } else {
+                  const blockInfo = result.result;
+
+                  if (blockInfo &&
+                      blockInfo.merkle_root) {
+                    devlog('blockinfo =>');
+                    devlog(blockInfo);
+                    devlog(blockInfo.merkle_root);
 
                     if (blockInfo &&
                         blockInfo.merkle_root) {
-                      devlog('blockinfo =>');
-                      devlog(blockInfo);
-                      devlog(blockInfo.merkle_root);
-
-                      if (blockInfo &&
-                          blockInfo.merkle_root) {
-                        if (_res === blockInfo.merkle_root) {
-                          resolve(true);
-                        } else {
-                          resolve(false);
-                        }
+                      if (_res === blockInfo.merkle_root) {
+                        devlog(`txid ${txid} verified`);
+                        resolve(true);
                       } else {
-                        resolve(CONNECTION_ERROR_OR_INCOMPLETE_DATA);
+                        devlog(`txid ${txid} unverified`);
+                        resolve(false);
                       }
                     } else {
                       resolve(CONNECTION_ERROR_OR_INCOMPLETE_DATA);
                     }
+                  } else {
+                    resolve(CONNECTION_ERROR_OR_INCOMPLETE_DATA);
                   }
-                });
-              }
+                }
+              });
             })();
           } else {
             resolve(CONNECTION_ERROR_OR_INCOMPLETE_DATA);
