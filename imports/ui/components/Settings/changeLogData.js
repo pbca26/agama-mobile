@@ -2,10 +2,12 @@ const changeLogData = [{
   version: '0.1.6',
   changes: [
     'New asset chain K64',
-    'Hush Coin switched to Hush asset chain',
+    'Hush Coin is switched to Hush asset chain',
     'KMD send coin clock out of sync check',
     'Transaction confirmations counter fix',
     'Low resolution screen scaling fixes',
+    'Removed GBX',
+    'Electrum protocol 1.4 support',
   ],
 }, {
   version: '0.1.5',
