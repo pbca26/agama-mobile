@@ -7,7 +7,7 @@ import {
   getLocalStorageVar,
 } from '../actions/utils';
 import translate from '../translate/translate';
-import { isKomodoCoin } from 'agama-wallet-lib/build/coin-helpers';
+import { kmdAssetChains } from 'agama-wallet-lib/build/coin-helpers';
 import erc20ContractId from 'agama-wallet-lib/build/eth-erc20-contract-id';
 import nnConfig from './NotaryVote/config';
 
@@ -33,12 +33,14 @@ class AddCoin extends React.Component {
     this.setState({
       searchTerm: '',
     });
+    window.scrollTo(0, 0);
   }
 
   updateInput(e) {
     this.setState({
       [e.target.name]: e.target.value,
     });
+    window.scrollTo(0, 0);
   }
 
   addCoin(coin) {
@@ -68,7 +70,7 @@ class AddCoin extends React.Component {
       const _mode = _coin.name.split('|')[1];
 
       if (!this.state.searchTerm ||
-          (this.state.searchTerm && ((this.state.searchTerm.toLowerCase() === 'kmd' && isKomodoCoin(_name.toLowerCase()) && !erc20ContractId[_name.toLowerCase()]) || _name.substring(0, this.state.searchTerm.length).toLowerCase() === this.state.searchTerm.toLowerCase() || _mode.substring(0, this.state.searchTerm.length).toLowerCase() === this.state.searchTerm.toLowerCase() || _coin.title.substring(0, this.state.searchTerm.length).toLowerCase() === this.state.searchTerm.toLowerCase()))) {
+          (this.state.searchTerm && ((this.state.searchTerm.toLowerCase() === 'erc20' && _mode === 'eth' && erc20ContractId[_name.toUpperCase()]) || (this.state.searchTerm.toLowerCase() === 'kic' && kmdAssetChains.indexOf(_name.toUpperCase()) > -1 && !erc20ContractId[_name.toUpperCase()]) || _name.substring(0, this.state.searchTerm.length).toLowerCase() === this.state.searchTerm.toLowerCase() || _mode.substring(0, this.state.searchTerm.length).toLowerCase() === this.state.searchTerm.toLowerCase() || _coin.title.substring(0, this.state.searchTerm.length).toLowerCase() === this.state.searchTerm.toLowerCase()))) {
         _items.push(
           <div
             onClick={ () => this.addCoin(_coin.name) }
