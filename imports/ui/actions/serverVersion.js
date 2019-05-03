@@ -12,6 +12,10 @@ const getServerVersion = async function (proxyServer, port, ip, proto) {
     if (protocolVersion[`${ip}:${port}:${proto}`] &&
         protocolVersion[`${ip}:${port}:${proto}`] === 1.4) {
       resolve(true);
+    } else if (
+      protocolVersion[`${ip}:${port}:${proto}`] &&
+      protocolVersion[`${ip}:${port}:${proto}`] < 1.4) {
+      resolve(false);
     } else {
       const params = {
         port,
@@ -40,8 +44,8 @@ const getServerVersion = async function (proxyServer, port, ip, proto) {
               typeof result.result === 'object' &&
               result.result.length === 2 &&
               result.result[0].indexOf('ElectrumX') > -1 &&
-              Number(result.result[1]) === 1.4) {
-            protocolVersion[`${ip}:${port}:${proto}`] = 1.4;
+              Number(result.result[1])) {
+            protocolVersion[`${ip}:${port}:${proto}`] = Number(result.result[1]);
             setLocalStorageVar('protocolVersion', protocolVersion);
 
             resolve(true);
