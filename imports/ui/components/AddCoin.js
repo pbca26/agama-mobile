@@ -17,10 +17,18 @@ class AddCoin extends React.Component {
     this.state = {
       multiSelect: {},
       searchTerm: '',
+      searchSub: null,
     };
     this.updateInput = this.updateInput.bind(this);
     this.clearSearchTerm = this.clearSearchTerm.bind(this);
     this.addCoin = this.addCoin.bind(this);
+    this.updateSearchSub = this.updateSearchSub.bind(this);
+  }
+
+  updateSearchSub(sub) {
+    this.setState({
+      searchSub: sub === this.state.searchSub ? null : sub,
+    });
   }
 
   componentWillMount() {
@@ -70,7 +78,7 @@ class AddCoin extends React.Component {
       const _mode = _coin.name.split('|')[1];
 
       if (!this.state.searchTerm ||
-          (this.state.searchTerm && ((this.state.searchTerm.toLowerCase() === 'erc20' && _mode === 'eth' && erc20ContractId[_name.toUpperCase()]) || (this.state.searchTerm.toLowerCase() === 'kic' && kmdAssetChains.indexOf(_name.toUpperCase()) > -1 && !erc20ContractId[_name.toUpperCase()]) || _name.substring(0, this.state.searchTerm.length).toLowerCase() === this.state.searchTerm.toLowerCase() || _mode.substring(0, this.state.searchTerm.length).toLowerCase() === this.state.searchTerm.toLowerCase() || _coin.title.substring(0, this.state.searchTerm.length).toLowerCase() === this.state.searchTerm.toLowerCase()))) {
+          (this.state.searchTerm && (_name.substring(0, this.state.searchTerm.length).toLowerCase() === this.state.searchTerm.toLowerCase() || _coin.title.substring(0, this.state.searchTerm.length).toLowerCase() === this.state.searchTerm.toLowerCase()))) {
         _items.push(
           <div
             onClick={ () => this.addCoin(_coin.name) }
@@ -98,12 +106,24 @@ class AddCoin extends React.Component {
             (Math.floor(Date.now() / 1000) < nnConfig.activation || Math.floor(Date.now() / 1000) > nnConfig.deactivation)) {
           _items.pop();
         }
+
+        if (this.state.searchSub &&
+            this.state.searchSub === 'kic' &&
+            (_mode === 'eth' || (_mode === 'spv' && kmdAssetChains.indexOf(_name.toUpperCase()) === -1))) {
+          _items.pop();
+        }
+
+        if (this.state.searchSub &&
+            this.state.searchSub === 'erc20' &&
+            (_mode === 'spv' || (_mode === 'eth' && !erc20ContractId[_name.toUpperCase()]))) {
+          _items.pop();
+        }
       }
     }
 
     if (!_items.length) {
       return (
-        <div className="padding-top-15 padding-left-15">{ translate('ADD_COIN.NO_MATCHING_RESULTS') }</div>
+        <div className="padding-top-25 padding-left-15">{ translate('ADD_COIN.NO_MATCHING_RESULTS') }</div>
       );
     }
 
@@ -133,7 +153,45 @@ class AddCoin extends React.Component {
                     onClick={ this.clearSearchTerm }
                     className="search-remove">x</i>
                 </div>
-                <div className="overview-coins">{ this.renderCoins() }</div>
+                { !this.props.activate &&
+                  <div className="edit margin-bottom-10 toggles">
+                    <div className="toggle-item">
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          value="on"
+                          checked={ this.state.searchSub === 'kic' }
+                          readOnly />
+                        <div
+                          className="slider"
+                          onClick={ () => this.updateSearchSub('kic') }></div>
+                      </label>
+                      <div
+                        className="toggle-label"
+                        onClick={ () => this.updateSearchSub('kic') }>
+                        { translate('ADD_COIN.KIC') }
+                      </div>
+                    </div>
+                    <div className="toggle-item">
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          value="on"
+                          checked={ this.state.searchSub === 'erc20' }
+                          readOnly />
+                        <div
+                          className="slider"
+                          onClick={ () => this.updateSearchSub('erc20') }></div>
+                      </label>
+                      <div
+                        className="toggle-label"
+                        onClick={ () => this.updateSearchSub('erc20') }>
+                        { translate('ADD_COIN.ERC20') }
+                      </div>
+                    </div>
+                  </div>
+                }
+                <div className={ 'overview-coins' + (this.props.activate ? ' overview-coins--small' : '') }>{ this.renderCoins() }</div>
               </div>
             </div>
           </div>

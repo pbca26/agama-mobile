@@ -236,6 +236,8 @@ const lang = {
       SHORTCUTS: 'Shortcuts',
       MULTI_SELECT: 'Multi-select',
       ADD_SELECTED_COINS: 'Add selected coins',
+      KIC: 'KIC',
+      ERC20: 'ERC20',
     },
     BALANCE: {
       BALANCE: 'Balance',

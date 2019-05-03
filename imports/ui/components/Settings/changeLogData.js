@@ -8,6 +8,7 @@ const changeLogData = [{
     'Low resolution screen scaling fixes',
     'Removed GBX',
     'Electrum protocol 1.4 support',
+    'Add coin KIC/ERC20 toggle',
   ],
 }, {
   version: '0.1.5',
