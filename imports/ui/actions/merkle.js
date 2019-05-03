@@ -1,44 +1,13 @@
-import crypto from 'crypto';
-import reverse from 'buffer-reverse';
 import { Promise } from 'meteor/promise';
 import { devlog } from './dev';
 import { getRandomIntInclusive } from 'agama-wallet-lib/build/utils';
 import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
+import getMerkleRoot from 'agama-wallet-lib/build/transaction-merkle';
 import getServerVersion from './serverVersion';
 
 // TODO: reduce verifymerkle to a single call if array
 
 const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
-
-// get merkle root
-const getMerkleRoot = (txid, proof, pos) => {
-  const _sha256 = (data) => {
-    return crypto.createHash('sha256').update(data).digest();
-  }
-  let hash = txid;
-  let serialized;
-
-  devlog(`getMerkleRoot txid ${txid}`);
-  devlog(`getMerkleRoot pos ${pos}`);
-  devlog('getMerkleRoot proof');
-  devlog(`getMerkleRoot ${proof}`);
-
-  for (i = 0; i < proof.length; i++) {
-    const _hashBuff = new Buffer(hash, 'hex');
-    const _proofBuff = new Buffer(proof[i], 'hex');
-
-    if ((pos & 1) == 0) {
-      serialized = Buffer.concat([reverse(_hashBuff), reverse(_proofBuff)]);
-    } else {
-      serialized = Buffer.concat([reverse(_proofBuff), reverse(_hashBuff)]);
-    }
-
-    hash = reverse(_sha256(_sha256(serialized))).toString('hex');
-    pos /= 2;
-  }
-
-  return hash;
-}
 
 const verifyMerkle = (txid, height, serverList, electrumServer, proxyServer, cache, network) => {
   // select random server
