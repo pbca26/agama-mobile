@@ -63,6 +63,7 @@ class AddCoin extends React.Component {
       this.setState({
         multiSelect: {},
         searchTerm: '',
+        searchSub: null,
       });
     }
   }
