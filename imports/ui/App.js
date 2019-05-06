@@ -1042,18 +1042,20 @@ class App extends React.Component {
                         src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                     </div>
                   }
-                  <div
-                    className="item"
-                    disabled={ this.state.activeSection === 'addcoin' }>
+                  { getLocalStorageVar('seed') &&
                     <div
-                      className="title"
-                      onClick={ () => this.toggleMenuOption('addcoin') }>
-                      { translate('DASHBOARD.ADD_COIN') }
+                      className="item"
+                      disabled={ this.state.activeSection === 'addcoin' }>
+                      <div
+                        className="title"
+                        onClick={ () => this.toggleMenuOption('addcoin') }>
+                        { translate('DASHBOARD.ADD_COIN') }
+                      </div>
+                      <img
+                        className="line"
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                     </div>
-                    <img
-                      className="line"
-                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
-                  </div>
+                  }
                   <div
                     className="item"
                     disabled={ this.state.activeSection === 'settings' }>
