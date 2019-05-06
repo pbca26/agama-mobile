@@ -161,6 +161,19 @@ class App extends React.Component {
         }       
       }
 
+      let _localStorageCache = getLocalStorageVar('cache');
+      
+      if (_localStorageCache.balance) {
+        for (let key in _localStorageCache.balance) {
+          if (!_localStorageCoins[key]) {
+            delete _localStorageCache.balance[key];
+            delete _localStorageCache.transactions[key];
+          }
+        }
+
+        setLocalStorageVar('cache', _localStorageCache);
+      }
+
       this.setState({
         coins: _localStorageCoins,
       });
@@ -1136,7 +1149,7 @@ class App extends React.Component {
         { this.state.proxyError &&
           this.state.proxyErrorCount === -777 &&
           <div className="app-main">
-            <div className="con-error width-limit">
+            <div className="con-error width-limit padding-top-20">
               <i className="fa fa-warning error"></i> <span className="error">{ translate('DASHBOARD.PROXY_ERROR') }</span>
             </div>
             <div className="form proxy">
@@ -1190,7 +1203,8 @@ class App extends React.Component {
                 sendtxEth={ this.props.actions.sendtxEth }
                 changeActiveSection={ this.changeActiveSection }
                 getBtcFees={ this.getBtcFees }
-                lock={ this.lock } />
+                lock={ this.lock }
+                getRemoteTimestamp={ this.props.actions.getRemoteTimestamp } />
             }
             { this.state.activeSection !== 'exchanges' &&
               <AddCoin
@@ -1270,7 +1284,8 @@ class App extends React.Component {
                 sendtxEth={ this.props.actions.sendtxEth }
                 getBtcFees={ this.getBtcFees }
                 pubKeys={ this.state.pubKeys }
-                lock={ this.lock } />
+                lock={ this.lock }
+                getRemoteTimestamp={ this.props.actions.getRemoteTimestamp } />
             }
             { this.state.activeSection === 'elections' &&
               <NotaryVote historyBack={ this.historyBack }/>

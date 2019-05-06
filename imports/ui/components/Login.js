@@ -71,6 +71,16 @@ class Login extends React.Component {
     this.toggleSeedVisibility = this.toggleSeedVisibility.bind(this);
     this.agreementAcceptedCB = this.agreementAcceptedCB.bind(this);
     this.qrHelperCB = this.qrHelperCB.bind(this);
+    this.popCreateSeedConfirm = this.popCreateSeedConfirm.bind(this);
+  }
+
+  popCreateSeedConfirm() {
+    let createSeedConfirm = JSON.parse(JSON.stringify(this.state.createSeedConfirm));
+    createSeedConfirm.pop();
+
+    this.setState({
+      createSeedConfirm,
+    });
   }
 
   agreementAcceptedCB() {
@@ -235,6 +245,7 @@ class Login extends React.Component {
         activeView: this.state.step === 0 ? null : this.state.activeView,
         createSeed: newSeed,
         createSeedShuffled: shuffleArray(newSeed.split(' ')),
+        createSeedConfirm: [],
       });
     } else {
       this.setState({
@@ -442,6 +453,24 @@ class Login extends React.Component {
     return items;
   }
 
+  renderCreateSeedWordsConfirmStack() {
+    const words = this.state.createSeedConfirm;
+    let items = [];
+
+    for (let i = 0; i < words.length; i++) {
+      items.push(
+        <span
+          key={ `seed-confirm-word-${i}-stack` }
+          className="seed-confirm-word-stack"
+          onClick={ this.popCreateSeedConfirm }>
+          { words[i] }
+        </span>
+      );
+    }
+
+    return items;
+  }
+
   renderCreateWallet() {
     return (
       <div className="create-wallet">
@@ -502,7 +531,9 @@ class Login extends React.Component {
                         onClick={ this.clearCreateSeedConfirm }
                         className="fa fa-trash"></i>
                     }
-                    <div className="seed-gen-box">{ this.state.createSeedConfirm.join(' ') }</div>
+                    <div className="seed-gen-box">
+                      { this.renderCreateSeedWordsConfirmStack() }
+                    </div>
                   </div>
                 }
                 <div

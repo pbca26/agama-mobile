@@ -227,6 +227,7 @@ const lang = {
       DPOW_UNSECURE: 'One ore more of your UTXO(s) are not dPoW secured',
       DPOW_SECURED: 'Your funds are dPoW secured',
       USE_ALL: 'Use all',
+      CLOCK_OUT_OF_SYNC: 'Your local clock is not set properly. This will prevent sending a KMD transaction.',
     },
     ADD_COIN: {
       NO_MATCHING_RESULTS: 'No matching results',
@@ -235,6 +236,8 @@ const lang = {
       SHORTCUTS: 'Shortcuts',
       MULTI_SELECT: 'Multi-select',
       ADD_SELECTED_COINS: 'Add selected coins',
+      KIC: 'KIC',
+      ERC20: 'ERC20',
     },
     BALANCE: {
       BALANCE: 'Balance',
@@ -412,6 +415,7 @@ const lang = {
       MORTY: 'Morty',
       ZEX: 'Zaddex',
       RFOX: 'Red fox',
+      K64: 'Komodore64',
       // crypto
       SUQA: 'SUQA',
       BZC: 'Bitzec',
@@ -714,6 +718,7 @@ const lang = {
       DEC8: 'DEC8 (TESTCOIN)',
       ETH: 'Ethereum',
       ZIL: 'Zilliqa',
+      TUSD: 'TrueUSD',
     },
     FIAT_CURRENCIES: {
       AUD: 'Australian Dollar',

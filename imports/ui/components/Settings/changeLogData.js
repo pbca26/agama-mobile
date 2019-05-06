@@ -1,4 +1,16 @@
 const changeLogData = [{
+  version: '0.1.6',
+  changes: [
+    'New asset chain K64',
+    'Hush Coin is switched to Hush asset chain',
+    'KMD send coin clock out of sync check',
+    'Transaction confirmations counter fix',
+    'Low resolution screen scaling fixes',
+    'Removed GBX',
+    'Electrum protocol 1.4 support',
+    'Add coin KIC/ERC20 toggle',
+  ],
+}, {
   version: '0.1.5',
   changes: [
     'dPoW icon',
