@@ -14,7 +14,7 @@ const CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data
 const listtransactions = (proxyServer, electrumServer, address, network, full, cache, txid) => {
   return new Promise((resolve, reject) => {
     (async function() {
-      const isElectrumProtocolV4 = await getServerVersion(
+      const electrumProtocolVersion = await getServerVersion(
         proxyServer,
         electrumServer.ip,
         electrumServer.port,
@@ -60,7 +60,7 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
             delete params.raw;
           }
 
-          if (isElectrumProtocolV4 === true) {
+          if (Number(electrumProtocolVersion) >= 1.2) {
             params.eprotocol = 1.4;
             params.address = pubToElectrumScriptHashHex(
               params.address,
@@ -110,7 +110,7 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
                             ip: electrumServer.ip,
                             proto: electrumServer.proto,
                             height: transaction.height,
-                            isElectrumProtocolV4,
+                            electrumProtocolVersion,
                           },
                         }
                       )

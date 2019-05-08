@@ -9,13 +9,8 @@ const getServerVersion = async function (proxyServer, ip, port, proto) {
   let protocolVersion = getLocalStorageVar('protocolVersion');
   
   return new Promise((resolve, reject) => {
-    if (protocolVersion[`${ip}:${port}:${proto}`] &&
-        protocolVersion[`${ip}:${port}:${proto}`] === 1.4) {
-      resolve(true);
-    } else if (
-      protocolVersion[`${ip}:${port}:${proto}`] &&
-      protocolVersion[`${ip}:${port}:${proto}`] < 1.4) {
-      resolve(false);
+    if (protocolVersion[`${ip}:${port}:${proto}`]) {
+      resolve(protocolVersion[`${ip}:${port}:${proto}`]);
     } else {
       const params = {
         port,
@@ -48,9 +43,9 @@ const getServerVersion = async function (proxyServer, ip, port, proto) {
             protocolVersion[`${ip}:${port}:${proto}`] = Number(result.result[1]);
             setLocalStorageVar('protocolVersion', protocolVersion);
 
-            resolve(true);
+            resolve(Number(result.result[1]));
           } else {
-            resolve(false);
+            resolve(1.0);
           }
         }
       });

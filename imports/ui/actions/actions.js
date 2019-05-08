@@ -110,8 +110,8 @@ const getTransaction = (txid, coin, httpParams) => {
 
 const getBlockheader = (height, coin, httpParams) => {
   return new Promise((resolve, reject) => {
-    if (httpParams.params.isElectrumProtocolV4 === true) {
-      delete httpParams.params.isElectrumProtocolV4;
+    if (Number(httpParams.params.electrumProtocolVersion) === 1.4) {
+      delete httpParams.params.electrumProtocolVersion;
       httpParams.params.eprotocol = 1.4;
     }
 
@@ -436,7 +436,7 @@ const balance = (network) => {
           let _electrumServer = network.indexOf(`${nnConfig.coin}|spv|nn`) > -1 ? getLocalStorageVar('nnCoin')[network].server : getLocalStorageVar('coins')[network].server;
           _electrumServer.serverList = electrumServers[_name].serverList;
           
-          const isElectrumProtocolV4 = await getServerVersion(
+          const electrumProtocolVersion = await getServerVersion(
             proxyServer,
             _electrumServer.ip,
             _electrumServer.port,
@@ -450,7 +450,9 @@ const balance = (network) => {
             address,
           };
 
-          if (isElectrumProtocolV4 === true) {
+          console.warn('electrumProtocolVersion', electrumProtocolVersion);
+
+          if (Number(electrumProtocolVersion) >= 1.2) {
             params.eprotocol = 1.4;
             params.address = pubToElectrumScriptHashHex(
               params.address,
@@ -716,7 +718,7 @@ const getOverview = (coins) => {
             (async function() {
               let _electrumServer = getLocalStorageVar('coins')[pair.coin].server;
               
-              const isElectrumProtocolV4 = await getServerVersion(
+              const electrumProtocolVersion = await getServerVersion(
                 proxyServer,
                 _electrumServer.ip,
                 _electrumServer.port,
@@ -730,7 +732,7 @@ const getOverview = (coins) => {
                 address: pair.pub,
               };
 
-              if (isElectrumProtocolV4 === true) {
+              if (Number(electrumProtocolVersion) >= 1.2) {
                 params.eprotocol = 1.4;
                 params.address = pubToElectrumScriptHashHex(
                   params.address,
