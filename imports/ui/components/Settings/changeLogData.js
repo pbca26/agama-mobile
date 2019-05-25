@@ -1,4 +1,9 @@
 const changeLogData = [{
+  version: '0.1.7',
+  changes: [
+    'Electrum server connnection issue hot fix',
+  ],
+}, {
   version: '0.1.6',
   changes: [
     'New asset chain K64',
