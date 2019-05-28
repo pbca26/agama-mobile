@@ -115,7 +115,34 @@ class App extends React.Component {
     this.toggleExchanges = this.toggleExchanges.bind(this);
     this.updateCoinsList = this.updateCoinsList.bind(this);
     this.updatePrices = this.updatePrices.bind(this);
-    this.changeTitle = this.changeTitle.bind(this)
+    this.changeTitle = this.changeTitle.bind(this);
+    this.phoneBackButtonTrigger = this.phoneBackButtonTrigger.bind(this);
+  }
+  
+  phoneBackButtonTrigger(event) {
+    event.preventDefault();
+    event.stopPropagation();
+  
+    let backButton = document.getElementById('main-app-back-btn');
+
+    if (document.getElementById('main-app-back-btn-transactions')) {
+      backButton = document.getElementById('main-app-back-btn-transactions');
+    } else if (document.getElementById('main-app-back-btn-exchanges')) {
+      backButton = document.getElementById('main-app-back-btn-exchanges');
+    } else if (document.getElementById('main-app-back-btn-coins')) {
+      backButton = document.getElementById('main-app-back-btn-coins');
+    } else if (document.getElementById('main-app-back-btn-settings')) {
+      backButton = document.getElementById('main-app-back-btn-settings');
+    } else if (document.getElementById('main-app-back-btn-notary')) {
+      backButton = document.getElementById('main-app-back-btn-notary');
+    } else if (document.getElementById('main-app-back-btn-login')) {
+      backButton = document.getElementById('main-app-back-btn-login');
+    }
+
+    if ((!this.state.auth || getLocalStorageVar('settings').phoneBackButtonAction === 'default') &&
+        backButton) {
+      backButton.click();
+    }
   }
 
   changeTitle(title) { // too dirty :(
@@ -177,6 +204,8 @@ class App extends React.Component {
       this.setState({
         coins: _localStorageCoins,
       });
+      
+      document.addEventListener('backbutton', this.phoneBackButtonTrigger, false);
     }
 
     if ((Math.floor(Date.now() / 1000) < nnConfig.activation || Math.floor(Date.now() / 1000) > nnConfig.deactivation) &&
@@ -1128,6 +1157,7 @@ class App extends React.Component {
             this.state.history !== this.state.activeSection &&
             (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
             <img
+              id="main-app-back-btn"
               onClick={ this.historyBack }
               className="menu-back"
               src={ `${assetsPath.menu}/trends-combined-shape.png` } />

@@ -826,6 +826,7 @@ class Login extends React.Component {
               { this.state.activeView &&
                 this.state.step < 2 &&
                 <img
+                  id="main-app-back-btn-login"
                   className="menu-back"
                   src={ `${assetsPath.menu}/trends-combined-shape.png` }
                   onClick={ this.prevStep } />

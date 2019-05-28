@@ -307,6 +307,7 @@ class NotaryVote extends React.Component {
             this.state.activeSection === 'send' &&
             !this.state.conError &&
             <img
+              id="main-app-back-btn-notary"
               className="menu-back"
               src={ `${assetsPath.menu}/trends-combined-shape.png` }
               onClick={ () => this.changeActiveSection('dashboard') } />

@@ -570,6 +570,7 @@ class Settings extends React.Component {
       return (
         <div className="settings-pin">
           <img
+            id="main-app-back-btn-settings"
             className="menu-back"
             src={ `${assetsPath.menu}/trends-combined-shape.png` }
             onClick={ () => this.toggleActiveView() } />
@@ -582,6 +583,7 @@ class Settings extends React.Component {
       return (
         <div className="settings-user-agreement">
           <img
+            id="main-app-back-btn-settings"
             className="menu-back"
             src={ `${assetsPath.menu}/trends-combined-shape.png` }
             onClick={ () => this.toggleActiveView() } />
@@ -592,6 +594,7 @@ class Settings extends React.Component {
       return (
         <div className="settings-about">
           <img
+            id="main-app-back-btn-settings"
             className="menu-back"
             src={ `${assetsPath.menu}/trends-combined-shape.png` }
             onClick={ () => this.toggleActiveView() } />
