@@ -142,6 +142,21 @@ class App extends React.Component {
     if ((!this.state.auth || getLocalStorageVar('settings').phoneBackButtonAction === 'default') &&
         backButton) {
       backButton.click();
+    } else if (
+      this.state.auth &&
+      getLocalStorageVar('settings').phoneBackButtonAction !== 'default'
+    ) {
+      if (getLocalStorageVar('settings').mainView === 'default') {
+        this.changeActiveSection('dashboard', true);
+      } else {
+        this.toggleOverview();
+      }
+
+      Meteor.setTimeout(() => {
+        this.setState({
+          history: null,
+        });
+      }, 50);
     }
   }
 

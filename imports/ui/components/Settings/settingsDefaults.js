@@ -8,6 +8,7 @@ const settingsDefaults = {
   btcFeesSource: btcFeesSource[0].name,
   pinBruteforceProtection: false,
   mainView: 'default',
+  phoneBackButtonAction: 'default', 
 };
 
 export default settingsDefaults;

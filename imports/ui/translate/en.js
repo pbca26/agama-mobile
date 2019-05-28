@@ -97,6 +97,8 @@ const lang = {
       SETTINS_PIN_REQUIRED: 'PIN confirmation is required',
       LOGOUT_REQUIRED: 'Certain settings changes require logout',
       PURGE_NN_DATA: 'Purge Notary Node Elections data',
+      PHONE_BACK_BUTTON_ACTION: 'Phone back button action',
+      DEFAULT_ACTION: 'Default',
     },
     RECOVERY: {
       PROVIDE_YOUR_PIN: 'Provide your PIN number to unlock seed/WIF.',
