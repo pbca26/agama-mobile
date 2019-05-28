@@ -26,8 +26,6 @@ const _coinsList = {
     'EQL',
     'PRLPAY',
     'ZILLA',
-    'PIZZA',
-    'BEER',
     'CCL',
     'VRSC',
     'DION',

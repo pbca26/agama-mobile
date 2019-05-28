@@ -1,4 +1,11 @@
 const changeLogData = [{
+  version: '0.1.8',
+  changes: [
+    'Removed BEER, PIZZA asset chains',
+    'K64 enable dPoW icon display',
+    'Phone back button default action settings option',
+  ],
+}, {
   version: '0.1.7',
   changes: [
     'Electrum server connnection issue hot fix',
