@@ -49,6 +49,21 @@ import {
 import getPrices from './prices';
 import nnConfig from '../components/NotaryVote/config';
 import getServerVersion from './serverVersion';
+import settingsDefaults from '../components/Settings/settingsDefaults';
+
+let initSettings = getLocalStorageVar('settings');
+
+// init settings
+if (!initSettings) {
+  setLocalStorageVar('settings', settingsDefaults);
+} else {
+  for (let key in settingsDefaults) {
+    if (!initSettings[key]) {
+      initSettings[key] = settingsDefaults[key];
+      setLocalStorageVar('settings', initSettings);
+    }
+  }
+}
 
 setLocalStorageVar('protocolVersion', {});
 

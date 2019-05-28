@@ -35,7 +35,6 @@ import Recovery from './components/Recovery';
 import Overview from './components/Overview';
 import Settings from './components/Settings/Settings';
 import Exchanges from './components/Exchanges/Exchanges';
-import settingsDefaults from './components/Settings/settingsDefaults';
 import nnConfig from './components/NotaryVote/config';
 import NotaryVote from './components/NotaryVote/NotaryVote';
 
@@ -43,20 +42,6 @@ const DASHBOARD_UPDATE_INTERVAL = 120000; // 2m
 const PROXY_RETRY_COUNT = 2;
 const PROXY_RETRY_TIMEOUT = 5000;
 const PRICES_UPDATE_INTERVAL = 300000; // 5m
-
-let _settings = getLocalStorageVar('settings');
-
-// init settings
-if (!_settings) {
-  setLocalStorageVar('settings', settingsDefaults);
-} else {
-  for (let key in settingsDefaults) {
-    if (!_settings[key]) {
-      _settings[key] = settingsDefaults[key];
-      setLocalStorageVar('settings', _settings);
-    }
-  }
-}
 
 class App extends React.Component {
   constructor() {
@@ -200,7 +185,7 @@ class App extends React.Component {
 
         if (_diffFound) {
           setLocalStorageVar('coins', _localStorageCoins);
-        }       
+        }
       }
 
       let _localStorageCache = getLocalStorageVar('cache');
