@@ -186,6 +186,25 @@ class App extends React.Component {
         if (_diffFound) {
           setLocalStorageVar('coins', _localStorageCoins);
         }
+
+        // check if electrum server in localstorage listed in agama-wallet-lib
+        if (key.indexOf('|spv') > -1) {
+          const _defaultSpvServer = `${_localStorageCoins[key].server.ip}:${_localStorageCoins[key].server.port}:${_localStorageCoins[key].server.proto}`;
+          const coinName = key.split('|')[0].toLowerCase();
+
+          if (electrumServers[coinName].serverList.indexOf(_defaultSpvServer) === -1) {
+            const newDefaultServer = electrumServers[coinName].serverList[getRandomIntInclusive(0, electrumServers[coinName].serverList.length - 1)].split(':');
+            
+            _localStorageCoins[key].server = {
+              ip: newDefaultServer[0],
+              port: newDefaultServer[1],
+              proto: newDefaultServer[2],
+            };
+
+            setLocalStorageVar('coins', _localStorageCoins);
+            devlog(`${coinName} spv server ${_defaultSpvServer} is not listed in agama-wallet-lib switch to new server ${newDefaultServer.join(':')}`);
+          }
+        }
       }
 
       let _localStorageCache = getLocalStorageVar('cache');
