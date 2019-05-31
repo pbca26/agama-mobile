@@ -344,7 +344,15 @@ const listtransactions = (proxyServer, electrumServer, address, network, full, c
                 resolve([]);
               }
             } else {
-              resolve('error');
+              let errorMsg = 'error';
+
+              if (result.result &&
+                  result.result.message &&
+                  (result.result.message.indexOf('response too large') > -1 || result.result.message.indexOf('history too large') > -1)) {
+                errorMsg = 'response too large';
+              }
+
+              resolve(errorMsg);
             }
 
             devlog(result);

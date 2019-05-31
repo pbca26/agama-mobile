@@ -690,7 +690,9 @@ class App extends React.Component {
           conError: true,
         });
       } else {
-        res = sort(res, 'timestamp', true);
+        if (typeof res === 'object') {
+          res = sort(res, 'timestamp', true);
+        }
 
         this.setState({
           transactions: res,

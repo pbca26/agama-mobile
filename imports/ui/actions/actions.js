@@ -465,7 +465,6 @@ const balance = (network) => {
             address,
           };
 
-          console.warn('electrumProtocolVersion', electrumProtocolVersion);
 
           if (Number(electrumProtocolVersion) >= 1.2) {
             params.eprotocol = 1.4;

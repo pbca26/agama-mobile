@@ -293,6 +293,8 @@ const lang = {
       YES: 'Yes',
       NO: 'No',
       NA: 'N/A',
+      RESPONSE_TOO_LARGE_P1: 'Transactions history is too big.',
+      RESPONSE_TOO_LARGE_P2: 'Please either use Agama desktop version in native mode or move funds to another address.',
     },
     CLAIM: {
       WARNING: 'Warning',
