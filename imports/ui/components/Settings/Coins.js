@@ -129,6 +129,7 @@ class SettingsCoins extends React.Component {
     return (
       <div className="addcoin-ui settings-coins">
         <img
+          id="main-app-back-btn-coins"
           className="menu-back"
           src={ `${assetsPath.menu}/trends-combined-shape.png` }
           onClick={ this.menuBack } />

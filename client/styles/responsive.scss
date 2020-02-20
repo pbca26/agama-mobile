@@ -1,0 +1,52 @@
+@media only screen and (max-width : 350px) {
+  .individualportfolio-inner {
+    max-width: 345px;
+
+    .transactions-list {
+      .item {
+        max-width: 300px;
+  
+        .line {
+          max-width: 310px;
+        }
+      }
+    }
+    .send-receive-block {
+      &.three-btn {
+        .send-receive-block-inner {
+          max-width: 320px !important;
+  
+          .margin-right-20 {
+            margin-right: 15px !important;
+          }
+          .margin-left-20 {
+            margin-left: 15px !important;
+          }
+          button {
+            white-space: nowrap;
+            width: calc(320px/3 - 16px) !important;
+          }
+        }
+      }
+    }
+  }
+  .overview-ui {
+    .group7,
+    .cryptocardbg,
+    .rectangle5 {
+      max-width: 100%;
+    }
+    .group7 {
+      .cryptocardgraph {
+        left: 50% !important;
+      }
+    }
+    .overview-coins {
+      max-width: 100%;
+
+      .a123345 {
+        left: 74%;
+      }
+    }
+  }
+}

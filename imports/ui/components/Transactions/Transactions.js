@@ -102,7 +102,7 @@ class Transactions extends React.Component {
         { Number(tx.interest) === Number(tx.amount) &&
           <span>+</span>
         }
-        { formatValue(tx.amount) * _amountNegative || this.props.coin === 'eth|eth' ? formatValue(tx.amount) * _amountNegative : translate('TRANSACTIONS.UNKNOWN') }
+        { Number(tx.amount) && formatValue(tx.amount) * _amountNegative || this.props.coin === 'eth|eth' ?  Number(tx.amount) && formatValue(tx.amount) * _amountNegative : translate('TRANSACTIONS.UNKNOWN') }
         { Number(tx.amount) !== 0 &&
           <span className="padding-left-5">{ _name.toUpperCase() }</span>
         }
@@ -173,7 +173,8 @@ class Transactions extends React.Component {
       const _transactions = this.props.transactions;
       let _items = [];
 
-      if (_transactions) {
+      if (_transactions &&
+          this.props.transactions !== 'response too large') {
         for (let i = 0; i < _transactions.length; i++) {
           _items.push(
             <div
@@ -195,6 +196,19 @@ class Transactions extends React.Component {
             </div>
           );
         }
+      }
+
+      if (this.props.transactions === 'response too large') {
+        _items.push(
+          <div
+            key="transactions-history-response-error"
+            className="fs-14">
+            { translate('TRANSACTIONS.RESPONSE_TOO_LARGE_P1') }
+            <div className="padding-top-10">
+              { translate('TRANSACTIONS.RESPONSE_TOO_LARGE_P2') }
+            </div>
+          </div>
+        );
       }
 
       const _coin = this.props.coin;

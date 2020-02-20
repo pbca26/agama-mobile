@@ -1191,7 +1191,8 @@ class Exchanges extends React.Component {
               sendtxEth={ this.props.sendtxEth }
               getBtcFees={ this.props.getBtcFees }
               init={ this.state.sendCoinInit }
-              lock={ this.props.lock } />
+              lock={ this.props.lock }
+              getRemoteTimestamp={ this.props.getRemoteTimestamp } />
           </div>
         }
       </div>
@@ -1202,6 +1203,7 @@ class Exchanges extends React.Component {
     return (
       <div className="form exchanges">
         <img
+          id="main-app-back-btn-exchanges"
           className="menu-back"
           src={ `${assetsPath.menu}/trends-combined-shape.png` }
           onClick={ this.menuBack } />

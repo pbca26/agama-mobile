@@ -12,6 +12,7 @@ import {
   devlog,
   config,
 } from '../actions/dev';
+import { checkTimestamp } from 'agama-wallet-lib/build/time';
 import {
   fromSats,
   toSats,
@@ -29,6 +30,8 @@ import electrumJSNetworks from 'agama-wallet-lib/build/bitcoinjs-networks';
 import { Meteor } from 'meteor/meteor';
 import { getAddress } from 'ethers/utils/address';
 import QrHelper from './QrHelper';
+
+const SPV_MAX_LOCAL_TIMESTAMP_DEVIATION = 300; // 5 min
 
 class SendCoin extends React.Component {
   constructor() {
@@ -56,6 +59,7 @@ class SendCoin extends React.Component {
       ethPreflightResult: null,
       ethFee: 'average',
       displayQrHelper: false,
+      kmdTimestampError: false,
     };
     this.defaultState = JSON.parse(JSON.stringify(this.state));
     this.changeSendCoinStep = this.changeSendCoinStep.bind(this);
@@ -67,6 +71,20 @@ class SendCoin extends React.Component {
     this.openExternalURL = this.openExternalURL.bind(this);
     this.setSendAmountAll = this.setSendAmountAll.bind(this);
     this.qrHelperCB = this.qrHelperCB.bind(this);
+    this.checkCurrentTimestamp = this.checkCurrentTimestamp.bind(this);
+  }
+
+  checkCurrentTimestamp() {
+    this.props.getRemoteTimestamp()
+    .then((res) => {
+      if (res !== 'error') {
+        if (Math.abs(checkTimestamp(res.result)) > SPV_MAX_LOCAL_TIMESTAMP_DEVIATION) {
+          this.setState({
+            kmdTimestampError: true,
+          });
+        }
+      }
+    });
   }
 
   setSendAmountAll() {
@@ -249,6 +267,11 @@ class SendCoin extends React.Component {
       // reset form state
       this.setState(this.defaultState);
     }
+
+    if (props.activeSection === 'send' &&
+        this.props.coin === 'kmd|spv') {
+      this.checkCurrentTimestamp();
+    }
   }
 
   componentWillMount() {
@@ -269,6 +292,10 @@ class SendCoin extends React.Component {
           ethFee: 'average',
         });
       }
+    }
+
+    if (this.props.coin === 'kmd|spv') {
+      this.checkCurrentTimestamp();
     }
   }
 
@@ -620,9 +647,15 @@ class SendCoin extends React.Component {
             this.props.ethGasPrice === 'error' &&
             <div className="error margin-top-15 text-center">{ translate('SEND.ETH_FEES_FETCHING_FAILED') }</div>
           }
+          { this.state.kmdTimestampError &&
+            <div className="error margin-top-15 text-center">
+              <i className="fa fa-warning"></i> { translate('SEND.CLOCK_OUT_OF_SYNC') }
+            </div>
+          }
           <div>
             <div
               disabled={
+                this.state.kmdTimestampError ||
                 !this.state.sendTo ||
                 !this.state.sendAmount ||
                 Number(this.state.sendAmount) < 0 ||

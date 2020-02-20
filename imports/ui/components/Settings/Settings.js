@@ -351,6 +351,20 @@ class Settings extends React.Component {
             </div>
           }
           <div className="margin-top-10 item">
+            <div className="padding-bottom-20">{ translate('SETTINGS.PHONE_BACK_BUTTON_ACTION') }</div>
+            <select
+              className="form-control form-material"
+              name="phoneBackButtonAction"
+              value={ this.state.phoneBackButtonAction }
+              onChange={ (event) => this.updateInput(event) }
+              autoFocus>
+              <option value="default">{ translate('SETTINGS.DEFAULT_ACTION') }</option>
+              <option value="main">
+                { this.state.mainView === 'default' ? translate('SETTINGS.DEFAULT') : translate('APP_TITLE.OVERVIEW') }
+              </option>
+            </select>
+          </div>
+          <div className="margin-top-10 item">
             <div className="padding-bottom-20">{ translate('SETTINGS.CURRENCY') }</div>
             <select
               className="form-control form-material"
@@ -570,6 +584,7 @@ class Settings extends React.Component {
       return (
         <div className="settings-pin">
           <img
+            id="main-app-back-btn-settings"
             className="menu-back"
             src={ `${assetsPath.menu}/trends-combined-shape.png` }
             onClick={ () => this.toggleActiveView() } />
@@ -582,6 +597,7 @@ class Settings extends React.Component {
       return (
         <div className="settings-user-agreement">
           <img
+            id="main-app-back-btn-settings"
             className="menu-back"
             src={ `${assetsPath.menu}/trends-combined-shape.png` }
             onClick={ () => this.toggleActiveView() } />
@@ -592,6 +608,7 @@ class Settings extends React.Component {
       return (
         <div className="settings-about">
           <img
+            id="main-app-back-btn-settings"
             className="menu-back"
             src={ `${assetsPath.menu}/trends-combined-shape.png` }
             onClick={ () => this.toggleActiveView() } />

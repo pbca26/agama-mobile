@@ -49,6 +49,7 @@ class TransactionDetails extends React.Component {
     return (
       <section className="transaction-details">
         <img
+          id="main-app-back-btn-transactions"
           className="menu-back"
           src={ `${assetsPath.menu}/trends-combined-shape.png` }
           onClick={ this.menuBack } />

@@ -97,6 +97,8 @@ const lang = {
       SETTINS_PIN_REQUIRED: 'PIN confirmation is required',
       LOGOUT_REQUIRED: 'Certain settings changes require logout',
       PURGE_NN_DATA: 'Purge Notary Node Elections data',
+      PHONE_BACK_BUTTON_ACTION: 'Phone back button action',
+      DEFAULT_ACTION: 'Default',
     },
     RECOVERY: {
       PROVIDE_YOUR_PIN: 'Provide your PIN number to unlock seed/WIF.',
@@ -227,6 +229,7 @@ const lang = {
       DPOW_UNSECURE: 'One ore more of your UTXO(s) are not dPoW secured',
       DPOW_SECURED: 'Your funds are dPoW secured',
       USE_ALL: 'Use all',
+      CLOCK_OUT_OF_SYNC: 'Your local clock is not set properly. This will prevent sending a KMD transaction.',
     },
     ADD_COIN: {
       NO_MATCHING_RESULTS: 'No matching results',
@@ -235,6 +238,8 @@ const lang = {
       SHORTCUTS: 'Shortcuts',
       MULTI_SELECT: 'Multi-select',
       ADD_SELECTED_COINS: 'Add selected coins',
+      KIC: 'KIC',
+      ERC20: 'ERC20',
     },
     BALANCE: {
       BALANCE: 'Balance',
@@ -288,6 +293,8 @@ const lang = {
       YES: 'Yes',
       NO: 'No',
       NA: 'N/A',
+      RESPONSE_TOO_LARGE_P1: 'Transactions history is too big.',
+      RESPONSE_TOO_LARGE_P2: 'Please either use Agama desktop version in native mode or move funds to another address.',
     },
     CLAIM: {
       WARNING: 'Warning',
@@ -412,6 +419,7 @@ const lang = {
       MORTY: 'Morty',
       ZEX: 'Zaddex',
       RFOX: 'Red fox',
+      K64: 'Komodore64',
       // crypto
       SUQA: 'SUQA',
       BZC: 'Bitzec',
@@ -714,6 +722,7 @@ const lang = {
       DEC8: 'DEC8 (TESTCOIN)',
       ETH: 'Ethereum',
       ZIL: 'Zilliqa',
+      TUSD: 'TrueUSD',
     },
     FIAT_CURRENCIES: {
       AUD: 'Australian Dollar',

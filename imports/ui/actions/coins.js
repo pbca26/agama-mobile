@@ -26,8 +26,6 @@ const _coinsList = {
     'EQL',
     'PRLPAY',
     'ZILLA',
-    'PIZZA',
-    'BEER',
     'CCL',
     'VRSC',
     'DION',
@@ -44,6 +42,8 @@ const _coinsList = {
     'VOTE2019',
     'ZEX',
     'RFOX',
+    'K64',
+    'HUSH',
     // other coins
     'BTC',
     'DOGE',
@@ -54,7 +54,6 @@ const _coinsList = {
     'VIA',
     'MONA',
     'ZEC',
-    'HUSH',
     'DASH',
     'CRW',
     'VTC',
@@ -71,17 +70,9 @@ const _coinsList = {
     'QTUM',
     'XZC',
     'FTC',
-    'GBX',
     'SUQA',
     'BZC',
     'GRS',
-    //'NINJA',
-    //'SHARK',
-    //'MVP',
-    //'CEAL',
-    //'MESH',
-    //'BLK',
-    //'BTX', (?) needs a fix
   ],
   eth: [
     'ETH',
@@ -253,6 +244,7 @@ const _coinsList = {
     'JST',
     'DEC8',
     'ZIL',
+    'TUSD',
   ],
 };
 

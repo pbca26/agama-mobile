@@ -35,7 +35,6 @@ import Recovery from './components/Recovery';
 import Overview from './components/Overview';
 import Settings from './components/Settings/Settings';
 import Exchanges from './components/Exchanges/Exchanges';
-import settingsDefaults from './components/Settings/settingsDefaults';
 import nnConfig from './components/NotaryVote/config';
 import NotaryVote from './components/NotaryVote/NotaryVote';
 
@@ -43,20 +42,6 @@ const DASHBOARD_UPDATE_INTERVAL = 120000; // 2m
 const PROXY_RETRY_COUNT = 2;
 const PROXY_RETRY_TIMEOUT = 5000;
 const PRICES_UPDATE_INTERVAL = 300000; // 5m
-
-let _settings = getLocalStorageVar('settings');
-
-// init settings
-if (!_settings) {
-  setLocalStorageVar('settings', settingsDefaults);
-} else {
-  for (let key in settingsDefaults) {
-    if (!_settings[key]) {
-      _settings[key] = settingsDefaults[key];
-      setLocalStorageVar('settings', _settings);
-    }
-  }
-}
 
 class App extends React.Component {
   constructor() {
@@ -115,7 +100,49 @@ class App extends React.Component {
     this.toggleExchanges = this.toggleExchanges.bind(this);
     this.updateCoinsList = this.updateCoinsList.bind(this);
     this.updatePrices = this.updatePrices.bind(this);
-    this.changeTitle = this.changeTitle.bind(this)
+    this.changeTitle = this.changeTitle.bind(this);
+    this.phoneBackButtonTrigger = this.phoneBackButtonTrigger.bind(this);
+  }
+  
+  phoneBackButtonTrigger(event) {
+    event.preventDefault();
+    event.stopPropagation();
+  
+    let backButton = document.getElementById('main-app-back-btn');
+
+    if (document.getElementById('main-app-back-btn-transactions')) {
+      backButton = document.getElementById('main-app-back-btn-transactions');
+    } else if (document.getElementById('main-app-back-btn-exchanges')) {
+      backButton = document.getElementById('main-app-back-btn-exchanges');
+    } else if (document.getElementById('main-app-back-btn-coins')) {
+      backButton = document.getElementById('main-app-back-btn-coins');
+    } else if (document.getElementById('main-app-back-btn-settings')) {
+      backButton = document.getElementById('main-app-back-btn-settings');
+    } else if (document.getElementById('main-app-back-btn-notary')) {
+      backButton = document.getElementById('main-app-back-btn-notary');
+    } else if (document.getElementById('main-app-back-btn-login')) {
+      backButton = document.getElementById('main-app-back-btn-login');
+    }
+
+    if ((!this.state.auth || getLocalStorageVar('settings').phoneBackButtonAction === 'default') &&
+        backButton) {
+      backButton.click();
+    } else if (
+      this.state.auth &&
+      getLocalStorageVar('settings').phoneBackButtonAction !== 'default'
+    ) {
+      if (getLocalStorageVar('settings').mainView === 'default') {
+        this.changeActiveSection('dashboard', true);
+      } else {
+        this.toggleOverview();
+      }
+
+      Meteor.setTimeout(() => {
+        this.setState({
+          history: null,
+        });
+      }, 50);
+    }
   }
 
   changeTitle(title) { // too dirty :(
@@ -158,12 +185,46 @@ class App extends React.Component {
 
         if (_diffFound) {
           setLocalStorageVar('coins', _localStorageCoins);
-        }       
+        }
+
+        // check if electrum server in localstorage listed in agama-wallet-lib
+        if (key.indexOf('|spv') > -1) {
+          const _defaultSpvServer = `${_localStorageCoins[key].server.ip}:${_localStorageCoins[key].server.port}:${_localStorageCoins[key].server.proto}`;
+          const coinName = key.split('|')[0].toLowerCase();
+
+          if (electrumServers[coinName].serverList.indexOf(_defaultSpvServer) === -1) {
+            const newDefaultServer = electrumServers[coinName].serverList[getRandomIntInclusive(0, electrumServers[coinName].serverList.length - 1)].split(':');
+            
+            _localStorageCoins[key].server = {
+              ip: newDefaultServer[0],
+              port: newDefaultServer[1],
+              proto: newDefaultServer[2],
+            };
+
+            setLocalStorageVar('coins', _localStorageCoins);
+            devlog(`${coinName} spv server ${_defaultSpvServer} is not listed in agama-wallet-lib switch to new server ${newDefaultServer.join(':')}`);
+          }
+        }
+      }
+
+      let _localStorageCache = getLocalStorageVar('cache');
+      
+      if (_localStorageCache.balance) {
+        for (let key in _localStorageCache.balance) {
+          if (!_localStorageCoins[key]) {
+            delete _localStorageCache.balance[key];
+            delete _localStorageCache.transactions[key];
+          }
+        }
+
+        setLocalStorageVar('cache', _localStorageCache);
       }
 
       this.setState({
         coins: _localStorageCoins,
       });
+      
+      document.addEventListener('backbutton', this.phoneBackButtonTrigger, false);
     }
 
     if ((Math.floor(Date.now() / 1000) < nnConfig.activation || Math.floor(Date.now() / 1000) > nnConfig.deactivation) &&
@@ -629,7 +690,9 @@ class App extends React.Component {
           conError: true,
         });
       } else {
-        res = sort(res, 'timestamp', true);
+        if (typeof res === 'object') {
+          res = sort(res, 'timestamp', true);
+        }
 
         this.setState({
           transactions: res,
@@ -1029,18 +1092,20 @@ class App extends React.Component {
                         src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                     </div>
                   }
-                  <div
-                    className="item"
-                    disabled={ this.state.activeSection === 'addcoin' }>
+                  { getLocalStorageVar('seed') &&
                     <div
-                      className="title"
-                      onClick={ () => this.toggleMenuOption('addcoin') }>
-                      { translate('DASHBOARD.ADD_COIN') }
+                      className="item"
+                      disabled={ this.state.activeSection === 'addcoin' }>
+                      <div
+                        className="title"
+                        onClick={ () => this.toggleMenuOption('addcoin') }>
+                        { translate('DASHBOARD.ADD_COIN') }
+                      </div>
+                      <img
+                        className="line"
+                        src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
                     </div>
-                    <img
-                      className="line"
-                      src={ `${assetsPath.menu}/sidemenu-rectangle-3.png` } />
-                  </div>
+                  }
                   <div
                     className="item"
                     disabled={ this.state.activeSection === 'settings' }>
@@ -1113,6 +1178,7 @@ class App extends React.Component {
             this.state.history !== this.state.activeSection &&
             (!this.state.proxyError || (this.state.proxyError && this.state.proxyErrorCount !== -777)) &&
             <img
+              id="main-app-back-btn"
               onClick={ this.historyBack }
               className="menu-back"
               src={ `${assetsPath.menu}/trends-combined-shape.png` } />
@@ -1136,7 +1202,7 @@ class App extends React.Component {
         { this.state.proxyError &&
           this.state.proxyErrorCount === -777 &&
           <div className="app-main">
-            <div className="con-error width-limit">
+            <div className="con-error width-limit padding-top-20">
               <i className="fa fa-warning error"></i> <span className="error">{ translate('DASHBOARD.PROXY_ERROR') }</span>
             </div>
             <div className="form proxy">
@@ -1190,7 +1256,8 @@ class App extends React.Component {
                 sendtxEth={ this.props.actions.sendtxEth }
                 changeActiveSection={ this.changeActiveSection }
                 getBtcFees={ this.getBtcFees }
-                lock={ this.lock } />
+                lock={ this.lock }
+                getRemoteTimestamp={ this.props.actions.getRemoteTimestamp } />
             }
             { this.state.activeSection !== 'exchanges' &&
               <AddCoin
@@ -1270,7 +1337,8 @@ class App extends React.Component {
                 sendtxEth={ this.props.actions.sendtxEth }
                 getBtcFees={ this.getBtcFees }
                 pubKeys={ this.state.pubKeys }
-                lock={ this.lock } />
+                lock={ this.lock }
+                getRemoteTimestamp={ this.props.actions.getRemoteTimestamp } />
             }
             { this.state.activeSection === 'elections' &&
               <NotaryVote historyBack={ this.historyBack }/>

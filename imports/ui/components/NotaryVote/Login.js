@@ -453,6 +453,7 @@ class NotaryVoteLogin extends React.Component {
           <div className="form-inner login-create-pin">
             { this.state.step < 2 &&
               <img
+                id="main-app-back-btn-login"
                 className="menu-back"
                 src={ `${assetsPath.menu}/trends-combined-shape.png` }
                 onClick={ this.prevStep } />

@@ -44,7 +44,16 @@
             display: inline-block;
           }
         }
+        .seed-confirm-word-stack {
+          padding-right: 5px;
+          display: inline-block;
+      
+          &:last-child {
+            padding-right: 0;
+          }
+        }
       }
+      
       .create-wallet-security-tip {
         margin-top: 30px;
         text-align: center;
