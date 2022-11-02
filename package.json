@@ -12,7 +12,7 @@
     "bitcoinjs-message": "^2.0.0",
     "bs58check": "^2.1.2",
     "buffer-reverse": "^1.0.1",
-    "cordova": "^7.1.0",
+    "cordova": "^11.0.0",
     "ethers": "git+https://github.com/pbca26/ethers.js",
     "jsqr": "^0.2.2",
     "meteor-node-stubs": "~0.2.4",
